@@ -17,13 +17,7 @@ public class EtoroClosedPositions
     public decimal StopLoseRate { get; set; }
     public decimal RolloverFeesAndDividends { get; set; }
     public string CopiedFrom { get; set; }
-    public EtoroPositionType Type { get; set; }
+    public EtoroInstrumentType Type { get; set; }
     public string Isin { get; set; }
     public string Notes { get; set; }
-}
-
-public enum EtoroPositionType
-{
-    Unknown,
-    Stocks
 }
