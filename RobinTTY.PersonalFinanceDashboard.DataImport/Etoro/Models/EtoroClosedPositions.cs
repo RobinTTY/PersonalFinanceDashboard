@@ -1,6 +1,6 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models;
 
-public class ClosedPositions
+public class EtoroClosedPositions
 {
     public long Id { get; set; }
     public string Action { get; set; }
