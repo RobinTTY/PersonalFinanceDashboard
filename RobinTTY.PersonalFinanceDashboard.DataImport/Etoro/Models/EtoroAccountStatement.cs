@@ -1,6 +1,6 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models;
 
-internal class EtoroAccountStatement
+public class EtoroAccountStatement
 {
     public EtoroAccountSummary AccountSummary { get; set; }
     public EtoroClosedPositions ClosedPositions { get; set; }
