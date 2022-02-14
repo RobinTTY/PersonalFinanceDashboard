@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NPOI" Version="2.5.5" />
+    <PackageReference Include="Npoi.Mapper" Version="3.5.1" />
+  </ItemGroup>
+
 </Project>
