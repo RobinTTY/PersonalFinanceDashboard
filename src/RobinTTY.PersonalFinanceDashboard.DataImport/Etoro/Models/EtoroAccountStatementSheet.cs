@@ -2,7 +2,7 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models
 {
-    public enum EtoroAccountStatementSheets
+    public enum EtoroAccountStatementSheet
     {
         [Description("Account Summary")]
         AccountSummary,
