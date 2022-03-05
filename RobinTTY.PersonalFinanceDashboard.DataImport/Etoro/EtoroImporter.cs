@@ -1,7 +1,9 @@
-﻿using Npoi.Mapper;
+﻿using System.Globalization;
+using Npoi.Mapper;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models;
+using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro;
 
@@ -11,12 +13,15 @@ public class EtoroImporter
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var workbook = new XSSFWorkbook(stream);
+        
+        // Make adjustments to internal sheet model to fix inconsistencies
+        ReplaceDecimalSeparatorOfUnitsColumn(workbook.GetSheet("Closed Positions"));
+
         var accountSummary = GetAccountSummary(workbook);
-        var closedPositions = GetClosedPositions(workbook).ToList();
-        var accountActivitySheet = workbook.GetSheet("Account Activity");
+        var closedPositions = ImportSheetValues<EtoroClosedPositions>(workbook, "Closed Positions").ToList();
+        var accountActivitySheet = ImportSheetValues<EtoroAccountActivity>(workbook, "Account Activity").ToList();
         var dividendsSheet = workbook.GetSheet("Dividends");
         var financialSummarySheet = workbook.GetSheet("Financial Summary");
-
 
         return null;
     }
@@ -128,10 +133,38 @@ public class EtoroImporter
         };
     }
 
-    private IEnumerable<EtoroClosedPositions> GetClosedPositions(IWorkbook closedPositionsWorkbook)
+    // TODO: replace sheetName with enum
+    private IEnumerable<T> ImportSheetValues<T>(IWorkbook workbook, string sheetName) where T : class
     {
-        var importer = new Mapper(closedPositionsWorkbook);
-        return importer.Take<EtoroClosedPositions>(1).Select(row => row.Value);
+        var sheetIndex = workbook.GetSheetIndex(sheetName);
+        var mapper = new Mapper(workbook);
+        return mapper.Take<T>(sheetIndex).Select(row => row.Value);
+    }
+
+    private void RegisterCustomMappings(IWorkbook workbook)
+    {
+        
+        var mapper = new Mapper(workbook);
+        
+    }
+
+    /// <summary>
+    /// For some reason the units column of the "Closed Positions" sheet uses an inconsistent decimal separator.
+    /// This method replaces the decimal separator to be consistent with all other separators.
+    /// </summary>
+    private void ReplaceDecimalSeparatorOfUnitsColumn(ISheet closedPositionsSheet)
+    {
+        // TODO: All these row/cell numbers should be constants and only be changed in one place
+        var usCulture = new CultureInfo("en-US");
+        var unitsHeader = closedPositionsSheet.GetRow(0).GetCell(3).StringCellValue;
+        if (unitsHeader != "Units")
+            throw new Exception($"Units header had unexpected value: {unitsHeader}");
+
+        for (var rowIndex = 1; rowIndex < closedPositionsSheet.LastRowNum; rowIndex++)
+        {
+            var currentValue = closedPositionsSheet.GetRow(rowIndex).GetCell(3).StringCellValue;
+            closedPositionsSheet.GetRow(rowIndex).GetCell(3).SetCellValue(double.Parse(currentValue, usCulture));
+        }
     }
 
     private bool StringValueOfCellIsEqual(ICell cell, string comparisonValue) => cell.StringCellValue == comparisonValue;
@@ -140,5 +173,16 @@ public class EtoroImporter
     {
         var (row, col) = documentValueStructure[category];
         return sheet.GetCell(row, col);
+    }
+
+}
+
+public static class MapperExtensions
+{
+    public static IEnumerable<RowInfo<T>> GetValues<T>(this Mapper mapper, EtoroAccountStatementSheets sheet)
+    {
+        var description = sheet.GetDescription();
+        if(description != null)
+            return mapper.Take<>(description)
     }
 }
