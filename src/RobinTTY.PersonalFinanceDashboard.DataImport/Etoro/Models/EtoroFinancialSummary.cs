@@ -20,4 +20,10 @@ public class EtoroAmountTaxRatePair
 {
     public decimal Amount { get; set; }
     public decimal TaxRate { get; set; }
+
+    public EtoroAmountTaxRatePair(decimal amount, decimal taxRate)
+    {
+        Amount = amount;
+        TaxRate = taxRate;
+    }
 }
