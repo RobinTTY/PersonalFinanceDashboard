@@ -3,13 +3,17 @@ using Npoi.Mapper;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models;
-using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro;
 
 public class EtoroImporter
 {
-    public EtoroAccountStatement ImportAccountStatement(string filePath)
+    /// <summary>
+    /// Imports the <see cref="EtoroAccountStatement"/> from the given file.
+    /// </summary>
+    /// <param name="filePath">The file path to import the data from.</param>
+    /// <returns></returns>
+    public static EtoroAccountStatement ImportAccountStatement(string filePath)
     {
         using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var workbook = new XSSFWorkbook(stream);
@@ -38,7 +42,7 @@ public class EtoroImporter
         };
     }
 
-    private EtoroAccountSummary GetAccountSummary(IWorkbook accountSummaryWorkbook)
+    private static EtoroAccountSummary GetAccountSummary(IWorkbook accountSummaryWorkbook)
     {
         var accountSummarySheet = accountSummaryWorkbook.GetSheet("Account Summary");
 
@@ -78,7 +82,7 @@ public class EtoroImporter
         };
     }
 
-    private EtoroAccountDetails GetAccountDetails(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
+    private static EtoroAccountDetails GetAccountDetails(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
     {
         var name = GetCellByCategoryString(sheet, "Name", categories, valueColumnIndex).StringCellValue;
         var username = GetCellByCategoryString(sheet, "Username", categories, valueColumnIndex).StringCellValue;
@@ -98,7 +102,7 @@ public class EtoroImporter
         };
     }
 
-    private EtoroRealizedAccountSummary GetRealizedAccountSummary(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
+    private static EtoroRealizedAccountSummary GetRealizedAccountSummary(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
     {
         var beginRealizedEquity = GetCellByCategoryString(sheet, "Beginning Realized Equity", categories, valueColumnIndex).NumericCellValue;
         var deposits = GetCellByCategoryString(sheet, "Deposits", categories, valueColumnIndex).NumericCellValue;
@@ -126,7 +130,7 @@ public class EtoroImporter
         };
     }
 
-    private EtoroUnrealizedAccountSummary GetUnrealizedAccountSummary(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
+    private static EtoroUnrealizedAccountSummary GetUnrealizedAccountSummary(ISheet sheet, IReadOnlyDictionary<string, int> categories, int valueColumnIndex)
     {
         var beginningUnrealizedEquity = GetCellByCategoryString(sheet, "Beginning Unrealized Equity", categories, valueColumnIndex).NumericCellValue;
         var endingUnrealizedEquity = GetCellByCategoryString(sheet, "Ending Unrealized Equity", categories, valueColumnIndex).NumericCellValue;
@@ -138,7 +142,7 @@ public class EtoroImporter
         };
     }
 
-    private EtoroFinancialSummary GetFinancialSummary(IWorkbook workbook)
+    private static EtoroFinancialSummary GetFinancialSummary(IWorkbook workbook)
     {
         var financialSummarySheet = workbook.GetSheet("Financial Summary");
         var documentCategoryStructure = new Dictionary<string, int>
@@ -188,7 +192,13 @@ public class EtoroImporter
         };
     }
 
-    private EtoroAmountTaxRatePair GetAmountTaxRatePair(ISheet sheet, int rowIndex)
+    /// <summary>
+    /// Gets an <see cref="EtoroAmountTaxRatePair"/> from the given <see cref="ISheet"/> and the row where the values appear.
+    /// </summary>
+    /// <param name="sheet">The sheet from which to get the <see cref="EtoroAmountTaxRatePair"/> (should be from sheet "Financial Summary").</param>
+    /// <param name="rowIndex">The row of the sheet from which to get the <see cref="EtoroAmountTaxRatePair"/>.</param>
+    /// <returns>The <see cref="EtoroAmountTaxRatePair"/> that was retrieved.</returns>
+    private static EtoroAmountTaxRatePair GetAmountTaxRatePair(ISheet sheet, int rowIndex)
     {
         const int amountIndex = 1;
         const int taxRateIndex = 2;
@@ -197,7 +207,7 @@ public class EtoroImporter
         var taxRateString = sheet.GetCell(rowIndex, taxRateIndex).StringCellValue;
         var taxRate = decimal.Parse(taxRateString, NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"));
 
-        return new EtoroAmountTaxRatePair((decimal)amount, (decimal)taxRate);
+        return new EtoroAmountTaxRatePair((decimal)amount, taxRate);
     }
 
     /// <summary>
@@ -207,7 +217,7 @@ public class EtoroImporter
     /// <param name="headerRows">The mapping of headers to rows.</param>
     /// <param name="headerColumnIndex">The index of the headers.</param>
     /// <exception cref="Exception">Thrown if an unknown header value is encountered.</exception>
-    private void EnsureDocumentHeaders(ISheet sheet, Dictionary<string, int> headerRows, int headerColumnIndex)
+    private static void EnsureDocumentHeaders(ISheet sheet, Dictionary<string, int> headerRows, int headerColumnIndex)
     {
         foreach (var (expectedHeader, row) in headerRows)
         {
@@ -217,7 +227,11 @@ public class EtoroImporter
         }
     }
 
-    private void RegisterCustomMappings(Mapper mapper)
+    /// <summary>
+    /// Registers custom type mappings for data which can't be imported with the default configuration.
+    /// </summary>
+    /// <param name="mapper">The mapper on which to register the custom mappings.</param>
+    private static void RegisterCustomMappings(Mapper mapper)
     {
         mapper.Map<EtoroAccountActivity>("Type", activity => activity.Type, (column, target) =>
         {
@@ -253,7 +267,7 @@ public class EtoroImporter
     /// For some reason the units column of the "Closed Positions" sheet uses an inconsistent decimal separator.
     /// This method replaces the decimal separator to be consistent with all other separators.
     /// </summary>
-    private void ReplaceDecimalSeparatorOfUnitsColumn(ISheet closedPositionsSheet)
+    private static void ReplaceDecimalSeparatorOfUnitsColumn(ISheet closedPositionsSheet)
     {
         // TODO: All these row/cell numbers should be constants and only be changed in one place
         var usCulture = new CultureInfo("en-US");
@@ -276,10 +290,9 @@ public class EtoroImporter
     /// <param name="documentValueStructure">The structure of the <see cref="ISheet"/>, mapping categories to row indices.</param>
     /// <param name="valueColumnIndex">The index of the column containing the values.</param>
     /// <returns></returns>
-    private ICell GetCellByCategoryString(ISheet sheet, string category, IReadOnlyDictionary<string, int> documentValueStructure, int valueColumnIndex)
+    private static ICell GetCellByCategoryString(ISheet sheet, string category, IReadOnlyDictionary<string, int> documentValueStructure, int valueColumnIndex)
     {
         var row = documentValueStructure[category];
         return sheet.GetCell(row, valueColumnIndex);
     }
-
 }
