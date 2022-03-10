@@ -2,6 +2,9 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Extensions
 {
+    /// <summary>
+    /// Provides extensions for Enums.
+    /// </summary>
     public static class EnumExtensions
     {
         /// <summary>

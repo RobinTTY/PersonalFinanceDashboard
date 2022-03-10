@@ -3,6 +3,7 @@ using Npoi.Mapper;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using RobinTTY.PersonalFinanceDashboard.DataImport.Etoro.Models;
+using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro;
 
@@ -35,14 +36,7 @@ public class EtoroImporter : IEtoroImporter
         var dividends = mapper.GetSheetValues<EtoroDividends>(EtoroAccountStatementSheet.Dividends).ToList();
         var financialSummary = GetFinancialSummary(workbook);
 
-        return new EtoroAccountStatement
-        {
-            AccountSummary = accountSummary,
-            ClosedPositions = closedPositions,
-            AccountActivity = accountActivity,
-            Dividends = dividends,
-            FinancialSummary = financialSummary
-        };
+        return new EtoroAccountStatement(accountSummary, closedPositions, accountActivity, dividends, financialSummary);
     }
 
     private EtoroAccountSummary GetAccountSummary(IWorkbook accountSummaryWorkbook)
@@ -148,47 +142,60 @@ public class EtoroImporter : IEtoroImporter
     private EtoroFinancialSummary GetFinancialSummary(IWorkbook workbook)
     {
         var financialSummarySheet = workbook.GetSheet("Financial Summary");
+        // TODO: this structure already changed once, it should be detected and can't be hardcoded (extend Npoi.Mapper)
         var documentCategoryStructure = new Dictionary<string, int>
         {
             { "CFDs (Profit or Loss)", 1 },
             { "Crypto (Profit or Loss)", 2 },
-            { "Stocks (Profit or Loss)", 3 },
-            { "ETFs (Profit or Loss)", 4 },
-            { "Stock Dividends (Profit)", 5 },
-            { "CFD Dividends (Profit or Loss)", 6 },
-            { "Income from Refunds", 7 },
-            { "Commissions (spread) on CFDs", 8 },
-            { "Commissions (spread) on Crypto", 9 },
-            { "Commissions (spread) on Stocks", 10 },
-            { "Commissions (spread) on ETFs", 11 },
-            { "Fees", 12 },
+            { "Total Return Swaps (Profit or Loss)", 3 },
+            { "Stocks (Profit or Loss)", 4 },
+            { "ETFs (Profit or Loss)", 5 },
+            { "Stock Dividends (Profit)", 6 },
+            { "CFD Dividends (Profit or Loss)", 7 },
+            { "Income from Refunds", 8 },
+            { "Income from AirDrops", 9 },
+            { "Income from Staking", 10 },
+            { "Commissions (spread) on CFDs", 11 },
+            { "Commissions (spread) on Crypto", 12 },
+            { "Commissions (spread) on TRS", 13 },
+            { "Commissions (spread) on Stocks", 14 },
+            { "Commissions (spread) on ETFs", 15 },
+            { "Fees", 16 }
         };
 
         EnsureDocumentHeaders(financialSummarySheet, documentCategoryStructure, 0);
         var cfds = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["CFDs (Profit or Loss)"]);
         var crypto = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Crypto (Profit or Loss)"]);
+        var totalReturnSwaps = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Total Return Swaps (Profit or Loss)"]);
         var stocks = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Stocks (Profit or Loss)"]);
         var etfs = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["ETFs (Profit or Loss)"]);
         var stockDividends = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Stock Dividends (Profit)"]);
         var cfdDividends = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["CFD Dividends (Profit or Loss)"]);
         var incomeRefunds = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Income from Refunds"]);
+        var incomeAirDrops = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Income from AirDrops"]);
+        var incomeStaking = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Income from Staking"]);
         var commissionCfds = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Commissions (spread) on CFDs"]);
         var commissionCrypto = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Commissions (spread) on Crypto"]);
+        var commissionTrs = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Commissions (spread) on TRS"]);
         var commissionStocks = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Commissions (spread) on Stocks"]);
         var commissionEtfs = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Commissions (spread) on ETFs"]);
         var fees = GetAmountTaxRatePair(financialSummarySheet, documentCategoryStructure["Fees"]);
         
         return new EtoroFinancialSummary
         {
-            Cfds = cfds,
-            Crypto = crypto,
-            Stocks = stocks,
-            Etfs = etfs,
-            StockDividends = stockDividends,
-            CfdDividends = cfdDividends,
+            ProfitOrLossCfds = cfds,
+            ProfitOrLossCrypto = crypto,
+            ProfitOrLossTotalReturnSwaps = totalReturnSwaps,
+            ProfitOrLossStocks = stocks,
+            ProfitOrLossEtfs = etfs,
+            ProfitStockDividends = stockDividends,
+            ProfitOrLossCfdDividends = cfdDividends,
             IncomeFromRefunds = incomeRefunds,
+            IncomeFromAirDrops = incomeAirDrops,
+            IncomeFromStaking = incomeStaking,
             CommissionsCfds = commissionCfds,
             CommissionsCrypto = commissionCrypto,
+            CommissionsTrs = commissionTrs,
             CommissionsStocks = commissionStocks,
             CommissionsEtfs = commissionEtfs,
             Fees = fees

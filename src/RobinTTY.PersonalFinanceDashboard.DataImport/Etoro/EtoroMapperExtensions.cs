@@ -4,6 +4,9 @@ using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro
 {
+    /// <summary>
+    /// Provides extensions for the <see cref="Mapper"/> class in the context of the eToro data importer.
+    /// </summary>
     public static class EtoroMapperExtensions
     {
         /// <summary>

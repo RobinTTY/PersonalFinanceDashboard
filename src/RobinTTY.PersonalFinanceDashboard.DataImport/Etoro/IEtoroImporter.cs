@@ -2,6 +2,9 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.DataImport.Etoro;
 
+/// <summary>
+/// Provides functionality to import data from eToro (www.etoro.com) data sources.
+/// </summary>
 public interface IEtoroImporter
 {
     /// <summary>
