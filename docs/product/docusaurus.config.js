@@ -11,14 +11,15 @@ const repoLink = "https://github.com/RobinTTY/PersonalFinanceDashboard";
 const config = {
   title: projectTitle,
   tagline: "Making personal finance simple.",
-  url: "https://your-docusaurus-test-site.com",
-  baseUrl: "/",
+  url: "https://robintty.github.io",
+  baseUrl: "/PersonalFinanceDashboard/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "RobinTTY",
   projectName: "PersonalFinanceDashboard",
-
+  deploymentBranch: "docs",
+  trailingSlash: false,
   presets: [
     [
       "classic",
