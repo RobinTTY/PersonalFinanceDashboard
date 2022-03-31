@@ -1,7 +1,7 @@
 ---
 id: development-banking-apis
 title: Banking APIs
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 Since I want to be able to import transactions, balances and the like automatically from a bank account, I need to interface with banking APIs (PSD2 APIs).
