@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobinTTY.PersonalFinanceDashboard", "RobinTTY.PersonalFinanceDashboard\RobinTTY.PersonalFinanceDashboard.csproj", "{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard", "RobinTTY.PersonalFinanceDashboard\RobinTTY.PersonalFinanceDashboard.csproj", "{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobinTTY.PersonalFinanceDashboard.DataImport", "RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj", "{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.DataImport", "RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj", "{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface", "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface.csproj", "{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
