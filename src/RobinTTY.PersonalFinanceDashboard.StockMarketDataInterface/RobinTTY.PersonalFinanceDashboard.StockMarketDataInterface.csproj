@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
-    <PackageReference Include="VSLee.IEXSharp" Version="2.9.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.15.1" />
+    <PackageReference Include="VSLee.IEXSharp" Version="2.9.3" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using IEXSharp;
+using IEXSharp.Helper;
 using IEXSharp.Model.CoreData.StockPrices.Request;
 using IEXSharp.Model.CoreData.StockPrices.Response;
 using MongoDB.Bson;
@@ -14,7 +15,7 @@ var database = dbClient.GetDatabase("PersonalFinanceDashboard");
 IMongoCollection<HistoricalPriceResponseDb> historicPriceDataCollection;
 
 
-var useSandbox = false;
+const bool useSandbox = false;
 string publishableToken, secretToken;
 if (useSandbox)
 {
@@ -26,19 +27,46 @@ else
 {
     publishableToken = "pk_c5769346a6604e1393b76324a71445f1";
     secretToken = "sk_47b333b3481d46959816516f10a0b97d";
-    historicPriceDataCollection = database.GetCollection<HistoricalPriceResponseDb>("HistoricalStockPriceData");
+    historicPriceDataCollection = database.GetCollection<HistoricalPriceResponseDb>("HistoricalStockPriceDataDaily");
 }
 
 var client = new IEXCloudClient(publishableToken, secretToken, false, useSandbox);
-var response = await client.StockPrices.HistoricalPriceAsync("TEAM", ChartRange.SixMonths);
-var prices = response.Data.Select(resp => new HistoricalPriceResponseDb(resp));
-historicPriceDataCollection.InsertMany(prices);
+//var response = await client.StockPrices.HistoricalPriceAsync("TEAM", ChartRange.Date);
+
+var symbols = new[] { "PEP", "PG", "BLK", "NKE", "TMUS", "LOGI", "DELL", "F", "VOO", "TEAM", "FB", "FFIV", "BA", "SQ", "SHOP", "PYPL", "AMZN", "DIS", "CRM", "INTC", "TSM", "TQQQ", "MSFT", "AAPL", "ADBE", "AMD", "GOOG", "JPM", "NVDA" };
+// You may also see null data points when viewing intraday prices and this indicates that no trades took place within the Investor's Exchange during that minute. 
+var currentDate = new DateTime(2022, 04, 15);
+var endDate = new DateTime(2022, 04, 30);
+
+foreach (var symbol in symbols)
+{
+    Console.WriteLine($"Downloading data for symbol {symbol}...");
+    while (currentDate <= endDate)
+    {
+        if (currentDate.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+            continue;
+
+        var response = await client.StockPrices.HistoricalPriceByDateAsync(symbol, currentDate, false);
+        foreach (var priceData in response.Data)
+        {
+            priceData.symbol = symbol;
+        }
+        var prices = response.Data.Select(resp => new HistoricalPriceResponseDb(resp)).ToList();
+
+        if (prices.Count > 0)
+            historicPriceDataCollection.InsertMany(prices);
+
+        currentDate = currentDate.AddDays(1);
+    }
+}
+
+Console.WriteLine("Operation finished.");
+
 
 //var exchanges = await client.ReferenceData.ExchangeInternationalAsync();
 //var symbols = await client.ReferenceData.SymbolsInternationalExchangeAsync("XFRA");
 
 //var test = await client.ReferenceData.
-Console.ReadKey();
 //if (response.ErrorMessage != null)
 //{
 //    Console.WriteLine(response.ErrorMessage);
