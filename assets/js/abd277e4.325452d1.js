@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkpersonal_finance_dashboard_docs=self.webpackChunkpersonal_finance_dashboard_docs||[]).push([[583],{1844:function(a){a.exports=JSON.parse('{"allTagsPath":"/PersonalFinanceDashboard/blog/tags","slug":"/PersonalFinanceDashboard/blog/tags/facebook","name":"facebook","count":1,"permalink":"/PersonalFinanceDashboard/blog/tags/facebook"}')}}]);

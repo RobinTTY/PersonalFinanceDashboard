@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkpersonal_finance_dashboard_docs=self.webpackChunkpersonal_finance_dashboard_docs||[]).push([[496],{6795:function(a){a.exports=JSON.parse('{"allTagsPath":"/PersonalFinanceDashboard/blog/tags","slug":"/PersonalFinanceDashboard/blog/tags/docusaurus","name":"docusaurus","count":4,"permalink":"/PersonalFinanceDashboard/blog/tags/docusaurus"}')}}]);
