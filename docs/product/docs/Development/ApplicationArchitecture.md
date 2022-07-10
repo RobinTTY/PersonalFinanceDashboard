@@ -43,10 +43,22 @@ Providing a single packaged application would be great in terms of deployment co
     - _Issue 1 - Experimental technology:_ Packaging C# code into a .wasm file is not direcctly supported by Microsoft (they only support this via their [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) framework - which itself could very well be another doomed project due to relatively low adoption)
     - _Issue 2 - Added complexity:_ Using WebAssembly is still very new and not well established. Problems could slow development down a lot and seem quite likely since running C# code in WebAssembly is extremly experimental outside of Blazor. It doesn't seem worth it.
 
+## Server Client approach
+
+A server client approach is a very low risk and generally managable solution:
+
+- A server that offers a traditional API can be used by users to develop their own applications based on the offered functionality
+- It's easier to solve common problems since the technology is already used in many real products
+  Edge case problems seem less likely
+
 ## Decission
 
 Using a **client/server model** seems to be the most realistic option. Drawdowns of the single application approach are too great. Deployment of the application will be a little harder for the user but I should be able to make it manageable (by providing a good deployment option).
 
+Therefore I will go with a **ASP.NET backend server offering a GraphQL API** to handle all the logic of my application. GraphQL seems like a good fit since I can offer a single interface which I and users who want to implement their own applications based on the server can use. The flexibility of the data fetching is perfect for that. It's also very much in use in many big products like Facebook, Github, etc.
+
 ### Architecture Sketch
 
 The application architecture should look roughly like this:
+
+TODO: Add a diagram
