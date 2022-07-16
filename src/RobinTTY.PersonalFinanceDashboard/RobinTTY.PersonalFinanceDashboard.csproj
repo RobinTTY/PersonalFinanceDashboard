@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Database\RobinTTY.PersonalFinanceDashboard.Database.csproj" />
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj" />
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface.csproj" />
   </ItemGroup>
