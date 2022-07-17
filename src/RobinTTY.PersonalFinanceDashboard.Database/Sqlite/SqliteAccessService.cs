@@ -1,12 +1,11 @@
 ﻿using Dapper;
-using System.Data;
 using System.Data.SQLite;
 
 namespace RobinTTY.PersonalFinanceDashboard.Database.Sqlite
 {
     public class SqliteAccessService
     {
-        private const string ConnectionString = "Data Source=application_data.db";
+        private const string ConnectionString = "Data Source=Sqlite\\application_data.db";
         private readonly SQLiteConnection _dbConnection;
 
         public SqliteAccessService()
@@ -16,7 +15,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Database.Sqlite
 
         public void ReadSampleMetadata()
         {
-            var metadata = _dbConnection.Query<MetadataModel>("select * from application_metadata");
+            var metadata = _dbConnection.Query<MetadataModel>("SELECT * FROM ApplicationMetadata");
             foreach (var data in metadata)
             {
                 Console.WriteLine(data.Id);
@@ -26,7 +25,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Database.Sqlite
 
         public void WriteSampleMetadata()
         {
-            _dbConnection.Execute($"insert into application_metadata (id, instance_name) values (1, test)");
+            _dbConnection.Execute("INSERT INTO ApplicationMetadata (Id, InstanceName) VALUES (1, 'test')");
         }
 
         public class MetadataModel
