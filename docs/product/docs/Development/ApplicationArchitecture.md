@@ -61,4 +61,17 @@ Therefore I will go with a **ASP.NET backend server offering a GraphQL API** to 
 
 The application architecture should look roughly like this:
 
-TODO: Add a diagram
+![ApplicationArchitecture](/img/docs/development/application_overview.png)
+
+The application layers are pretty straight forward:
+
+- A **database layer** that stores data used by the services layer
+  - This layer should be agnostic to the used database
+  - I will implement a SQLite data access layer for now
+- A **services layer** which handles the logic of the application
+  - e.g. adding transactions to an account or getting the current price of a stock
+- An **API layer** which provides a GraphQL endpoint to access the different services
+- A **native client** which is used as the client interface to the different services offered by the backend
+  - I will implement this client in React (due to the huge ecosystem)
+  - This client could also be hosted on another server and be independent of the backend server
+  - Users can also integrate their own application and interface via the GraphQL API directly
