@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard", "RobinTTY.PersonalFinanceDashboard\RobinTTY.PersonalFinanceDashboard.csproj", "{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.DataImport", "RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj", "{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface", "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface.csproj", "{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}"
@@ -18,16 +16,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.Core", "RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj", "{283FB4A0-C918-4527-9DD7-462E08A809DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5DF014C-B984-4DF1-B3A7-716768D2DCE0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,6 +40,10 @@ Global
 		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
