@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.Core", "RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj", "{283FB4A0-C918-4527-9DD7-462E08A809DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobinTTY.PersonalFinanceDashboard.NordigenClient", "RobinTTY.PersonalFinanceDashboard.NordigenClient\RobinTTY.PersonalFinanceDashboard.NordigenClient.csproj", "{F21695C0-EB5B-4249-9989-16676FB3684B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F21695C0-EB5B-4249-9989-16676FB3684B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F21695C0-EB5B-4249-9989-16676FB3684B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F21695C0-EB5B-4249-9989-16676FB3684B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F21695C0-EB5B-4249-9989-16676FB3684B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
