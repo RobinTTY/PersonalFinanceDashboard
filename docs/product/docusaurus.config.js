@@ -27,11 +27,9 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: repoLink,
         },
         blog: {
           showReadingTime: true,
-          editUrl: repoLink,
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
