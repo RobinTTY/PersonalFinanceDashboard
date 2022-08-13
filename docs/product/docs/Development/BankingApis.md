@@ -1,7 +1,7 @@
 ---
-id: development-banking-apis
+id: banking-apis
 title: Banking APIs
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 Since I want to be able to import transactions, balances and the like automatically from a bank account, I need to interface with banking APIs (PSD2 APIs).
@@ -10,12 +10,12 @@ There are multiple options to interface with banking APIs through third parties,
 
 ## Comparison
 
-|       Provider        |    [Nordigen](https://nordigen.com/en/)     |                   [Plaid](https://plaid.com/)                    | [Truelayer](https://truelayer.com/) | [Tink](https://tink.com/) | [Saltedge](https://www.saltedge.com/products/account_information/coverage) |
-| :-------------------: | :-----------------------------------------: | :--------------------------------------------------------------: | :---------------------------------: | :-----------------------: | :------------------------------------------------------------------------: |
-|  Free tier available  |                     ✅                      |                                ✅                                |                 ❌                  |            ❌             |                                     ❌                                     |
-| Features in free tier |           Transactions, Balances            | Transactions, Balances, Investments, Liabilities, Authentication |                 \*                  |            \*             |                                     \*                                     |
-|      Limitations      | Some rate limiting (no further information) |                     only testing envrionment                     |                 \*                  |            \*             |                                     \*                                     |
-|       Coverage        |            [31 European countries](https://nordigen.com/en/coverage/)            |   [US, Canada, UK, France, Ireland, Netherlands, Spain, Germany](https://plaid.com/global/)   |                 \*                  |            \*             |                                     \*                                     |
+|       Provider        |            [Nordigen](https://nordigen.com/en/)            |                                [Plaid](https://plaid.com/)                                | [Truelayer](https://truelayer.com/) | [Tink](https://tink.com/) | [Saltedge](https://www.saltedge.com/products/account_information/coverage) |
+| :-------------------: | :--------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :---------------------------------: | :-----------------------: | :------------------------------------------------------------------------: |
+|  Free tier available  |                             ✅                             |                                            ✅                                             |                 ❌                  |            ❌             |                                     ❌                                     |
+| Features in free tier |                   Transactions, Balances                   |             Transactions, Balances, Investments, Liabilities, Authentication              |                 \*                  |            \*             |                                     \*                                     |
+|      Limitations      |        Some rate limiting (no further information)         |                                 only testing environment                                  |                 \*                  |            \*             |                                     \*                                     |
+|       Coverage        | [31 European countries](https://nordigen.com/en/coverage/) | [US, Canada, UK, France, Ireland, Netherlands, Spain, Germany](https://plaid.com/global/) |                 \*                  |            \*             |                                     \*                                     |
 
 \* not further investigated since no free tier is available.
 

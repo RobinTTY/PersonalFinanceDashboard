@@ -1,4 +1,5 @@
 ---
+id: getting-started
 title: Getting started
 sidebar_position: 1
 ---

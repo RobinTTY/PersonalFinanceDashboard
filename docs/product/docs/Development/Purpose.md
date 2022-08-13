@@ -1,5 +1,5 @@
 ---
-id: development-purpose
+id: purpose
 title: Purpose
 sidebar_position: 1
 ---

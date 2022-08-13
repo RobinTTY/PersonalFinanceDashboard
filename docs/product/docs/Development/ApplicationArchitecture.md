@@ -1,4 +1,8 @@
-# Application Architecture
+---
+id: application-architecture
+title: Application Architecture
+sidebar_position: 2
+---
 
 ## Prerequisites
 

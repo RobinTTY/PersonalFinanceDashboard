@@ -1,7 +1,7 @@
 ---
-id: development-essential-features
+id: essential-features
 title: Essential Features
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 The features I want to implement for version 1.0 are as follows:
