@@ -5,7 +5,6 @@ const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 const projectTitle = "Personal Finance Dashboard";
-const repoLink = "https://github.com/RobinTTY/PersonalFinanceDashboard";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {

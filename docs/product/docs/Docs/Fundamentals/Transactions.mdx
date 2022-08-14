@@ -6,6 +6,7 @@ sidebar_position: 2
 
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import ThemedImage from "@theme/ThemedImage";
+import siteConfig from "/docusaurus.config.js";
 
 A transaction is a monetary exchange between two parties. For instance you going to your favorite restaurant and paying for a meal.
 
@@ -18,3 +19,21 @@ A transaction is a monetary exchange between two parties. For instance you going
 />
 
 A party in this sense can be a person, a company or some type of other entity. Sometimes you might even have instances where the two parties are kind of the same person. For instance if you withdraw cash from an ATM, the money doesn't change hands but the two parties involved are your bank account and your cash available to you in your wallet.
+
+## Structure of a transaction
+
+<>
+  A transaction, as its used in {siteConfig.title}, is mainly described by the
+  following:
+</>
+
+- When did the transaction happen?
+- Who are the involved parties? (Payer/Payee)
+- What is the amount being transacted and what currency is used?
+- What overall category does the transaction belong to? (e.g. Travel, Food, etc.)
+
+Then there is additional metadata that might be added to a transaction:
+
+- Tags associated with the transaction (to asscoiate expenses with certain sub-categories)
+- Information provided by your bank (e.g. SEPA mandate ids)
+- Notes about the transaction
