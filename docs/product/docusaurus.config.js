@@ -25,6 +25,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          routeBasePath: "docs",
           sidebarPath: require.resolve("./sidebars.js"),
         },
         blog: {
@@ -34,6 +35,17 @@ const config = {
           customCss: require.resolve("./src/css/custom.css"),
         },
       }),
+    ],
+  ],
+  plugins: [
+    [
+      "content-docs",
+      {
+        id: "dev",
+        path: "dev",
+        routeBasePath: "dev",
+        sidebarPath: require.resolve("./sidebars.js"),
+      },
     ],
   ],
 
@@ -52,8 +64,16 @@ const config = {
             docId: "getting-started",
             position: "left",
             label: "Docs",
+            activeBaseRegex: `/dev/`,
+            sidebarId: "docs",
           },
-          { to: "/blog", label: "Blog", position: "left" },
+          { to: "/blog", position: "left", label: "Blog" },
+          {
+            to: "/dev/purpose",
+            position: "left",
+            label: "Development",
+            sidebarId: "dev",
+          },
         ],
       },
       footer: {

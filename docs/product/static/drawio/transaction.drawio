@@ -1,1 +1,40 @@
-<mxfile host="app.diagrams.net" modified="2022-08-13T07:00:54.379Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.62" etag="YxaTK055k4psYD7JKnzT" version="20.1.1" type="device"><diagram id="GsIjGPgQR3tFYCc7OeM9" name="Page-1">7Zlbc5s4FIB/jR/xgMCYPDoXdx/SnUzTSTdPHRlk0EZGrBAJ7q9fCSQuhtjUt3ZSe8ZGHAlJnPPpHOl4ZN+s8k8MJtFnGiAyAmaQj+zbEQDW1PLERUrWpeQKKEHIcKAa1YJH/AMpoamkGQ5Q2mrIKSUcJ22hT+MY+bwlg4zRt3azJSXtURMYoo7g0YekK/2GAx6VUm9i1vK/EA4jPbJlqpoV1I2VII1gQN8aIvtuZN8wSnlZWuU3iEjlab2Uz83fqa0mxlDMhzzw8Pz0PZsg828QLp782f3TF881gFt28wpJpt5YzZavtQpCRrNENUOMo7xP8XChm5vdiVnV6wpOEF0hztaiSV7prHxEIQJcdf9WK3xiqolGDWVXY0Fl5LDqu9aDKChV/IRarKtzqGWLRbrKaijDufLOqQy7RxcuEcNeL0QhlIUHyLic5Gxkz8TlmWa6iRixatVRoVgSiSziVbEKryO+EjO7tURRqhSLZTgjOIyFjNOkIb2HC0QeaIo5prJ2QTmnK9GAyIpr6L9I68TBDSWUifqYxrL/YpxZmpSOwhQSqG+WOEeBbiLuI86lh5lJ1YG5H8TmGAubLnEcIDb2xWBgHkAOxUXKU3FNIpqKLzMYCjMCmfFKiVTeHExcqXiYvhjihZO1YQFvnMShHq6ebz3VJY25nn2AljAjtQZ7cNuJVUl0F6u1Xl+dJWeBHsoq4dEpm+xecRqXJUH5TPp2oREUB6p46xOYptgXwpQLHrviBl6FtqXBCwqWmJANVFLO6AvSwhGwzeJT1ehg4FRWQUEnkuxpk6YRdDhpGUELGSKQ49f2sH2WUWM8UCwmVDtet+14rU0XktKM+Ug91QwtGx3ZzmR7R8IeIeKdjgpQqhc/wF1bHVakNR7VLWU8oiGNIbmrpRsI1G3uqXQ1BSX/Is7Xak8CM07bDKEc83/k4+OJuntu1NzmqufiZq1J613WQ2GzTwDbgQwBz26b3tyToZ0dnZqh6YAwx2iQiXAB5o+IvWIffbgo5+yMcktKAwPGgYH+y3CyEtAZNOMEi6HB3JZ2CXAaNULcNuQ12AXqCfRxHH4tVp9h1Y71mOFOw+Z6nXjn9YQ771TRTh+LttH2WZhz/QcS5njGIluIjXN5I37M6fgbJATxg7GyT0mV5WzE055d1bQnnk9PdowZvnO/LnfuX5DYO2UMSh/7wcCzdoInplIUtUMrNvDSBBNL/rJKN1UDjePeRL132tMbq6nXIurXb9Nt58LUeZhquzixKZwXn6EObHvOpUohaLCmv5ws0JdzueQZzphnODJj1Snw92HMNnsY+zhZhnfsca58AvDaBnedPc+CjjvZ3tGJz4L2JZ8wAKsDaXHM9oHf3Tf7tLOjU9MCBgSuS+bgsMxBMzYdL3ewPYDZ3sYmCXQD2FmzBvaAv2IuWYOhWYOfQWpw3mA7UWAj4+72bImOlCGQh4vqv+XS1dX/0Nt3/wM=</diagram></mxfile>
+<mxfile host="65bd71144e">
+    <diagram id="GsIjGPgQR3tFYCc7OeM9" name="Page-1">
+        <mxGraphModel dx="659" dy="1042" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-26" value="" style="group" parent="1" vertex="1" connectable="0">
+                    <mxGeometry x="110" y="260" width="506" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-19" value="" style="group" parent="PYV_u5e0N2gbVcALVR86-26" vertex="1" connectable="0">
+                    <mxGeometry width="498" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-5" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;fillColor=none;strokeColor=#000000;strokeWidth=4;" parent="PYV_u5e0N2gbVcALVR86-19" edge="1">
+                    <mxGeometry width="100" height="100" relative="1" as="geometry">
+                        <mxPoint x="160" y="120" as="sourcePoint"/>
+                        <mxPoint x="345" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontColor=default;strokeColor=#000000;strokeWidth=3;" parent="PYV_u5e0N2gbVcALVR86-19" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="283" y="100" as="sourcePoint"/>
+                        <mxPoint x="283" y="100" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-17" value="&lt;b&gt;Product/Service&lt;/b&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=none;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/food-and-equipment-outline/32/dish-128.png;fontColor=default;strokeWidth=0;spacingTop=-14;" parent="PYV_u5e0N2gbVcALVR86-19" vertex="1">
+                    <mxGeometry x="268" width="88" height="88" as="geometry"/>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-18" value="&lt;b&gt;Money&lt;/b&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=none;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/48-bubbles/48/07.Wallet-128.png;fontColor=default;strokeWidth=5;spacingTop=-3;imageBorder=none;" parent="PYV_u5e0N2gbVcALVR86-19" vertex="1">
+                    <mxGeometry x="140" y="150" width="70" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-1" value="&lt;b&gt;Party B: Restaurant&lt;/b&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=none;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/ionicons-outline-vol-2/512/restaurant-outline-128.png" parent="PYV_u5e0N2gbVcALVR86-26" vertex="1">
+                    <mxGeometry x="378" y="50" width="128" height="128" as="geometry"/>
+                </mxCell>
+                <mxCell id="PYV_u5e0N2gbVcALVR86-3" value="&lt;b&gt;Party A: You&lt;/b&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=none;imageAspect=0;aspect=fixed;image=https://cdn0.iconfinder.com/data/icons/phosphor-regular-vol-3/256/mask-happy-128.png;imageBackground=none;fontColor=default;" parent="1" vertex="1">
+                    <mxGeometry x="108" y="296" width="148" height="148" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
