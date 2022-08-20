@@ -33,7 +33,7 @@ Gathering financial data is rather difficult at a reasonable prize, here is an o
   - Free tier only includes 500 API calls a day, payed tiers start at 50$ a month => better options available
 - [EODHD APIs](https://eodhistoricaldata.com/)
   - Data packet that includes fundamentals starts at 79.99€/month
-- [Tiingo](api.tiingo.com):
+- [Tiingo](https://api.tiingo.com):
   - Only offers price data, fundamental data is in beta and costs extra (50 API calls per hour free)
 - Category "Way to expensive":
   - [Finnhub](https://finnhub.io/)
