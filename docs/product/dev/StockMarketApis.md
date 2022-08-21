@@ -4,7 +4,7 @@ title: Stock Market APIs
 sidebar_position: 5
 ---
 
-Gathering financial data is rather difficult at a reasonable prize, here is an overview of available APIs I could gather:
+Gathering financial data is rather difficult at a reasonable prize. To offer live portfolio tracking I need this data. Here is an overview of available APIs I could gather:
 
 - [Polygon](https://polygon.io/stocks)
   - Solid 29$/month tier: 15-minute delayed data, unlimited API calls, 5 years historical data, fundamental data
@@ -43,7 +43,7 @@ Gathering financial data is rather difficult at a reasonable prize, here is an o
 
 There are some free APIs that can be used to gather secondary data:
 
-- [EconDB](https://www.econdb.com/api/series/?page=1): Conumer Price index, Unemployment, Consumer Confidence, etc.
+- [EconDB](https://www.econdb.com/api/series/?page=1): Consumer Price index, Unemployment, Consumer Confidence, etc.
 - [FiscalData.Treasury.gov](https://fiscaldata.treasury.gov/api-documentation/): Wide array of US fiscal data
 
 ## Decision
