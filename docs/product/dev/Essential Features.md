@@ -38,3 +38,7 @@ These goals require considerable work and should maybe go into the next version:
   - Provide information about dividends if possible
   - Import of statements from investment accounts (prototype for etoro.com) to integrate those transactions
   - Provide risk scores for assets (There are established ways to calculate those based on volitility and other factors)
+  - Have a note section for each asset purchase to provide user a way to document the reasoning behind the purchase
+    - Good way for the user to later identify mistakes in decision making and improve upon them
+- Indicators (which could be consumed from external sources)
+  - PMI Indices
