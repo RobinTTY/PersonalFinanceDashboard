@@ -3,7 +3,7 @@
 namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
-/// A transaction represents the monetary exchange between 2 parties.
+/// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
 internal class Transaction
 {
