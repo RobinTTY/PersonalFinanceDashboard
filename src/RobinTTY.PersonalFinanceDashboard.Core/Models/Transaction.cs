@@ -5,7 +5,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-internal class Transaction
+public class Transaction
 {
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.

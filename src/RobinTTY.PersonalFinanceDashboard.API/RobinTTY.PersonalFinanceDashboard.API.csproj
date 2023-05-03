@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj" />
+    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Database\RobinTTY.PersonalFinanceDashboard.Database.csproj" />
   </ItemGroup>
 
 </Project>

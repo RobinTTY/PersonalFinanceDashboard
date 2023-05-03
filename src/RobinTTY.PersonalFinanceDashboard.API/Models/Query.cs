@@ -1,5 +1,11 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.API.Resolvers;
+﻿namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 
+public record Book(string Title, Author Author);
+public record Author(string Name);
+
+/// <summary>
+/// GraphQL root type for query operations.
+/// </summary>
 public class Query
 {
     private readonly List<Book> _books = new()

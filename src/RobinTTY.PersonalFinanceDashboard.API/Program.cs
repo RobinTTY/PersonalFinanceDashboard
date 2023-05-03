@@ -9,8 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RobinTTY.PersonalFinanceDashboard.API.Resolvers;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
+using RobinTTY.PersonalFinanceDashboard.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,13 +28,5 @@ builder.Services.AddGraphQLServer()
     .AddQueryType<Query>();
 
 var app = builder.Build();
-
-// Sets up "/graphql" endpoint
-app.UseRouting().UseEndpoints(endpointBuilder => endpointBuilder.MapGraphQL());
-
-app.MapGet("/", () => "Hello World!");
-
+app.MapGraphQL();
 app.Run();
-
-public record Book(string Title, Author Author);
-public record Author(string Name);

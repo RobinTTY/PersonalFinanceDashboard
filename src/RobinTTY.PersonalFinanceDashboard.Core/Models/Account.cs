@@ -5,7 +5,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 /// <summary>
 /// An account is an entity that represents for instance a checking account at a bank or an investment account.
 /// </summary>
-internal class Account
+public class Account
 {
     /// <summary>
     /// The name of the account.
