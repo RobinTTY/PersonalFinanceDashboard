@@ -1,14 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
