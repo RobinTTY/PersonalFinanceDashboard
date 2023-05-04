@@ -19,4 +19,17 @@ public class MockDataAccessService
                 notes: f.Lorem.Sentence()
             )).Generate(amount);
     }
+
+    public static IEnumerable<Account> GetAccounts(int amount)
+    {
+        return new Faker<Account>()
+            .CustomInstantiator(f => new Account(
+                name: f.Person.FullName,
+                description: f.Finance.AccountName(),
+                balance: f.Finance.Amount(-10_000, 50_000),
+                currency: f.Finance.Currency().Code,
+                type: f.PickRandom<AccountType>(),
+                transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
+            )).Generate(amount);
+    }
 }
