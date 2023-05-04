@@ -1,6 +1,4 @@
-﻿using TeixeiraSoftware.Finance;
-
-namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// An account is an entity that represents for instance a checking account at a bank or an investment account.
@@ -22,7 +20,7 @@ public class Account
     /// <summary>
     /// The currency this account is denominated in.
     /// </summary>
-    public Currency Currency { get; set; }
+    public string Currency { get; set; }
     /// <summary>
     /// The type of the account.
     /// </summary>
@@ -41,7 +39,7 @@ public class Account
     /// <param name="currency">The currency this account is denominated in.</param>
     /// <param name="type">The type of the account.</param>
     /// <param name="transactions">Transactions that are associated with this account.</param>
-    public Account(string name, string description, decimal balance, Currency currency, AccountType type, List<Transaction> transactions)
+    public Account(string name, string description, decimal balance, string currency, AccountType type, List<Transaction> transactions)
     {
         Name = name;
         Description = description;

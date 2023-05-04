@@ -1,6 +1,4 @@
-﻿using TeixeiraSoftware.Finance;
-
-namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
@@ -26,7 +24,7 @@ public class Transaction
     /// <summary>
     /// The currency the amount is denominated in.
     /// </summary>
-    public Currency Currency { get; set; }
+    public string Currency { get; set ; }
     /// <summary>
     /// The category this transaction belongs to.
     /// </summary>
@@ -54,7 +52,7 @@ public class Transaction
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public Transaction(DateTime valueDate, string payer, string payee, decimal amount, Currency currency, string category, List<string> tags, string notes)
+    public Transaction(DateTime valueDate, string payer, string payee, decimal amount, string currency, string category, List<string> tags, string notes)
     {
         ValueDate = valueDate;
         Payer = payer;

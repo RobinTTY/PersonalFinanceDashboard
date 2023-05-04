@@ -8,12 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TeixeiraSoftware.Finance.Currency" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj" />
-    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface.csproj" />
   </ItemGroup>
 
 </Project>
