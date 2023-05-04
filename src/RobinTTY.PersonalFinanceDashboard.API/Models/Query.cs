@@ -1,4 +1,7 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.API.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Database.Mock;
+
+namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 
 public record Book(string Title, Author Author);
 public record Author(string Name);
@@ -15,7 +18,7 @@ public class Query
         new Book("Code: The Hidden Language of Computer Hardware and Software", new Author("Charles Petzold"))
     };
 
-    public List<Book> GetBooks() => _books;
+    public IEnumerable<Transaction> GetTransactions() => MockDataAccessService.GetTransactions(100);
     public Book? GetBook(string title) => _books.FirstOrDefault(x => x.Title == title);
 
     public Author? GetAuthor(string name) => _books.FirstOrDefault(x => x.Author.Name == name)?.Author;

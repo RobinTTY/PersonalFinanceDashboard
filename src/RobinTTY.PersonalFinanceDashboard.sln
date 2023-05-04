@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.DataImport", "RobinTTY.PersonalFinanceDashboard.DataImport\RobinTTY.PersonalFinanceDashboard.DataImport.csproj", "{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface", "RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface\RobinTTY.PersonalFinanceDashboard.StockMarketDataInterface.csproj", "{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.API", "RobinTTY.PersonalFinanceDashboard.API\RobinTTY.PersonalFinanceDashboard.API.csproj", "{074309B6-9F66-4923-A038-5B332DF9E494}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.Database", "RobinTTY.PersonalFinanceDashboard.Database\RobinTTY.PersonalFinanceDashboard.Database.csproj", "{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}"
@@ -28,10 +26,6 @@ Global
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4DD4397-0A1C-41EE-BFD6-ACD97179EA07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EA415EF-733B-4442-9853-D9FB5FAF8AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Release|Any CPU.ActiveCfg = Release|Any CPU
