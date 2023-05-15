@@ -3,17 +3,17 @@ import {
   AppShell,
   Navbar,
   Header,
-  Footer,
-  Aside,
   Text,
   MediaQuery,
   Burger,
   useMantineTheme,
 } from "@mantine/core";
+import AppHeader from "../app-header/AppHeader";
 
 const Shell = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+
   return (
     <AppShell
       styles={{
@@ -50,13 +50,12 @@ const Shell = () => {
                 mr="xl"
               />
             </MediaQuery>
-
-            <Text>Application header</Text>
+            <AppHeader />
           </div>
         </Header>
       }
     >
-      <Text>App Content</Text>
+      <Text>Application Content</Text>
     </AppShell>
   );
 };
