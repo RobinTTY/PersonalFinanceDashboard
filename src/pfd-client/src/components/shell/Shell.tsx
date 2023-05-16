@@ -9,6 +9,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import AppHeader from "../app-header/AppHeader";
+import AccountButton from "../account-button/AccountButton";
 
 const Shell = () => {
   const theme = useMantineTheme();
@@ -33,7 +34,12 @@ const Shell = () => {
           hidden={!opened}
           width={{ sm: 200, lg: 300 }}
         >
-          <Text>Application navbar</Text>
+          <Navbar.Section grow>
+            <Text>Application Navbar</Text>
+          </Navbar.Section>
+          <Navbar.Section>
+            <AccountButton />
+          </Navbar.Section>
         </Navbar>
       }
       header={
