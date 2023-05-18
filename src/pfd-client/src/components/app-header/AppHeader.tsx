@@ -7,16 +7,16 @@ const AppHeader = () => {
   // TODO: reconsider spacing units (rem, 40...)
   return (
     <Group position="apart" style={{ width: "100%" }}>
-      <Text>Application Name</Text>
+      <Text>Personal Finance Dashboard</Text>
       <ActionIcon
         variant="default"
         onClick={() => toggleColorScheme()}
-        size={40}
+        size={35}
       >
         {colorScheme === "dark" ? (
-          <IconSun size="1.3rem" />
+          <IconSun size="1.2rem" />
         ) : (
-          <IconMoonStars size="1.3rem" />
+          <IconMoonStars size="1.2rem" />
         )}
       </ActionIcon>
     </Group>
