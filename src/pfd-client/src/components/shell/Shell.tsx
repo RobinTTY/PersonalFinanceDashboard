@@ -1,18 +1,19 @@
 import { useState } from "react";
+import { Outlet, Link } from "react-router-dom";
 import {
   AppShell,
   Navbar,
   Header,
-  Text,
   MediaQuery,
   Burger,
   useMantineTheme,
   Stack,
 } from "@mantine/core";
+import { IconArrowsExchange, IconHome } from "@tabler/icons-react";
+
 import AppHeader from "../app-header/AppHeader";
 import AccountButton from "../account-button/AccountButton";
 import NavigationLink from "../navigation-link/NavigationLink";
-import { IconArrowsExchange, IconHome } from "@tabler/icons-react";
 
 const Shell = () => {
   const theme = useMantineTheme();
@@ -39,16 +40,20 @@ const Shell = () => {
         >
           <Navbar.Section grow>
             <Stack justify="flex-end" h={"100%"} spacing="xs" pb="md">
-              <NavigationLink
-                icon={<IconHome size="1rem" />}
-                color={theme.colors.blue[6]}
-                label="Dashboard"
-              />
-              <NavigationLink
-                icon={<IconArrowsExchange size="1rem" />}
-                color={theme.colors.teal[6]}
-                label="Transactions"
-              />
+              <Link to={`dashboard`}>
+                <NavigationLink
+                  icon={<IconHome size="1rem" />}
+                  color={theme.colors.blue[6]}
+                  label="Dashboard"
+                />
+              </Link>
+              <Link to={`transactions`}>
+                <NavigationLink
+                  icon={<IconArrowsExchange size="1rem" />}
+                  color={theme.colors.teal[6]}
+                  label="Transactions"
+                />
+              </Link>
             </Stack>
           </Navbar.Section>
           <Navbar.Section>
@@ -75,7 +80,7 @@ const Shell = () => {
         </Header>
       }
     >
-      <Text>Application Content</Text>
+      <Outlet />
     </AppShell>
   );
 };

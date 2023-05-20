@@ -22,4 +22,5 @@ const AppHeader = () => {
     </Group>
   );
 };
+
 export default AppHeader;
