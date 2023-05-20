@@ -7,9 +7,12 @@ import {
   MediaQuery,
   Burger,
   useMantineTheme,
+  Stack,
 } from "@mantine/core";
 import AppHeader from "../app-header/AppHeader";
 import AccountButton from "../account-button/AccountButton";
+import NavigationLink from "../navigation-link/NavigationLink";
+import { IconArrowsExchange, IconHome } from "@tabler/icons-react";
 
 const Shell = () => {
   const theme = useMantineTheme();
@@ -35,7 +38,18 @@ const Shell = () => {
           width={{ sm: 200, lg: 300 }}
         >
           <Navbar.Section grow>
-            <Text>Application Navbar</Text>
+            <Stack justify="flex-end" h={"100%"} spacing="xs" pb="md">
+              <NavigationLink
+                icon={<IconHome size="1rem" />}
+                color={theme.colors.blue[6]}
+                label="Dashboard"
+              />
+              <NavigationLink
+                icon={<IconArrowsExchange size="1rem" />}
+                color={theme.colors.teal[6]}
+                label="Transactions"
+              />
+            </Stack>
           </Navbar.Section>
           <Navbar.Section>
             <AccountButton />
