@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
 import {
   MantineProvider,
   ColorSchemeProvider,
@@ -11,28 +16,23 @@ import ErrorPage from "./routes/ErrorPage";
 import Dashboard from "./routes/Dashboard";
 import Transactions from "./routes/Transactions";
 
-// TODO: redo with jsx syntax?! See: https://reactrouter.com/en/main/route/route
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Shell />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
-      {
-        path: "transactions",
-        element: <Transactions />,
-      },
-    ],
-  },
-]);
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route
+      path="/"
+      element={<Shell />}
+      // loader={rootLoader}
+      // action={rootAction}
+      errorElement={<ErrorPage />}
+    >
+      {/* <Route errorElement={<ErrorPage />}> */}
+      <Route index element={<Dashboard />} />
+      <Route path="dashboard" element={<Dashboard />} />
+      <Route path="transactions" element={<Transactions />} />
+      {/* </Route> */}
+    </Route>
+  )
+);
 
 const App = () => {
   // TODO: Default color scheme should depend on system settings

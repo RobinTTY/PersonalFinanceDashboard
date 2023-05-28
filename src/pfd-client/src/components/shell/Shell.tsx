@@ -15,6 +15,7 @@ import AppHeader from "../app-header/AppHeader";
 import AccountButton from "../account-button/AccountButton";
 import NavigationLink from "../navigation-link/NavigationLink";
 
+// TODO: icon color of navigation links don't work on light background
 const Shell = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
