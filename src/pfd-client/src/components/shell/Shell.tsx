@@ -44,14 +44,14 @@ const Shell = () => {
               <Link to={`dashboard`}>
                 <NavigationLink
                   icon={<IconHome size="1rem" />}
-                  color={theme.colors.blue[6]}
+                  color="blue"
                   label="Dashboard"
                 />
               </Link>
               <Link to={`transactions`}>
                 <NavigationLink
                   icon={<IconArrowsExchange size="1rem" />}
-                  color={theme.colors.teal[6]}
+                  color="teal"
                   label="Transactions"
                 />
               </Link>
