@@ -43,14 +43,14 @@ const Shell = () => {
             <Stack justify="flex-end" h={"100%"} spacing="xs" pb="md">
               <Link to={`dashboard`}>
                 <NavigationLink
-                  icon={<IconHome size="1rem" />}
+                  icon={<IconHome size="1.3rem" />}
                   color="blue"
                   label="Dashboard"
                 />
               </Link>
               <Link to={`transactions`}>
                 <NavigationLink
-                  icon={<IconArrowsExchange size="1rem" />}
+                  icon={<IconArrowsExchange size="1.3rem" />}
                   color="teal"
                   label="Transactions"
                 />

@@ -20,11 +20,11 @@ const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
       })}
     >
       <Group>
-        <ThemeIcon color={color} variant="light">
+        <ThemeIcon size="lg" color={color} variant="light">
           {icon}
         </ThemeIcon>
 
-        <Text size="sm">{label}</Text>
+        <Text size="lg">{label}</Text>
       </Group>
     </UnstyledButton>
   );
