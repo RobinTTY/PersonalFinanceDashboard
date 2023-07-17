@@ -15,7 +15,7 @@ import AppHeader from "../app-header/AppHeader";
 import AccountButton from "../account-button/AccountButton";
 import NavigationLink from "../navigation-link/NavigationLink";
 
-// TODO: icon color of navigation links don't work on light background
+// TODO: NavLinks aren't responsive yet
 const Shell = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
@@ -43,14 +43,14 @@ const Shell = () => {
             <Stack justify="flex-end" h={"100%"} spacing="xs" pb="md">
               <Link to={`dashboard`}>
                 <NavigationLink
-                  icon={<IconHome size="1.3rem" />}
+                  icon={<IconHome size="1.25rem" />}
                   color="blue"
                   label="Dashboard"
                 />
               </Link>
               <Link to={`transactions`}>
                 <NavigationLink
-                  icon={<IconArrowsExchange size="1.3rem" />}
+                  icon={<IconArrowsExchange size="1.25rem" />}
                   color="teal"
                   label="Transactions"
                 />
