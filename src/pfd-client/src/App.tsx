@@ -10,12 +10,20 @@ import {
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 
 import Shell from "./components/shell/Shell";
 import ErrorPage from "./routes/ErrorPage";
 import Dashboard from "./routes/Dashboard";
 import Transactions from "./routes/Transactions";
 
+// Appolo (GraphQL) Setup
+const client = new ApolloClient({
+  uri: "https://localhost:7115",
+  cache: new InMemoryCache(),
+});
+
+// React Router Setup
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route
@@ -42,18 +50,20 @@ const App = () => {
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
   return (
-    <ColorSchemeProvider
-      colorScheme={colorScheme}
-      toggleColorScheme={toggleColorScheme}
-    >
-      <MantineProvider
-        theme={{ colorScheme }}
-        withGlobalStyles
-        withNormalizeCSS
+    <ApolloProvider client={client}>
+      <ColorSchemeProvider
+        colorScheme={colorScheme}
+        toggleColorScheme={toggleColorScheme}
       >
-        <RouterProvider router={router} />
-      </MantineProvider>
-    </ColorSchemeProvider>
+        <MantineProvider
+          theme={{ colorScheme }}
+          withGlobalStyles
+          withNormalizeCSS
+        >
+          <RouterProvider router={router} />
+        </MantineProvider>
+      </ColorSchemeProvider>
+    </ApolloProvider>
   );
 };
 
