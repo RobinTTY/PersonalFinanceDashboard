@@ -19,7 +19,7 @@ import Transactions from "./routes/Transactions";
 
 // Appolo (GraphQL) Setup
 const client = new ApolloClient({
-  uri: "https://localhost:7115",
+  uri: "http://localhost:5115/graphql",
   cache: new InMemoryCache(),
 });
 

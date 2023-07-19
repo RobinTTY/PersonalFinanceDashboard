@@ -1,10 +1,32 @@
-import StatsGrid, {
-  StatsGridProps,
-  icons,
-} from "../components/stat-card/StatCard";
+import StatsGrid, { StatsGridProps } from "../components/stat-card/StatCard";
+import { gql, useQuery } from "@apollo/client";
+
+const query = gql`
+  query GetAccounts {
+    accounts {
+      description
+      balance
+      currency
+      type
+      transactions {
+        payer
+        payee
+        valueDate
+        currency
+        amount
+      }
+    }
+  }
+`;
 
 const Dashboard = () => {
-  const data: StatsGridProps["data"] = [
+  const { loading, error, data } = useQuery(query);
+  if (loading) return <p>Loading...</p>;
+  data.accounts.forEach((account: any) => {
+    console.log(account);
+  });
+
+  const gridprops: StatsGridProps["data"] = [
     { title: "Revenue", icon: "receipt", value: "13,456", diff: 34 },
     { title: "Profit", icon: "coin", value: "4,145", diff: -13 },
     { title: "Coupons usage", icon: "discount", value: "745", diff: 18 },
@@ -13,7 +35,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <StatsGrid data={data}></StatsGrid>
+      <StatsGrid data={gridprops}></StatsGrid>
     </div>
   );
 };
