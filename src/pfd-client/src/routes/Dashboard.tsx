@@ -8,13 +8,6 @@ const query = gql`
       balance
       currency
       type
-      transactions {
-        payer
-        payee
-        valueDate
-        currency
-        amount
-      }
     }
   }
 `;
