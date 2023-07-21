@@ -1,3 +1,4 @@
+import { Loader, Center } from "@mantine/core";
 import StatsGrid, { StatsGridProps } from "../components/stat-card/StatCard";
 import { gql, useQuery } from "@apollo/client";
 
@@ -14,7 +15,12 @@ const query = gql`
 
 const Dashboard = () => {
   const { loading, error, data } = useQuery(query);
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <Center h={"100%"}>
+        <Loader color="violet" />
+      </Center>
+    );
   data.accounts.forEach((account: any) => {
     console.log(account);
   });

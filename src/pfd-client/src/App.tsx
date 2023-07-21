@@ -56,7 +56,7 @@ const App = () => {
         toggleColorScheme={toggleColorScheme}
       >
         <MantineProvider
-          theme={{ colorScheme }}
+          theme={{ colorScheme, loader: "bars" }}
           withGlobalStyles
           withNormalizeCSS
         >

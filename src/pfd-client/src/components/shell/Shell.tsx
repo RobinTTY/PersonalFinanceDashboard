@@ -37,7 +37,7 @@ const Shell = () => {
           p="md"
           hiddenBreakpoint="sm"
           hidden={!opened}
-          width={{ sm: 200, lg: 300 }}
+          width={{ sm: 250, lg: 250 }}
         >
           <Navbar.Section grow>
             <Stack justify="flex-end" h={"100%"} spacing="xs" pb="md">
