@@ -1,5 +1,6 @@
 import { Loader, Center } from "@mantine/core";
-import StatsGrid, { StatsGridProps } from "../components/stat-card/StatCard";
+import { StatCardProps } from "../components/stat-card/StatCard";
+import StatsGrid from "../components/stat-grid/StatsGrid";
 import { gql, useQuery } from "@apollo/client";
 
 const query = gql`
@@ -21,11 +22,8 @@ const Dashboard = () => {
         <Loader color="violet" />
       </Center>
     );
-  data.accounts.forEach((account: any) => {
-    console.log(account);
-  });
 
-  const gridprops: StatsGridProps["data"] = [
+  const gridprops: StatCardProps[] = [
     { title: "Revenue", icon: "receipt", value: "13,456", diff: 34 },
     { title: "Profit", icon: "coin", value: "4,145", diff: -13 },
     { title: "Coupons usage", icon: "discount", value: "745", diff: 18 },
