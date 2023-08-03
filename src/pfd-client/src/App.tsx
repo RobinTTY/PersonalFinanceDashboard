@@ -16,6 +16,7 @@ import Shell from "./components/shell/Shell";
 import ErrorPage from "./routes/ErrorPage";
 import Dashboard from "./routes/Dashboard";
 import Transactions from "./routes/Transactions";
+import Accounts from "./routes/Accounts";
 
 // Appolo (GraphQL) Setup
 const client = new ApolloClient({
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       {/* <Route errorElement={<ErrorPage />}> */}
       <Route index element={<Dashboard />} />
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="accounts" element={<Accounts />} />
       <Route path="transactions" element={<Transactions />} />
       {/* </Route> */}
     </Route>

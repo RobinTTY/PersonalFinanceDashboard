@@ -9,7 +9,7 @@ import {
   useMantineTheme,
   Stack,
 } from "@mantine/core";
-import { IconArrowsExchange, IconHome } from "@tabler/icons-react";
+import { IconArrowsExchange, IconHome, IconWallet } from "@tabler/icons-react";
 
 import AppHeader from "../app-header/AppHeader";
 import AccountButton from "../account-button/AccountButton";
@@ -46,6 +46,13 @@ const Shell = () => {
                   icon={<IconHome size="1.25rem" />}
                   color="blue"
                   label="Dashboard"
+                />
+              </Link>
+              <Link to={`accounts`}>
+                <NavigationLink
+                  icon={<IconWallet size="1.25rem" />}
+                  color="violet"
+                  label="Accounts"
                 />
               </Link>
               <Link to={`transactions`}>

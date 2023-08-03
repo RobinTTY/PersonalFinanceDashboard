@@ -1,7 +1,7 @@
 import { Loader, Center } from "@mantine/core";
-import { StatCardProps } from "../components/stat-card/StatCard";
-import StatsGrid from "../components/stat-grid/StatsGrid";
 import { gql, useQuery } from "@apollo/client";
+import { StatCardProps } from "../components/stat-card/StatCardProps";
+import StatsGrid from "../components/stat-grid/StatsGrid";
 
 const query = gql`
   query GetAccounts {
