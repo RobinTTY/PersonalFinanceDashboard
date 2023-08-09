@@ -5,11 +5,15 @@ import StatsGrid from "../components/stat-grid/StatsGrid";
 
 const query = gql`
   query GetAccounts {
-    accounts {
-      description
-      balance
-      currency
-      type
+    accounts(first: 10) {
+      edges {
+        node {
+          description
+          balance
+          currency
+          type
+        }
+      }
     }
   }
 `;
@@ -23,7 +27,7 @@ const Dashboard = () => {
       </Center>
     );
 
-  console.log(data);
+  console.log(data.accounts.edges);
 
   const gridprops: StatCardProps[] = [
     { title: "Net Worth", icon: "coin", value: "$13,456", diff: 34 },
