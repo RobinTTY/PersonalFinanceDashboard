@@ -22,6 +22,7 @@ import Accounts from "./routes/Accounts";
 const client = new ApolloClient({
   uri: "http://localhost:5115/graphql",
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
 
 // React Router Setup

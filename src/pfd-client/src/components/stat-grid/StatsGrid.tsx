@@ -23,7 +23,7 @@ const StatsGrid = (props: StatsGridProps) => {
         ]}
       >
         {props.data.map((stat) => {
-          return <StatCard {...stat}></StatCard>;
+          return <StatCard key={stat.title} {...stat}></StatCard>;
         })}
       </SimpleGrid>
     </div>

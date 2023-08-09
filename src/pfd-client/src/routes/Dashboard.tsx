@@ -23,11 +23,18 @@ const Dashboard = () => {
       </Center>
     );
 
+  console.log(data);
+
   const gridprops: StatCardProps[] = [
-    { title: "Revenue", icon: "receipt", value: "13,456", diff: 34 },
-    { title: "Profit", icon: "coin", value: "4,145", diff: -13 },
-    { title: "Coupons usage", icon: "discount", value: "745", diff: 18 },
-    { title: "New customers", icon: "user", value: "188", diff: -30 },
+    { title: "Net Worth", icon: "coin", value: "$13,456", diff: 34 },
+    { title: "Profit", icon: "receipt", value: "$145.56", diff: -13 },
+    { title: "Transactions", icon: "discount", value: "23", diff: 8 },
+    {
+      title: "Followers",
+      icon: "user",
+      value: "1835",
+      diff: 3,
+    },
   ];
 
   return (

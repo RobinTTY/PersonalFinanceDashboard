@@ -34,7 +34,7 @@ const StatCard = (props: StatCardProps) => {
   const DiffIcon = props.diff > 0 ? IconArrowUpRight : IconArrowDownRight;
 
   return (
-    <Paper withBorder p="md" radius="md" key={props.title}>
+    <Paper withBorder p="md" radius="md">
       <Group position="apart">
         <Text size="xs" color="dimmed" className={classes.title}>
           {props.title}
