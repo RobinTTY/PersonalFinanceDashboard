@@ -1,4 +1,6 @@
-﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using System.Linq;
+using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Database.Mock;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;
@@ -8,7 +10,9 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 /// </summary>
 public class Query
 {
-    public IEnumerable<Account> GetAccounts() => MockDataAccessService.GetAccounts(100);
+    [UsePaging]
+    public IQueryable<Account> GetAccounts() => MockDataAccessService.GetAccounts(100);
 
-    public IEnumerable<Transaction> GetTransactions() => MockDataAccessService.GetTransactions(100);
+    [UsePaging]
+    public IQueryable<Transaction> GetTransactions() => MockDataAccessService.GetTransactions(100);
 }
