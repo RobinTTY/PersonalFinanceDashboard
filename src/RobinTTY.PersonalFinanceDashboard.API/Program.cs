@@ -1,5 +1,4 @@
 global using System;
-global using System.Linq;
 global using System.Collections.Generic;
 global using Autofac;
 global using Serilog;
@@ -24,9 +23,15 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 // Add configuration parameters
 builder.Configuration.AddConfiguration(AppConfigurationManager.GetApplicationConfiguration());
 
+// TODO: update to sensible policy
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
 builder.Services.AddGraphQLServer()
     .AddQueryType<Query>();
 
 var app = builder.Build();
+app.UseCors();
 app.MapGraphQL();
 app.Run();
