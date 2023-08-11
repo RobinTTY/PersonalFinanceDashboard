@@ -5,7 +5,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Database.Mock;
 
 public class MockDataAccessService
 {
-    public static IEnumerable<Transaction> GetTransactions(int amount)
+    public static IQueryable<Transaction> GetTransactions(int amount)
     {
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
@@ -13,23 +13,25 @@ public class MockDataAccessService
                 payer: f.Person.FullName,
                 payee: f.Company.CompanyName(),
                 amount: f.Random.Decimal(10, 1000),
-                currency: f.Finance.Currency().Code,
+                //currency: "f.Finance.Currency().Code",
+                currency: "USD",
                 category: f.Commerce.Categories(1).First(),
                 tags: f.Lorem.Words().ToList(),
                 notes: f.Lorem.Sentence()
-            )).Generate(amount);
+            )).Generate(amount).AsQueryable();
     }
 
-    public static IEnumerable<Account> GetAccounts(int amount)
+    public static IQueryable<Account> GetAccounts(int amount)
     {
         return new Faker<Account>()
             .CustomInstantiator(f => new Account(
                 name: f.Person.FullName,
                 description: f.Finance.AccountName(),
                 balance: f.Finance.Amount(-10_000, 50_000),
-                currency: f.Finance.Currency().Code,
+                //currency: f.Finance.Currency().Code,
+                currency: "USD",
                 type: f.PickRandom<AccountType>(),
                 transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
-            )).Generate(amount);
+            )).Generate(amount).AsQueryable();
     }
 }
