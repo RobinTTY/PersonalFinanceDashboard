@@ -1,33 +1,21 @@
 import { Loader, Center } from "@mantine/core";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { StatCardProps } from "../components/stat-card/StatCardProps";
 import StatsGrid from "../components/stat-grid/StatsGrid";
-
-const query = gql`
-  query GetAccounts {
-    accounts(first: 10) {
-      edges {
-        node {
-          description
-          balance
-          currency
-          type
-        }
-      }
-    }
-  }
-`;
+import { GetAccountsQuery } from "../queries/GetAccounts";
 
 const Dashboard = () => {
-  const { loading, error, data } = useQuery(query);
+  const { loading, error, data } = useQuery(GetAccountsQuery, {
+    variables: { first: 10 },
+  });
+
+  // TODO: Remove this duplicate code (also used in Accounts)
   if (loading)
     return (
       <Center h={"100%"}>
         <Loader color="violet" />
       </Center>
     );
-
-  console.log(data.accounts.edges);
 
   const gridprops: StatCardProps[] = [
     { title: "Net Worth", icon: "coin", value: "$13,456", diff: 34 },
