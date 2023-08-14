@@ -1,4 +1,4 @@
-import { StatCardProps } from "../stat-card/StatCard";
+import { StatCardProps } from "../stat-card/StatCardProps";
 
 export interface StatsGridProps {
   data: StatCardProps[];
