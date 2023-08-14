@@ -21,6 +21,8 @@
     "@mantine/notifications": "^6.0.16",
     "@mantine/spotlight": "^6.0.16",
     "@mantine/tiptap": "^6.0.16",
+    "@nivo/core": "^0.83.0",
+    "@nivo/line": "^0.83.0",
     "@tabler/icons-react": "^2.26.0",
     "@tiptap/extension-link": "^2.0.4",
     "@tiptap/react": "^2.0.4",
