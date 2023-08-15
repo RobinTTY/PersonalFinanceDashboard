@@ -28,13 +28,13 @@ const Accounts = () => {
 
   return (
     <>
-      <SimpleGrid cols={2} breakpoints={[{ maxWidth: "xs", cols: 1 }]}>
+      <LineGraph />
+      <SimpleGrid mt="2%" cols={2} breakpoints={[{ maxWidth: "xs", cols: 1 }]}>
         {accounts.map((account: AccountSummaryProps) => {
           // TODO: Add key
           return <AccountSummary {...account} key={account.balance} />;
         })}
       </SimpleGrid>
-      <LineGraph />
     </>
   );
 };

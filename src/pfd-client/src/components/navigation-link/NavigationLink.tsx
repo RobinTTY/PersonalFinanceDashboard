@@ -10,7 +10,6 @@ const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
         borderRadius: theme.radius.sm,
         color:
           theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-
         "&:hover": {
           backgroundColor:
             theme.colorScheme === "dark"
