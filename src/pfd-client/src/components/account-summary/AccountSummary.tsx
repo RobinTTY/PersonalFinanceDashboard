@@ -1,7 +1,7 @@
 import { Paper, Text } from "@mantine/core";
 import { AccountSummaryProps } from "./AccountSummaryProps";
 
-const AccountSummary = (props: AccountSummaryProps) => {
+export const AccountSummary = (props: AccountSummaryProps) => {
   // TODO: make formatter dynamic
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -23,5 +23,3 @@ const AccountSummary = (props: AccountSummaryProps) => {
     </Paper>
   );
 };
-
-export default AccountSummary;

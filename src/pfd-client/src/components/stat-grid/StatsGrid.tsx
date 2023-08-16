@@ -1,7 +1,7 @@
 // TODO: move to extra file
 import { createStyles, SimpleGrid } from "@mantine/core";
 import { StatsGridProps } from "./StatsGridProps";
-import StatCard from "../stat-card/StatCard";
+import { StatCard } from "../stat-card/StatCard";
 
 // TODO: remove this, handle in parent
 const useStyles = createStyles(() => ({
@@ -11,7 +11,7 @@ const useStyles = createStyles(() => ({
 }));
 
 // TODO: should use children
-const StatsGrid = (props: StatsGridProps) => {
+export const StatsGrid = (props: StatsGridProps) => {
   const { classes } = useStyles();
 
   return (
@@ -30,5 +30,3 @@ const StatsGrid = (props: StatsGridProps) => {
     </div>
   );
 };
-
-export default StatsGrid;

@@ -1,6 +1,6 @@
 import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
 
-const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
+export const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
   return (
     <UnstyledButton
       sx={(theme) => ({
@@ -28,8 +28,6 @@ const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
     </UnstyledButton>
   );
 };
-
-export default NavigationLink;
 
 interface NavigationLinkProps {
   icon: React.ReactNode;

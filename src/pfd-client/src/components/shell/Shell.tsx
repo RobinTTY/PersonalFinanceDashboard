@@ -11,12 +11,12 @@ import {
 } from "@mantine/core";
 import { IconArrowsExchange, IconHome, IconWallet } from "@tabler/icons-react";
 
-import AppHeader from "../app-header/AppHeader";
-import AccountButton from "../account-button/AccountButton";
-import NavigationLink from "../navigation-link/NavigationLink";
+import { AppHeader } from "../app-header/AppHeader";
+import { AccountButton } from "../account-button/AccountButton";
+import { NavigationLink } from "../navigation-link/NavigationLink";
 
 // TODO: NavLinks aren't responsive yet
-const Shell = () => {
+export const Shell = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
 
@@ -92,5 +92,3 @@ const Shell = () => {
     </AppShell>
   );
 };
-
-export default Shell;

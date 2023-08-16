@@ -3,10 +3,10 @@ import { useQuery } from "@apollo/client";
 
 import { StatCardProps } from "../components/stat-card/StatCardProps";
 import { GetAccountsQuery } from "../queries/GetAccounts";
-import LineGraph from "../components/graphs/line-graph/LineGraph";
-import StatsGrid from "../components/stat-grid/StatsGrid";
+import { LineGraph } from "../components/graphs/line-graph/LineGraph";
+import { StatsGrid } from "../components/stat-grid/StatsGrid";
 
-const Dashboard = () => {
+export const Dashboard = () => {
   const { loading, error, data } = useQuery(GetAccountsQuery, {
     variables: { first: 10 },
   });
@@ -38,5 +38,3 @@ const Dashboard = () => {
     </>
   );
 };
-
-export default Dashboard;

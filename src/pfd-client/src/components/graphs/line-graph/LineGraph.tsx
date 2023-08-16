@@ -6,7 +6,7 @@ import "./LineGraph.css";
 
 // TODO: typing for data
 // TODO: theme color switch (light mode)
-const LineGraph = () => {
+export const LineGraph = () => {
   const theme = useMantineTheme();
 
   return (
@@ -116,5 +116,3 @@ const LineGraph = () => {
     </Paper>
   );
 };
-
-export default LineGraph;
