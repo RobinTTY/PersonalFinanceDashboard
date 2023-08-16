@@ -4,7 +4,7 @@ PersonalFinanceDashboard is the working title of this project which is intended 
 
 ## Development Status
 
-This project is in an early development stage and not yet ready for use  ;)
+This project is in an early development stage and not yet ready for use ;)
 
 ## Why another personal finance app?
 
@@ -14,4 +14,4 @@ I grew a little dissatisfied with the personal finance apps I have used so far. 
 
 Here is a very early impression of the application. Keep in mind that most of what you see is no where near a finished state:
 
-![vision](./docs/vision/vision.png)
+![vision](./docs/readme/vision.png)
