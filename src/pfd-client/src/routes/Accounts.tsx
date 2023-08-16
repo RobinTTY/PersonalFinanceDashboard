@@ -3,7 +3,6 @@ import { GetAccountsQuery } from "../queries/GetAccounts";
 import { Center, Loader, SimpleGrid } from "@mantine/core";
 import AccountSummary from "../components/account-summary/AccountSummary";
 import { AccountSummaryProps } from "../components/account-summary/AccountSummaryProps";
-import LineGraph from "../components/graphs/line-graph/LineGraph";
 
 // TODO: Add all accounts view?
 // TODO: Add icon (e.g. bank logo)
@@ -28,7 +27,6 @@ const Accounts = () => {
 
   return (
     <>
-      <LineGraph />
       <SimpleGrid mt="2%" cols={2} breakpoints={[{ maxWidth: "xs", cols: 1 }]}>
         {accounts.map((account: AccountSummaryProps) => {
           // TODO: Add key

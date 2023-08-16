@@ -1,8 +1,10 @@
 import { Loader, Center } from "@mantine/core";
 import { useQuery } from "@apollo/client";
+
 import { StatCardProps } from "../components/stat-card/StatCardProps";
-import StatsGrid from "../components/stat-grid/StatsGrid";
 import { GetAccountsQuery } from "../queries/GetAccounts";
+import LineGraph from "../components/graphs/line-graph/LineGraph";
+import StatsGrid from "../components/stat-grid/StatsGrid";
 
 const Dashboard = () => {
   const { loading, error, data } = useQuery(GetAccountsQuery, {
@@ -30,9 +32,10 @@ const Dashboard = () => {
   ];
 
   return (
-    <div>
+    <>
+      <LineGraph />
       <StatsGrid data={gridprops}></StatsGrid>
-    </div>
+    </>
   );
 };
 

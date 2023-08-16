@@ -3,9 +3,10 @@ import { createStyles, SimpleGrid } from "@mantine/core";
 import { StatsGridProps } from "./StatsGridProps";
 import StatCard from "../stat-card/StatCard";
 
-const useStyles = createStyles((theme) => ({
+// TODO: remove this, handle in parent
+const useStyles = createStyles(() => ({
   root: {
-    padding: `calc(${theme.spacing.xl} * 1.5)`,
+    marginTop: "1rem",
   },
 }));
 
