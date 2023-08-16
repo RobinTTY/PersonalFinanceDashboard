@@ -4,7 +4,7 @@ PersonalFinanceDashboard is the working title of this project which is intended 
 
 ## Development Status
 
-This project is in an early development stage and not ready for use yet ;)
+This project is in an early development stage and not yet ready for use  ;)
 
 ## Why another personal finance app?
 
