@@ -3,3 +3,8 @@
   display: grid;
   grid-template-rows: 1fr auto;
 }
+
+.account-type-selection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

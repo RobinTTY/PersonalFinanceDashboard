@@ -17,6 +17,7 @@ export const AccountSummary = (props: AccountSummaryProps) => {
       <Text size="xs" color="dimmed">
         {props.description}
       </Text>
+      {/* TODO: text can't be white only => light mode */}
       <Text size="lg" color="white">
         {formatter.format(props.balance)}
       </Text>
