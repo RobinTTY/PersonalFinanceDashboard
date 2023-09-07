@@ -14,7 +14,7 @@ import {
   Container,
 } from "@mantine/core";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
-import { US } from "country-flag-icons/react/3x2";
+import { DE, US } from "country-flag-icons/react/3x2";
 import { CA } from "country-flag-icons/react/3x2";
 import { GB } from "country-flag-icons/react/3x2";
 import { AU } from "country-flag-icons/react/3x2";
@@ -26,6 +26,7 @@ import { ModalButton } from "../components/modal-button/ModalButton";
 
 import "./Accounts.css";
 import { SearchBox } from "../components/search-box/SearchBox";
+import { ModalOptionSearchList } from "../components/modal-option-search-list/ModalOptionSearchList";
 
 type AccountType = "savings" | "investment";
 
@@ -53,50 +54,14 @@ interface AccountTypeSelectionStepProps {
   selectionAction: (accountType: AccountType) => void;
 }
 
-const SavingsAccountSetupStep = () => {
-  const countries = [
-    { name: "United States", icon: <US /> },
-    { name: "Canada", icon: <CA /> },
-    { name: "United Kingdom", icon: <GB /> },
-    { name: "Australia", icon: <AU /> },
-    { name: "New Zealand", icon: <NZ /> },
-  ];
-  const [searchFilter, setSearchFilter] = useState("");
-
-  const onFilterUpdate = (filter: string) => {
-    setSearchFilter(filter);
-  };
-
-  return (
-    <Container p={0} size="sm">
-      <SearchBox
-        pl="xs"
-        pr="xs"
-        placeholder="Filter countries..."
-        actionIconActive={false}
-        value={searchFilter}
-        onChange={(event) => onFilterUpdate(event.currentTarget.value)}
-      />
-      <Grid pt="md" pb="md" pl="md" pr="md">
-        {countries.map((country) => {
-          return (
-            <Grid.Col span={6} key={country.name}>
-              <ModalButton
-                icon={country.icon}
-                iconHeight="32px"
-                iconPosition="left"
-                description={country.name}
-                includeChevron={true}
-                padding="md"
-                action={() => {}}
-              />
-            </Grid.Col>
-          );
-        })}
-      </Grid>
-    </Container>
-  );
-};
+const countries = [
+  { key: "US", description: "United States", icon: <US /> },
+  { key: "CA", description: "Canada", icon: <CA /> },
+  { key: "GB", description: "United Kingdom", icon: <GB /> },
+  { key: "AU", description: "Australia", icon: <AU /> },
+  { key: "NZ", description: "New Zealand", icon: <NZ /> },
+  { key: "DE", description: "Germany", icon: <DE /> },
+];
 
 // TODO: Add all accounts view?
 // TODO: Add icon (e.g. bank logo)
@@ -140,7 +105,15 @@ export const Accounts = () => {
       case 2:
         switch (accountType) {
           case "savings":
-            return <SavingsAccountSetupStep />;
+            return (
+              <ModalOptionSearchList
+                options={countries}
+                searchPlaceholder="Filter countries..."
+                onOptionSelect={(optionKey) => {
+                  console.log(optionKey);
+                }}
+              />
+            );
           case "investment":
             return <Text>Step 2</Text>;
           default:
