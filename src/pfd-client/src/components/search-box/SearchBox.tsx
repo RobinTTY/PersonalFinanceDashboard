@@ -8,6 +8,7 @@ import { IconSearch, IconArrowRight, IconArrowLeft } from "@tabler/icons-react";
 
 export const SearchBox = (props: SearchBoxProps) => {
   const theme = useMantineTheme();
+  const { actionIconActive, ...textInputProps } = props;
 
   return (
     <TextInput
@@ -15,7 +16,7 @@ export const SearchBox = (props: SearchBoxProps) => {
       radius="xl"
       size="md"
       rightSection={
-        props.actionIconActive ? (
+        actionIconActive ? (
           <ActionIcon
             size={32}
             radius="xl"
@@ -32,7 +33,7 @@ export const SearchBox = (props: SearchBoxProps) => {
       }
       placeholder="Search for something..."
       rightSectionWidth={42}
-      {...props}
+      {...textInputProps}
     />
   );
 };
