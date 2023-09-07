@@ -1,7 +1,10 @@
+import { SystemProp } from "@mantine/core";
+import { CSSProperties } from "react";
+
 export interface ModalButtonProps {
   icon: JSX.Element;
   iconPosition?: "left" | "right" | "top" | "bottom";
-  iconSize?: "xs" | "sm" | "md" | "lg" | "xl";
+  iconHeight?: SystemProp<CSSProperties["height"]>;
   description: string;
   action: () => void;
 }

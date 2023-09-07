@@ -1,5 +1,31 @@
-import { UnstyledButton, Center, Text } from "@mantine/core";
+import { UnstyledButton, Center, Text, createStyles } from "@mantine/core";
 import { ModalButtonProps } from "./ModalButtonProps";
+
+const useStyles = createStyles((theme) => ({
+  button: {
+    display: "block",
+    width: "100%",
+    border: "solid .5px #404040",
+    padding: theme.spacing.xl,
+    borderRadius: theme.radius.sm,
+    color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
+    backgroundColor:
+      theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
+    "&:hover": {
+      border: "solid .5px #808080",
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[4]
+          : theme.colors.gray[0],
+    },
+  },
+
+  iconContainer: {
+    "> *": {
+      height: "inherit",
+    },
+  },
+}));
 
 // TODO: Light mode styling
 /**
@@ -10,33 +36,17 @@ import { ModalButtonProps } from "./ModalButtonProps";
 export const ModalButton = ({
   icon,
   iconPosition,
-  iconSize,
+  iconHeight,
   description,
   action,
 }: ModalButtonProps) => {
+  const { classes } = useStyles();
+
   return (
-    <UnstyledButton
-      onClick={action}
-      sx={(theme) => ({
-        display: "block",
-        width: "100%",
-        border: "solid .5px #404040",
-        padding: theme.spacing.xl,
-        borderRadius: theme.radius.sm,
-        color:
-          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-        backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
-        "&:hover": {
-          border: "solid .5px #808080",
-          backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[4]
-              : theme.colors.gray[0],
-        },
-      })}
-    >
-      <Center>{icon}</Center>
+    <UnstyledButton onClick={action} className={classes.button}>
+      <Center h={iconHeight} className={classes.iconContainer}>
+        {icon}
+      </Center>
       <Center>
         <Text fz="lg" fw={700}>
           {description}
