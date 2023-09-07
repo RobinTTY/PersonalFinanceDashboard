@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GetAccountsQuery } from "../queries/GetAccounts";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useCounter } from "@mantine/hooks";
 import {
-  UnstyledButton,
   Modal,
   Center,
   Loader,
@@ -10,60 +10,101 @@ import {
   Button,
   Group,
   Text,
+  Grid,
 } from "@mantine/core";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
+import { US } from "country-flag-icons/react/3x2";
+import { CA } from "country-flag-icons/react/3x2";
+import { GB } from "country-flag-icons/react/3x2";
+import { AU } from "country-flag-icons/react/3x2";
+import { NZ } from "country-flag-icons/react/3x2";
 
 import { AccountSummary } from "../components/account-summary/AccountSummary";
 import { AccountSummaryProps } from "../components/account-summary/AccountSummaryProps";
+import { ModalButton } from "../components/modal-button/ModalButton";
 
 import "./Accounts.css";
+import { SearchBox } from "../components/search-box/SearchBox";
 
-/**
- * The available options when adding an account.
- * @param param0 The button icon and text.
- * @returns A button with the icon and text.
- */
-const ModalButton = ({ icon, description, action }: AccountOptionsProps) => {
+type AccountType = "savings" | "investment";
+
+const AccountTypeSelectionStep = ({
+  selectionAction,
+}: AccountTypeSelectionStepProps) => {
   return (
-    <UnstyledButton
-      onClick={action}
-      sx={(theme) => ({
-        display: "block",
-        width: "100%",
-        padding: theme.spacing.xl,
-        borderRadius: theme.radius.sm,
-        color:
-          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-        backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.white,
-        "&:hover": {
-          backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[4]
-              : theme.colors.gray[0],
-        },
-      })}
-    >
-      <Center>{icon}</Center>
-      <Center>
-        <Text fz="lg" fw={700}>
-          {description}
-        </Text>
-      </Center>
-    </UnstyledButton>
+    <Group className="account-type-selection" p="xs">
+      {/* TODO: Create reusable component */}
+      <ModalButton
+        icon={<IconCoins size="4rem" />}
+        description="Savings Account"
+        action={() => selectionAction("savings")}
+      />
+      <ModalButton
+        icon={<IconGraph size="4rem" />}
+        description="Investment Account"
+        action={() => selectionAction("investment")}
+      />
+    </Group>
   );
 };
 
-interface AccountOptionsProps {
-  icon: JSX.Element;
-  description: string;
-  action: () => void;
+interface AccountTypeSelectionStepProps {
+  selectionAction: (accountType: AccountType) => void;
 }
+
+const SavingsAccountSetupStep = () => {
+  const countries = [
+    { name: "United States", icon: <US /> },
+    { name: "Canada", icon: <CA /> },
+    { name: "United Kingdom", icon: <GB /> },
+    { name: "Australia", icon: <AU /> },
+    { name: "New Zealand", icon: <NZ /> },
+  ];
+  const [searchFilter, setSearchFilter] = useState("");
+
+  const onFilterUpdate = (filter: string) => {
+    setSearchFilter(filter);
+  };
+
+  return (
+    <>
+      <SearchBox
+        placeholder="Filter countries..."
+        actionIconActive={false}
+        value={searchFilter}
+        onChange={(event) => onFilterUpdate(event.currentTarget.value)}
+      />
+      <Grid pt="md" pb="md" pl="sm" pr="sm">
+        {countries.map((country) => {
+          return (
+            <Grid.Col span={6} key={country.name}>
+              <ModalButton
+                icon={country.icon}
+                description={country.name}
+                action={() => {
+                  console.log("clicked");
+                }}
+              />
+            </Grid.Col>
+          );
+        })}
+      </Grid>
+    </>
+  );
+};
 
 // TODO: Add all accounts view?
 // TODO: Add icon (e.g. bank logo)
 export const Accounts = () => {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [
+    addAccountModalOpen,
+    { open: openAddAccountModal, close: closeAddAccountModal },
+  ] = useDisclosure(false);
+  const [accountType, setAccountType] = useState<AccountType>();
+  const [addAccountStep, addAccountStepHandler] = useCounter(1, {
+    min: 1,
+    max: 4,
+  });
   const { loading, error, data } = useQuery(GetAccountsQuery, {
     variables: { first: 5 },
   });
@@ -82,34 +123,56 @@ export const Accounts = () => {
       </Center>
     );
 
-  // TODO: common css class for 100% height/width container?
-  return (
-    <>
+  const onNewAccount = (accountType: AccountType) => {
+    setAccountType(accountType);
+    addAccountStepHandler.increment();
+  };
+
+  const getNewAccountModal = () => {
+    return (
       <Modal
-        opened={opened}
-        onClose={close}
+        opened={addAccountModalOpen}
+        onClose={() => {
+          closeAddAccountModal();
+          addAccountStepHandler.reset();
+        }}
         title={
           <Text fz="lg" fw={700} pr="xl">
-            What type of account would you like to add?
+            {addAccountStep === 1 &&
+              "What type of account would you like to add?"}
+            {addAccountStep === 2 && "Select your country"}
           </Text>
         }
         centered
         size="auto"
       >
-        <Group className="account-type-selection" p="xs">
-          {/* TODO: Create reusable component */}
-          <ModalButton
-            icon={<IconCoins size="4rem" />}
-            description="Savings Account"
-            action={() => console.log("Savings Account")}
-          />
-          <ModalButton
-            icon={<IconGraph size="4rem" />}
-            description="Investment Account"
-            action={() => console.log("Investment Account")}
-          />
-        </Group>
+        {getActiveNewAccountStep()}
       </Modal>
+    );
+  };
+
+  const getActiveNewAccountStep = () => {
+    switch (addAccountStep) {
+      case 1:
+        return <AccountTypeSelectionStep selectionAction={onNewAccount} />;
+      case 2:
+        switch (accountType) {
+          case "savings":
+            return <SavingsAccountSetupStep />;
+          case "investment":
+            return <Text>Step 2</Text>;
+          default:
+            throw new Error("Invalid account type");
+        }
+      default:
+        return <Text>Step {addAccountStep}</Text>;
+    }
+  };
+
+  // TODO: common css class for 100% height/width container?
+  return (
+    <>
+      {getNewAccountModal()}
       <div className="accounts-container">
         <div>
           <SimpleGrid
@@ -124,7 +187,7 @@ export const Accounts = () => {
           </SimpleGrid>
         </div>
         <Center py="md">
-          <Button onClick={open} size="md">
+          <Button onClick={openAddAccountModal} size="md">
             Add Account
           </Button>
         </Center>
