@@ -11,6 +11,7 @@ import {
   Group,
   Text,
   Grid,
+  Container,
 } from "@mantine/core";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
 import { US } from "country-flag-icons/react/3x2";
@@ -67,14 +68,16 @@ const SavingsAccountSetupStep = () => {
   };
 
   return (
-    <>
+    <Container p={0} size="sm">
       <SearchBox
+        pl="xs"
+        pr="xs"
         placeholder="Filter countries..."
         actionIconActive={false}
         value={searchFilter}
         onChange={(event) => onFilterUpdate(event.currentTarget.value)}
       />
-      <Grid pt="md" pb="md" pl="sm" pr="sm">
+      <Grid pt="md" pb="md" pl="md" pr="md">
         {countries.map((country) => {
           return (
             <Grid.Col span={6} key={country.name}>
@@ -91,7 +94,7 @@ const SavingsAccountSetupStep = () => {
           );
         })}
       </Grid>
-    </>
+    </Container>
   );
 };
 
@@ -130,29 +133,6 @@ export const Accounts = () => {
     addAccountStepHandler.increment();
   };
 
-  const getNewAccountModal = () => {
-    return (
-      <Modal
-        opened={addAccountModalOpen}
-        onClose={() => {
-          closeAddAccountModal();
-          addAccountStepHandler.reset();
-        }}
-        title={
-          <Text fz="lg" fw={700} pr="xl">
-            {addAccountStep === 1 &&
-              "What type of account would you like to add?"}
-            {addAccountStep === 2 && "Select your country"}
-          </Text>
-        }
-        centered
-        size="auto"
-      >
-        {getActiveNewAccountStep()}
-      </Modal>
-    );
-  };
-
   const getActiveNewAccountStep = () => {
     switch (addAccountStep) {
       case 1:
@@ -171,10 +151,31 @@ export const Accounts = () => {
     }
   };
 
+  const newAccountModal = (
+    <Modal
+      opened={addAccountModalOpen}
+      onClose={() => {
+        closeAddAccountModal();
+        addAccountStepHandler.reset();
+      }}
+      title={
+        <Text fz="lg" fw={700} pl=".4rem">
+          {addAccountStep === 1 &&
+            "What type of account would you like to add?"}
+          {addAccountStep === 2 && "Select your country"}
+        </Text>
+      }
+      centered
+      size="auto"
+    >
+      {getActiveNewAccountStep()}
+    </Modal>
+  );
+
   // TODO: common css class for 100% height/width container?
   return (
     <>
-      {getNewAccountModal()}
+      {newAccountModal}
       <div className="accounts-container">
         <div>
           <SimpleGrid
