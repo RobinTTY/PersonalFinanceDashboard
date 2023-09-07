@@ -46,6 +46,8 @@ export const ModalButton = ({
   iconPosition,
   iconHeight,
   description,
+  truncateDescription,
+  textWidth,
   includeChevron,
   padding,
   action,
@@ -53,15 +55,22 @@ export const ModalButton = ({
   const { classes } = useStyles();
 
   // TODO: implement position right, bottom
+  // TODO: truncate should be based on parent container width?
   const flagAndText = (
     <>
       <Center h={iconHeight} className={classes.iconContainer}>
         {icon}
       </Center>
       <Center>
-        <Text fz="lg" fw={700}>
-          {description}
-        </Text>
+        {truncateDescription ? (
+          <Text fz="lg" fw={700} w={textWidth} truncate>
+            {description}
+          </Text>
+        ) : (
+          <Text fz="lg" fw={700}>
+            {description}
+          </Text>
+        )}
       </Center>
     </>
   );

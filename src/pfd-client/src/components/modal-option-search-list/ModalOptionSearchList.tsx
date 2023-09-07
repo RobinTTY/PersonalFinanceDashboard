@@ -7,6 +7,8 @@ import { ModalButton } from "../modal-button/ModalButton";
 export const ModalOptionSearchList = ({
   options,
   searchPlaceholder,
+  truncateOptionDescription,
+  optionDescriptionWidth,
   onOptionSelect,
 }: ModalOptionSearchListProps) => {
   const [searchFilter, setSearchFilter] = useState("");
@@ -42,6 +44,8 @@ export const ModalOptionSearchList = ({
                 description={option.description}
                 includeChevron={true}
                 padding="md"
+                truncateDescription={truncateOptionDescription}
+                textWidth={optionDescriptionWidth}
                 action={() => onOptionSelect && onOptionSelect(option.key)}
               />
             </Grid.Col>
@@ -54,6 +58,8 @@ export const ModalOptionSearchList = ({
 
 interface ModalOptionSearchListProps {
   options: Array<{ key: string; description: string; icon: JSX.Element }>;
+  truncateOptionDescription?: boolean;
+  optionDescriptionWidth?: number;
   searchPlaceholder?: string;
   onOptionSelect?: (optionKey: string) => void;
 }
