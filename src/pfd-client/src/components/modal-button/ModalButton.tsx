@@ -1,5 +1,13 @@
-import { UnstyledButton, Center, Text, createStyles } from "@mantine/core";
+import {
+  UnstyledButton,
+  Center,
+  Text,
+  Group,
+  createStyles,
+  rem,
+} from "@mantine/core";
 import { ModalButtonProps } from "./ModalButtonProps";
+import { IconChevronRight } from "@tabler/icons-react";
 
 const useStyles = createStyles((theme) => ({
   button: {
@@ -38,12 +46,15 @@ export const ModalButton = ({
   iconPosition,
   iconHeight,
   description,
+  includeChevron,
+  padding,
   action,
 }: ModalButtonProps) => {
   const { classes } = useStyles();
 
-  return (
-    <UnstyledButton onClick={action} className={classes.button}>
+  // TODO: implement position right, bottom
+  const flagAndText = (
+    <>
       <Center h={iconHeight} className={classes.iconContainer}>
         {icon}
       </Center>
@@ -52,6 +63,25 @@ export const ModalButton = ({
           {description}
         </Text>
       </Center>
+    </>
+  );
+
+  const flagAndTextLayout =
+    iconPosition === "left" ? <Group>{flagAndText}</Group> : flagAndText;
+
+  const chevronContent = (
+    <Group w="100%" position="apart">
+      {flagAndTextLayout}
+      <IconChevronRight size={rem(28)} />
+    </Group>
+  );
+
+  const content =
+    includeChevron && iconPosition === "left" ? chevronContent : flagAndText;
+
+  return (
+    <UnstyledButton onClick={action} className={classes.button} p={padding}>
+      {content}
     </UnstyledButton>
   );
 };

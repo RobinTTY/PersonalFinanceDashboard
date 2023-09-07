@@ -80,10 +80,12 @@ const SavingsAccountSetupStep = () => {
             <Grid.Col span={6} key={country.name}>
               <ModalButton
                 icon={country.icon}
+                iconHeight="32px"
+                iconPosition="left"
                 description={country.name}
-                action={() => {
-                  console.log("clicked");
-                }}
+                includeChevron={true}
+                padding="md"
+                action={() => {}}
               />
             </Grid.Col>
           );
