@@ -11,7 +11,9 @@ export const ModalOptionSearchList = ({
 }: ModalOptionSearchListProps) => {
   const [searchFilter, setSearchFilter] = useState("");
   const filteredOptions = options.filter((option) =>
-    option.description.toLowerCase().startsWith(searchFilter.toLowerCase())
+    searchFilter.length == 1
+      ? option.description.toLowerCase().startsWith(searchFilter.toLowerCase())
+      : option.description.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
   const onFilterUpdate = (filter: string) => {
