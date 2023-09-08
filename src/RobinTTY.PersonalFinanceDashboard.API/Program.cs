@@ -1,5 +1,4 @@
 global using System;
-global using System.Collections.Generic;
 global using Autofac;
 global using Serilog;
 
@@ -15,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Setup Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Services.AddHttpClient();
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterModule<ApplicationModule>();

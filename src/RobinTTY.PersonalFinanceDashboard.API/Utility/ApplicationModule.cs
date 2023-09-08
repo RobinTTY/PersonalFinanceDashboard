@@ -1,4 +1,7 @@
 ﻿using AutofacSerilogIntegration;
+using RobinTTY.PersonalFinanceDashboard.API.Models;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
+using System.Net.Http;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
@@ -14,5 +17,8 @@ public class ApplicationModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterLogger(LoggerManager.GetDefaultLogger());
+        builder.Register(c => c.Resolve<IHttpClientFactory>().CreateClient());
+        builder.RegisterType<GoCardlessDataProvider>().SingleInstance();
+        builder.RegisterType<Query>().SingleInstance();
     }
 }
