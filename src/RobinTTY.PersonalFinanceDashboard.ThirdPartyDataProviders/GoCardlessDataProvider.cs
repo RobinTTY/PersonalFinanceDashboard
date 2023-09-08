@@ -15,9 +15,8 @@ public class GoCardlessDataProvider
 {
     private readonly NordigenClient _client;
 
-    public GoCardlessDataProvider(HttpClient httpClient)
+    public GoCardlessDataProvider(HttpClient httpClient, NordigenClientCredentials credentials)
     {
-        var credentials = new NordigenClientCredentials("d08de1cd-1971-4d06-880b-75db2910cffe", "83e96fb6364a21a788696e811526d39701ca633c06c7e2560ba2a5eb8e48b236c84c2ad155beeab9da19235ff63d5c40c79e017a040d95f3fd086fffe50a546b");
         _client = new NordigenClient(httpClient, credentials);
     }
 
@@ -29,7 +28,7 @@ public class GoCardlessDataProvider
     /// <returns>The available banking <see cref="Institution"/>s.</returns>
     public async Task<ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>> GetBankingInstitutions(string? country = null)
     {
-        var response = country is null ? await _client.InstitutionsEndpoint.GetInstitutions(country) : await _client.InstitutionsEndpoint.GetInstitutions();
+        var response = await _client.InstitutionsEndpoint.GetInstitutions(country);
         
         if (response.IsSuccess)
         {

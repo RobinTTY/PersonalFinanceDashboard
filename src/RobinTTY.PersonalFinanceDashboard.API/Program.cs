@@ -5,7 +5,6 @@ global using Serilog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.API.Models;
@@ -19,9 +18,6 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterModule<ApplicationModule>();
 });
-
-// Add configuration parameters
-builder.Configuration.AddConfiguration(AppConfigurationManager.GetApplicationConfiguration());
 
 // TODO: update to sensible policy
 builder.Services.AddCors(options =>
