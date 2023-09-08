@@ -3,6 +3,10 @@
 public class BankingInstitution
 {
     /// <summary>
+    /// The identifier of the bank.
+    /// </summary>
+    public string Id { get; set; }
+    /// <summary>
     /// The Business Identifier Code (BIC) of the institution.
     /// </summary>
     public string Bic { get; set; }
@@ -18,11 +22,13 @@ public class BankingInstitution
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitution"/>.
     /// </summary>
+    /// <param name="id">The identifier of the bank.</param>
     /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
     /// <param name="name">The name of the institution.</param>
     /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution</param>
-    public BankingInstitution(string bic, string name, Uri logoUri)
+    public BankingInstitution(string id, string bic, string name, Uri logoUri)
     {
+        Id = id;
         Bic = bic;
         Name = name;
         LogoUri = logoUri;
