@@ -12,11 +12,11 @@ import {
 } from "@mantine/core";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 
-import Shell from "./components/shell/Shell";
-import ErrorPage from "./routes/ErrorPage";
-import Dashboard from "./routes/Dashboard";
-import Transactions from "./routes/Transactions";
-import Accounts from "./routes/Accounts";
+import { Shell } from "./components/shell/Shell";
+import { ErrorPage } from "./routes/ErrorPage";
+import { Dashboard } from "./routes/Dashboard";
+import { Transactions } from "./routes/Transactions";
+import { Accounts } from "./routes/Accounts";
 
 // Appolo (GraphQL) Setup
 const client = new ApolloClient({
@@ -36,7 +36,7 @@ const router = createBrowserRouter(
       errorElement={<ErrorPage />}
     >
       {/* <Route errorElement={<ErrorPage />}> */}
-      <Route index element={<Dashboard />} />
+      <Route index element={<Accounts />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="accounts" element={<Accounts />} />
       <Route path="transactions" element={<Transactions />} />

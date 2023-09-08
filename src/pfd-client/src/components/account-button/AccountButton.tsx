@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { IconChevronRight, IconChevronLeft } from "@tabler/icons-react";
 
-const AccountButton = () => {
+export const AccountButton = () => {
   const theme = useMantineTheme();
 
   return (
@@ -64,5 +64,3 @@ const AccountButton = () => {
     </Box>
   );
 };
-
-export default AccountButton;

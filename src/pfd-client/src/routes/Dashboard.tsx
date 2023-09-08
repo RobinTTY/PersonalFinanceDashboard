@@ -1,29 +1,23 @@
 import { Loader, Center } from "@mantine/core";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+
 import { StatCardProps } from "../components/stat-card/StatCardProps";
-import StatsGrid from "../components/stat-grid/StatsGrid";
+import { GetAccountsQuery } from "../queries/GetAccounts";
+import { LineGraph } from "../components/graphs/line-graph/LineGraph";
+import { StatsGrid } from "../components/stat-grid/StatsGrid";
 
-const query = gql`
-  query GetAccounts {
-    accounts {
-      description
-      balance
-      currency
-      type
-    }
-  }
-`;
+export const Dashboard = () => {
+  const { loading, error, data } = useQuery(GetAccountsQuery, {
+    variables: { first: 10 },
+  });
 
-const Dashboard = () => {
-  const { loading, error, data } = useQuery(query);
+  // TODO: Remove this duplicate code (also used in Accounts)
   if (loading)
     return (
       <Center h={"100%"}>
         <Loader color="violet" />
       </Center>
     );
-
-  console.log(data);
 
   const gridprops: StatCardProps[] = [
     { title: "Net Worth", icon: "coin", value: "$13,456", diff: 34 },
@@ -38,10 +32,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div>
+    <>
+      <LineGraph />
       <StatsGrid data={gridprops}></StatsGrid>
-    </div>
+    </>
   );
 };
-
-export default Dashboard;

@@ -1,7 +1,7 @@
 import { Group, Text, ActionIcon, useMantineColorScheme } from "@mantine/core";
 import { IconSun, IconMoonStars } from "@tabler/icons-react";
 
-const AppHeader = () => {
+export const AppHeader = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   // TODO: reconsider spacing units (rem, 40...)
@@ -22,5 +22,3 @@ const AppHeader = () => {
     </Group>
   );
 };
-
-export default AppHeader;

@@ -28,7 +28,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const StatCard = (props: StatCardProps) => {
+export const StatCard = (props: StatCardProps) => {
   const { classes } = useStyles();
   const Icon = icons[props.icon];
   const DiffIcon = props.diff > 0 ? IconArrowUpRight : IconArrowDownRight;
@@ -61,5 +61,3 @@ const StatCard = (props: StatCardProps) => {
     </Paper>
   );
 };
-
-export default StatCard;
