@@ -55,7 +55,7 @@ public class GoCardlessDataProvider
             // TODO: handle request failure
             var requisitions = response.Result!.Results;
             var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
-                req.Accounts.Select(guid => guid.ToString()), AuthenticationStatus.Failed, req.AuthenticationLink)).AsQueryable();
+                req.Accounts.Select(guid => guid.ToString()), ConvertRequisitionStatus(req.Status), req.AuthenticationLink)).AsQueryable();
             return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess, result, response.Error);
         }
         else
@@ -64,7 +64,7 @@ public class GoCardlessDataProvider
             // TODO: handle request failure
             var requisition = response.Result!;
             var result = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
-                AuthenticationStatus.Failed, requisition.AuthenticationLink);
+                ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink);
             return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess,
                 new List<AuthenticationRequest> {result}.AsQueryable(), response.Error);
         }
@@ -85,12 +85,29 @@ public class GoCardlessDataProvider
         if (response.IsSuccess)
         {
             var requisition = response.Result;
-            var authenticationRequest = new AuthenticationRequest(requisition.Id.ToString(),
-                requisition.Accounts.Select(guid => guid.ToString()), AuthenticationStatus.Failed, requisition.AuthenticationLink);
+            var authenticationRequest = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
+                ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink);
             return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, authenticationRequest, null);
         }
 
         return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null, response.Error);
     }
-}
 
+    private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
+    {
+        return status switch
+        {
+            RequisitionStatus.Created => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.GivingConsent => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.UndergoingAuthentication => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.SelectingAccounts => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.Undefined => AuthenticationStatus.Failed,
+            RequisitionStatus.Suspended => AuthenticationStatus.Failed,
+            RequisitionStatus.Rejected => AuthenticationStatus.Failed,
+            RequisitionStatus.Linked => AuthenticationStatus.Successful,
+            RequisitionStatus.Expired => AuthenticationStatus.Expired,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
+    }
+}

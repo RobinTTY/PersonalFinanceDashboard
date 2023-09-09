@@ -55,5 +55,9 @@ public enum AuthenticationStatus
     /// <summary>
     /// The authentication failed.
     /// </summary>
-    Failed
+    Failed,
+    /// <summary>
+    /// The authentication has expired and is no longer valid.
+    /// </summary>
+    Expired
 }
