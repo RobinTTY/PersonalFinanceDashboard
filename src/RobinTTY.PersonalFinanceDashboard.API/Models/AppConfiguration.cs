@@ -8,7 +8,12 @@ public class AppConfiguration
     /// <summary>
     /// Configuration parameters for the Nordigen API client.
     /// </summary>
-    public NordigenApiClientConfiguration NordigenApi { get; set; }
+    public NordigenApiClientConfiguration? NordigenApi { get; set; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="AppConfiguration"/>.
+    /// </summary>
+    public AppConfiguration() { }
 
     /// <summary>
     /// Creates a new instance of <see cref="AppConfiguration"/>.
