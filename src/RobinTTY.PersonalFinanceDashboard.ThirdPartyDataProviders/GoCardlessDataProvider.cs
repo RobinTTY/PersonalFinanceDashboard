@@ -42,40 +42,55 @@ public class GoCardlessDataProvider
 
     // TODO: Cancellation token support
     /// <summary>
-    /// Gets existing requisitions for all banking institutions.
+    /// Gets existing authentication requests (requisitions) for all banking institutions.
     /// </summary>
     /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
     /// <param name="requisitionId">Optional id filter to apply to the query. Only the requisition which matches the filter will be returned as far as it exists.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
-    public async Task<ThirdPartyResponse<IQueryable<Requisition>, BasicError>> GetBankingInstitutionRequisitions(int requisitionLimit, Guid? requisitionId = null)
+    public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>> GetAuthenticationRequests(int requisitionLimit, Guid? requisitionId = null)
     {
         if (requisitionId is null)
         {
             var response = await _client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
-            return new ThirdPartyResponse<IQueryable<Requisition>, BasicError>(response.IsSuccess, response.Result?.Results.AsQueryable(), response.Error);
+            // TODO: handle request failure
+            var requisitions = response.Result!.Results;
+            var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
+                req.Accounts.Select(guid => guid.ToString()), AuthenticationStatus.Failed, req.AuthenticationLink)).AsQueryable();
+            return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess, result, response.Error);
         }
         else
         {
             var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId.Value);
-            var result = response.IsSuccess ? new List<Requisition> { response.Result }.AsQueryable() : null;
-            return new ThirdPartyResponse<IQueryable<Requisition>, BasicError>(response.IsSuccess, result, response.Error);
+            // TODO: handle request failure
+            var requisition = response.Result!;
+            var result = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
+                AuthenticationStatus.Failed, requisition.AuthenticationLink);
+            return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess,
+                new List<AuthenticationRequest> {result}.AsQueryable(), response.Error);
         }
         
     }
 
     /// <summary>
-    /// Creates a new requisition for the chosen institution and returns it.
+    /// Creates a new authentication request (requisition) for the chosen institution and returns it.
     /// </summary>
     /// <param name="institutionId">Id of the institution for which to create the requisition.</param>
-    /// <param name="userLanguage">User language for the given requisition.</param>
-    /// <param name="internalReference">Internal reference for identifying the requisition.</param>
     /// <param name="redirectUri"><see cref="Uri"/> which will be redirected too when the user completes authentication for the given requisition.</param>
     /// <returns>The created <see cref="Requisition"/>.</returns>
-    public async Task<ThirdPartyResponse<Requisition, CreateRequisitionError>> GetNewBankingInstitutionRequisition(string institutionId, string userLanguage, string internalReference, Uri redirectUri)
+    public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> GetNewAuthenticationRequest(string institutionId, Uri redirectUri)
     {
-        var requisitionRequest = new CreateRequisitionRequest(redirectUri, institutionId, internalReference, userLanguage);
+        var requisitionRequest = new CreateRequisitionRequest(redirectUri, institutionId, Guid.NewGuid().ToString(), "EN");
         var response = await _client.RequisitionsEndpoint.CreateRequisition(requisitionRequest);
-        return new ThirdPartyResponse<Requisition, CreateRequisitionError>(response.IsSuccess, response.Result, response.Error);
+        
+        if (response.IsSuccess)
+        {
+            var requisition = response.Result;
+            var authenticationRequest = new AuthenticationRequest(requisition.Id.ToString(),
+                requisition.Accounts.Select(guid => guid.ToString()), AuthenticationStatus.Failed, requisition.AuthenticationLink);
+            return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, authenticationRequest, null);
+        }
+
+        return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null, response.Error);
     }
 }
 
