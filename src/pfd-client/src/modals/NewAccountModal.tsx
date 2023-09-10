@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
 import { Button, Center, Group, Modal, Stack, Text } from "@mantine/core";
 import { useCounter } from "@mantine/hooks";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
@@ -5,7 +7,7 @@ import { DE, US, CA, GB, AU, NZ } from "country-flag-icons/react/3x2";
 
 import { ModalButton } from "../components/modal-button/ModalButton";
 import { ModalOptionSearchList } from "../components/modal-option-search-list/ModalOptionSearchList";
-import { useState } from "react";
+import { CreateAuthenticationRequestQuery } from "../queries/CreateAuthenticationRequest";
 
 type AccountType = "savings" | "investment";
 
@@ -151,6 +153,18 @@ interface BankSelectionStepProps {
 const sanboxInstitution = "SANDBOXFINANCE_SFIN0000";
 // TODO: logo needs to depend on theme (light/dark)
 const AuthenticationStep = () => {
+  const [createAuthenticationRequest, { loading, error, data }] = useMutation(
+    CreateAuthenticationRequestQuery,
+    {
+      variables: {
+        institutionId: sanboxInstitution,
+        redirectUri: "https://www.robinttycom/",
+      },
+    }
+  );
+
+  if (data) console.log(data);
+
   return (
     <Stack p="md" miw={275}>
       <Center>
@@ -163,7 +177,12 @@ const AuthenticationStep = () => {
       <Center>
         <Text fw={500}>Data Provider: GoCardless</Text>
       </Center>
-      <Button size="lg" loaderPosition="center" fullWidth>
+      <Button
+        size="lg"
+        loaderPosition="center"
+        fullWidth
+        onClick={() => createAuthenticationRequest()}
+      >
         Start Authentication
       </Button>
     </Stack>
