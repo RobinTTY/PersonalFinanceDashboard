@@ -5,7 +5,7 @@ import { Center, Loader, SimpleGrid, Button } from "@mantine/core";
 
 import { AccountSummary } from "../components/account-summary/AccountSummary";
 import { AccountSummaryProps } from "../components/account-summary/AccountSummaryProps";
-import { NewAccountModal } from "../Modals/NewAccountModal";
+import { NewAccountModal } from "../modals/NewAccountModal";
 
 import "./Accounts.css";
 

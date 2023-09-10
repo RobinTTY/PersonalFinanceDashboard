@@ -1,4 +1,4 @@
-import { Group, Modal, Text } from "@mantine/core";
+import { Button, Center, Group, Modal, Stack, Text } from "@mantine/core";
 import { useCounter } from "@mantine/hooks";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
 import { DE, US, CA, GB, AU, NZ } from "country-flag-icons/react/3x2";
@@ -18,6 +18,7 @@ const AccountTypeSelectionStep = ({
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
       }}
+      spacing="xl"
       p="xs"
     >
       {/* TODO: Create reusable component */}
@@ -63,7 +64,7 @@ const CountrySelectionStep = ({
 };
 
 interface CountrySelectionStepProps {
-  onCountrySelect: (country: string) => void;
+  onCountrySelect: (countryKey: string) => void;
 }
 
 const banks = [
@@ -129,15 +130,43 @@ const banks = [
   },
 ];
 
-const BankSelectionStep = () => {
+const BankSelectionStep = ({ onBankSelect }: BankSelectionStepProps) => {
   return (
     <ModalOptionSearchList
       options={banks}
       searchPlaceholder="Filter banks..."
       optionDescriptionWidth={200}
       truncateOptionDescription
-      onOptionSelect={(optionKey) => {}}
+      onOptionSelect={(optionKey) => {
+        onBankSelect(optionKey);
+      }}
     />
+  );
+};
+
+interface BankSelectionStepProps {
+  onBankSelect: (bankKey: string) => void;
+}
+
+const sanboxInstitution = "SANDBOXFINANCE_SFIN0000";
+// TODO: logo needs to depend on theme (light/dark)
+const AuthenticationStep = () => {
+  return (
+    <Stack p="md" miw={275}>
+      <Center>
+        <img
+          width="192px"
+          src="/src/assets/img/go-cardless/logo-negative.svg"
+        />
+      </Center>
+      {/* Provider should be link? */}
+      <Center>
+        <Text fw={500}>Data Provider: GoCardless</Text>
+      </Center>
+      <Button size="lg" loaderPosition="center" fullWidth>
+        Start Authentication
+      </Button>
+    </Stack>
   );
 };
 
@@ -151,6 +180,7 @@ export const NewAccountModal = ({
   });
   const [accountType, setAccountType] = useState<AccountType>();
   const [country, setCountry] = useState<string>();
+  const [bank, setBank] = useState<string>();
 
   const onNewAccount = (accountType: AccountType) => {
     setAccountType(accountType);
@@ -178,7 +208,16 @@ export const NewAccountModal = ({
             throw new Error("Invalid account type");
         }
       case 3:
-        return <BankSelectionStep />;
+        return (
+          <BankSelectionStep
+            onBankSelect={(optionKey) => {
+              setBank(optionKey);
+              addAccountStepHandler.increment();
+            }}
+          />
+        );
+      case 4:
+        return <AuthenticationStep />;
       default:
         return <Text>Step {addAccountStep}</Text>;
     }
@@ -192,11 +231,12 @@ export const NewAccountModal = ({
         addAccountStepHandler.reset();
       }}
       title={
-        <Text fz="lg" fw={700} pl=".4rem">
+        <Text fz="xl" fw={700} pl=".4rem">
           {addAccountStep === 1 &&
             "What type of account would you like to add?"}
           {addAccountStep === 2 && "Select your country"}
           {addAccountStep === 3 && "Select your bank"}
+          {addAccountStep === 4 && "Authenticate"}
         </Text>
       }
       centered
