@@ -12,7 +12,7 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 /// </summary>
 public class Query
 {
-    readonly GoCardlessDataProvider _dataProvider;
+    private readonly GoCardlessDataProvider _dataProvider;
 
     public Query(GoCardlessDataProvider dataProvider)
     {
@@ -38,17 +38,5 @@ public class Query
         // TODO: Limit?
         var requests = await _dataProvider.GetAuthenticationRequests(100);
         return requests.Result!.AsQueryable();
-    }
-
-    /// <summary>
-    /// TODO
-    /// </summary>
-    /// <param name="institutionId"></param>
-    /// <param name="redirectUri"></param>
-    /// <returns></returns>
-    public async Task<AuthenticationRequest> GetNewAuthenticationRequest(string institutionId, string redirectUri)
-    {
-        var request = await _dataProvider.GetNewAuthenticationRequest(institutionId, new Uri(redirectUri));
-        return request.Result!;
     }
 }

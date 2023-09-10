@@ -77,7 +77,7 @@ public class GoCardlessDataProvider
     /// <param name="institutionId">Id of the institution for which to create the requisition.</param>
     /// <param name="redirectUri"><see cref="Uri"/> which will be redirected too when the user completes authentication for the given requisition.</param>
     /// <returns>The created <see cref="Requisition"/>.</returns>
-    public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> GetNewAuthenticationRequest(string institutionId, Uri redirectUri)
+    public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> CreateAuthenticationRequest(string institutionId, Uri redirectUri)
     {
         var requisitionRequest = new CreateRequisitionRequest(redirectUri, institutionId, Guid.NewGuid().ToString(), "EN");
         var response = await _client.RequisitionsEndpoint.CreateRequisition(requisitionRequest);
