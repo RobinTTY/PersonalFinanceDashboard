@@ -1,6 +1,7 @@
 ﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using System.Threading.Tasks;
+using RobinTTY.NordigenApiClient.Models.Responses;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 
@@ -25,6 +26,12 @@ public class Mutation
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(string institutionId, string redirectUri)
     {
         var request = await _dataProvider.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
+        return request.Result!;
+    }
+
+    public async Task<BasicResponse> DeleteAuthenticationRequest(string authenticationId)
+    {
+        var request = await _dataProvider.DeleteAuthenticationRequest(authenticationId);
         return request.Result!;
     }
 }

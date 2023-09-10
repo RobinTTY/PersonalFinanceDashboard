@@ -93,6 +93,12 @@ public class GoCardlessDataProvider
         return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null, response.Error);
     }
 
+    public async Task<ThirdPartyResponse<BasicResponse, BasicError>> DeleteAuthenticationRequest(string id)
+    {
+        var response = await _client.RequisitionsEndpoint.DeleteRequisition(id);
+        return new ThirdPartyResponse<BasicResponse, BasicError>(response.IsSuccess, response.Result, response.Error);
+    }
+
     private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
     {
         return status switch
