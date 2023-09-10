@@ -5,7 +5,24 @@
 /// </summary>
 public class AppConfiguration
 {
-    public NordigenApiClientConfiguration NordigenApi { get; set; }
+    /// <summary>
+    /// Configuration parameters for the Nordigen API client.
+    /// </summary>
+    public NordigenApiClientConfiguration? NordigenApi { get; set; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="AppConfiguration"/>.
+    /// </summary>
+    public AppConfiguration() { }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="AppConfiguration"/>.
+    /// </summary>
+    /// <param name="nordigenApi">Configuration parameters for the Nordigen API client.</param>
+    public AppConfiguration(NordigenApiClientConfiguration nordigenApi)
+    {
+        NordigenApi = nordigenApi;
+    }
 }
 
 /// <summary>
@@ -25,12 +42,17 @@ public class NordigenApiClientConfiguration
     /// The secret key to access the Nordigen API.
     /// </summary>
     public string SecretKey { get; set; }
+
     /// <summary>
-    /// Unclear documentation on this parameter. Default value = 5.
+    /// 
     /// </summary>
-    public int AccessTokenValidBeforeSeconds { get; set; }
-    /// <summary>
-    /// Unclear documentation on this parameter. Default value = 5.
-    /// </summary>
-    public int RefreshTokenValidBeforeSeconds { get; set; }
+    /// <param name="url">The nordigen API endpoint to use.</param>
+    /// <param name="secretId">The secret id to access the Nordigen API.</param>
+    /// <param name="secretKey">The secret key to access the Nordigen API.</param>
+    public NordigenApiClientConfiguration(string url, string secretId, string secretKey)
+    {
+        Url = url;
+        SecretId = secretId;
+        SecretKey = secretKey;
+    }
 }

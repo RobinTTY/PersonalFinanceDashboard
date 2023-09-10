@@ -27,7 +27,7 @@ public class MockDataAccessService
             .CustomInstantiator(f => new Account(
                 name: f.Person.FullName,
                 description: f.Finance.AccountName(),
-                balance: f.Finance.Amount(-10_000, 50_000),
+                balance: f.Finance.Amount(0, 5_000),
                 //currency: f.Finance.Currency().Code,
                 currency: "USD",
                 type: f.PickRandom<AccountType>(),
