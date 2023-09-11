@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { Button, Center, Group, Modal, Stack, Text } from "@mantine/core";
-import { useCounter } from "@mantine/hooks";
+import { useCounter, useDisclosure } from "@mantine/hooks";
 import { IconCoins, IconGraph } from "@tabler/icons-react";
 import { DE, US, CA, GB, AU, NZ } from "country-flag-icons/react/3x2";
 
@@ -150,20 +150,27 @@ interface BankSelectionStepProps {
   onBankSelect: (bankKey: string) => void;
 }
 
-const sanboxInstitution = "SANDBOXFINANCE_SFIN0000";
+// TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
 const AuthenticationStep = () => {
-  const [createAuthenticationRequest, { loading, error, data }] = useMutation(
-    CreateAuthenticationRequestQuery,
-    {
-      variables: {
-        institutionId: sanboxInstitution,
-        redirectUri: "https://www.robinttycom/",
-      },
-    }
+  const sanboxInstitution = "SANDBOXFINANCE_SFIN0000";
+  const [buttonDescription, setButtonDescription] = useState(
+    "Start Authentication"
   );
-
-  if (data) console.log(data);
+  const [loading, loadingHandler] = useDisclosure(false);
+  const [
+    createAuthenticationRequest,
+    { loading: loadingMutation, error, data },
+  ] = useMutation(CreateAuthenticationRequestQuery, {
+    variables: {
+      institutionId: sanboxInstitution,
+      redirectUri: "https://www.robintty.com/",
+    },
+    onCompleted: (data) => {
+      let link = data.createAuthenticationRequest.authenticationLink;
+      window.open(link, "_blank")?.focus();
+    },
+  });
 
   return (
     <Stack p="md" miw={275}>
@@ -181,9 +188,22 @@ const AuthenticationStep = () => {
         size="lg"
         loaderPosition="center"
         fullWidth
-        onClick={() => createAuthenticationRequest()}
+        loading={loading}
+        onClick={() => {
+          // TODO: This could maybe be done more elegantly?
+          if (data) {
+            console.log("Next step...");
+          } else {
+            createAuthenticationRequest();
+            loadingHandler.open();
+            setTimeout(() => {
+              loadingHandler.close();
+              setButtonDescription("Finish Setup...");
+            }, 2000);
+          }
+        }}
       >
-        Start Authentication
+        {buttonDescription}
       </Button>
     </Stack>
   );
