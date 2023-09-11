@@ -19,6 +19,17 @@ public class Query
         _dataProvider = dataProvider;
     }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="accountId"></param>
+    /// <returns></returns>
+    public async Task<Account> GetAccount(string accountId)
+    {
+        var account = await _dataProvider.GetBankAccount(accountId);
+        return account.Result!;
+    }
+
     [UsePaging]
     public IQueryable<Account> GetAccounts() => MockDataAccessService.GetAccounts(100);
 

@@ -4,6 +4,7 @@ using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Requests;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -45,7 +46,7 @@ public class GoCardlessDataProvider
     /// Gets existing authentication requests (requisitions) for all banking institutions.
     /// </summary>
     /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
-    /// <param name="requisitionId">Optional id filter to apply to the query. Only the requisition which matches the filter will be returned as far as it exists.</param>
+    /// <param name="requisitionId">Optional authenticationId filter to apply to the query. Only the requisition which matches the filter will be returned as far as it exists.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
     public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>> GetAuthenticationRequests(int requisitionLimit, Guid? requisitionId = null)
     {
@@ -93,10 +94,27 @@ public class GoCardlessDataProvider
         return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null, response.Error);
     }
 
-    public async Task<ThirdPartyResponse<BasicResponse, BasicError>> DeleteAuthenticationRequest(string id)
+    public async Task<ThirdPartyResponse<BasicResponse, BasicError>> DeleteAuthenticationRequest(string authenticationId)
     {
-        var response = await _client.RequisitionsEndpoint.DeleteRequisition(id);
+        var response = await _client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
         return new ThirdPartyResponse<BasicResponse, BasicError>(response.IsSuccess, response.Result, response.Error);
+    }
+
+    public async Task<ThirdPartyResponse<Account, AccountsError>> GetBankAccount(string accountId)
+    {
+        var accountDetailsTask = _client.AccountsEndpoint.GetAccountDetails(accountId);
+        var balanceTask = _client.AccountsEndpoint.GetBalances(accountId);
+
+        // TODO: Handle possible null values
+        var accountDetailsRequest = await accountDetailsTask;
+        var balanceRequest = await balanceTask;
+        var accountDetailsResult = accountDetailsRequest.Result!;
+        var balanceResult = balanceRequest.Result!;
+        var bankAccount = new Account(accountDetailsResult.Product ?? "Default Name", accountDetailsResult.Details ?? "Default Details",
+            balanceResult.FirstOrDefault(bal => bal.BalanceType == BalanceType.ClosingBooked)?.BalanceAmount.Amount ?? decimal.MaxValue,
+            accountDetailsResult.Currency, AccountType.General, new List<Transaction>());
+        return new ThirdPartyResponse<Account, AccountsError>(
+            accountDetailsRequest.IsSuccess && balanceRequest.IsSuccess, bankAccount, accountDetailsRequest.Error);
     }
 
     private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
