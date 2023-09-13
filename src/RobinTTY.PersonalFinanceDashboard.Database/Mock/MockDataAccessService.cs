@@ -30,7 +30,6 @@ public class MockDataAccessService
                 balance: f.Finance.Amount(0, 5_000),
                 //currency: f.Finance.Currency().Code,
                 currency: "USD",
-                type: f.PickRandom<AccountType>(),
                 transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
             )).Generate(amount).AsQueryable();
     }

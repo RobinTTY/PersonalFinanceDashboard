@@ -4,6 +4,8 @@ using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Requests;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
+using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
 using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -100,7 +102,7 @@ public class GoCardlessDataProvider
         return new ThirdPartyResponse<BasicResponse, BasicError>(response.IsSuccess, response.Result, response.Error);
     }
 
-    public async Task<ThirdPartyResponse<Account, AccountsError>> GetBankAccount(string accountId)
+    public async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(string accountId)
     {
         var accountDetailsTask = _client.AccountsEndpoint.GetAccountDetails(accountId);
         var balanceTask = _client.AccountsEndpoint.GetBalances(accountId);
@@ -110,10 +112,9 @@ public class GoCardlessDataProvider
         var balanceRequest = await balanceTask;
         var accountDetailsResult = accountDetailsRequest.Result!;
         var balanceResult = balanceRequest.Result!;
-        var bankAccount = new Account(accountDetailsResult.Product ?? "Default Name", accountDetailsResult.Details ?? "Default Details",
-            balanceResult.FirstOrDefault(bal => bal.BalanceType == BalanceType.ClosingBooked)?.BalanceAmount.Amount ?? decimal.MaxValue,
-            accountDetailsResult.Currency, AccountType.General, new List<Transaction>());
-        return new ThirdPartyResponse<Account, AccountsError>(
+        var bankAccount = ConvertAccount(accountDetailsResult, balanceResult);
+
+        return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsRequest.IsSuccess && balanceRequest.IsSuccess, bankAccount, accountDetailsRequest.Error);
     }
 
@@ -133,5 +134,23 @@ public class GoCardlessDataProvider
             RequisitionStatus.Expired => AuthenticationStatus.Expired,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
+    }
+
+    private BankAccount ConvertAccount(BankAccountDetails account, List<Balance> balances)
+    {
+        return new BankAccount
+        (
+            // TODO: Convert Account
+            accountType: account.CashAccountType?.GetDescription(),
+            name: account.Product,
+            description: account.Details,
+            balance: balances.First(bal => bal.BalanceType == BalanceType.ClosingBooked).BalanceAmount.Amount,
+            currency: account.Currency,
+            iban: account.Iban,
+            bic: account.Bic,
+            bban: account.Bban,
+            ownerName: account.OwnerName,
+            transactions: new List<Transaction>()
+        );
     }
 }

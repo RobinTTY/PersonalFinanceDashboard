@@ -24,7 +24,7 @@ public class Query
     /// </summary>
     /// <param name="accountId"></param>
     /// <returns></returns>
-    public async Task<Account> GetAccount(string accountId)
+    public async Task<BankAccount> GetAccount(string accountId)
     {
         var account = await _dataProvider.GetBankAccount(accountId);
         return account.Result!;

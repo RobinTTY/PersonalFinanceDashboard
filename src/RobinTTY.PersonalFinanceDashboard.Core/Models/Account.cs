@@ -8,23 +8,19 @@ public class Account
     /// <summary>
     /// The name of the account.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
     /// <summary>
     /// A description of this account.
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
     /// <summary>
     /// The current balance of the account.
     /// </summary>
-    public decimal Balance { get; set; }
+    public decimal? Balance { get; set; }
     /// <summary>
     /// The currency this account is denominated in.
     /// </summary>
-    public string Currency { get; set; }
-    /// <summary>
-    /// The type of the account.
-    /// </summary>
-    public AccountType Type { get; set; }
+    public string? Currency { get; set; }
     /// <summary>
     /// Transactions that are associated with this account.
     /// </summary>
@@ -37,15 +33,13 @@ public class Account
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
     /// <param name="currency">The currency this account is denominated in.</param>
-    /// <param name="type">The type of the account.</param>
     /// <param name="transactions">Transactions that are associated with this account.</param>
-    public Account(string name, string description, decimal balance, string currency, AccountType type, List<Transaction> transactions)
+    public Account(string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
     {
         Name = name;
         Description = description;
         Balance = balance;
         Currency = currency;
-        Type = type;
         Transactions = transactions;
     }
 }
