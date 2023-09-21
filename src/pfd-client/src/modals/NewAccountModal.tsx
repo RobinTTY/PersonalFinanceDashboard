@@ -1,38 +1,31 @@
-import { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { Button, Center, Group, Modal, Stack, Text } from "@mantine/core";
-import { useCounter, useDisclosure } from "@mantine/hooks";
-import { IconCoins, IconGraph } from "@tabler/icons-react";
-import { DE, US, CA, GB, AU, NZ } from "country-flag-icons/react/3x2";
+import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { Button, Center, Group, Modal, Stack, Text } from '@mantine/core';
+import { useCounter, useDisclosure } from '@mantine/hooks';
+import { IconCoins, IconGraph } from '@tabler/icons-react';
+import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
 
-import { ModalButton } from "../components/modal-button/ModalButton";
-import { ModalOptionSearchList } from "../components/modal-option-search-list/ModalOptionSearchList";
-import { CreateAuthenticationRequestQuery } from "../queries/CreateAuthenticationRequest";
+import { ModalButton } from '../components/modal-button/ModalButton';
+import { ModalOptionSearchList } from '../components/modal-option-search-list/ModalOptionSearchList';
+import { CreateAuthenticationRequestQuery } from '../queries/CreateAuthenticationRequest';
 
-type AccountType = "savings" | "investment";
+import classes from './NewAccountModal.module.css';
 
-const AccountTypeSelectionStep = ({
-  selectionAction,
-}: AccountTypeSelectionStepProps) => {
+type AccountType = 'savings' | 'investment';
+
+const AccountTypeSelectionStep = ({ selectionAction }: AccountTypeSelectionStepProps) => {
   return (
-    <Group
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-      }}
-      spacing="xl"
-      p="xs"
-    >
+    <Group className={classes.group} gap="lg" p="xs">
       {/* TODO: Create reusable component */}
       <ModalButton
         icon={<IconCoins size="4rem" />}
         description="Savings Account"
-        action={() => selectionAction("savings")}
+        action={() => selectionAction('savings')}
       />
       <ModalButton
         icon={<IconGraph size="4rem" />}
         description="Investment Account"
-        action={() => selectionAction("investment")}
+        action={() => selectionAction('investment')}
       />
     </Group>
   );
@@ -43,17 +36,15 @@ interface AccountTypeSelectionStepProps {
 }
 
 const countries = [
-  { key: "US", description: "United States", icon: <US /> },
-  { key: "CA", description: "Canada", icon: <CA /> },
-  { key: "GB", description: "United Kingdom", icon: <GB /> },
-  { key: "AU", description: "Australia", icon: <AU /> },
-  { key: "NZ", description: "New Zealand", icon: <NZ /> },
-  { key: "DE", description: "Germany", icon: <DE /> },
+  { key: 'US', description: 'United States', icon: <US /> },
+  { key: 'CA', description: 'Canada', icon: <CA /> },
+  { key: 'GB', description: 'United Kingdom', icon: <GB /> },
+  { key: 'AU', description: 'Australia', icon: <AU /> },
+  { key: 'NZ', description: 'New Zealand', icon: <NZ /> },
+  { key: 'DE', description: 'Germany', icon: <DE /> },
 ];
 
-const CountrySelectionStep = ({
-  onCountrySelect,
-}: CountrySelectionStepProps) => {
+const CountrySelectionStep = ({ onCountrySelect }: CountrySelectionStepProps) => {
   return (
     <ModalOptionSearchList
       options={countries}
@@ -71,8 +62,8 @@ interface CountrySelectionStepProps {
 
 const banks = [
   {
-    key: "DORTMUNDER_VOLKSBANK_GENODEM1DOR",
-    description: "Dortmunder Volksbank",
+    key: 'DORTMUNDER_VOLKSBANK_GENODEM1DOR',
+    description: 'Dortmunder Volksbank',
     icon: (
       <img
         src="https://cdn.nordigen.com/ais/VOLKSBANK_NIEDERGRAFSCHAFT_GENODEF1HOO.png"
@@ -81,8 +72,8 @@ const banks = [
     ),
   },
   {
-    key: "KSK_BOBLINGEN_BBKRDE6BXXX",
-    description: "Kreissparkasse Böblingen",
+    key: 'KSK_BOBLINGEN_BBKRDE6BXXX',
+    description: 'Kreissparkasse Böblingen',
     icon: (
       <img
         src="https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/sparkasse.png"
@@ -91,8 +82,8 @@ const banks = [
     ),
   },
   {
-    key: "COMMERZBANK_COBADEFF",
-    description: "Commerzbank",
+    key: 'COMMERZBANK_COBADEFF',
+    description: 'Commerzbank',
     icon: (
       <img
         src="https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/commerzbank.png"
@@ -101,8 +92,8 @@ const banks = [
     ),
   },
   {
-    key: "ING_INGDDEFF",
-    description: "ING",
+    key: 'ING_INGDDEFF',
+    description: 'ING',
     icon: (
       <img
         src="https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/ing.png"
@@ -111,8 +102,8 @@ const banks = [
     ),
   },
   {
-    key: "DKB_BYLADEM1",
-    description: "Deutsche Kreditbank AG (DKB)",
+    key: 'DKB_BYLADEM1',
+    description: 'Deutsche Kreditbank AG (DKB)',
     icon: (
       <img
         src="https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/deutschekreditbank.png"
@@ -121,8 +112,8 @@ const banks = [
     ),
   },
   {
-    key: "DEUTSCHE_BANK_DEUTDEFF",
-    description: "Deutsche Bank",
+    key: 'DEUTSCHE_BANK_DEUTDEFF',
+    description: 'Deutsche Bank',
     icon: (
       <img
         src="https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/deutschebank.png"
@@ -153,32 +144,27 @@ interface BankSelectionStepProps {
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
 const AuthenticationStep = () => {
-  const sanboxInstitution = "SANDBOXFINANCE_SFIN0000";
-  const [buttonDescription, setButtonDescription] = useState(
-    "Start Authentication"
-  );
+  const sanboxInstitution = 'SANDBOXFINANCE_SFIN0000';
+  const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
-  const [
-    createAuthenticationRequest,
-    { loading: loadingMutation, error, data },
-  ] = useMutation(CreateAuthenticationRequestQuery, {
-    variables: {
-      institutionId: sanboxInstitution,
-      redirectUri: "https://www.robintty.com/",
-    },
-    onCompleted: (data) => {
-      let link = data.createAuthenticationRequest.authenticationLink;
-      window.open(link, "_blank")?.focus();
-    },
-  });
+  const [createAuthenticationRequest, { loading: loadingMutation, error, data }] = useMutation(
+    CreateAuthenticationRequestQuery,
+    {
+      variables: {
+        institutionId: sanboxInstitution,
+        redirectUri: 'https://www.robintty.com/',
+      },
+      onCompleted: (data) => {
+        let link = data.createAuthenticationRequest.authenticationLink;
+        window.open(link, '_blank')?.focus();
+      },
+    }
+  );
 
   return (
     <Stack p="md" miw={275}>
       <Center>
-        <img
-          width="192px"
-          src="/src/assets/img/go-cardless/logo-negative.svg"
-        />
+        <img width="192px" src="/src/assets/img/go-cardless/logo-negative.svg" />
       </Center>
       {/* Provider should be link? */}
       <Center>
@@ -186,19 +172,18 @@ const AuthenticationStep = () => {
       </Center>
       <Button
         size="lg"
-        loaderPosition="center"
         fullWidth
         loading={loading}
         onClick={() => {
           // TODO: This could maybe be done more elegantly?
           if (data) {
-            console.log("Next step...");
+            console.log('Next step...');
           } else {
             createAuthenticationRequest();
             loadingHandler.open();
             setTimeout(() => {
               loadingHandler.close();
-              setButtonDescription("Finish Setup...");
+              setButtonDescription('Finish Setup...');
             }, 2000);
           }
         }}
@@ -209,10 +194,7 @@ const AuthenticationStep = () => {
   );
 };
 
-export const NewAccountModal = ({
-  opened,
-  closeModal,
-}: NewAccountModalProps) => {
+export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) => {
   const [addAccountStep, addAccountStepHandler] = useCounter(1, {
     min: 1,
     max: 4,
@@ -232,7 +214,7 @@ export const NewAccountModal = ({
         return <AccountTypeSelectionStep selectionAction={onNewAccount} />;
       case 2:
         switch (accountType) {
-          case "savings":
+          case 'savings':
             return (
               <CountrySelectionStep
                 onCountrySelect={(optionKey) => {
@@ -241,10 +223,10 @@ export const NewAccountModal = ({
                 }}
               />
             );
-          case "investment":
+          case 'investment':
             return <Text>Step 2</Text>;
           default:
-            throw new Error("Invalid account type");
+            throw new Error('Invalid account type');
         }
       case 3:
         return (
@@ -271,11 +253,10 @@ export const NewAccountModal = ({
       }}
       title={
         <Text fz="xl" fw={700} pl=".4rem">
-          {addAccountStep === 1 &&
-            "What type of account would you like to add?"}
-          {addAccountStep === 2 && "Select your country"}
-          {addAccountStep === 3 && "Select your bank"}
-          {addAccountStep === 4 && "Authenticate"}
+          {addAccountStep === 1 && 'What type of account would you like to add?'}
+          {addAccountStep === 2 && 'Select your country'}
+          {addAccountStep === 3 && 'Select your bank'}
+          {addAccountStep === 4 && 'Authenticate'}
         </Text>
       }
       centered
