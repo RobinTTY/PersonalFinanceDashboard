@@ -1,29 +1,18 @@
-import { ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
+import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
+
+import classes from './NavigationLink.module.css';
 
 export const NavigationLink = ({ icon, color, label }: NavigationLinkProps) => {
   return (
-    <UnstyledButton
-      sx={(theme) => ({
-        display: "block",
-        width: "100%",
-        padding: theme.spacing.xs,
-        borderRadius: theme.radius.sm,
-        color:
-          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-        "&:hover": {
-          backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[0],
-        },
-      })}
-    >
+    <UnstyledButton className={classes['unstyled-button']}>
       <Group>
         <ThemeIcon size="lg" color={color} variant="light">
           {icon}
         </ThemeIcon>
 
-        <Text size="lg">{label}</Text>
+        <Text size="lg" fw="500">
+          {label}
+        </Text>
       </Group>
     </UnstyledButton>
   );
