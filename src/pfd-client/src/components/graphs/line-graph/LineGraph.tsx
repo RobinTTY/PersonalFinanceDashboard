@@ -1,8 +1,8 @@
-import { Text, Paper, useMantineTheme } from "@mantine/core";
-import { ResponsiveLine } from "@nivo/line";
-import { SampleLineData as data } from "./SampleLineData";
-import { NivoGridWrapper } from "../nivo-grid-wrapper/NivoGridWrapper";
-import "./LineGraph.css";
+import { Text, Paper, useMantineTheme } from '@mantine/core';
+import { ResponsiveLine } from '@nivo/line';
+import { SampleLineData as data } from './SampleLineData';
+import { NivoGridWrapper } from '../nivo-grid-wrapper/NivoGridWrapper';
+import './LineGraph.css';
 
 // TODO: typing for data
 // TODO: theme color switch (light mode)
@@ -12,7 +12,7 @@ export const LineGraph = () => {
   return (
     <Paper withBorder p="md" radius="md" h="50%">
       <div id="main-container">
-        <Text size="lg" pl="xl" color="white">
+        <Text size="lg" pl="xl" c="white">
           Net Worth
         </Text>
         <NivoGridWrapper>
@@ -52,18 +52,18 @@ export const LineGraph = () => {
               },
               crosshair: {
                 line: {
-                  stroke: "#afffff",
+                  stroke: '#afffff',
                   strokeWidth: 1.5,
                   strokeOpacity: 0.75,
                 },
               },
             }}
             margin={{ top: 20, right: 110, bottom: 40, left: 60 }}
-            xScale={{ type: "point" }}
+            xScale={{ type: 'point' }}
             yScale={{
-              type: "linear",
-              min: "auto",
-              max: "auto",
+              type: 'linear',
+              min: 'auto',
+              max: 'auto',
               stacked: false,
               reverse: false,
             }}
@@ -74,36 +74,36 @@ export const LineGraph = () => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: "USD",
+              legend: 'USD',
               legendOffset: -50,
-              legendPosition: "middle",
+              legendPosition: 'middle',
             }}
             pointSize={10}
-            pointColor={{ theme: "background" }}
+            pointColor={{ theme: 'background' }}
             pointBorderWidth={2}
-            pointBorderColor={{ from: "serieColor" }}
+            pointBorderColor={{ from: 'serieColor' }}
             pointLabelYOffset={-12}
             useMesh={true}
             legends={[
               {
-                anchor: "bottom-right",
-                direction: "column",
+                anchor: 'bottom-right',
+                direction: 'column',
                 justify: false,
                 translateX: 100,
                 translateY: 0,
                 itemsSpacing: 0,
-                itemDirection: "left-to-right",
+                itemDirection: 'left-to-right',
                 itemWidth: 80,
                 itemHeight: 20,
                 itemOpacity: 0.75,
                 symbolSize: 12,
-                symbolShape: "circle",
-                symbolBorderColor: "rgba(0, 0, 0, .5)",
+                symbolShape: 'circle',
+                symbolBorderColor: 'rgba(0, 0, 0, .5)',
                 effects: [
                   {
-                    on: "hover",
+                    on: 'hover',
                     style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
+                      itemBackground: 'rgba(0, 0, 0, .03)',
                       itemOpacity: 1,
                     },
                   },
