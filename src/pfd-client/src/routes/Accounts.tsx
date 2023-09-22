@@ -19,7 +19,7 @@ export const Accounts = () => {
   });
 
   let accounts: any[] = [];
-  if (data)
+  if (data && data.accounts && data.accounts.edges)
     data.accounts.edges.map((account: any) => {
       accounts.push(account.node);
       // console.log(account.node);

@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { gql } from '../graphql-types/gql';
 
-export const CreateAuthenticationRequestQuery = gql`
+export const CreateAuthenticationRequestQuery = gql(`
   mutation CreateAuthenticationRequest(
     $institutionId: String!
     $redirectUri: String!
@@ -15,4 +15,4 @@ export const CreateAuthenticationRequestQuery = gql`
       authenticationLink
     }
   }
-`;
+`);
