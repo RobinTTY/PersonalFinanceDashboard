@@ -7,7 +7,7 @@ import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
 
 import { ModalButton } from '../../components/modal-button/ModalButton';
 import { ModalOptionSearchList } from '../../components/modal-option-search-list/ModalOptionSearchList';
-import { CreateAuthenticationRequestQuery } from '../../queries/CreateAuthenticationRequest';
+import { CreateAuthenticationRequestQuery } from '../../graphql/queries/CreateAuthenticationRequest';
 
 import classes from './NewAccountModal.module.css';
 
@@ -147,6 +147,7 @@ const AuthenticationStep = () => {
   const sanboxInstitution = 'SANDBOXFINANCE_SFIN0000';
   const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
+  console.log(sanboxInstitution);
   const [createAuthenticationRequest, { loading: loadingMutation, error, data }] = useMutation(
     CreateAuthenticationRequestQuery,
     {

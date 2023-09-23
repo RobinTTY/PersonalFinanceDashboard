@@ -1,4 +1,4 @@
-import { gql } from '../graphql-types/gql';
+import { gql } from '../types/gql';
 
 // Apollo uses offset pagination by default: https://www.apollographql.com/docs/react/pagination/core-api/
 // HotChocolate recommends using Connections: https://chillicream.com/docs/hotchocolate/v13/fetching-data/pagination/#connections

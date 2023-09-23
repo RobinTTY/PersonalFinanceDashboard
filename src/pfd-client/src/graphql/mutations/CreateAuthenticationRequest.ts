@@ -1,6 +1,6 @@
-import { gql } from '../graphql-types/gql';
+import { gql } from '../types/gql';
 
-export const CreateAuthenticationRequestQuery = gql(`
+export const CreateAuthenticationRequestMutation = gql(`
   mutation CreateAuthenticationRequest(
     $institutionId: String!
     $redirectUri: String!

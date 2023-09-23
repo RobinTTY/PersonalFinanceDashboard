@@ -4,7 +4,7 @@ import { Router } from './Router';
 import { theme } from './theme';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing';
-import { MockData } from './mock-data/api/MockData';
+import { MockData } from './graphql/mock-data/MockData';
 
 // TODO: Remove when fixed: https://github.com/mantinedev/mantine/issues/4830
 import './App.css';

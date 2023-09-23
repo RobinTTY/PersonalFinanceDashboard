@@ -7,7 +7,7 @@ import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
 
 import { ModalButton } from '../components/modal-button/ModalButton';
 import { ModalOptionSearchList } from '../components/modal-option-search-list/ModalOptionSearchList';
-import { CreateAuthenticationRequestQuery } from '../queries/CreateAuthenticationRequest';
+import { CreateAuthenticationRequestMutation } from '../graphql/mutations/CreateAuthenticationRequest';
 
 import classes from './NewAccountModal.module.css';
 
@@ -148,7 +148,7 @@ const AuthenticationStep = () => {
   const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
   const [createAuthenticationRequest, { loading: loadingMutation, error, data }] = useMutation(
-    CreateAuthenticationRequestQuery,
+    CreateAuthenticationRequestMutation,
     {
       variables: {
         institutionId: sanboxInstitution,

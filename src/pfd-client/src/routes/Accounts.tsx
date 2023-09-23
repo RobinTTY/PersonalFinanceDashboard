@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GetAccountsQuery } from '../queries/GetAccounts';
+import { GetAccountsQuery } from '../graphql/queries/GetAccounts';
 import { useDisclosure } from '@mantine/hooks';
 import { Center, Loader, SimpleGrid, Button, Container } from '@mantine/core';
 
