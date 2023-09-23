@@ -9,6 +9,7 @@ import { MockData } from './graphql/mock-data/MockData';
 // TODO: Remove when fixed: https://github.com/mantinedev/mantine/issues/4830
 import './App.css';
 
+// TODO: This could be used to provide a demo mode without backend
 const testEnvironment = true;
 
 // Appolo (GraphQL) Setup
