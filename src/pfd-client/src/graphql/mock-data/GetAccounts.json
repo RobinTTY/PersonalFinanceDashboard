@@ -4,37 +4,30 @@
       "edges": [
         {
           "node": {
-            "description": "Personal Loan Account",
-            "balance": 2521.9,
-            "currency": "USD"
+            "id": "072fefa4-4530-4322-aafe-e953d37402ae",
+            "name": "Checkings",
+            "description": null,
+            "balance": 1913.12,
+            "currency": "EUR",
+            "iban": "GL2010440000010445",
+            "bic": null,
+            "bban": null,
+            "ownerName": "Jane Doe",
+            "accountType": "Current"
           }
         },
         {
           "node": {
-            "description": "Personal Loan Account",
-            "balance": 1989.09,
-            "currency": "USD"
-          }
-        },
-        {
-          "node": {
-            "description": "Money Market Account",
-            "balance": 3908.26,
-            "currency": "USD"
-          }
-        },
-        {
-          "node": {
-            "description": "Money Market Account",
-            "balance": 4658.92,
-            "currency": "USD"
-          }
-        },
-        {
-          "node": {
-            "description": "Home Loan Account",
-            "balance": 242.48,
-            "currency": "USD"
+            "id": "443a187b-6900-410e-8706-7cc0d8c39987",
+            "name": "Checkings",
+            "description": null,
+            "balance": 1913.12,
+            "currency": "EUR",
+            "iban": "GL6298500000098503",
+            "bic": null,
+            "bban": null,
+            "ownerName": "John Doe",
+            "accountType": "Current"
           }
         }
       ]

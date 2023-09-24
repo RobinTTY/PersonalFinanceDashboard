@@ -4,13 +4,20 @@ import { gql } from '../types/gql';
 // HotChocolate recommends using Connections: https://chillicream.com/docs/hotchocolate/v13/fetching-data/pagination/#connections
 // TODO: Figure out what would be the best strategy
 export const GetAccountsQuery = gql(`
-  query GetAccounts($first: Int) {
-    accounts(first: $first) {
+  query GetAccounts($accountIds: [String!]!) {
+    accounts(accountIds: $accountIds) {
       edges {
         node {
+          id
+          name
           description
           balance
           currency
+          iban
+          bic
+          bban
+          ownerName
+          accountType
         }
       }
     }

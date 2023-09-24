@@ -1,12 +1,12 @@
-import { useQuery } from '@apollo/client';
+import { QueryResult, useQuery } from '@apollo/client';
 import { Center, Loader, Text } from '@mantine/core';
 import { Authentication } from './AuthenticationStep';
-import { GetAccountQuery } from '@/graphql/queries/GetAccount';
+import { GetAccountsQuery } from '@/graphql/queries/GetAccounts';
 
 export const AccountSelectionStep = ({ authentication }: AccountSelectionStepProps) => {
-  const { loading, error, data } = useQuery(GetAccountQuery, {
+  const { loading, error, data } = useQuery(GetAccountsQuery, {
     variables: {
-      accountId: '072fefa4-4530-4322-aafe-e953d37402ae',
+      accountIds: authentication.associatedAccounts,
     },
   });
 
@@ -18,7 +18,7 @@ export const AccountSelectionStep = ({ authentication }: AccountSelectionStepPro
       </Center>
     );
 
-  console.log(authentication);
+  console.log(data);
   return <Text>Account Selection</Text>;
 };
 

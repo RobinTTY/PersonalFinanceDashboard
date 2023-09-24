@@ -21,22 +21,13 @@ export type Scalars = {
   URL: { input: any; output: any; }
 };
 
-export type Account = {
-  __typename?: 'Account';
-  balance?: Maybe<Scalars['Decimal']['output']>;
-  currency?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  transactions: Array<Transaction>;
-};
-
 /** A connection to a list of items. */
 export type AccountsConnection = {
   __typename?: 'AccountsConnection';
   /** A list of edges. */
   edges?: Maybe<Array<AccountsEdge>>;
   /** A flattened list of the nodes. */
-  nodes?: Maybe<Array<Account>>;
+  nodes?: Maybe<Array<BankAccount>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
 };
@@ -47,7 +38,7 @@ export type AccountsEdge = {
   /** A cursor for use in pagination. */
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
-  node: Account;
+  node: BankAccount;
 };
 
 export type AuthenticationRequest = {
@@ -75,6 +66,7 @@ export type BankAccount = {
   currency?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   iban?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
   ownerName?: Maybe<Scalars['String']['output']>;
   transactions: Array<Transaction>;
@@ -153,7 +145,7 @@ export type Query = {
   __typename?: 'Query';
   /** Look up an account by its id. */
   account?: Maybe<BankAccount>;
-  /** Look up accounts. */
+  /** Look up accounts by a list of ids. */
   accounts?: Maybe<AccountsConnection>;
   authenticationRequest?: Maybe<AuthenticationRequest>;
   authenticationRequests: Array<AuthenticationRequest>;
@@ -171,6 +163,7 @@ export type QueryAccountArgs = {
 
 /** GraphQL root type for query operations. */
 export type QueryAccountsArgs = {
+  accountIds: Array<Scalars['String']['input']>;
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -249,11 +242,11 @@ export type GetAccountQueryVariables = Exact<{
 export type GetAccountQuery = { __typename?: 'Query', account?: { __typename?: 'BankAccount', name?: string | null, description?: string | null, balance?: any | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } | null };
 
 export type GetAccountsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']['input']>;
+  accountIds: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
-export type GetAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'Account', description?: string | null, balance?: any | null, currency?: string | null } }> | null } | null };
+export type GetAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'BankAccount', id: string, name?: string | null, description?: string | null, balance?: any | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } }> | null } | null };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['String']['input'];
@@ -265,5 +258,5 @@ export type GetAuthenticationRequestQuery = { __typename?: 'Query', authenticati
 
 export const CreateAuthenticationRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateAuthenticationRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAuthenticationRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"institutionId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}}},{"kind":"Argument","name":{"kind":"Name","value":"redirectUri"},"value":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"associatedAccounts"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"authenticationLink"}}]}}]}}]} as unknown as DocumentNode<CreateAuthenticationRequestMutation, CreateAuthenticationRequestMutationVariables>;
 export const GetAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAccount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"accountId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"balance"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"iban"}},{"kind":"Field","name":{"kind":"Name","value":"bic"}},{"kind":"Field","name":{"kind":"Name","value":"bban"}},{"kind":"Field","name":{"kind":"Name","value":"ownerName"}},{"kind":"Field","name":{"kind":"Name","value":"accountType"}}]}}]}}]} as unknown as DocumentNode<GetAccountQuery, GetAccountQueryVariables>;
-export const GetAccountsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAccounts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accounts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"balance"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAccountsQuery, GetAccountsQueryVariables>;
+export const GetAccountsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAccounts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"accountIds"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accounts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"accountIds"},"value":{"kind":"Variable","name":{"kind":"Name","value":"accountIds"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"balance"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"iban"}},{"kind":"Field","name":{"kind":"Name","value":"bic"}},{"kind":"Field","name":{"kind":"Name","value":"bban"}},{"kind":"Field","name":{"kind":"Name","value":"ownerName"}},{"kind":"Field","name":{"kind":"Name","value":"accountType"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAccountsQuery, GetAccountsQueryVariables>;
 export const GetAuthenticationRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAuthenticationRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"authenticationId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticationRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"authenticationId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"authenticationId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"associatedAccounts"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"authenticationLink"}}]}}]}}]} as unknown as DocumentNode<GetAuthenticationRequestQuery, GetAuthenticationRequestQueryVariables>;

@@ -48,9 +48,12 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
           // Second button interaction: Once user is redirected back from GoCardless
           if (data) {
             // TODO: Handle status other than success
+            loadingHandler.open();
             const auth = await getAuthenticationRequest({
               variables: { authenticationId: data.createAuthenticationRequest.id },
             });
+            loadingHandler.close();
+
             onFinishSetup({
               id: data.createAuthenticationRequest.id,
               associatedAccounts: auth.data?.authenticationRequest?.associatedAccounts || [],

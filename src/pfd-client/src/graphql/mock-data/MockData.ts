@@ -28,7 +28,12 @@ export const MockData: readonly MockedResponse<Record<string, any>, Record<strin
   {
     request: {
       query: GetAccountsQuery,
-      variables: { first: 5 },
+      variables: {
+        accountIds: [
+          '072fefa4-4530-4322-aafe-e953d37402ae',
+          '443a187b-6900-410e-8706-7cc0d8c39987',
+        ],
+      },
     },
     result: {
       data: MockAccountsData.data,
