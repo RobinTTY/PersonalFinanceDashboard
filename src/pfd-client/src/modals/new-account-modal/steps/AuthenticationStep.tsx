@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useDisclosure } from '@mantine/hooks';
 import { Button, Center, Stack, Text } from '@mantine/core';
-import { CreateAuthenticationRequestMutation } from '../../../graphql/mutations/CreateAuthenticationRequest';
+import { CreateAuthenticationRequestMutation } from '@/graphql/mutations/CreateAuthenticationRequest';
+import { GetAuthenticationRequestQuery } from '@/graphql/queries/GetAuthenticationRequest';
 
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
@@ -24,6 +25,11 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
     }
   );
 
+  const [
+    getAuthenticationRequest,
+    { loading: accountLoading, error: accountError, data: accountData },
+  ] = useLazyQuery(GetAuthenticationRequestQuery);
+
   return (
     <Stack p="md" miw={275}>
       <Center>
@@ -37,14 +43,17 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
         size="lg"
         fullWidth
         loading={loading}
-        onClick={() => {
+        onClick={async () => {
           // TODO: This could maybe be done more elegantly?
           // Second button interaction: Once user is redirected back from GoCardless
           if (data) {
             // TODO: Handle status other than success
+            const auth = await getAuthenticationRequest({
+              variables: { authenticationId: data.createAuthenticationRequest.id },
+            });
             onFinishSetup({
               id: data.createAuthenticationRequest.id,
-              associatedAccounts: data.createAuthenticationRequest.associatedAccounts,
+              associatedAccounts: auth.data?.authenticationRequest?.associatedAccounts || [],
             });
             // First button interaction: Create authentication request
           } else {

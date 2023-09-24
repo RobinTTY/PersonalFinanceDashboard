@@ -25,6 +25,7 @@ export const Accounts = () => {
       // console.log(account.node);
     });
 
+  // TODO: Create reusable loader component
   if (loading)
     return (
       <Center h={'100%'}>

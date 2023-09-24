@@ -12,6 +12,7 @@ import './App.css';
 // TODO: This could be used to provide a demo mode without backend
 const testEnvironment = true;
 
+// TODO: Investigate caching (https://www.apollographql.com/docs/react/caching/cache-configuration/)
 // Appolo (GraphQL) Setup
 const client = new ApolloClient({
   uri: 'http://localhost:5115/graphql',
