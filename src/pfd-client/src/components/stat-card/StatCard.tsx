@@ -1,4 +1,4 @@
-import { Group, Paper, Text, rem } from '@mantine/core';
+import { Group, Paper, Text } from '@mantine/core';
 import { IconArrowUpRight, IconArrowDownRight } from '@tabler/icons-react';
 import { StatCardProps, icons } from './StatCardProps';
 

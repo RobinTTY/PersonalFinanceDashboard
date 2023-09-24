@@ -11,7 +11,7 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
   const sanboxInstitution = 'SANDBOXFINANCE_SFIN0000';
   const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
-  const [createAuthenticationRequest, { loading: loadingMutation, error, data }] = useMutation(
+  const [createAuthenticationRequest, { data: authRequestData }] = useMutation(
     CreateAuthenticationRequestMutation,
     {
       variables: {
@@ -19,7 +19,7 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
         redirectUri: 'https://www.robintty.com/',
       },
       onCompleted: (data) => {
-        let link = data.createAuthenticationRequest.authenticationLink;
+        const link = data.createAuthenticationRequest.authenticationLink;
         window.open(link, '_blank')?.focus();
       },
     }
@@ -27,13 +27,17 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
 
   const [
     getAuthenticationRequest,
-    { loading: accountLoading, error: accountError, data: accountData },
+    // { loading: accountLoading, error: accountError, data: accountData },
   ] = useLazyQuery(GetAuthenticationRequestQuery);
 
   return (
     <Stack p="md" miw={275}>
       <Center>
-        <img width="192px" src="/src/assets/img/go-cardless/logo-negative.svg" />
+        <img
+          width="192px"
+          src="/src/assets/img/go-cardless/logo-negative.svg"
+          alt="go-cardless-logo"
+        />
       </Center>
       {/* Provider should be link? */}
       <Center>
@@ -46,16 +50,16 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
         onClick={async () => {
           // TODO: This could maybe be done more elegantly?
           // Second button interaction: Once user is redirected back from GoCardless
-          if (data) {
+          if (authRequestData) {
             // TODO: Handle status other than success
             loadingHandler.open();
             const auth = await getAuthenticationRequest({
-              variables: { authenticationId: data.createAuthenticationRequest.id },
+              variables: { authenticationId: authRequestData.createAuthenticationRequest.id },
             });
             loadingHandler.close();
 
             onFinishSetup({
-              id: data.createAuthenticationRequest.id,
+              id: authRequestData.createAuthenticationRequest.id,
               associatedAccounts: auth.data?.authenticationRequest?.associatedAccounts || [],
             });
             // First button interaction: Create authentication request

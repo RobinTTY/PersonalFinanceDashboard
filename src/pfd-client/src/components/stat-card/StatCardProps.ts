@@ -1,9 +1,4 @@
-import {
-  IconUserPlus,
-  IconDiscount2,
-  IconReceipt2,
-  IconCoin,
-} from "@tabler/icons-react";
+import { IconUserPlus, IconDiscount2, IconReceipt2, IconCoin } from '@tabler/icons-react';
 
 export const icons = {
   user: IconUserPlus,

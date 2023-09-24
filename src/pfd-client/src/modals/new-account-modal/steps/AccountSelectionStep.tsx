@@ -4,25 +4,30 @@ import { Authentication } from './AuthenticationStep';
 import { GetAccountsQuery } from '@/graphql/queries/GetAccounts';
 
 export const AccountSelectionStep = ({ authentication }: AccountSelectionStepProps) => {
-  const { loading, error, data } = useQuery(GetAccountsQuery, {
+  const { loading, data } = useQuery(GetAccountsQuery, {
     variables: {
       accountIds: authentication.associatedAccounts,
     },
   });
 
   // TODO: Create reusable loader component
-  if (loading)
+  if (loading) {
     return (
-      <Center h={'100%'}>
+      <Center h="100%">
         <Loader color="violet" />
       </Center>
     );
+  }
 
   // TODO: safeguard
-  data?.accounts?.edges?.map((account) => {
-    console.log(account);
-  });
-  return <Text></Text>;
+  return (
+    <>
+      {data?.accounts?.edges?.map((account) => {
+        console.log(account);
+        return <Text key={account.node.id}>Account</Text>;
+      })}
+    </>
+  );
 };
 
 export interface AccountSelectionStepProps {

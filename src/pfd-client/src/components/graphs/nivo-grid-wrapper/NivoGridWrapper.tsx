@@ -1,10 +1,8 @@
-import "./NivoGridWrapper.css";
+import './NivoGridWrapper.css';
 
 // TODO: typing
-export const NivoGridWrapper = ({ children }: any) => {
-  return (
-    <div id="wrapper">
-      <div id="child">{children}</div>
-    </div>
-  );
-};
+export const NivoGridWrapper = ({ children }: any) => (
+  <div id="wrapper">
+    <div id="child">{children}</div>
+  </div>
+);

@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client';
-import { GetMinimalAccountsQuery } from '../graphql/queries/GetAccounts';
 import { useDisclosure } from '@mantine/hooks';
-import { Center, Loader, SimpleGrid, Button, Container } from '@mantine/core';
+import { Center, Loader, SimpleGrid, Button } from '@mantine/core';
 
-import { AccountSummary } from '../components/account-summary/AccountSummary';
-import { AccountSummaryProps } from '../components/account-summary/AccountSummaryProps';
-import { NewAccountModal } from '../modals/new-account-modal/NewAccountModal';
+import { BankAccount } from '@/graphql/types/graphql';
+import { GetMinimalAccountsQuery } from '@/graphql/queries/GetAccounts';
+import { AccountSummary } from '@/components/account-summary/AccountSummary';
+import { NewAccountModal } from '@/modals/new-account-modal/NewAccountModal';
 
 import classes from './Accounts.module.css';
 
@@ -14,41 +14,45 @@ import classes from './Accounts.module.css';
 export const Accounts = () => {
   const [addAccountModalOpen, { open: openAddAccountModal, close: closeAddAccountModal }] =
     useDisclosure(false);
-  const { loading, error, data } = useQuery(GetMinimalAccountsQuery, {
+  const { loading, data } = useQuery(GetMinimalAccountsQuery, {
     variables: {
       accountIds: [],
     },
   });
 
-  let accounts: any[] = [];
-  if (data && data.accounts && data.accounts.edges)
-    data.accounts.edges.map((account: any) => {
-      accounts.push(account.node);
-      // console.log(account.node);
+  const accounts: BankAccount[] = [];
+  if (data && data.accounts && data.accounts.edges) {
+    data.accounts.edges.forEach((account) => {
+      accounts.push(account.node as BankAccount);
     });
+  }
 
   // TODO: Create reusable loader component
-  if (loading)
+  if (loading) {
     return (
-      <Center h={'100%'}>
+      <Center h="100%">
         <Loader color="violet" />
       </Center>
     );
+  }
 
   // TODO: common css class for 100% height/width container?
   return (
     <>
-      <NewAccountModal
-        opened={addAccountModalOpen}
-        closeModal={closeAddAccountModal}
-      ></NewAccountModal>
+      <NewAccountModal opened={addAccountModalOpen} closeModal={closeAddAccountModal} />
       <div className={classes['accounts-container']}>
         <div>
           <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }}>
-            {accounts.map((account: AccountSummaryProps) => {
-              // TODO: Add key
-              return <AccountSummary {...account} key={account.balance} />;
-            })}
+            {accounts.map((account) => (
+              // TODO: handle null
+              <AccountSummary
+                balance={account.balance}
+                currency={account.currency!}
+                description={account.description!}
+                type={account.accountType!}
+                key={account.id}
+              />
+            ))}
           </SimpleGrid>
         </div>
         <Center py="md">

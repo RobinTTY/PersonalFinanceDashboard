@@ -83,7 +83,7 @@ export const LineGraph = () => {
             pointBorderWidth={2}
             pointBorderColor={{ from: 'serieColor' }}
             pointLabelYOffset={-12}
-            useMesh={true}
+            useMesh
             legends={[
               {
                 anchor: 'bottom-right',

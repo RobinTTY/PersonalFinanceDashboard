@@ -29,6 +29,7 @@ export const GetMinimalAccountsQuery = gql(`
     accounts(accountIds: $accountIds) {
       edges {
         node {
+          id
           description
           balance
           currency

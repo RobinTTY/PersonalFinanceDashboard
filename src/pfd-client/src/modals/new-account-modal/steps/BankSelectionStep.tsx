@@ -64,19 +64,17 @@ const banks = [
   },
 ];
 
-export const BankSelectionStep = ({ onBankSelect }: BankSelectionStepProps) => {
-  return (
-    <ModalOptionSearchList
-      options={banks}
-      searchPlaceholder="Filter banks..."
-      optionDescriptionWidth={200}
-      truncateOptionDescription
-      onOptionSelect={(optionKey) => {
-        onBankSelect(optionKey);
-      }}
-    />
-  );
-};
+export const BankSelectionStep = ({ onBankSelect }: BankSelectionStepProps) => (
+  <ModalOptionSearchList
+    options={banks}
+    searchPlaceholder="Filter banks..."
+    optionDescriptionWidth={200}
+    truncateOptionDescription
+    onOptionSelect={(optionKey) => {
+      onBankSelect(optionKey);
+    }}
+  />
+);
 
 export interface BankSelectionStepProps {
   onBankSelect: (bankKey: string) => void;

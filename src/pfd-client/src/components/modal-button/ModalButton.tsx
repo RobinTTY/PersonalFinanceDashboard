@@ -1,6 +1,6 @@
+import { IconChevronRight } from '@tabler/icons-react';
 import { UnstyledButton, Center, Text, Group, rem } from '@mantine/core';
 import { ModalButtonProps } from './ModalButtonProps';
-import { IconChevronRight } from '@tabler/icons-react';
 
 import classes from './ModalButton.module.css';
 

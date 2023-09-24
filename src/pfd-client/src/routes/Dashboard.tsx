@@ -21,7 +21,7 @@ export const Dashboard = () => {
     <>
       <LineGraph />
       <Space h="md" />
-      <StatsGrid data={gridprops}></StatsGrid>
+      <StatsGrid data={gridprops} />
     </>
   );
 };

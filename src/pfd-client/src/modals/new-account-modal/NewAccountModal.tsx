@@ -14,12 +14,12 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
     max: 5,
   });
   const [accountType, setAccountType] = useState<AccountType>();
-  const [country, setCountry] = useState<string>();
-  const [bank, setBank] = useState<string>();
+  const [, setCountry] = useState<string>();
+  const [, setBank] = useState<string>();
   const [authentication, setAuthentication] = useState<Authentication>();
 
-  const onNewAccount = (accountType: AccountType) => {
-    setAccountType(accountType);
+  const onNewAccount = (type: AccountType) => {
+    setAccountType(type);
     addAccountStepHandler.increment();
   };
 
@@ -55,8 +55,8 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
       case 4:
         return (
           <AuthenticationStep
-            onFinishSetup={(authentication) => {
-              setAuthentication(authentication);
+            onFinishSetup={(auth) => {
+              setAuthentication(auth);
               addAccountStepHandler.increment();
             }}
           />

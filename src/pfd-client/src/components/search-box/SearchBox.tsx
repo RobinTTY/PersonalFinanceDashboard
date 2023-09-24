@@ -1,33 +1,18 @@
-import {
-  TextInput,
-  TextInputProps,
-  ActionIcon,
-  useMantineTheme,
-} from "@mantine/core";
-import { IconSearch, IconArrowRight, IconArrowLeft } from "@tabler/icons-react";
+import { TextInput, TextInputProps, ActionIcon } from '@mantine/core';
+import { IconSearch, IconArrowRight } from '@tabler/icons-react';
 
 export const SearchBox = (props: SearchBoxProps) => {
-  const theme = useMantineTheme();
   const { actionIconActive, ...textInputProps } = props;
 
   return (
     <TextInput
-      icon={<IconSearch size="1.1rem" stroke={1.5} />}
+      leftSection={<IconSearch size="1.1rem" stroke={1.5} />}
       radius="xl"
       size="md"
       rightSection={
         actionIconActive ? (
-          <ActionIcon
-            size={32}
-            radius="xl"
-            color={theme.primaryColor}
-            variant="filled"
-          >
-            {theme.dir === "ltr" ? (
-              <IconArrowRight size="1.1rem" stroke={1.5} />
-            ) : (
-              <IconArrowLeft size="1.1rem" stroke={1.5} />
-            )}
+          <ActionIcon size={32} radius="xl" variant="filled">
+            <IconArrowRight size="1.1rem" stroke={1.5} />
           </ActionIcon>
         ) : null
       }
