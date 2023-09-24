@@ -4,7 +4,6 @@ using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Requests;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.DataImport.Extensions;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
 using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
@@ -20,6 +19,7 @@ public class GoCardlessDataProvider
 
     public GoCardlessDataProvider(HttpClient httpClient, NordigenClientCredentials credentials)
     {
+        // TODO: injection
         _client = new NordigenClient(httpClient, credentials);
     }
 
@@ -32,7 +32,7 @@ public class GoCardlessDataProvider
     public async Task<ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>> GetBankingInstitutions(string? country = null)
     {
         var response = await _client.InstitutionsEndpoint.GetInstitutions(country);
-        
+
         if (response.IsSuccess)
         {
             var institutions =
@@ -43,35 +43,36 @@ public class GoCardlessDataProvider
         return new ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>(false, null, response.Error);
     }
 
+    /// <summary>
+    /// Gets an existing authentication request (requisitions).
+    /// </summary>
+    /// <param name="requisitionId">The id of the requisition to be retrieved.</param>
+    /// <returns>The <see cref="AuthenticationRequest"/> which matches the id, as far as it exists.</returns>
+    public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicError?>> GetAuthenticationRequest(string requisitionId)
+    {
+        var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId);
+        // TODO: handle request failure
+        var requisition = response.Result!;
+        var result = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
+            ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink);
+        return new ThirdPartyResponse<AuthenticationRequest?, BasicError?>(response.IsSuccess, result, response.Error);
+    }
+
     // TODO: Cancellation token support
     /// <summary>
     /// Gets existing authentication requests (requisitions) for all banking institutions.
     /// </summary>
     /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
-    /// <param name="requisitionId">Optional authenticationId filter to apply to the query. Only the requisition which matches the filter will be returned as far as it exists.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
-    public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>> GetAuthenticationRequests(int requisitionLimit, Guid? requisitionId = null)
+    public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError?>> GetAuthenticationRequests(int requisitionLimit)
     {
-        if (requisitionId is null)
-        {
-            var response = await _client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
-            // TODO: handle request failure
-            var requisitions = response.Result!.Results;
-            var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
-                req.Accounts.Select(guid => guid.ToString()), ConvertRequisitionStatus(req.Status), req.AuthenticationLink)).AsQueryable();
-            return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess, result, response.Error);
-        }
-        else
-        {
-            var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId.Value);
-            // TODO: handle request failure
-            var requisition = response.Result!;
-            var result = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
-                ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink);
-            return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError>(response.IsSuccess,
-                new List<AuthenticationRequest> {result}.AsQueryable(), response.Error);
-        }
-        
+        var response = await _client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
+        // TODO: handle request failure
+        var requisitions = response.Result!.Results;
+        var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
+            req.Accounts.Select(guid => guid.ToString()), ConvertRequisitionStatus(req.Status), req.AuthenticationLink)).AsQueryable();
+        return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError?>(response.IsSuccess, result, response.Error);
+
     }
 
     /// <summary>
@@ -84,7 +85,7 @@ public class GoCardlessDataProvider
     {
         var requisitionRequest = new CreateRequisitionRequest(redirectUri, institutionId, Guid.NewGuid().ToString(), "EN");
         var response = await _client.RequisitionsEndpoint.CreateRequisition(requisitionRequest);
-        
+
         if (response.IsSuccess)
         {
             var requisition = response.Result;
@@ -112,10 +113,17 @@ public class GoCardlessDataProvider
         var balanceRequest = await balanceTask;
         var accountDetailsResult = accountDetailsRequest.Result!;
         var balanceResult = balanceRequest.Result!;
-        var bankAccount = ConvertAccount(accountDetailsResult, balanceResult);
+        var bankAccount = ConvertAccount(accountId, accountDetailsResult, balanceResult);
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsRequest.IsSuccess && balanceRequest.IsSuccess, bankAccount, accountDetailsRequest.Error);
+    }
+
+    public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(IEnumerable<string> accountIds)
+    {
+        var tasks = accountIds.Select(GetBankAccount).ToList();
+        await Task.WhenAll(tasks);
+        return tasks.Select(task => task.Result).ToList();
     }
 
     private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
@@ -136,15 +144,19 @@ public class GoCardlessDataProvider
         };
     }
 
-    private BankAccount ConvertAccount(BankAccountDetails account, List<Balance> balances)
+    private BankAccount ConvertAccount(string accountId, BankAccountDetails account, List<Balance> balances)
     {
         return new BankAccount
         (
             // TODO: Convert Account
-            accountType: account.CashAccountType?.GetDescription(),
+            id: accountId,
+            accountType: account.CashAccountType.HasValue ? Enum.GetName(typeof(CashAccountType), account.CashAccountType) : null,
             name: account.Product,
             description: account.Details,
-            balance: balances.First(bal => bal.BalanceType == BalanceType.ClosingBooked).BalanceAmount.Amount,
+            // TODO: The balance type could be something different (which one should be grabbed?)
+            balance: balances.First(bal => 
+                bal.BalanceType is BalanceType.ClosingBooked or BalanceType.InterimAvailable)
+                .BalanceAmount.Amount,
             currency: account.Currency,
             iban: account.Iban,
             bic: account.Bic,

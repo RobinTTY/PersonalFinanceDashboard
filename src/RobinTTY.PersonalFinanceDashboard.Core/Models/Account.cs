@@ -6,6 +6,10 @@
 public class Account
 {
     /// <summary>
+    /// The id of the account.
+    /// </summary>
+    public string Id { get; set; }
+    /// <summary>
     /// The name of the account.
     /// </summary>
     public string? Name { get; set; }
@@ -29,13 +33,15 @@ public class Account
     /// <summary>
     /// Creates a new instance of <see cref="Account"/>.
     /// </summary>
+    /// <param name="id">The id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
     /// <param name="currency">The currency this account is denominated in.</param>
     /// <param name="transactions">Transactions that are associated with this account.</param>
-    public Account(string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
+    public Account(string id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
     {
+        Id = id;
         Name = name;
         Description = description;
         Balance = balance;

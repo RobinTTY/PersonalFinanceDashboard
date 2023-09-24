@@ -30,6 +30,7 @@ public class BankAccount : Account
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
     /// </summary>
+    /// <param name="id">The id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
@@ -42,9 +43,9 @@ public class BankAccount : Account
     /// <param name="ownerName">Name of the legal account owner. If there is more than one owner,
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
-    public BankAccount(string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions,
+    public BankAccount(string id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType)
-        : base(name, description, balance, currency, transactions)
+        : base(id, name, description, balance, currency, transactions)
     {
         Iban = iban;
         Bic = bic;
