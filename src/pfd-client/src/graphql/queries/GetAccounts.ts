@@ -23,3 +23,17 @@ export const GetAccountsQuery = gql(`
     }
   }
 `);
+
+export const GetMinimalAccountsQuery = gql(`
+  query GetMinimalAccounts($accountIds: [String!]!) {
+    accounts(accountIds: $accountIds) {
+      edges {
+        node {
+          description
+          balance
+          currency
+        }
+      }
+    }
+  }
+`);

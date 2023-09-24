@@ -1,11 +1,12 @@
 import { MockedResponse } from '@apollo/client/testing';
 import { GetAccountQuery } from '../queries/GetAccount';
-import { GetAccountsQuery } from '../queries/GetAccounts';
+import { GetAccountsQuery, GetMinimalAccountsQuery } from '../queries/GetAccounts';
 import { CreateAuthenticationRequestMutation } from '../mutations/CreateAuthenticationRequest';
 import { GetAuthenticationRequestQuery } from '../queries/GetAuthenticationRequest';
 
 import * as MockAccountData from './GetAccount.json';
 import * as MockAccountsData from './GetAccounts.json';
+import * as MockMinimalAccountsData from './GetMinimalAccounts.json';
 import * as MockCreateAuthenticationRequest from './CreateAuthenticationRequest.json';
 import * as MockGetAuthenticationRequest from './GetAuthenticationRequest.json';
 
@@ -37,6 +38,19 @@ export const MockData: readonly MockedResponse<Record<string, any>, Record<strin
     },
     result: {
       data: MockAccountsData.data,
+    },
+    maxUsageCount: maxReuseCount,
+  },
+  // TODO: To be correct, this would require accountIds to be a non-empty array
+  {
+    request: {
+      query: GetMinimalAccountsQuery,
+      variables: {
+        accountIds: [],
+      },
+    },
+    result: {
+      data: MockMinimalAccountsData.data,
     },
     maxUsageCount: maxReuseCount,
   },

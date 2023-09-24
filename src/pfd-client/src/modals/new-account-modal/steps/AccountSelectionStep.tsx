@@ -1,4 +1,4 @@
-import { QueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Center, Loader, Text } from '@mantine/core';
 import { Authentication } from './AuthenticationStep';
 import { GetAccountsQuery } from '@/graphql/queries/GetAccounts';
@@ -18,8 +18,11 @@ export const AccountSelectionStep = ({ authentication }: AccountSelectionStepPro
       </Center>
     );
 
-  console.log(data);
-  return <Text>Account Selection</Text>;
+  // TODO: safeguard
+  data?.accounts?.edges?.map((account) => {
+    console.log(account);
+  });
+  return <Text></Text>;
 };
 
 export interface AccountSelectionStepProps {

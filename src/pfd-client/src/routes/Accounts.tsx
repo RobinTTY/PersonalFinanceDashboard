@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GetAccountsQuery } from '../graphql/queries/GetAccounts';
+import { GetMinimalAccountsQuery } from '../graphql/queries/GetAccounts';
 import { useDisclosure } from '@mantine/hooks';
 import { Center, Loader, SimpleGrid, Button, Container } from '@mantine/core';
 
@@ -14,8 +14,10 @@ import classes from './Accounts.module.css';
 export const Accounts = () => {
   const [addAccountModalOpen, { open: openAddAccountModal, close: closeAddAccountModal }] =
     useDisclosure(false);
-  const { loading, error, data } = useQuery(GetAccountsQuery, {
-    variables: { first: 5 },
+  const { loading, error, data } = useQuery(GetMinimalAccountsQuery, {
+    variables: {
+      accountIds: [],
+    },
   });
 
   let accounts: any[] = [];
