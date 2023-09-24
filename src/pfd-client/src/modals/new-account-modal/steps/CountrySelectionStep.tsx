@@ -1,4 +1,4 @@
-import { ModalOptionSearchList } from '../../../components/modal-option-search-list/ModalOptionSearchList';
+import { ModalOptionSearchList } from '@/components/modal-option-search-list/ModalOptionSearchList';
 import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
 
 const countries = [

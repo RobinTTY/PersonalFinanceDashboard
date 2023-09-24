@@ -1,4 +1,4 @@
-import { ModalOptionSearchList } from '../../../components/modal-option-search-list/ModalOptionSearchList';
+import { ModalOptionSearchList } from '@/components/modal-option-search-list/ModalOptionSearchList';
 
 // TODO: replace with grapql query
 const banks = [

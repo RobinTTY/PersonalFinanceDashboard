@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import { ModalButton } from '../../../components/modal-button/ModalButton';
+import { ModalButton } from '@/components/modal-button/ModalButton';
 import { IconCoins, IconGraph } from '@tabler/icons-react';
 
 import classes from './AccountTypeSelectionStep.module.css';
