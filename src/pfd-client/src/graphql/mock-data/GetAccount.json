@@ -1,0 +1,15 @@
+{
+  "data": {
+    "account": {
+      "name": "Kontokorrent",
+      "description": null,
+      "balance": 789.45,
+      "currency": "EUR",
+      "iban": "DE12345678901234567890",
+      "bic": "DEUTDEDB123",
+      "bban": null,
+      "ownerName": "Aleg Tolstoy",
+      "accountType": null
+    }
+  }
+}

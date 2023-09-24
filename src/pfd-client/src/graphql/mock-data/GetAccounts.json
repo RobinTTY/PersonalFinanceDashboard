@@ -1,0 +1,43 @@
+{
+  "data": {
+    "accounts": {
+      "edges": [
+        {
+          "node": {
+            "description": "Personal Loan Account",
+            "balance": 2521.9,
+            "currency": "USD"
+          }
+        },
+        {
+          "node": {
+            "description": "Personal Loan Account",
+            "balance": 1989.09,
+            "currency": "USD"
+          }
+        },
+        {
+          "node": {
+            "description": "Money Market Account",
+            "balance": 3908.26,
+            "currency": "USD"
+          }
+        },
+        {
+          "node": {
+            "description": "Money Market Account",
+            "balance": 4658.92,
+            "currency": "USD"
+          }
+        },
+        {
+          "node": {
+            "description": "Home Loan Account",
+            "balance": 242.48,
+            "currency": "USD"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,32 +1,15 @@
 // TODO: move to extra file
-import { createStyles, SimpleGrid } from "@mantine/core";
-import { StatsGridProps } from "./StatsGridProps";
-import { StatCard } from "../stat-card/StatCard";
-
-// TODO: remove this, handle in parent
-const useStyles = createStyles(() => ({
-  root: {
-    marginTop: "1rem",
-  },
-}));
+import { SimpleGrid } from '@mantine/core';
+import { StatsGridProps } from './StatsGridProps';
+import { StatCard } from '../stat-card/StatCard';
 
 // TODO: should use children
 export const StatsGrid = (props: StatsGridProps) => {
-  const { classes } = useStyles();
-
   return (
-    <div className={classes.root}>
-      <SimpleGrid
-        cols={4}
-        breakpoints={[
-          { maxWidth: "md", cols: 2 },
-          { maxWidth: "xs", cols: 1 },
-        ]}
-      >
-        {props.data.map((stat) => {
-          return <StatCard key={stat.title} {...stat}></StatCard>;
-        })}
-      </SimpleGrid>
-    </div>
+    <SimpleGrid cols={{ xs: 1, md: 2, lg: 4 }}>
+      {props.data.map((stat) => {
+        return <StatCard key={stat.title} {...stat}></StatCard>;
+      })}
+    </SimpleGrid>
   );
 };

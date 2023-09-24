@@ -1,0 +1,10 @@
+{
+  "data": {
+    "createAuthenticationRequest": {
+      "id": "57e19144-f1df-47ab-860b-c908fcd2015b",
+      "associatedAccounts": [],
+      "status": "REQUIRES_USER_ACTION",
+      "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/57e19144-f1df-47ab-860b-c908fcd2015b/SANDBOXFINANCE_SFIN0000"
+    }
+  }
+}
