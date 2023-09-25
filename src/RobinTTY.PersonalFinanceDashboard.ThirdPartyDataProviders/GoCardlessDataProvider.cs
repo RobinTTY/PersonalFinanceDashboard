@@ -126,6 +126,18 @@ public class GoCardlessDataProvider
         return tasks.Select(task => task.Result).ToList();
     }
 
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(string accountId)
+    {
+        var response = await _client.AccountsEndpoint.GetTransactions(accountId);
+        // TODO: Also return pending transactions
+        var transactions = response.Result!.BookedTransactions.Select(transaction => 
+            new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), transaction.ValueDateTime ?? transaction.ValueDate,
+                transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount, transaction.TransactionAmount.Currency,
+                "example-category", new List<string>(), "example-notes")
+        );
+        return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions, response.Error);
+    }
+
     private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
     {
         return status switch

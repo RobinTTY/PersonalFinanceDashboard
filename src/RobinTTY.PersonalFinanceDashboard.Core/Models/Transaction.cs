@@ -6,17 +6,21 @@
 public class Transaction
 {
     /// <summary>
+    /// The id of the transaction.
+    /// </summary>
+    public string Id { get; set; }
+    /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
-    public DateTime ValueDate { get; set; }
+    public DateTime? ValueDate { get; set; }
     /// <summary>
     /// The name of the party which owes the money.
     /// </summary>
-    public string Payer { get; set; }
+    public string? Payer { get; set; }
     /// <summary>
     /// The name of the party which is owed the money.
     /// </summary>
-    public string Payee { get; set; }
+    public string? Payee { get; set; }
     /// <summary>
     /// The amount being transacted.
     /// </summary>
@@ -44,6 +48,7 @@ public class Transaction
     /// <summary>
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
+    /// <param name="id">The id of the transaction.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
     /// <param name="payee">The name of the party which is owed the money.</param>
@@ -52,8 +57,9 @@ public class Transaction
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public Transaction(DateTime valueDate, string payer, string payee, decimal amount, string currency, string category, List<string> tags, string notes)
+    public Transaction(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, List<string> tags, string notes)
     {
+        Id = id;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;

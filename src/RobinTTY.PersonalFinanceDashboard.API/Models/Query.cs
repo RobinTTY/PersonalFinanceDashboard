@@ -58,7 +58,11 @@ public class Query
     /// </summary>
     /// <returns></returns>
     [UsePaging]
-    public IQueryable<Transaction> GetTransactions() => MockDataAccessService.GetTransactions(100);
+    public async Task<IQueryable<Transaction>> GetTransactions(string accountId)
+    {
+        var transactions = await _dataProvider.GetTransactions(accountId);
+        return transactions.Result!.AsQueryable();
+    }
 
     // TODO: Investigate how to handle the return type (result/error) properly with paging
     [UsePaging]
