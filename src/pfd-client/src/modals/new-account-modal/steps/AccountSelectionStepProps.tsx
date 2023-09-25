@@ -1,4 +1,4 @@
-import { BankAccount } from '@/graphql/types/graphql';
+import { BankAccount } from '@graphql-types/graphql';
 import { Authentication } from './AuthenticationStep';
 
 export interface AccountSelection extends BankAccount {

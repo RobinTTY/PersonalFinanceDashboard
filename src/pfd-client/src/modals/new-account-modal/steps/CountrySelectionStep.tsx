@@ -1,5 +1,5 @@
 import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
-import { ModalOptionSearchList } from '@/components/modal-option-search-list/ModalOptionSearchList';
+import { ModalOptionSearchList } from '@components/modal-option-search-list/ModalOptionSearchList';
 
 const countries = [
   { key: 'US', description: 'United States', icon: <US /> },

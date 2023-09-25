@@ -2,8 +2,8 @@ import { useQuery } from '@apollo/client';
 import { Box, Center, Loader, SimpleGrid, Text, Group, Badge, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { GetAccountsQuery } from '@/graphql/queries/GetAccounts';
-import { ContentCheckbox } from '@/components/image-checkbox/ContentCheckbox';
+import { GetAccountsQuery } from '@graphql-queries/GetAccounts';
+import { ContentCheckbox } from '@components/image-checkbox/ContentCheckbox';
 import { AccountSelection, AccountSelectionStepProps } from './AccountSelectionStepProps';
 
 export const AccountSelectionStep = ({

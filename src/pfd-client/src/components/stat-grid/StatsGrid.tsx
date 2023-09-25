@@ -1,7 +1,7 @@
 // TODO: move to extra file
 import { SimpleGrid } from '@mantine/core';
+import { StatCard } from '@components/stat-card/StatCard';
 import { StatsGridProps } from './StatsGridProps';
-import { StatCard } from '../stat-card/StatCard';
 
 // TODO: should use children
 export const StatsGrid = (props: StatsGridProps) => (

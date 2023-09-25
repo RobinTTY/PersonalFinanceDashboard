@@ -2,10 +2,10 @@ import { useQuery } from '@apollo/client';
 import { useDisclosure } from '@mantine/hooks';
 import { Center, Loader, SimpleGrid, Button } from '@mantine/core';
 
-import { BankAccount } from '@/graphql/types/graphql';
-import { GetMinimalAccountsQuery } from '@/graphql/queries/GetAccounts';
-import { AccountSummary } from '@/components/account-summary/AccountSummary';
-import { NewAccountModal } from '@/modals/new-account-modal/NewAccountModal';
+import { BankAccount } from '@graphql-types/graphql';
+import { GetMinimalAccountsQuery } from '@graphql-queries/GetAccounts';
+import { AccountSummary } from '@components/account-summary/AccountSummary';
+import { NewAccountModal } from '@modals/new-account-modal/NewAccountModal';
 
 import classes from './Accounts.module.css';
 

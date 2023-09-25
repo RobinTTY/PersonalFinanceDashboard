@@ -1,7 +1,7 @@
-import { Container, Grid } from '@mantine/core';
 import { useState } from 'react';
-import { SearchBox } from '../search-box/SearchBox';
-import { ModalButton } from '../modal-button/ModalButton';
+import { Container, Grid } from '@mantine/core';
+import { SearchBox } from '@components/search-box/SearchBox';
+import { ModalButton } from '@components/modal-button/ModalButton';
 
 // TODO: Handle list overflow
 export const ModalOptionSearchList = ({

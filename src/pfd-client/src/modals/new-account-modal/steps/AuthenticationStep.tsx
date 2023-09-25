@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { useDisclosure } from '@mantine/hooks';
 import { Button, Center, Stack, Text } from '@mantine/core';
-import { CreateAuthenticationRequestMutation } from '@/graphql/mutations/CreateAuthenticationRequest';
-import { GetAuthenticationRequestQuery } from '@/graphql/queries/GetAuthenticationRequest';
+import { CreateAuthenticationRequestMutation } from '@graphql-mutations/CreateAuthenticationRequest';
+import { GetAuthenticationRequestQuery } from '@graphql-queries/GetAuthenticationRequest';
 
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
