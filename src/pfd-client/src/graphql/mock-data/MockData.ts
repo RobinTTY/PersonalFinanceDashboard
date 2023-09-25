@@ -3,12 +3,14 @@ import { GetAccountQuery } from '../queries/GetAccount';
 import { GetAccountsQuery, GetMinimalAccountsQuery } from '../queries/GetAccounts';
 import { CreateAuthenticationRequestMutation } from '../mutations/CreateAuthenticationRequest';
 import { GetAuthenticationRequestQuery } from '../queries/GetAuthenticationRequest';
+import { GetTransactionsQuery } from '../queries/GetTransactions';
 
 import * as MockAccountData from './GetAccount.json';
 import * as MockAccountsData from './GetAccounts.json';
 import * as MockMinimalAccountsData from './GetMinimalAccounts.json';
 import * as MockCreateAuthenticationRequest from './CreateAuthenticationRequest.json';
 import * as MockGetAuthenticationRequest from './GetAuthenticationRequest.json';
+import * as MockGetTransactions from './GetTransactions.json';
 
 const maxReuseCount = Number.POSITIVE_INFINITY;
 
@@ -76,6 +78,19 @@ export const MockData: readonly MockedResponse<Record<string, any>, Record<strin
     },
     result: {
       data: MockGetAuthenticationRequest.data,
+    },
+    maxUsageCount: maxReuseCount,
+    delay: 500,
+  },
+  {
+    request: {
+      query: GetTransactionsQuery,
+      variables: {
+        accountId: '072fefa4-4530-4322-aafe-e953d37402ae',
+      },
+    },
+    result: {
+      data: MockGetTransactions.data,
     },
     maxUsageCount: maxReuseCount,
     delay: 500,
