@@ -16,4 +16,4 @@ jobs:
         with:
           dotnet-version: '7.x'
       - name: Build
-        run: dotnet build --configuration Release src/
+        run: dotnet build --configuration Release src/server/
