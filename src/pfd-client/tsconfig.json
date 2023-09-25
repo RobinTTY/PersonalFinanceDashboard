@@ -17,6 +17,11 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@modals/*": ["./src/modals/*"],
+      "@graphql-queries/*": ["./src/graphql/queries/*"],
+      "@graphql-mutations/*": ["./src/graphql/mutations/*"],
+      "@graphql-types/*": ["./src/graphql/types/*"],
       "@test-utils": ["./test-utils"]
     }
   },

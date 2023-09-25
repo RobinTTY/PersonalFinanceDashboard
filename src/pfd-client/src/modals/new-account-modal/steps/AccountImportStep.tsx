@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { Center, Loader } from '@mantine/core';
-import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
+import { GetTransactionsQuery } from '@graphql-queries/GetTransactions';
 
 export const AccountImportStep = () => {
   const { loading, data } = useQuery(GetTransactionsQuery, {

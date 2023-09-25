@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Modal, Text } from '@mantine/core';
 import { useCounter } from '@mantine/hooks';
 
+import { BankAccount } from '@graphql-types/graphql';
 import { AccountTypeSelectionStep, AccountType } from './steps/AccountTypeSelectionStep';
 import { CountrySelectionStep } from './steps/CountrySelectionStep';
 import { BankSelectionStep } from './steps/BankSelectionStep';
 import { AuthenticationStep, Authentication } from './steps/AuthenticationStep';
 import { AccountSelectionStep } from './steps/AccountSelectionStep';
-import { BankAccount } from '@/graphql/types/graphql';
 import { AccountImportStep } from './steps/AccountImportStep';
 
 export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) => {

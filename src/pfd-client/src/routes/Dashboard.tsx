@@ -1,8 +1,8 @@
 import { Space } from '@mantine/core';
 
-import { StatCardProps } from '@/components/stat-card/StatCardProps';
-import { LineGraph } from '@/components/graphs/line-graph/LineGraph';
-import { StatsGrid } from '@/components/stat-grid/StatsGrid';
+import { StatCardProps } from '@components/stat-card/StatCardProps';
+import { LineGraph } from '@components/graphs/line-graph/LineGraph';
+import { StatsGrid } from '@components/stat-grid/StatsGrid';
 
 export const Dashboard = () => {
   const gridprops: StatCardProps[] = [

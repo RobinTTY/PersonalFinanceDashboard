@@ -1,7 +1,7 @@
 import { Text, Paper, useMantineTheme } from '@mantine/core';
 import { ResponsiveLine } from '@nivo/line';
+import { NivoGridWrapper } from '@components/graphs/nivo-grid-wrapper/NivoGridWrapper';
 import { SampleLineData as data } from './SampleLineData';
-import { NivoGridWrapper } from '../nivo-grid-wrapper/NivoGridWrapper';
 import './LineGraph.css';
 
 // TODO: typing for data

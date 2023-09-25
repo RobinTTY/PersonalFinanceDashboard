@@ -2,9 +2,9 @@ import { Outlet, Link } from 'react-router-dom';
 import { AppShell, Stack } from '@mantine/core';
 import { IconArrowsExchange, IconHome, IconWallet } from '@tabler/icons-react';
 
-import { AppHeader } from '../app-header/AppHeader';
-import { AccountButton } from '../account-button/AccountButton';
-import { NavigationLink } from '../navigation-link/NavigationLink';
+import { AppHeader } from '@components/app-header/AppHeader';
+import { AccountButton } from '@components/account-button/AccountButton';
+import { NavigationLink } from '@components/navigation-link/NavigationLink';
 
 import classes from './Shell.module.css';
 
