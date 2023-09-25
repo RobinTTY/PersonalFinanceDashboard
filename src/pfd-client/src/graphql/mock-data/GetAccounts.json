@@ -19,9 +19,9 @@
         {
           "node": {
             "id": "443a187b-6900-410e-8706-7cc0d8c39987",
-            "name": "Checkings",
+            "name": "Credit Card",
             "description": null,
-            "balance": 1913.12,
+            "balance": 351.87,
             "currency": "EUR",
             "iban": "GL6298500000098503",
             "bic": null,

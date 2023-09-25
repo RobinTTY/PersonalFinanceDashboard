@@ -18,6 +18,7 @@ const documents = {
     "\n  query GetAccounts($accountIds: [String!]!) {\n    accounts(accountIds: $accountIds) {\n      edges {\n        node {\n          id\n          name\n          description\n          balance\n          currency\n          iban\n          bic\n          bban\n          ownerName\n          accountType\n        }\n      }\n    }\n  }\n": types.GetAccountsDocument,
     "\n  query GetMinimalAccounts($accountIds: [String!]!) {\n    accounts(accountIds: $accountIds) {\n      edges {\n        node {\n          id\n          description\n          balance\n          currency\n        }\n      }\n    }\n  }\n": types.GetMinimalAccountsDocument,
     "\n  query GetAuthenticationRequest($authenticationId: String!) {\n    authenticationRequest(authenticationId: $authenticationId) {\n      id\n      associatedAccounts\n      status\n      authenticationLink\n    }\n  }\n": types.GetAuthenticationRequestDocument,
+    "\n  query GetTransactions($accountId: String!) {\n    transactions(accountId: $accountId) {\n      edges {\n        node {\n          valueDate\n          payer\n          payee\n          amount\n          currency\n          category\n          tags\n          notes\n        }\n      }\n    }\n  }\n": types.GetTransactionsDocument,
 };
 
 /**
@@ -54,6 +55,10 @@ export function gql(source: "\n  query GetMinimalAccounts($accountIds: [String!]
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetAuthenticationRequest($authenticationId: String!) {\n    authenticationRequest(authenticationId: $authenticationId) {\n      id\n      associatedAccounts\n      status\n      authenticationLink\n    }\n  }\n"): (typeof documents)["\n  query GetAuthenticationRequest($authenticationId: String!) {\n    authenticationRequest(authenticationId: $authenticationId) {\n      id\n      associatedAccounts\n      status\n      authenticationLink\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetTransactions($accountId: String!) {\n    transactions(accountId: $accountId) {\n      edges {\n        node {\n          valueDate\n          payer\n          payee\n          amount\n          currency\n          category\n          tags\n          notes\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetTransactions($accountId: String!) {\n    transactions(accountId: $accountId) {\n      edges {\n        node {\n          valueDate\n          payer\n          payee\n          amount\n          currency\n          category\n          tags\n          notes\n        }\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

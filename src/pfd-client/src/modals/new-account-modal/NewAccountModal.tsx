@@ -7,16 +7,19 @@ import { CountrySelectionStep } from './steps/CountrySelectionStep';
 import { BankSelectionStep } from './steps/BankSelectionStep';
 import { AuthenticationStep, Authentication } from './steps/AuthenticationStep';
 import { AccountSelectionStep } from './steps/AccountSelectionStep';
+import { BankAccount } from '@/graphql/types/graphql';
+import { AccountImportStep } from './steps/AccountImportStep';
 
 export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) => {
   const [addAccountStep, addAccountStepHandler] = useCounter(1, {
     min: 1,
-    max: 5,
+    max: 6,
   });
   const [accountType, setAccountType] = useState<AccountType>();
   const [, setCountry] = useState<string>();
   const [, setBank] = useState<string>();
   const [authentication, setAuthentication] = useState<Authentication>();
+  const [, setAccounts] = useState<BankAccount[]>();
 
   const onNewAccount = (type: AccountType) => {
     setAccountType(type);
@@ -62,7 +65,17 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
           />
         );
       case 5:
-        return <AccountSelectionStep authentication={authentication!} />;
+        return (
+          <AccountSelectionStep
+            authentication={authentication!}
+            onAccountsSelected={(accounts) => {
+              setAccounts(accounts);
+              addAccountStepHandler.increment();
+            }}
+          />
+        );
+      case 6:
+        return <AccountImportStep />;
       default:
         return <Text>Step {addAccountStep}</Text>;
     }
@@ -81,7 +94,8 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
           {addAccountStep === 2 && 'Select your country'}
           {addAccountStep === 3 && 'Select your bank'}
           {addAccountStep === 4 && 'Authenticate'}
-          {addAccountStep === 5 && 'Select the account(s) to add'}
+          {addAccountStep === 5 && 'Select the accounts to add'}
+          {addAccountStep === 6 && 'Account import'}
         </Text>
       }
       centered
