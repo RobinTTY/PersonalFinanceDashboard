@@ -46,11 +46,11 @@ export const Accounts = () => {
             {accounts.map((account) => (
               // TODO: handle null
               <AccountSummary
+                key={account.id}
                 balance={account.balance}
                 currency={account.currency!}
                 description={account.description!}
                 type={account.accountType!}
-                key={account.id}
               />
             ))}
           </SimpleGrid>
