@@ -87,6 +87,7 @@ export const MockData: readonly MockedResponse<Record<string, any>, Record<strin
       query: GetTransactionsQuery,
       variables: {
         accountId: '072fefa4-4530-4322-aafe-e953d37402ae',
+        first: 15,
       },
     },
     result: {

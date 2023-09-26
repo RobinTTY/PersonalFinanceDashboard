@@ -1,10 +1,16 @@
 {
   "data": {
     "transactions": {
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "MA==",
+        "endCursor": "MTQ="
+      },
       "edges": [
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
             "payer": null,
             "payee": null,
             "amount": -15,
@@ -16,7 +22,7 @@
         },
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
             "payer": null,
             "payee": "MON MOTHMA",
             "amount": 45,
@@ -28,7 +34,7 @@
         },
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
             "payer": null,
             "payee": null,
             "amount": -15,
@@ -40,7 +46,7 @@
         },
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
             "payer": null,
             "payee": "MON MOTHMA",
             "amount": 45,
@@ -52,7 +58,7 @@
         },
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
             "payer": null,
             "payee": null,
             "amount": -15,
@@ -64,7 +70,31 @@
         },
         {
           "node": {
-            "valueDate": "2023-09-24T00:00:00.000+02:00",
+            "valueDate": "2023-09-25T00:00:00.000+02:00",
+            "payer": null,
+            "payee": "MON MOTHMA",
+            "amount": 45,
+            "currency": "EUR",
+            "category": "example-category",
+            "tags": [],
+            "notes": "example-notes"
+          }
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-30T00:00:00.000+02:00",
+            "payer": null,
+            "payee": null,
+            "amount": -15,
+            "currency": "EUR",
+            "category": "example-category",
+            "tags": [],
+            "notes": "example-notes"
+          }
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-30T00:00:00.000+02:00",
             "payer": null,
             "payee": "MON MOTHMA",
             "amount": 45,
@@ -116,6 +146,42 @@
             "payer": null,
             "payee": "MON MOTHMA",
             "amount": 45,
+            "currency": "EUR",
+            "category": "example-category",
+            "tags": [],
+            "notes": "example-notes"
+          }
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-29T00:00:00.000+02:00",
+            "payer": null,
+            "payee": null,
+            "amount": -15,
+            "currency": "EUR",
+            "category": "example-category",
+            "tags": [],
+            "notes": "example-notes"
+          }
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-29T00:00:00.000+02:00",
+            "payer": null,
+            "payee": "MON MOTHMA",
+            "amount": 45,
+            "currency": "EUR",
+            "category": "example-category",
+            "tags": [],
+            "notes": "example-notes"
+          }
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-29T00:00:00.000+02:00",
+            "payer": null,
+            "payee": null,
+            "amount": -15,
             "currency": "EUR",
             "category": "example-category",
             "tags": [],

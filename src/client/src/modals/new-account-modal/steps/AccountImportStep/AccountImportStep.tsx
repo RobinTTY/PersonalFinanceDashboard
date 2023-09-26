@@ -8,6 +8,7 @@ export const AccountImportStep = ({ onImportComplete }: AccountImportStepProps) 
   const { loading, data } = useQuery(GetTransactionsQuery, {
     variables: {
       accountId: '072fefa4-4530-4322-aafe-e953d37402ae',
+      first: 15,
     },
   });
 
