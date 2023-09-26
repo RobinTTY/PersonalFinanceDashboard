@@ -1,4 +1,4 @@
-import { Space } from '@mantine/core';
+import { Box, Space } from '@mantine/core';
 
 import { StatCardProps } from '@components/stat-card/StatCardProps';
 import { LineGraph } from '@components/graphs/line-graph/LineGraph';
@@ -18,10 +18,10 @@ export const Dashboard = () => {
   ];
 
   return (
-    <>
+    <Box p="md" style={{ height: '100%' }}>
       <LineGraph />
       <Space h="md" />
       <StatsGrid data={gridprops} />
-    </>
+    </Box>
   );
 };

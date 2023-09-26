@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import { useDisclosure } from '@mantine/hooks';
-import { Center, Loader, SimpleGrid, Button } from '@mantine/core';
+import { Center, Loader, SimpleGrid, Button, Box } from '@mantine/core';
 
 import { BankAccount } from '@graphql-types/graphql';
 import { GetMinimalAccountsQuery } from '@graphql-queries/GetAccounts';
@@ -38,7 +38,7 @@ export const Accounts = () => {
 
   // TODO: common css class for 100% height/width container?
   return (
-    <>
+    <Box p="md" style={{ height: '100%' }}>
       <NewAccountModal opened={addAccountModalOpen} closeModal={closeAddAccountModal} />
       <div className={classes['accounts-container']}>
         <div>
@@ -61,6 +61,6 @@ export const Accounts = () => {
           </Button>
         </Center>
       </div>
-    </>
+    </Box>
   );
 };
