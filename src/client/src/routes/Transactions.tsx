@@ -10,7 +10,6 @@ export const Transactions = () => {
     () => ({
       sortable: true,
       filter: true,
-      resizable: true,
     }),
     []
   );
@@ -51,6 +50,7 @@ export const Transactions = () => {
         animateRows
         onCellClicked={cellClickedHandler}
         onGridReady={onGridReady}
+        onGridSizeChanged={() => gridRef.current?.api?.sizeColumnsToFit()}
       />
     </div>
   );
