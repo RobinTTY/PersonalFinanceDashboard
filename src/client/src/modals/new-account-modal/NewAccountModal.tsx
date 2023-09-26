@@ -11,7 +11,8 @@ import { CountrySelectionStep } from './steps/CountrySelectionStep/CountrySelect
 import { BankSelectionStep } from './steps/BankSelectionStep/BankSelectionStep';
 import { AuthenticationStep } from './steps/AuthenticationStep/AuthenticationStep';
 import { AccountSelectionStep } from './steps/AccountSelectionStep/AccountSelectionStep';
-import { AccountImportStep } from './steps/AccountImportStep';
+import { AccountImportStep } from './steps/AccountImportStep/AccountImportStep';
+import { NewAccountModalProps } from './NewAccountModalProps';
 
 export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) => {
   const [addAccountStep, addAccountStepHandler] = useCounter(1, {
@@ -24,15 +25,25 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
   const [authentication, setAuthentication] = useState<AuthenticationRequest>();
   const [, setAccounts] = useState<BankAccount[]>();
 
-  const onNewAccount = (type: AccountType) => {
-    setAccountType(type);
-    addAccountStepHandler.increment();
+  const closeTransitionDuration = 200;
+  const closeAndResetModal = () => {
+    closeModal();
+    setTimeout(() => {
+      addAccountStepHandler.reset();
+    }, closeTransitionDuration);
   };
 
   const getActiveNewAccountStep = () => {
     switch (addAccountStep) {
       case 1:
-        return <AccountTypeSelectionStep selectionAction={onNewAccount} />;
+        return (
+          <AccountTypeSelectionStep
+            selectionAction={(type) => {
+              setAccountType(type);
+              addAccountStepHandler.increment();
+            }}
+          />
+        );
       case 2:
         switch (accountType) {
           case 'savings':
@@ -78,7 +89,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
           />
         );
       case 6:
-        return <AccountImportStep />;
+        return <AccountImportStep onImportComplete={closeAndResetModal} />;
       default:
         return <Text>Step {addAccountStep}</Text>;
     }
@@ -87,10 +98,8 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
   return (
     <Modal
       opened={opened}
-      onClose={() => {
-        closeModal();
-        addAccountStepHandler.reset();
-      }}
+      transitionProps={{ duration: closeTransitionDuration }}
+      onClose={closeAndResetModal}
       title={
         <Text fz="xl" fw={700} pl=".4rem">
           {addAccountStep === 1 && 'What type of account would you like to add?'}
@@ -108,8 +117,3 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
     </Modal>
   );
 };
-
-interface NewAccountModalProps {
-  opened: boolean;
-  closeModal: () => void;
-}
