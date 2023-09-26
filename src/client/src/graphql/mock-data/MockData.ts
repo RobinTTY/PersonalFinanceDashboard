@@ -1,10 +1,12 @@
 import { MockedResponse } from '@apollo/client/testing';
+import { GetBankingInstitutionsQuery } from '../queries/GetBankingInstitutions';
 import { GetAccountQuery } from '../queries/GetAccount';
 import { GetAccountsQuery, GetMinimalAccountsQuery } from '../queries/GetAccounts';
 import { CreateAuthenticationRequestMutation } from '../mutations/CreateAuthenticationRequest';
 import { GetAuthenticationRequestQuery } from '../queries/GetAuthenticationRequest';
 import { GetTransactionsQuery } from '../queries/GetTransactions';
 
+import * as MockBankingInstitutionsData from './GetBankingInstitutions.json';
 import * as MockAccountData from './GetAccount.json';
 import * as MockAccountsData from './GetAccounts.json';
 import * as MockMinimalAccountsData from './GetMinimalAccounts.json';
@@ -15,6 +17,16 @@ import * as MockGetTransactions from './GetTransactions.json';
 const maxReuseCount = Number.POSITIVE_INFINITY;
 
 export const MockData: readonly MockedResponse<Record<string, any>, Record<string, any>>[] = [
+  {
+    request: {
+      query: GetBankingInstitutionsQuery,
+    },
+    result: {
+      data: MockBankingInstitutionsData.data,
+    },
+    maxUsageCount: maxReuseCount,
+    delay: 1000,
+  },
   {
     request: {
       query: GetAccountQuery,
