@@ -1,5 +1,6 @@
 import { DE, US, CA, GB, AU, NZ } from 'country-flag-icons/react/3x2';
 import { ModalOptionSearchList } from '@components/modal-option-search-list/ModalOptionSearchList';
+import { CountrySelectionStepProps } from './CountrySelectionStepProps';
 
 const countries = [
   { key: 'US', description: 'United States', icon: <US /> },
@@ -19,7 +20,3 @@ export const CountrySelectionStep = ({ onCountrySelect }: CountrySelectionStepPr
     }}
   />
 );
-
-export interface CountrySelectionStepProps {
-  onCountrySelect: (countryKey: string) => void;
-}

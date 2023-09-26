@@ -1,4 +1,5 @@
 import { ModalOptionSearchList } from '@components/modal-option-search-list/ModalOptionSearchList';
+import { BankSelectionStepProps } from './BankSelectionStepProps';
 
 // TODO: replace with grapql query
 const banks = [
@@ -75,7 +76,3 @@ export const BankSelectionStep = ({ onBankSelect }: BankSelectionStepProps) => (
     }}
   />
 );
-
-export interface BankSelectionStepProps {
-  onBankSelect: (bankKey: string) => void;
-}

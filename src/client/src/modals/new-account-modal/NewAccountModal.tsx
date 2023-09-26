@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { Modal, Text } from '@mantine/core';
 import { useCounter } from '@mantine/hooks';
 
-import { BankAccount } from '@graphql-types/graphql';
-import { AccountTypeSelectionStep, AccountType } from './steps/AccountTypeSelectionStep';
-import { CountrySelectionStep } from './steps/CountrySelectionStep';
-import { BankSelectionStep } from './steps/BankSelectionStep';
-import { AuthenticationStep, Authentication } from './steps/AuthenticationStep';
-import { AccountSelectionStep } from './steps/AccountSelectionStep';
+import { AuthenticationRequest, BankAccount } from '@graphql-types/graphql';
+import {
+  AccountTypeSelectionStep,
+  AccountType,
+} from './steps/AccountTypeSelectionStep/AccountTypeSelectionStep';
+import { CountrySelectionStep } from './steps/CountrySelectionStep/CountrySelectionStep';
+import { BankSelectionStep } from './steps/BankSelectionStep/BankSelectionStep';
+import { AuthenticationStep } from './steps/AuthenticationStep/AuthenticationStep';
+import { AccountSelectionStep } from './steps/AccountSelectionStep/AccountSelectionStep';
 import { AccountImportStep } from './steps/AccountImportStep';
 
 export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) => {
@@ -18,7 +21,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
   const [accountType, setAccountType] = useState<AccountType>();
   const [, setCountry] = useState<string>();
   const [, setBank] = useState<string>();
-  const [authentication, setAuthentication] = useState<Authentication>();
+  const [authentication, setAuthentication] = useState<AuthenticationRequest>();
   const [, setAccounts] = useState<BankAccount[]>();
 
   const onNewAccount = (type: AccountType) => {

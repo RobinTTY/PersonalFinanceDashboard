@@ -4,6 +4,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Button, Center, Stack, Text } from '@mantine/core';
 import { CreateAuthenticationRequestMutation } from '@graphql-mutations/CreateAuthenticationRequest';
 import { GetAuthenticationRequestQuery } from '@graphql-queries/GetAuthenticationRequest';
+import { AuthenticationStepProps } from './AuthenticationStepProps';
 
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
@@ -58,10 +59,7 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
             });
             loadingHandler.close();
 
-            onFinishSetup({
-              id: authRequestData.createAuthenticationRequest.id,
-              associatedAccounts: auth.data?.authenticationRequest?.associatedAccounts || [],
-            });
+            onFinishSetup(auth.data?.authenticationRequest!);
             // First button interaction: Create authentication request
           } else {
             createAuthenticationRequest();
@@ -78,12 +76,3 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
     </Stack>
   );
 };
-
-export interface AuthenticationStepProps {
-  onFinishSetup: (authentication: Authentication) => void;
-}
-
-export interface Authentication {
-  id: string;
-  associatedAccounts: string[];
-}
