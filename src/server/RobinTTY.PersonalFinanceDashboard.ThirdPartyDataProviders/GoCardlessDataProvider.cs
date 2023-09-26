@@ -36,7 +36,7 @@ public class GoCardlessDataProvider
         if (response.IsSuccess)
         {
             var institutions =
-                response.Result.Select(inst => new BankingInstitution(inst.Id, inst.Name, inst.Bic, inst.Logo));
+                response.Result.Select(inst => new BankingInstitution(inst.Id, inst.Name, inst.Bic, inst.Logo, inst.Countries));
             return new ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>(true, institutions.AsQueryable(), null);
         }
 

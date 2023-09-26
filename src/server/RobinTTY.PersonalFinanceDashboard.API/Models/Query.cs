@@ -64,8 +64,11 @@ public class Query
     }
 
     // TODO: Investigate how to handle the return type (result/error) properly with paging
-    [UsePaging]
-    public IQueryable<BankingInstitution> GetBankingInstitutions() => _dataProvider.GetBankingInstitutions().GetAwaiter().GetResult().Result!;
+    [UsePaging(MaxPageSize = 3000)]
+    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions() {
+        var request = await _dataProvider.GetBankingInstitutions();
+        return request.Result!;
+    }
 
     public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId)
     {

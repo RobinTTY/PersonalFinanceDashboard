@@ -18,6 +18,10 @@ public class BankingInstitution
     /// A <see cref="Uri"/> for the logo of the institution
     /// </summary>
     public Uri LogoUri { get; set; }
+    /// <summary>
+    /// The countries the institution operates in.
+    /// </summary>
+    public List<string> Countries { get; set; }
 
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitution"/>.
@@ -26,11 +30,13 @@ public class BankingInstitution
     /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
     /// <param name="name">The name of the institution.</param>
     /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution</param>
-    public BankingInstitution(string id, string bic, string name, Uri logoUri)
+    /// <param name="countries">The countries the institution operates in.</param>
+    public BankingInstitution(string id, string bic, string name, Uri logoUri, List<string> countries)
     {
         Id = id;
         Bic = bic;
         Name = name;
         LogoUri = logoUri;
+        Countries = countries;
     }
 }
