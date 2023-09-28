@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./docs/product/
+        working-directory: ./docs/docusaurus/
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: npm
-          cache-dependency-path: ./docs/product/
+          cache-dependency-path: ./docs/docusaurus/
 
       - name: Install dependencies
         run: npm ci
@@ -30,6 +30,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: docs
-          publish_dir: ./docs/product/build
+          publish_dir: ./docs/docusaurus/build
           user_name: RobinTTY
           user_email: muellerobin95@gmail.com
