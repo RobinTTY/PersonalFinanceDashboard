@@ -1,31 +1,31 @@
 // @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
-
 const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
-
 const projectTitle = "Personal Finance Dashboard";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: projectTitle,
-  tagline: "Making personal finance simple.",
+  tagline: "Making personal finance simple",
+  favicon: "img/favicon.ico",
   url: "https://robintty.github.io",
   baseUrl: "/PersonalFinanceDashboard/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
   organizationName: "RobinTTY",
   projectName: "PersonalFinanceDashboard",
   deploymentBranch: "docs",
   trailingSlash: false,
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en"],
+  },
   presets: [
     [
       "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          routeBasePath: "docs",
           sidebarPath: require.resolve("./sidebars.js"),
         },
         blog: {
@@ -44,18 +44,18 @@ const config = {
         id: "dev",
         path: "dev",
         routeBasePath: "dev",
-        sidebarPath: require.resolve("./sidebars.js"),
+        sidebarPath: require.resolve("./sidebarsDev.js"),
       },
     ],
   ],
-
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: projectTitle,
+        title: "Personal Finance Dashboard",
         logo: {
-          alt: "My Site Logo",
+          alt: "Site Logo",
           src: "img/logo.svg",
         },
         items: [
@@ -64,7 +64,6 @@ const config = {
             docId: "getting-started",
             position: "left",
             label: "Docs",
-            activeBaseRegex: `/dev/`,
             sidebarId: "docs",
           },
           { to: "/blog", position: "left", label: "Blog" },
@@ -72,6 +71,7 @@ const config = {
             to: "/dev/purpose",
             position: "left",
             label: "Development",
+            activeBaseRegex: `dev/`,
             sidebarId: "dev",
           },
         ],
@@ -115,6 +115,7 @@ const config = {
             ],
           },
         ],
+        copyright: `Copyright © ${new Date().getFullYear()} Robin Müller. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
