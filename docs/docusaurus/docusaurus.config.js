@@ -64,7 +64,6 @@ const config = {
             docId: "getting-started",
             position: "left",
             label: "Docs",
-            sidebarId: "docs",
           },
           { to: "/blog", position: "left", label: "Blog" },
           {
@@ -72,7 +71,6 @@ const config = {
             position: "left",
             label: "Development",
             activeBaseRegex: `dev/`,
-            sidebarId: "dev",
           },
         ],
       },

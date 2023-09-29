@@ -23,8 +23,9 @@ export const ModalOptionSearchList = ({
   };
 
   // TODO: The container sizing should be more dynamic?
+  // TODO: Optimize for small width
   return (
-    <Container p={0} w={700} h={300} size="xl">
+    <Container p={0} w={750} h={300} size="xl">
       <SearchBox
         pl="xs"
         pr="xs"
@@ -33,7 +34,7 @@ export const ModalOptionSearchList = ({
         value={searchFilter}
         onChange={(event) => onFilterUpdate(event.currentTarget.value)}
       />
-      <Grid pt="md" pb="md" pl="md" pr="md">
+      <Grid pt="md" pb="md" pl="md" pr="md" style={{ height: '86%', overflow: 'auto' }}>
         {filteredOptions.map((option) => (
           <Grid.Col span={6} key={option.key}>
             <ModalButton

@@ -21,3 +21,17 @@
   align-items: center;
   justify-content: center;
 }
+
+.content {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  padding: 3rem 0;
+}
+
+.hero-container {
+  width: 80%;
+  max-width: 1300px;
+  margin-bottom: 2rem;
+}
