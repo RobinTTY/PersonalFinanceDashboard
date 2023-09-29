@@ -54,9 +54,9 @@ export default function HomepageFeatures(): JSX.Element {
       Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
       description: (
         <>
-          Set saving goals and track your progress. {siteConfig.title} will help
-          you keep track of your progress and provide helpful analytics along
-          the way.
+          Set up saving goals for what matters to you. {siteConfig.title} will
+          help you keep track of your progress and provide helpful analytics
+          along the way.
         </>
       ),
     },
