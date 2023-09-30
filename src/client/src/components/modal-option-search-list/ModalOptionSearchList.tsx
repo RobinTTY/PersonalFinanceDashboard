@@ -7,14 +7,14 @@ import { ModalOptionSearchListProps, Option, RowProps } from './ModalOptionSearc
 
 import classes from './ModalOptionSearchList.module.css';
 
-export const ModalOptionSearchList: React.FC<ModalOptionSearchListProps> = ({
+export const ModalOptionSearchList = ({
   options,
   displayOptions,
   searchPlaceholder,
   truncateOptionDescription,
   optionDescriptionWidth,
   onOptionSelect,
-}) => {
+}: ModalOptionSearchListProps) => {
   const [searchFilter, setSearchFilter] = useState('');
   const filteredOptions = options.filter(
     (option) =>

@@ -1,10 +1,6 @@
 import {
   DE,
-  US,
-  CA,
   GB,
-  AU,
-  NZ,
   AT,
   BE,
   BG,
@@ -38,11 +34,7 @@ import { ModalOptionSearchList } from '@components/modal-option-search-list/Moda
 import { CountrySelectionStepProps } from './CountrySelectionStepProps';
 
 const countries = [
-  { key: 'US', description: 'United States', icon: <US /> },
-  { key: 'CA', description: 'Canada', icon: <CA /> },
   { key: 'GB', description: 'United Kingdom', icon: <GB /> },
-  { key: 'AU', description: 'Australia', icon: <AU /> },
-  { key: 'NZ', description: 'New Zealand', icon: <NZ /> },
   { key: 'DE', description: 'Germany', icon: <DE /> },
   { key: 'AT', description: 'Austria', icon: <AT /> },
   { key: 'BE', description: 'Belgium', icon: <BE /> },

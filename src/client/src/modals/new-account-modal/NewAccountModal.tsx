@@ -20,7 +20,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
     max: 6,
   });
   const [accountType, setAccountType] = useState<AccountType>();
-  const [, setCountry] = useState<string>();
+  const [country, setCountry] = useState<string>();
   const [, setBank] = useState<string>();
   const [authentication, setAuthentication] = useState<AuthenticationRequest>();
   const [, setAccounts] = useState<BankAccount[]>();
@@ -63,6 +63,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
       case 3:
         return (
           <BankSelectionStep
+            countryCode={country!}
             onBankSelect={(optionKey) => {
               setBank(optionKey);
               addAccountStepHandler.increment();
