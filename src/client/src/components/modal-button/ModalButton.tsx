@@ -14,6 +14,7 @@ export const ModalButton = ({
   icon,
   iconPosition,
   iconHeight,
+  iconWidth,
   description,
   truncateDescription,
   textWidth,
@@ -25,7 +26,12 @@ export const ModalButton = ({
   // TODO: truncate should be based on parent container width?
   const flagAndText = (
     <>
-      <Center h={iconHeight} className={classes['icon-container']}>
+      <Center
+        h={iconHeight}
+        w={iconWidth}
+        style={{ overflow: 'hidden' }}
+        className={classes['icon-container']}
+      >
         {icon}
       </Center>
       <Center>

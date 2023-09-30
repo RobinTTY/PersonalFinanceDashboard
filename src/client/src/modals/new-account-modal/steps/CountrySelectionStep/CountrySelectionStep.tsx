@@ -77,6 +77,7 @@ const countries = [
 export const CountrySelectionStep = ({ onCountrySelect }: CountrySelectionStepProps) => (
   <ModalOptionSearchList
     options={countries}
+    displayOptions={{ iconHeight: '32px', iconWidth: '48px' }}
     searchPlaceholder="Filter countries..."
     onOptionSelect={(optionKey) => {
       onCountrySelect(optionKey);
