@@ -16,6 +16,7 @@ import * as MockGetTransactions from './GetTransactions.json';
 
 const maxReuseCount = Number.POSITIVE_INFINITY;
 
+// TODO: https://mswjs.io/docs/ has a more flexible testing approach, maybe migrate
 export const MockData: readonly MockedResponse<Record<string, any>, Record<string, any>>[] = [
   {
     request: {

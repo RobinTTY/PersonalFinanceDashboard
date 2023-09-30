@@ -8,15 +8,14 @@ import { AuthenticationStepProps } from './AuthenticationStepProps';
 
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
-export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) => {
-  const sanboxInstitution = 'SANDBOXFINANCE_SFIN0000';
+export const AuthenticationStep = ({ bankId, onFinishSetup }: AuthenticationStepProps) => {
   const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
   const [createAuthenticationRequest, { data: authRequestData }] = useMutation(
     CreateAuthenticationRequestMutation,
     {
       variables: {
-        institutionId: sanboxInstitution,
+        institutionId: bankId,
         redirectUri: 'https://www.robintty.com/',
       },
       onCompleted: (data) => {
@@ -40,7 +39,7 @@ export const AuthenticationStep = ({ onFinishSetup }: AuthenticationStepProps) =
           alt="go-cardless-logo"
         />
       </Center>
-      {/* Provider should be link? */}
+      {/* TODO: Provider should be link? */}
       <Center>
         <Text fw={500}>Data Provider: GoCardless</Text>
       </Center>

@@ -20,8 +20,8 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
     max: 6,
   });
   const [accountType, setAccountType] = useState<AccountType>();
-  const [country, setCountry] = useState<string>();
-  const [, setBank] = useState<string>();
+  const [countryCode, setCountryCode] = useState<string>();
+  const [bankId, setBankId] = useState<string>();
   const [authentication, setAuthentication] = useState<AuthenticationRequest>();
   const [, setAccounts] = useState<BankAccount[]>();
 
@@ -50,7 +50,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
             return (
               <CountrySelectionStep
                 onCountrySelect={(optionKey) => {
-                  setCountry(optionKey);
+                  setCountryCode(optionKey);
                   addAccountStepHandler.increment();
                 }}
               />
@@ -63,9 +63,9 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
       case 3:
         return (
           <BankSelectionStep
-            countryCode={country!}
+            countryCode={countryCode!}
             onBankSelect={(optionKey) => {
-              setBank(optionKey);
+              setBankId(optionKey);
               addAccountStepHandler.increment();
             }}
           />
@@ -73,6 +73,7 @@ export const NewAccountModal = ({ opened, closeModal }: NewAccountModalProps) =>
       case 4:
         return (
           <AuthenticationStep
+            bankId={bankId!}
             onFinishSetup={(auth) => {
               setAuthentication(auth);
               addAccountStepHandler.increment();
