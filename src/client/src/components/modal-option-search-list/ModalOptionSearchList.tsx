@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Grid } from '@mantine/core';
+import { Container, Grid, ScrollArea } from '@mantine/core';
 import { SearchBox } from '@components/search-box/SearchBox';
 import { ModalButton } from '@components/modal-button/ModalButton';
 
@@ -29,36 +29,45 @@ export const ModalOptionSearchList = ({
       <SearchBox
         pl="xs"
         pr="xs"
+        pb="md"
         placeholder={searchPlaceholder ?? 'Filter ...'}
         actionIconActive={false}
         value={searchFilter}
         onChange={(event) => onFilterUpdate(event.currentTarget.value)}
       />
-      <Grid pt="md" pb="md" pl="md" pr="md" style={{ height: '86%', overflow: 'auto' }}>
-        {filteredOptions.map((option) => (
-          <Grid.Col span={6} key={option.key}>
-            <ModalButton
-              icon={option.icon}
-              iconHeight="32px"
-              iconPosition="left"
-              description={option.description}
-              includeChevron
-              padding="md"
-              truncateDescription={truncateOptionDescription}
-              textWidth={optionDescriptionWidth}
-              action={() => onOptionSelect && onOptionSelect(option.key)}
-            />
-          </Grid.Col>
-        ))}
-      </Grid>
+      <ScrollArea type="auto" style={{ height: '80%', overflow: 'auto' }}>
+        <Grid pb="md" pl="md" pr="md">
+          {filteredOptions.map((option) => (
+            <Grid.Col span={6} key={option.key}>
+              <ModalButton
+                icon={option.icon}
+                iconHeight="32px"
+                iconPosition="left"
+                description={option.description}
+                includeChevron
+                padding="md"
+                truncateDescription={truncateOptionDescription}
+                textWidth={optionDescriptionWidth}
+                action={() => onOptionSelect && onOptionSelect(option.key)}
+              />
+            </Grid.Col>
+          ))}
+        </Grid>
+      </ScrollArea>
     </Container>
   );
 };
 
 interface ModalOptionSearchListProps {
-  options: Array<{ key: string; description: string; icon: JSX.Element }>;
+  options: Array<Option>;
   truncateOptionDescription?: boolean;
   optionDescriptionWidth?: number;
   searchPlaceholder?: string;
   onOptionSelect?: (optionKey: string) => void;
+}
+
+interface Option {
+  key: string;
+  description: string;
+  icon: JSX.Element;
 }

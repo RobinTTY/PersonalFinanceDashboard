@@ -20,6 +20,9 @@ export const MockData: readonly MockedResponse<Record<string, any>, Record<strin
   {
     request: {
       query: GetBankingInstitutionsQuery,
+      variables: {
+        first: 3000,
+      },
     },
     result: {
       data: MockBankingInstitutionsData.data,

@@ -113,7 +113,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Robin Müller. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Robin Müller.`,
       },
       prism: {
         theme: lightCodeTheme,

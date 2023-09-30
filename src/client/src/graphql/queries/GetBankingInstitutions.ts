@@ -1,8 +1,8 @@
 import { gql } from '../types/gql';
 
 export const GetBankingInstitutionsQuery = gql(`
-  query GetBankingInstitutions{
-    bankingInstitutions(first: 3000) {
+  query GetBankingInstitutions($first: Int){
+    bankingInstitutions(first: $first) {
       pageInfo{
         hasNextPage
         hasPreviousPage
@@ -11,6 +11,7 @@ export const GetBankingInstitutionsQuery = gql(`
       }
       edges {
         node {
+          id
           name
           bic
           logoUri
