@@ -9,6 +9,7 @@ import { AuthenticationStepProps } from './AuthenticationStepProps';
 // TODO: The redirect could go to a page that indicates that authentication was sucessful and tab can be closed
 // TODO: logo needs to depend on theme (light/dark)
 export const AuthenticationStep = ({ bankId, onFinishSetup }: AuthenticationStepProps) => {
+  // const sanboxInstitution = 'SANDBOXFINANCE_SFIN0000';
   const [buttonDescription, setButtonDescription] = useState('Start Authentication');
   const [loading, loadingHandler] = useDisclosure(false);
   const [createAuthenticationRequest, { data: authRequestData }] = useMutation(

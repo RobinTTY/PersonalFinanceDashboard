@@ -52,10 +52,10 @@ export const AccountSelectionStep = ({
     );
   }
 
+  const formValues = { accounts: accounts ?? [] };
   if (form.values.accounts.length === 0) {
-    form.setValues({
-      accounts,
-    });
+    form.setInitialValues(formValues);
+    form.setValues(formValues);
   }
 
   // TODO: should be light background when selected, dark when not
