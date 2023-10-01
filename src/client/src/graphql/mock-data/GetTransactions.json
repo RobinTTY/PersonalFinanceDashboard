@@ -10,182 +10,182 @@
       "edges": [
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2022-11-20T23:36:27.881+01:00",
+            "payer": "Irvin Nader",
+            "payee": "Romaguera Group",
+            "amount": 647.6576681149741,
+            "currency": "USD",
+            "category": "Jewelery",
+            "tags": ["non", "earum", "pariatur"],
+            "notes": "Corrupti eos neque numquam consequatur animi sed."
           }
         },
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2018-05-10T21:49:45.626+02:00",
+            "payer": "Opal Cormier",
+            "payee": "Dooley LLC",
+            "amount": 518.6176322754231,
+            "currency": "USD",
+            "category": "Electronics",
+            "tags": ["quis", "similique", "vel"],
+            "notes": "Natus ut dolorem."
           }
         },
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-03-15T10:36:45.399+01:00",
+            "payer": "Grant DuBuque",
+            "payee": "Mann - Wolff",
+            "amount": 356.37257652858386,
+            "currency": "USD",
+            "category": "Health",
+            "tags": ["in", "tempore", "aut"],
+            "notes": "Totam nulla quia omnis praesentium eum autem."
           }
         },
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-09-16T23:23:19.552+02:00",
+            "payer": "Ivan Ryan",
+            "payee": "O'Reilly Inc",
+            "amount": 950.0123536737532,
+            "currency": "USD",
+            "category": "Health",
+            "tags": ["modi", "aliquid", "dolores"],
+            "notes": "Itaque itaque vero aut quo ut nihil sunt neque inventore."
           }
         },
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2021-11-21T17:18:35.873+01:00",
+            "payer": "Desiree Vandervort",
+            "payee": "Hintz, Bogan and Steuber",
+            "amount": 541.1409372862674,
+            "currency": "USD",
+            "category": "Games",
+            "tags": ["dicta", "dolore", "et"],
+            "notes": "Illum illo magnam mollitia culpa aperiam et labore."
           }
         },
         {
           "node": {
-            "valueDate": "2023-09-25T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-08-15T00:31:02.222+02:00",
+            "payer": "Louise Fritsch",
+            "payee": "Wolf, Hansen and Wilkinson",
+            "amount": 532.0094525244023,
+            "currency": "USD",
+            "category": "Garden",
+            "tags": ["in", "ut", "aliquam"],
+            "notes": "Aspernatur atque qui dolores."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2018-11-03T23:38:34.456+01:00",
+            "payer": "Christian Hills",
+            "payee": "Fadel - Steuber",
+            "amount": 781.4023290419912,
+            "currency": "USD",
+            "category": "Sports",
+            "tags": ["reprehenderit", "perspiciatis", "tempora"],
+            "notes": "Libero est consequatur qui ut delectus similique cum."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2022-03-27T01:04:39.626+01:00",
+            "payer": "Ben Osinski",
+            "payee": "Fritsch, Gislason and Gorczany",
+            "amount": 594.6009845385506,
+            "currency": "USD",
+            "category": "Industrial",
+            "tags": ["vitae", "possimus", "quia"],
+            "notes": "Consequuntur enim voluptatem qui eum."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2022-11-14T14:26:12.016+01:00",
+            "payer": "Roberta Hintz",
+            "payee": "Gaylord Inc",
+            "amount": 317.8456598503772,
+            "currency": "USD",
+            "category": "Grocery",
+            "tags": ["architecto", "architecto", "placeat"],
+            "notes": "Architecto consectetur aut maxime natus sed veniam est a quisquam."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-01-06T01:01:04.022+01:00",
+            "payer": "Annie Corwin",
+            "payee": "Green Group",
+            "amount": 294.80193803756134,
+            "currency": "USD",
+            "category": "Jewelery",
+            "tags": ["ut", "mollitia", "vel"],
+            "notes": "Eaque libero in iure maxime soluta fuga."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-08-16T04:26:26.877+02:00",
+            "payer": "Jeffery Sanford",
+            "payee": "Farrell Inc",
+            "amount": 154.90745478260723,
+            "currency": "USD",
+            "category": "Outdoors",
+            "tags": ["consequatur", "amet", "sint"],
+            "notes": "Dolorum quis et."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-30T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2019-07-25T00:17:27.275+02:00",
+            "payer": "Zachary Kirlin",
+            "payee": "Olson - Pagac",
+            "amount": 775.1948370291924,
+            "currency": "USD",
+            "category": "Sports",
+            "tags": ["et", "alias", "minima"],
+            "notes": "Nam et eum impedit."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-29T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2022-01-24T22:12:10.390+01:00",
+            "payer": "Mandy Reichel",
+            "payee": "Yundt and Sons",
+            "amount": 173.73205880047027,
+            "currency": "USD",
+            "category": "Home",
+            "tags": ["vitae", "consectetur", "fugiat"],
+            "notes": "Omnis ducimus aut eaque voluptas rerum itaque necessitatibus quia."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-29T00:00:00.000+02:00",
-            "payer": null,
-            "payee": "MON MOTHMA",
-            "amount": 45,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2021-05-22T00:49:56.314+02:00",
+            "payer": "Tim Block",
+            "payee": "Predovic - Dooley",
+            "amount": 959.0776699771071,
+            "currency": "USD",
+            "category": "Games",
+            "tags": ["unde", "et", "eius"],
+            "notes": "Et eos laborum reiciendis est enim."
           }
         },
         {
           "node": {
-            "valueDate": "2023-07-29T00:00:00.000+02:00",
-            "payer": null,
-            "payee": null,
-            "amount": -15,
-            "currency": "EUR",
-            "category": "example-category",
-            "tags": [],
-            "notes": "example-notes"
+            "valueDate": "2018-12-25T16:06:33.671+01:00",
+            "payer": "Irvin Koss",
+            "payee": "Simonis - Marvin",
+            "amount": 530.3603385799657,
+            "currency": "USD",
+            "category": "Movies",
+            "tags": ["laborum", "ut", "distinctio"],
+            "notes": "Voluptas nam consequatur libero cumque libero aut ullam officia quasi."
           }
         }
       ]

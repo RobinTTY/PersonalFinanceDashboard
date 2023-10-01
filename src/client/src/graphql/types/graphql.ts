@@ -15,7 +15,7 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
-  DateTime: { input: any; output: any; }
+  DateTime: { input: Date; output: Date; }
   /** The built-in `Decimal` scalar type. */
   Decimal: { input: any; output: any; }
   URL: { input: any; output: any; }
@@ -103,8 +103,8 @@ export type BankingInstitutionsEdge = {
 
 export type BasicResponse = {
   __typename?: 'BasicResponse';
-  details: Scalars['String']['output'];
-  summary: Scalars['String']['output'];
+  details?: Maybe<Scalars['String']['output']>;
+  summary?: Maybe<Scalars['String']['output']>;
 };
 
 /** GraphQL root type for mutation operations. */
@@ -278,7 +278,7 @@ export type GetTransactionsQueryVariables = Exact<{
 }>;
 
 
-export type GetTransactionsQuery = { __typename?: 'Query', transactions?: { __typename?: 'TransactionsConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, edges?: Array<{ __typename?: 'TransactionsEdge', node: { __typename?: 'Transaction', valueDate?: any | null, payer?: string | null, payee?: string | null, amount: any, currency: string, category: string, tags: Array<string>, notes: string } }> | null } | null };
+export type GetTransactionsQuery = { __typename?: 'Query', transactions?: { __typename?: 'TransactionsConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, edges?: Array<{ __typename?: 'TransactionsEdge', node: { __typename?: 'Transaction', valueDate?: Date | null, payer?: string | null, payee?: string | null, amount: any, currency: string, category: string, tags: Array<string>, notes: string } }> | null } | null };
 
 
 export const CreateAuthenticationRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateAuthenticationRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAuthenticationRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"institutionId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}}},{"kind":"Argument","name":{"kind":"Name","value":"redirectUri"},"value":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"associatedAccounts"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"authenticationLink"}}]}}]}}]} as unknown as DocumentNode<CreateAuthenticationRequestMutation, CreateAuthenticationRequestMutationVariables>;

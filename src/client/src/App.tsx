@@ -6,6 +6,7 @@ import { Router } from './Router';
 import { theme } from './theme';
 
 import { MockData } from './graphql/mock-data/MockData';
+import { scalarTypePolicies } from './graphql/types/type-policies';
 
 // TODO: This could be used to provide a demo mode without backend
 const testEnvironment = true;
@@ -14,7 +15,7 @@ const testEnvironment = true;
 // Appolo (GraphQL) Setup
 const client = new ApolloClient({
   uri: 'http://localhost:5115/graphql',
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({ typePolicies: scalarTypePolicies }),
   connectToDevTools: true,
 });
 

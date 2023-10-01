@@ -11,6 +11,22 @@ const config: CodegenConfig = {
       presetConfig: {
         gqlTagName: 'gql',
       },
+      config: {
+        scalars: {
+          DateTime: 'Date',
+        },
+      },
+    },
+    './src/graphql/types/type-policies.ts': {
+      plugins: ['@homebound/graphql-typescript-scalar-type-policies'],
+      config: {
+        scalars: {
+          DateTime: 'Date',
+        },
+        scalarTypePolicies: {
+          DateTime: '../type-policies/DateTime.js#dateTimeTypePolicy',
+        },
+      },
     },
   },
   ignoreNoDocuments: true,

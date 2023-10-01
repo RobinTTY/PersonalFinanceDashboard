@@ -1,8 +1,12 @@
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useCallback, useMemo, useRef } from 'react';
 import { CellClickedEvent, GridReadyEvent } from 'ag-grid-community';
+import { useQuery } from '@apollo/client';
+import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
+
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import './GlobalGridStyles.css';
 
 export const Transactions = () => {
   const gridRef = useRef<AgGridReact>(null);
@@ -22,14 +26,23 @@ export const Transactions = () => {
     params.api.sizeColumnsToFit();
   }, []);
 
-  const rowData: any[] = [
-    { date: '1/1/2020', payee: 'Target', category: 'Shopping', payment: 100, deposit: 0 },
-    { date: '1/2/2020', payee: 'Best Buy', category: 'Shopping', payment: 200, deposit: 0 },
-    { date: '1/3/2020', payee: 'Paycheck', category: 'Income', payment: 0, deposit: 1000 },
-    { date: '1/4/2020', payee: 'Shell', category: 'Gas', payment: 50, deposit: 0 },
-    { date: '1/5/2020', payee: 'Target', category: 'Shopping', payment: 100, deposit: 0 },
-    { date: '1/6/2020', payee: 'Best Buy', category: 'Shopping', payment: 200, deposit: 0 },
-  ];
+  const { data } = useQuery(GetTransactionsQuery, {
+    variables: {
+      accountId: '072fefa4-4530-4322-aafe-e953d37402ae',
+      first: 15,
+    },
+  });
+
+  const rowData = data?.transactions?.edges!.map((edge) => {
+    const node = edge?.node;
+    return {
+      date: node.valueDate,
+      payee: node.payee,
+      category: node.category,
+      payment: node.amount,
+      deposit: 0,
+    };
+  });
 
   const columnDefs: any[] = [
     { headerName: 'Date', field: 'date' },

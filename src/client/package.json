@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.0-alpha.1",
+    "@homebound/graphql-typescript-scalar-type-policies": "^2.11.0",
     "@mantine/core": "^7.0.1",
     "@mantine/dates": "^7.0.1",
     "@mantine/dropzone": "^7.0.1",
