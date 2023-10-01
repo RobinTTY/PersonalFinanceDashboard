@@ -1,8 +1,8 @@
 import { gql } from '../types/gql';
 
 export const GetBankingInstitutionsQuery = gql(`
-  query GetBankingInstitutions($first: Int){
-    bankingInstitutions(first: $first) {
+  query GetBankingInstitutions($countryCode: String $first: Int){
+    bankingInstitutions(countryCode: $countryCode first: $first) {
       pageInfo{
         hasNextPage
         hasPreviousPage
