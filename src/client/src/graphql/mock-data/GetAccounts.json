@@ -13,24 +13,30 @@
             "bic": null,
             "bban": null,
             "ownerName": "Jane Doe",
-            "accountType": "Current"
-          }
+            "accountType": "Current",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         },
         {
           "node": {
             "id": "443a187b-6900-410e-8706-7cc0d8c39987",
-            "name": "Credit Card",
+            "name": "Checkings",
             "description": null,
-            "balance": 351.87,
+            "balance": 1913.12,
             "currency": "EUR",
             "iban": "GL6298500000098503",
             "bic": null,
             "bban": null,
             "ownerName": "John Doe",
-            "accountType": "Current"
-          }
+            "accountType": "Current",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         }
-      ]
-    }
+      ],
+      "__typename": "AccountsConnection"
+    },
+    "__typename": "Query"
   }
 }

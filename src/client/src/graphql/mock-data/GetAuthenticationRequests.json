@@ -5,7 +5,8 @@
         "id": "57e19144-f1df-47ab-860b-c908fcd2015b",
         "associatedAccounts": [],
         "status": "REQUIRES_USER_ACTION",
-        "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/57e19144-f1df-47ab-860b-c908fcd2015b/SANDBOXFINANCE_SFIN0000"
+        "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/57e19144-f1df-47ab-860b-c908fcd2015b/SANDBOXFINANCE_SFIN0000",
+        "__typename": "AuthenticationRequest"
       },
       {
         "id": "bdb639a3-ce22-4207-8346-898bfafa6516",
@@ -14,8 +15,10 @@
           "443a187b-6900-410e-8706-7cc0d8c39987"
         ],
         "status": "SUCCESSFUL",
-        "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/bdb639a3-ce22-4207-8346-898bfafa6516/SANDBOXFINANCE_SFIN0000"
+        "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/bdb639a3-ce22-4207-8346-898bfafa6516/SANDBOXFINANCE_SFIN0000",
+        "__typename": "AuthenticationRequest"
       }
-    ]
+    ],
+    "__typename": "Query"
   }
 }

@@ -5,190 +5,223 @@
         "hasNextPage": true,
         "hasPreviousPage": false,
         "startCursor": "MA==",
-        "endCursor": "MTQ="
+        "endCursor": "MTQ=",
+        "__typename": "PageInfo"
       },
       "edges": [
         {
           "node": {
-            "valueDate": "2022-11-20T23:36:27.881+01:00",
-            "payer": "Irvin Nader",
-            "payee": "Romaguera Group",
-            "amount": 647.6576681149741,
-            "currency": "USD",
-            "category": "Jewelery",
-            "tags": ["non", "earum", "pariatur"],
-            "notes": "Corrupti eos neque numquam consequatur animi sed."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2018-05-10T21:49:45.626+02:00",
-            "payer": "Opal Cormier",
-            "payee": "Dooley LLC",
-            "amount": 518.6176322754231,
+            "valueDate": "2021-01-29T01:57:15.179+01:00",
+            "payer": "Teri Schmidt",
+            "payee": "Terry - Schinner",
+            "amount": 510.05124946708924,
             "currency": "USD",
             "category": "Electronics",
-            "tags": ["quis", "similique", "vel"],
-            "notes": "Natus ut dolorem."
-          }
+            "tags": ["expedita", "nihil", "voluptas"],
+            "notes": "Consequatur exercitationem commodi.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2019-03-15T10:36:45.399+01:00",
-            "payer": "Grant DuBuque",
-            "payee": "Mann - Wolff",
-            "amount": 356.37257652858386,
+            "valueDate": "2018-09-29T06:58:37.102+02:00",
+            "payer": "Andrea Kuvalis",
+            "payee": "Jast, Nienow and Herzog",
+            "amount": 502.91828493281605,
             "currency": "USD",
             "category": "Health",
-            "tags": ["in", "tempore", "aut"],
-            "notes": "Totam nulla quia omnis praesentium eum autem."
-          }
+            "tags": ["aliquam", "qui", "non"],
+            "notes": "Harum nisi est ratione sapiente.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2019-09-16T23:23:19.552+02:00",
-            "payer": "Ivan Ryan",
-            "payee": "O'Reilly Inc",
-            "amount": 950.0123536737532,
+            "valueDate": "2021-06-18T11:57:45.387+02:00",
+            "payer": "Thomas Bauch",
+            "payee": "Von - Cole",
+            "amount": 276.926457972991,
             "currency": "USD",
             "category": "Health",
-            "tags": ["modi", "aliquid", "dolores"],
-            "notes": "Itaque itaque vero aut quo ut nihil sunt neque inventore."
-          }
+            "tags": ["sit", "rerum", "aut"],
+            "notes": "A similique totam dicta tempore ut earum et.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2021-11-21T17:18:35.873+01:00",
-            "payer": "Desiree Vandervort",
-            "payee": "Hintz, Bogan and Steuber",
-            "amount": 541.1409372862674,
-            "currency": "USD",
-            "category": "Games",
-            "tags": ["dicta", "dolore", "et"],
-            "notes": "Illum illo magnam mollitia culpa aperiam et labore."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2019-08-15T00:31:02.222+02:00",
-            "payer": "Louise Fritsch",
-            "payee": "Wolf, Hansen and Wilkinson",
-            "amount": 532.0094525244023,
-            "currency": "USD",
-            "category": "Garden",
-            "tags": ["in", "ut", "aliquam"],
-            "notes": "Aspernatur atque qui dolores."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2018-11-03T23:38:34.456+01:00",
-            "payer": "Christian Hills",
-            "payee": "Fadel - Steuber",
-            "amount": 781.4023290419912,
-            "currency": "USD",
-            "category": "Sports",
-            "tags": ["reprehenderit", "perspiciatis", "tempora"],
-            "notes": "Libero est consequatur qui ut delectus similique cum."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2022-03-27T01:04:39.626+01:00",
-            "payer": "Ben Osinski",
-            "payee": "Fritsch, Gislason and Gorczany",
-            "amount": 594.6009845385506,
-            "currency": "USD",
-            "category": "Industrial",
-            "tags": ["vitae", "possimus", "quia"],
-            "notes": "Consequuntur enim voluptatem qui eum."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2022-11-14T14:26:12.016+01:00",
-            "payer": "Roberta Hintz",
-            "payee": "Gaylord Inc",
-            "amount": 317.8456598503772,
-            "currency": "USD",
-            "category": "Grocery",
-            "tags": ["architecto", "architecto", "placeat"],
-            "notes": "Architecto consectetur aut maxime natus sed veniam est a quisquam."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2019-01-06T01:01:04.022+01:00",
-            "payer": "Annie Corwin",
-            "payee": "Green Group",
-            "amount": 294.80193803756134,
+            "valueDate": "2019-07-06T00:58:23.541+02:00",
+            "payer": "Patsy Funk",
+            "payee": "Kerluke, Heathcote and Kris",
+            "amount": 291.10063140136947,
             "currency": "USD",
             "category": "Jewelery",
-            "tags": ["ut", "mollitia", "vel"],
-            "notes": "Eaque libero in iure maxime soluta fuga."
-          }
+            "tags": ["facere", "beatae", "non"],
+            "notes": "Magnam aliquam totam aut numquam iure nesciunt incidunt maxime.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2019-08-16T04:26:26.877+02:00",
-            "payer": "Jeffery Sanford",
-            "payee": "Farrell Inc",
-            "amount": 154.90745478260723,
-            "currency": "USD",
-            "category": "Outdoors",
-            "tags": ["consequatur", "amet", "sint"],
-            "notes": "Dolorum quis et."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2019-07-25T00:17:27.275+02:00",
-            "payer": "Zachary Kirlin",
-            "payee": "Olson - Pagac",
-            "amount": 775.1948370291924,
-            "currency": "USD",
-            "category": "Sports",
-            "tags": ["et", "alias", "minima"],
-            "notes": "Nam et eum impedit."
-          }
-        },
-        {
-          "node": {
-            "valueDate": "2022-01-24T22:12:10.390+01:00",
-            "payer": "Mandy Reichel",
-            "payee": "Yundt and Sons",
-            "amount": 173.73205880047027,
+            "valueDate": "2019-09-15T15:03:44.777+02:00",
+            "payer": "Gene Hessel",
+            "payee": "Bechtelar, Strosin and Botsford",
+            "amount": 95.74101728409755,
             "currency": "USD",
             "category": "Home",
-            "tags": ["vitae", "consectetur", "fugiat"],
-            "notes": "Omnis ducimus aut eaque voluptas rerum itaque necessitatibus quia."
-          }
+            "tags": ["occaecati", "nisi", "consequatur"],
+            "notes": "Non vel praesentium adipisci debitis et nesciunt sunt quia.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2021-05-22T00:49:56.314+02:00",
-            "payer": "Tim Block",
-            "payee": "Predovic - Dooley",
-            "amount": 959.0776699771071,
+            "valueDate": "2018-09-30T02:38:43.715+02:00",
+            "payer": "Damon Heaney",
+            "payee": "Howell, Dietrich and Jenkins",
+            "amount": 771.2592842038314,
+            "currency": "USD",
+            "category": "Beauty",
+            "tags": ["tempore", "a", "quaerat"],
+            "notes": "Ut et nihil rerum.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2018-12-25T00:23:00.931+01:00",
+            "payer": "Patsy Howell",
+            "payee": "Strosin LLC",
+            "amount": 111.8546202201022,
+            "currency": "USD",
+            "category": "Sports",
+            "tags": ["est", "eligendi", "unde"],
+            "notes": "Veritatis cumque aut dolorem consequatur quod similique reprehenderit.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2023-09-19T16:23:42.865+02:00",
+            "payer": "Willie Jakubowski",
+            "payee": "Armstrong, Weimann and Padberg",
+            "amount": 436.2680556301529,
+            "currency": "USD",
+            "category": "Music",
+            "tags": ["voluptas", "aspernatur", "distinctio"],
+            "notes": "Laudantium rerum minus dolorum dolores eos excepturi unde laborum dicta.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2022-08-24T04:12:05.398+02:00",
+            "payer": "Sandy Runolfsdottir",
+            "payee": "Hand - Paucek",
+            "amount": 566.9851270774067,
             "currency": "USD",
             "category": "Games",
-            "tags": ["unde", "et", "eius"],
-            "notes": "Et eos laborum reiciendis est enim."
-          }
+            "tags": ["omnis", "aliquid", "iste"],
+            "notes": "Sit reiciendis voluptas alias dolor earum.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2018-12-25T16:06:33.671+01:00",
-            "payer": "Irvin Koss",
-            "payee": "Simonis - Marvin",
-            "amount": 530.3603385799657,
+            "valueDate": "2018-06-29T03:45:52.982+02:00",
+            "payer": "Velma Nitzsche",
+            "payee": "Sauer and Sons",
+            "amount": 294.9967272984515,
             "currency": "USD",
-            "category": "Movies",
-            "tags": ["laborum", "ut", "distinctio"],
-            "notes": "Voluptas nam consequatur libero cumque libero aut ullam officia quasi."
-          }
+            "category": "Outdoors",
+            "tags": ["cum", "in", "ipsam"],
+            "notes": "Quia quisquam occaecati deserunt enim quaerat.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2020-12-27T21:10:41.347+01:00",
+            "payer": "Sean Larkin",
+            "payee": "Oberbrunner - Roberts",
+            "amount": 434.43826221997386,
+            "currency": "USD",
+            "category": "Grocery",
+            "tags": ["eligendi", "amet", "est"],
+            "notes": "Aperiam neque neque qui porro animi voluptate.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2018-10-02T17:30:09.395+02:00",
+            "payer": "Brooke Cummings",
+            "payee": "Cummerata, Runte and Farrell",
+            "amount": 380.3174004198978,
+            "currency": "USD",
+            "category": "Clothing",
+            "tags": ["iste", "modi", "fugit"],
+            "notes": "Dolor omnis incidunt perspiciatis vel fugiat voluptatem.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2019-12-03T13:55:34.994+01:00",
+            "payer": "Audrey Fisher",
+            "payee": "Renner - Gleason",
+            "amount": 590.2587503389666,
+            "currency": "USD",
+            "category": "Games",
+            "tags": ["ad", "ut", "molestiae"],
+            "notes": "Earum officiis dolore in velit vero eum aperiam consequatur.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2020-04-28T15:05:46.350+02:00",
+            "payer": "Donald Roob",
+            "payee": "Erdman - Steuber",
+            "amount": 991.8544416464842,
+            "currency": "USD",
+            "category": "Music",
+            "tags": ["repellat", "alias", "sunt"],
+            "notes": "Omnis assumenda recusandae sit.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "valueDate": "2023-07-04T01:01:48.227+02:00",
+            "payer": "Roderick Hackett",
+            "payee": "Sanford LLC",
+            "amount": 101.9460363756024,
+            "currency": "USD",
+            "category": "Music",
+            "tags": ["ut", "nisi", "accusantium"],
+            "notes": "Dignissimos inventore voluptas eos consequatur ea non mollitia distinctio.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
         }
-      ]
-    }
+      ],
+      "__typename": "TransactionsConnection"
+    },
+    "__typename": "Query"
   }
 }

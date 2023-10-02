@@ -9,7 +9,9 @@
       "bic": "DEUTDEDB123",
       "bban": null,
       "ownerName": "Aleg Tolstoy",
-      "accountType": null
-    }
+      "accountType": null,
+      "__typename": "BankAccount"
+    },
+    "__typename": "Query"
   }
 }

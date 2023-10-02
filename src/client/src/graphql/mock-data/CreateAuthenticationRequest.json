@@ -1,10 +1,12 @@
 {
   "data": {
     "createAuthenticationRequest": {
-      "id": "57e19144-f1df-47ab-860b-c908fcd2015b",
+      "id": "79b61ae3-0040-4132-bdac-010c1b2c1dfc",
       "associatedAccounts": [],
       "status": "REQUIRES_USER_ACTION",
-      "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/57e19144-f1df-47ab-860b-c908fcd2015b/SANDBOXFINANCE_SFIN0000"
-    }
+      "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/79b61ae3-0040-4132-bdac-010c1b2c1dfc/SANDBOXFINANCE_SFIN0000",
+      "__typename": "AuthenticationRequest"
+    },
+    "__typename": "Mutation"
   }
 }

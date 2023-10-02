@@ -7,42 +7,54 @@
             "id": "1a23713a-7c60-4c60-8542-936acc2f967e",
             "description": "Personal Loan Account",
             "balance": 2521.9,
-            "currency": "USD"
-          }
+            "currency": "USD",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         },
         {
           "node": {
             "id": "ba50e6cf-75bb-4dcd-9f41-53574ae1d8ee",
             "description": "Personal Loan Account",
             "balance": 1989.09,
-            "currency": "USD"
-          }
+            "currency": "USD",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         },
         {
           "node": {
             "id": "1e9cd4b2-a895-498e-ab15-029e51ee82ca",
             "description": "Money Market Account",
             "balance": 3908.26,
-            "currency": "USD"
-          }
+            "currency": "USD",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         },
         {
           "node": {
             "id": "4b948bf7-9523-4660-a8c1-4c241fa797fe",
             "description": "Money Market Account",
             "balance": 4658.92,
-            "currency": "USD"
-          }
+            "currency": "USD",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         },
         {
           "node": {
             "id": "4a281648-b2bf-43d6-b43e-15dabfd88291",
             "description": "Home Loan Account",
             "balance": 242.48,
-            "currency": "USD"
-          }
+            "currency": "USD",
+            "__typename": "BankAccount"
+          },
+          "__typename": "AccountsEdge"
         }
-      ]
-    }
+      ],
+      "__typename": "AccountsConnection"
+    },
+    "__typename": "Query"
   }
 }

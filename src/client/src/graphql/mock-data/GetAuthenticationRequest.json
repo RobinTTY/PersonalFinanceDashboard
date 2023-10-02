@@ -7,7 +7,9 @@
         "443a187b-6900-410e-8706-7cc0d8c39987"
       ],
       "status": "SUCCESSFUL",
-      "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/d632d24b-4b87-435f-b216-51726088953c/SANDBOXFINANCE_SFIN0000"
-    }
+      "authenticationLink": "https://bankaccountdata.gocardless.com/psd2/start/d632d24b-4b87-435f-b216-51726088953c/SANDBOXFINANCE_SFIN0000",
+      "__typename": "AuthenticationRequest"
+    },
+    "__typename": "Query"
   }
 }

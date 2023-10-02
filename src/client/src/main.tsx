@@ -8,6 +8,7 @@ import { App } from './App';
 import './index.css';
 
 // TODO: Maybe create seperate clean entrypoint for production
+// Probably change workerDirectory in package.json to './' ?
 const worker = setupWorker(...handlers);
 async function prepare() {
   if (import.meta.env.DEV) {
