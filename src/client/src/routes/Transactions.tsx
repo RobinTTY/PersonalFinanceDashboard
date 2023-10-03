@@ -1,6 +1,11 @@
 import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef } from 'react';
-import { CellClickedEvent, GridReadyEvent } from 'ag-grid-community';
+import {
+  CellClickedEvent,
+  GridReadyEvent,
+  ValueFormatterFunc,
+  ValueFormatterParams,
+} from 'ag-grid-community';
 import { useQuery } from '@apollo/client';
 import { Badge } from '@mantine/core';
 import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
@@ -56,10 +61,8 @@ export const Transactions = () => {
     </Badge>
   );
 
-  const agDateFormatter = (date: Date | null | undefined) => {
-    if (!(date instanceof Date)) return null;
-    return dateFormatter.format(date);
-  };
+  const agDateFormatter: ValueFormatterFunc<Date> = (params: ValueFormatterParams): string =>
+    dateFormatter.format(params.value);
 
   const columnDefs: any[] = [
     { headerName: 'Date', field: 'date', valueFormatter: agDateFormatter },

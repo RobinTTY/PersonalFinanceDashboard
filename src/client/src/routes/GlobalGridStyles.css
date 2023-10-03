@@ -1,8 +1,10 @@
 .ag-theme-alpine-dark {
   /* --ag-foreground-color: rgb(126, 46, 132); */
-  --ag-header-background-color: var(--mantine-color-dark-4);
+
+  --ag-header-background-color: var(--mantine-color-dark-7);
   --ag-background-color: var(--mantine-color-dark-8);
-  --ag-odd-row-background-color: var(--mantine-color-dark-6);
+  --ag-odd-row-background-color: var(--mantine-color-dark-7);
+
   /* --ag-header-foreground-color: rgb(204, 245, 172); */
   /* --ag-header-column-resize-handle-color: rgb(126, 46, 132); */
 
