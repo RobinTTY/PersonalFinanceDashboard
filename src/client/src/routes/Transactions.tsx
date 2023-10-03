@@ -9,6 +9,7 @@ import { getCurrencyFormatter } from '@/utility/getCurrencyFormatter';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './GlobalGridStyles.css';
+import { getDateFormatter } from '@/utility/getDateFormatter';
 
 export const Transactions = () => {
   const gridRef = useRef<AgGridReact>(null);
@@ -35,28 +36,40 @@ export const Transactions = () => {
     },
   });
 
-  const formatter = getCurrencyFormatter('en-US', 'USD');
+  // TODO: locale should be set by user preference
+  const locale = 'en-US';
+  const dateFormatter = getDateFormatter(locale, 'medium');
+  const currencyFormatter = getCurrencyFormatter(locale, 'USD');
   const rowData = data?.transactions?.edges!.map((edge) => {
     const node = edge?.node;
     return {
       date: node.valueDate,
       payee: node.payee,
       category: node.category,
-      activity: formatter.format(node.amount),
+      activity: node.amount,
     };
   });
 
   const MyRenderer = (params: any) => (
     <Badge size="lg" variant="light" color="red">
-      {params.value}
+      {currencyFormatter.format(params.value)}
     </Badge>
   );
 
+  const agDateFormatter = (date: Date | null | undefined) => {
+    if (!(date instanceof Date)) return null;
+    return dateFormatter.format(date);
+  };
+
   const columnDefs: any[] = [
-    { headerName: 'Date', field: 'date' },
+    { headerName: 'Date', field: 'date', valueFormatter: agDateFormatter },
     { headerName: 'Payee', field: 'payee' },
     { headerName: 'Category', field: 'category' },
-    { headerName: 'Activity', field: 'activity', cellRenderer: MyRenderer },
+    {
+      headerName: 'Activity',
+      field: 'activity',
+      cellRenderer: MyRenderer,
+    },
   ];
 
   return (
