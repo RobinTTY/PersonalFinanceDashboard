@@ -72,8 +72,9 @@ export const AccountSelectionStep = ({
                     {account.name}
                   </Text>
                 </Box>
+                {/* TODO: Create reusable component */}
                 <Badge size="md" variant="light">
-                  {formatter.format(account.balance)}
+                  {formatter.format(account.balance!)}
                 </Badge>
               </Group>
               <Text c="dimmed" size="xs">

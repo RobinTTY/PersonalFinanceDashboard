@@ -47,7 +47,7 @@ export const Accounts = () => {
               // TODO: handle null
               <AccountSummary
                 key={account.id}
-                balance={account.balance}
+                balance={account.balance!}
                 currency={account.currency!}
                 description={account.description!}
                 type={account.accountType!}

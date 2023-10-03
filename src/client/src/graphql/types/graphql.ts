@@ -17,7 +17,7 @@ export type Scalars = {
   /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
   DateTime: { input: Date; output: Date; }
   /** The built-in `Decimal` scalar type. */
-  Decimal: { input: any; output: any; }
+  Decimal: { input: number; output: number; }
   URL: { input: any; output: any; }
 };
 
@@ -243,21 +243,21 @@ export type GetAccountQueryVariables = Exact<{
 }>;
 
 
-export type GetAccountQuery = { __typename?: 'Query', account?: { __typename?: 'BankAccount', name?: string | null, description?: string | null, balance?: any | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } | null };
+export type GetAccountQuery = { __typename?: 'Query', account?: { __typename?: 'BankAccount', name?: string | null, description?: string | null, balance?: number | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } | null };
 
 export type GetAccountsQueryVariables = Exact<{
   accountIds: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
-export type GetAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'BankAccount', id: string, name?: string | null, description?: string | null, balance?: any | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } }> | null } | null };
+export type GetAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'BankAccount', id: string, name?: string | null, description?: string | null, balance?: number | null, currency?: string | null, iban?: string | null, bic?: string | null, bban?: string | null, ownerName?: string | null, accountType?: string | null } }> | null } | null };
 
 export type GetMinimalAccountsQueryVariables = Exact<{
   accountIds: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
-export type GetMinimalAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'BankAccount', id: string, description?: string | null, balance?: any | null, currency?: string | null } }> | null } | null };
+export type GetMinimalAccountsQuery = { __typename?: 'Query', accounts?: { __typename?: 'AccountsConnection', edges?: Array<{ __typename?: 'AccountsEdge', node: { __typename?: 'BankAccount', id: string, description?: string | null, balance?: number | null, currency?: string | null } }> | null } | null };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['String']['input'];
@@ -280,7 +280,7 @@ export type GetTransactionsQueryVariables = Exact<{
 }>;
 
 
-export type GetTransactionsQuery = { __typename?: 'Query', transactions?: { __typename?: 'TransactionsConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, edges?: Array<{ __typename?: 'TransactionsEdge', node: { __typename?: 'Transaction', valueDate?: Date | null, payer?: string | null, payee?: string | null, amount: any, currency: string, category: string, tags: Array<string>, notes: string } }> | null } | null };
+export type GetTransactionsQuery = { __typename?: 'Query', transactions?: { __typename?: 'TransactionsConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, edges?: Array<{ __typename?: 'TransactionsEdge', node: { __typename?: 'Transaction', valueDate?: Date | null, payer?: string | null, payee?: string | null, amount: number, currency: string, category: string, tags: Array<string>, notes: string } }> | null } | null };
 
 
 export const CreateAuthenticationRequestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateAuthenticationRequest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAuthenticationRequest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"institutionId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"institutionId"}}},{"kind":"Argument","name":{"kind":"Name","value":"redirectUri"},"value":{"kind":"Variable","name":{"kind":"Name","value":"redirectUri"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"associatedAccounts"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"authenticationLink"}}]}}]}}]} as unknown as DocumentNode<CreateAuthenticationRequestMutation, CreateAuthenticationRequestMutationVariables>;

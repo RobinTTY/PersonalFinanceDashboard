@@ -2,7 +2,9 @@ import { AgGridReact } from 'ag-grid-react';
 import { useCallback, useMemo, useRef } from 'react';
 import { CellClickedEvent, GridReadyEvent } from 'ag-grid-community';
 import { useQuery } from '@apollo/client';
+import { Badge } from '@mantine/core';
 import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
+import { getCurrencyFormatter } from '@/utility/getCurrencyFormatter';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -33,23 +35,28 @@ export const Transactions = () => {
     },
   });
 
+  const formatter = getCurrencyFormatter('en-US', 'USD');
   const rowData = data?.transactions?.edges!.map((edge) => {
     const node = edge?.node;
     return {
       date: node.valueDate,
       payee: node.payee,
       category: node.category,
-      payment: node.amount,
-      deposit: 0,
+      activity: formatter.format(node.amount),
     };
   });
+
+  const MyRenderer = (params: any) => (
+    <Badge size="lg" variant="light" color="red">
+      {params.value}
+    </Badge>
+  );
 
   const columnDefs: any[] = [
     { headerName: 'Date', field: 'date' },
     { headerName: 'Payee', field: 'payee' },
     { headerName: 'Category', field: 'category' },
-    { headerName: 'Payment', field: 'payment' },
-    { headerName: 'Deposit', field: 'deposit' },
+    { headerName: 'Activity', field: 'activity', cellRenderer: MyRenderer },
   ];
 
   return (
