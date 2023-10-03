@@ -14,7 +14,7 @@ export const Shell = () => (
   <AppShell
     className={classes.shell}
     header={{ height: { base: 50, md: 70 } }}
-    navbar={{ width: 250, breakpoint: 'sm' }}
+    navbar={{ width: 230, breakpoint: 'sm' }}
   >
     <AppShell.Header p="md">
       <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
