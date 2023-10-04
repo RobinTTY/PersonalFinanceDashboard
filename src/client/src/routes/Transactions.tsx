@@ -89,6 +89,7 @@ export const Transactions = () => {
         defaultColDef={defaultColDef}
         rowSelection="multiple"
         animateRows
+        suppressHorizontalScroll
         onCellClicked={cellClickedHandler}
         onGridReady={onGridReady}
         onGridSizeChanged={() => gridRef.current?.api?.sizeColumnsToFit()}

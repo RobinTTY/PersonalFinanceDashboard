@@ -99,6 +99,11 @@ export const handlers: Array<RequestHandler> = [
     );
   }),
 
+  // Don't pass through any unhandled graphql operations
+  graphql.operation((req) => {
+    throw new Error(`Unhandled graphql operation: ${req.operationName}`);
+  }),
+
   // Ignore all get calls (non-graphql)
   rest.get('*', (req) => req.passthrough()),
 ];
