@@ -11,210 +11,1275 @@
       "edges": [
         {
           "node": {
-            "valueDate": "2021-01-29T01:57:15.179+01:00",
-            "payer": "Teri Schmidt",
-            "payee": "Terry - Schinner",
-            "amount": 510.05124946708924,
-            "currency": "USD",
-            "category": "Electronics",
-            "tags": ["expedita", "nihil", "voluptas"],
-            "notes": "Consequatur exercitationem commodi.",
-            "__typename": "Transaction"
-          },
-          "__typename": "TransactionsEdge"
-        },
-        {
-          "node": {
-            "valueDate": "2018-09-29T06:58:37.102+02:00",
-            "payer": "Andrea Kuvalis",
-            "payee": "Jast, Nienow and Herzog",
-            "amount": 502.91828493281605,
-            "currency": "USD",
-            "category": "Health",
-            "tags": ["aliquam", "qui", "non"],
-            "notes": "Harum nisi est ratione sapiente.",
-            "__typename": "Transaction"
-          },
-          "__typename": "TransactionsEdge"
-        },
-        {
-          "node": {
-            "valueDate": "2021-06-18T11:57:45.387+02:00",
-            "payer": "Thomas Bauch",
-            "payee": "Von - Cole",
-            "amount": 276.926457972991,
-            "currency": "USD",
-            "category": "Health",
-            "tags": ["sit", "rerum", "aut"],
-            "notes": "A similique totam dicta tempore ut earum et.",
-            "__typename": "Transaction"
-          },
-          "__typename": "TransactionsEdge"
-        },
-        {
-          "node": {
-            "valueDate": "2019-07-06T00:58:23.541+02:00",
-            "payer": "Patsy Funk",
-            "payee": "Kerluke, Heathcote and Kris",
-            "amount": 291.10063140136947,
-            "currency": "USD",
-            "category": "Jewelery",
-            "tags": ["facere", "beatae", "non"],
-            "notes": "Magnam aliquam totam aut numquam iure nesciunt incidunt maxime.",
-            "__typename": "Transaction"
-          },
-          "__typename": "TransactionsEdge"
-        },
-        {
-          "node": {
-            "valueDate": "2019-09-15T15:03:44.777+02:00",
-            "payer": "Gene Hessel",
-            "payee": "Bechtelar, Strosin and Botsford",
-            "amount": 95.74101728409755,
-            "currency": "USD",
-            "category": "Home",
-            "tags": ["occaecati", "nisi", "consequatur"],
-            "notes": "Non vel praesentium adipisci debitis et nesciunt sunt quia.",
-            "__typename": "Transaction"
-          },
-          "__typename": "TransactionsEdge"
-        },
-        {
-          "node": {
-            "valueDate": "2018-09-30T02:38:43.715+02:00",
-            "payer": "Damon Heaney",
-            "payee": "Howell, Dietrich and Jenkins",
-            "amount": 771.2592842038314,
-            "currency": "USD",
+            "id": "a2407e330e9dd54adfc877e5b26da462",
+            "valueDate": "2023-09-14T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -128.46,
+            "currency": "EUR",
             "category": "Beauty",
-            "tags": ["tempore", "a", "quaerat"],
-            "notes": "Ut et nihil rerum.",
+            "tags": ["Tasty", "Fantastic", "Rustic"],
+            "notes": "Health Insurance",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2018-12-25T00:23:00.931+01:00",
-            "payer": "Patsy Howell",
-            "payee": "Strosin LLC",
-            "amount": 111.8546202201022,
-            "currency": "USD",
-            "category": "Sports",
-            "tags": ["est", "eligendi", "unde"],
-            "notes": "Veritatis cumque aut dolorem consequatur quod similique reprehenderit.",
+            "id": "6eb4b1ac311a80c7523866741a0925a7",
+            "valueDate": "2023-09-06T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -16.93,
+            "currency": "EUR",
+            "category": "Shoes",
+            "tags": ["Ergonomic", "Small", "Generic"],
+            "notes": "Ihre Tarifrechnung",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2023-09-19T16:23:42.865+02:00",
-            "payer": "Willie Jakubowski",
-            "payee": "Armstrong, Weimann and Padberg",
-            "amount": 436.2680556301529,
-            "currency": "USD",
-            "category": "Music",
-            "tags": ["voluptas", "aspernatur", "distinctio"],
-            "notes": "Laudantium rerum minus dolorum dolores eos excepturi unde laborum dicta.",
+            "id": "cbd3a1e0659d2a33cd837aff0778d916",
+            "valueDate": "2023-09-06T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Drillisch Online GmbH",
+            "amount": -19.99,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Sleek", "Intelligent", "Refined"],
+            "notes": "Phone Plan",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2022-08-24T04:12:05.398+02:00",
-            "payer": "Sandy Runolfsdottir",
-            "payee": "Hand - Paucek",
-            "amount": 566.9851270774067,
-            "currency": "USD",
-            "category": "Games",
-            "tags": ["omnis", "aliquid", "iste"],
-            "notes": "Sit reiciendis voluptas alias dolor earum.",
+            "id": "00a9970210dc8e74cb29c804569ed7fb",
+            "valueDate": "2023-09-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Movies",
+            "tags": ["Gorgeous", "Refined", "Small"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2018-06-29T03:45:52.982+02:00",
-            "payer": "Velma Nitzsche",
-            "payee": "Sauer and Sons",
-            "amount": 294.9967272984515,
-            "currency": "USD",
-            "category": "Outdoors",
-            "tags": ["cum", "in", "ipsam"],
-            "notes": "Quia quisquam occaecati deserunt enim quaerat.",
+            "id": "d1e5291ddc50d43ed3cf071bf6df6db4",
+            "valueDate": "2023-09-03T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -330.14,
+            "currency": "EUR",
+            "category": "Shoes",
+            "tags": ["Awesome", "Awesome", "Ergonomic"],
+            "notes": "LASTSCHRIFT BARCLAYS",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2020-12-27T21:10:41.347+01:00",
-            "payer": "Sean Larkin",
-            "payee": "Oberbrunner - Roberts",
-            "amount": 434.43826221997386,
-            "currency": "USD",
-            "category": "Grocery",
-            "tags": ["eligendi", "amet", "est"],
-            "notes": "Aperiam neque neque qui porro animi voluptate.",
+            "id": "a3d030247537af8ef8ba47dc42e910c4",
+            "valueDate": "2023-08-31T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 50.0,
+            "currency": "EUR",
+            "category": "Health",
+            "tags": ["Practical", "Ergonomic", "Tasty"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2018-10-02T17:30:09.395+02:00",
-            "payer": "Brooke Cummings",
-            "payee": "Cummerata, Runte and Farrell",
-            "amount": 380.3174004198978,
-            "currency": "USD",
+            "id": "09684e1a3d54b0b13f37ea0f42d2d7e9",
+            "valueDate": "2023-08-31T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "REWE",
+            "amount": -3.61,
+            "currency": "EUR",
+            "category": "Books",
+            "tags": ["Tasty", "Tasty", "Ergonomic"],
+            "notes": "Groceries",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "7f113aff9a89809dab305c1f833177bf",
+            "valueDate": "2023-08-30T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -9.99,
+            "currency": "EUR",
             "category": "Clothing",
-            "tags": ["iste", "modi", "fugit"],
-            "notes": "Dolor omnis incidunt perspiciatis vel fugiat voluptatem.",
+            "tags": ["Small", "Rustic", "Handcrafted"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2019-12-03T13:55:34.994+01:00",
-            "payer": "Audrey Fisher",
-            "payee": "Renner - Gleason",
-            "amount": 590.2587503389666,
-            "currency": "USD",
+            "id": "c861da745fd61b7d603d9ae44f39cd97",
+            "valueDate": "2023-08-20T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "REWE",
+            "amount": -1.36,
+            "currency": "EUR",
+            "category": "Shoes",
+            "tags": ["Tasty", "Small", "Gorgeous"],
+            "notes": "Groceries",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "7fde4877059bdc9f798b2f516f0c3a5b",
+            "valueDate": "2023-08-14T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -128.46,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Ergonomic", "Sleek", "Tasty"],
+            "notes": "BEITRAG 0723 - 0723",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "2298565f29795dc4c4887a8b6aa96b13",
+            "valueDate": "2023-08-12T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 100.0,
+            "currency": "EUR",
+            "category": "Home",
+            "tags": ["Sleek", "Awesome", "Unbranded"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "8ec6ed590ecd370554440a291bccbf7a",
+            "valueDate": "2023-08-08T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Outdoors",
+            "tags": ["Practical", "Handcrafted", "Incredible"],
+            "notes": "Phone Plan",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "0960f921e29d9f7aa6d768534178c863",
+            "valueDate": "2023-08-07T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal (Europe) S.a r.l. et Cie, S.C.A.",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Sleek", "Gorgeous", "Unbranded"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "f4daec362fdc1f6a21eb5f47b2d47733",
+            "valueDate": "2023-08-03T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -191.32,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Unbranded", "Generic", "Ergonomic"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "f951f786af8d1996a60d3c56b8503d43",
+            "valueDate": "2023-08-02T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 39.24,
+            "currency": "EUR",
+            "category": "Books",
+            "tags": ["Generic", "Small", "Gorgeous"],
+            "notes": "eToro Withdrawal",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "025f6011b5401a1c08e97c6af95e6698",
+            "valueDate": "2023-07-31T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -9.99,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Generic", "Ergonomic", "Small"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "cac7a75d982c8b0f2d39dd8d9a05aaf4",
+            "valueDate": "2023-07-30T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "REWE",
+            "amount": -40.62,
+            "currency": "EUR",
+            "category": "Tools",
+            "tags": ["Gorgeous", "Generic", "Sleek"],
+            "notes": "Groceries",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "98610790b0ceff5904eac7efd8343821",
+            "valueDate": "2023-07-23T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 100.0,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Generic", "Small", "Small"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "5ecfcc826dfebeb1dd406b58192767eb",
+            "valueDate": "2023-07-23T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "REWE",
+            "amount": -6.34,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Small", "Rustic", "Rustic"],
+            "notes": "Groceries",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "4b3d52847625a5a0540141fa8ed781fb",
+            "valueDate": "2023-07-16T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
             "category": "Games",
-            "tags": ["ad", "ut", "molestiae"],
-            "notes": "Earum officiis dolore in velit vero eum aperiam consequatur.",
+            "tags": ["Awesome", "Rustic", "Handmade"],
+            "notes": "BEITRAG 0623 - 0623",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2020-04-28T15:05:46.350+02:00",
-            "payer": "Donald Roob",
-            "payee": "Erdman - Steuber",
-            "amount": 991.8544416464842,
-            "currency": "USD",
-            "category": "Music",
-            "tags": ["repellat", "alias", "sunt"],
-            "notes": "Omnis assumenda recusandae sit.",
+            "id": "ef2b1cbd943b82dba06de5c5cceaedd8",
+            "valueDate": "2023-07-15T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 50.0,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Rustic", "Handmade", "Gorgeous"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
         },
         {
           "node": {
-            "valueDate": "2023-07-04T01:01:48.227+02:00",
-            "payer": "Roderick Hackett",
-            "payee": "Sanford LLC",
-            "amount": 101.9460363756024,
-            "currency": "USD",
+            "id": "5f206ec9a284c880be770d2af42ead60",
+            "valueDate": "2023-07-13T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Robin Müller",
+            "amount": -5600.0,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Incredible", "Tasty", "Awesome"],
+            "notes": "Scalable Capital Broker",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "546cbf247a57abe81130cf03ce90eefa",
+            "valueDate": "2023-07-13T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 150.0,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Sleek", "Ergonomic", "Unbranded"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "665081ec814f0a5d34a28bb272c5ceb7",
+            "valueDate": "2023-07-12T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 5602.93,
+            "currency": "EUR",
+            "category": "Grocery",
+            "tags": ["Awesome", "Intelligent", "Generic"],
+            "notes": "eToro Withdrawal",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "1d5d219a67feddfaacb5c3b5bc8dd93e",
+            "valueDate": "2023-07-12T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Landesoberkasse BW",
+            "amount": -166.5,
+            "currency": "EUR",
+            "category": "Books",
+            "tags": ["Tasty", "Sleek", "Generic"],
+            "notes": "Rueckmeldung HS Esslingen",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "983205c37ea6359bd48b15082d586376",
+            "valueDate": "2023-07-12T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Robin Müller",
+            "amount": -4400.0,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Gorgeous", "Handmade", "Refined"],
+            "notes": "Scalable Capital Broker",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "7914dd988d69c82ef38f1714eb432159",
+            "valueDate": "2023-07-11T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 4506.4,
+            "currency": "EUR",
+            "category": "Outdoors",
+            "tags": ["Tasty", "Unbranded", "Refined"],
+            "notes": "eToro Withdrawal",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "6e00aea4af1ac9bfbcd7f0e4691f40d2",
+            "valueDate": "2023-07-10T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal (Europe) S.a r.l. et Cie, S.C.A.",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Handmade", "Intelligent", "Tasty"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "e32ba492bfbff9d394487c8caea02e67",
+            "valueDate": "2023-07-09T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
             "category": "Music",
-            "tags": ["ut", "nisi", "accusantium"],
-            "notes": "Dignissimos inventore voluptas eos consequatur ea non mollitia distinctio.",
+            "tags": ["Handmade", "Tasty", "Ergonomic"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "97a676c2d322e4a6438c9748ecac2b7f",
+            "valueDate": "2023-07-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -303.1,
+            "currency": "EUR",
+            "category": "Shoes",
+            "tags": ["Generic", "Tasty", "Generic"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "21508f5a9a1735f28515d5cd37475320",
+            "valueDate": "2023-07-02T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Jewelery",
+            "tags": ["Gorgeous", "Sleek", "Tasty"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "5a3afadd41dd7c06bab8b66803285779",
+            "valueDate": "2023-06-29T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Müller",
+            "amount": 0.78,
+            "currency": "EUR",
+            "category": "Electronics",
+            "tags": ["Fantastic", "Handmade", "Handmade"],
+            "notes": "ABSCHLUSS PER 30.06.2023",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "a39a46cef0aae5c063894bdf73b6ff6a",
+            "valueDate": "2023-06-25T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 60.0,
+            "currency": "EUR",
+            "category": "Music",
+            "tags": ["Tasty", "Handmade", "Licensed"],
+            "notes": "ABBUCHUNG VOM PAYPAL-KONTO",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "3bb7eadb7964aaec6b685c6043079c04",
+            "valueDate": "2023-06-14T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
+            "category": "Toys",
+            "tags": ["Ergonomic", "Handcrafted", "Incredible"],
+            "notes": "BEITRAG 0523 - 0523",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "68beae4d5ce6d68e30dce1dc63077d04",
+            "valueDate": "2023-06-12T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal (Europe) S.a r.l. et Cie, S.C.A.",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Health",
+            "tags": ["Fantastic", "Handmade", "Incredible"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "38ca19c19015de7879b83063565dc540",
+            "valueDate": "2023-06-11T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Incredible", "Sleek", "Generic"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "3a80bb254660c978a8b87f5090c179be",
+            "valueDate": "2023-06-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -262.85,
+            "currency": "EUR",
+            "category": "Movies",
+            "tags": ["Practical", "Fantastic", "Licensed"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "325e337fa533c9a6901a11bf63df1a18",
+            "valueDate": "2023-05-30T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Movies",
+            "tags": ["Practical", "Refined", "Gorgeous"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "65cc38f94d8b86b7ea97de4df547c58f",
+            "valueDate": "2023-05-15T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Clothing",
+            "tags": ["Unbranded", "Tasty", "Rustic"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "91b595e83d24d6a5c48dc541c9a68e21",
+            "valueDate": "2023-05-14T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
+            "category": "Beauty",
+            "tags": ["Rustic", "Refined", "Tasty"],
+            "notes": "BEITRAG 0423 - 0423",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "b6d69e68d3980f46a543a2eef14dd364",
+            "valueDate": "2023-05-10T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Handcrafted", "Awesome", "Tasty"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "ebe4335a37e686e49d4eeb71327d4894",
+            "valueDate": "2023-05-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -221.27,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Rustic", "Unbranded", "Handcrafted"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "550f5f1d536efc46baa1ec96186dbcc6",
+            "valueDate": "2023-05-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.38,
+            "currency": "EUR",
+            "category": "Toys",
+            "tags": ["Tasty", "Rustic", "Ergonomic"],
+            "notes": "Patreon Ireland Limited, Ihr Einkauf bei Patreon Ireland Limited",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "949baac533be1b2ef5e05cfe27f9ad1f",
+            "valueDate": "2023-05-04T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Powercash21 Limited",
+            "amount": -200.0,
+            "currency": "EUR",
+            "category": "Music",
+            "tags": ["Intelligent", "Unbranded", "Handcrafted"],
+            "notes": "www.eToro.com",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "363ec9665837002315cd508045f003bf",
+            "valueDate": "2023-05-03T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Müller",
+            "amount": 200.0,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Licensed", "Fantastic", "Sleek"],
+            "notes": "Storno der Buchung des Auftragsbetrages 200.00 EUR vom 04.05.2023",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "7c562bd0ee470202a3aac14014070540",
+            "valueDate": "2023-05-03T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Robin Muller",
+            "amount": -200.0,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Intelligent", "Licensed", "Unbranded"],
+            "notes": "SecureGo plus",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "d44da57bf77405d106e58d0e16926538",
+            "valueDate": "2023-05-02T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Gorgeous", "Practical", "Licensed"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "d786395a5c53f78e62dad99187b35c2d",
+            "valueDate": "2023-04-28T22:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 260.0,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Rustic", "Ergonomic", "Awesome"],
+            "notes": "VOLKSBANK STUTTGART Filiale Korb/Korb/DE 29.04.2023/18:24 girocard GA 60090100/00000132/03150860090100/0714862002/0/1223",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "d3ff602d2b45f8221bf0155d7dcd2a54",
+            "valueDate": "2023-04-23T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "REWE",
+            "amount": -22.8,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Fantastic", "Handmade", "Handcrafted"],
+            "notes": "Groceries",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "0d91c5508d45cd95a220c0aabd60dbcc",
+            "valueDate": "2023-04-17T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Incredible", "Intelligent", "Awesome"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "171719ff0182b0aefb1f16c8b278e4da",
+            "valueDate": "2023-04-16T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
+            "category": "Electronics",
+            "tags": ["Handmade", "Small", "Licensed"],
+            "notes": "BEITRAG 0323 - 0323",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "38860f816e500bdde0f130be8f5b6959",
+            "valueDate": "2023-04-12T22:00:00Z",
+            "payer": "",
+            "payee": "MUELLER ROBIN",
+            "amount": 428.48,
+            "currency": "EUR",
+            "category": "Tools",
+            "tags": ["Fantastic", "Fantastic", "Incredible"],
+            "notes": "ERSTATT.90813/21019 EST-VERANL. ABWA: Landesoberkasse Karlsruhe",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "0fdf74a088319f3e99c4df21043c6a99",
+            "valueDate": "2023-04-10T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Refined", "Licensed", "Awesome"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "e7da6d8aec21525f54107611c8001321",
+            "valueDate": "2023-04-03T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -87.9,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Handmade", "Intelligent", "Fantastic"],
+            "notes": "BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "6cb85b4cd023572d6a04d039c8b3c969",
+            "valueDate": "2023-03-30T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Müller",
+            "amount": 0.4,
+            "currency": "EUR",
+            "category": "Shoes",
+            "tags": ["Incredible", "Refined", "Licensed"],
+            "notes": "ABSCHLUSS PER 31.03.2023",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "47414add43e271731755b3c71ffbbf6b",
+            "valueDate": "2023-03-30T22:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Kids",
+            "tags": ["Gorgeous", "Tasty", "Licensed"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "12bf770e7bc2602e2ebe035f7cec8f54",
+            "valueDate": "2023-03-28T22:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 770.0,
+            "currency": "EUR",
+            "category": "Toys",
+            "tags": ["Intelligent", "Sleek", "Small"],
+            "notes": "Lohn/Gehalt",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "2d90b44f16730a5b0bb740a380482d06",
+            "valueDate": "2023-03-20T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal (Europe) S.a r.l. et Cie, S.C.A.",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Practical", "Gorgeous", "Small"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "50e0bfd14ce10b63b0bf5ccf96fe5efb",
+            "valueDate": "2023-03-19T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 200.0,
+            "currency": "EUR",
+            "category": "Baby",
+            "tags": ["Rustic", "Small", "Small"],
+            "notes": "EnergieP 01054397 BW",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "33bd0ce88e54e86e064f824275745d13",
+            "valueDate": "2023-03-14T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Practical", "Unbranded", "Unbranded"],
+            "notes": "BEITRAG 0223 - 0223",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "9f283bf0e9c48123186369a5f7f9cbdc",
+            "valueDate": "2023-03-12T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Jewelery",
+            "tags": ["Sleek", "Licensed", "Intelligent"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "efd45ef04f1417a4a1a3a2ae691aa60a",
+            "valueDate": "2023-03-06T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -167.51,
+            "currency": "EUR",
+            "category": "Movies",
+            "tags": ["Intelligent", "Fantastic", "Ergonomic"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "9a0f5c8022f11acf13c65d3c81d9d9bf",
+            "valueDate": "2023-03-01T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Automotive",
+            "tags": ["Incredible", "Sleek", "Unbranded"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "464a3bfd7d4f2bcab71fa26a796d6733",
+            "valueDate": "2023-02-23T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 770.0,
+            "currency": "EUR",
+            "category": "Outdoors",
+            "tags": ["Awesome", "Refined", "Practical"],
+            "notes": "Lohn/Gehalt",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "2781a0148b1767a24a4668468b98109a",
+            "valueDate": "2023-02-20T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal (Europe) S.a r.l. et Cie, S.C.A.",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Sleek", "Awesome", "Rustic"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "dcc52bbd59e5c739125c976682be750e",
+            "valueDate": "2023-02-14T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -123.59,
+            "currency": "EUR",
+            "category": "Grocery",
+            "tags": ["Unbranded", "Practical", "Fantastic"],
+            "notes": "BEITRAG 0123 - 0123",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "7827240d49bf41107cc9189729961c8c",
+            "valueDate": "2023-02-12T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Tools",
+            "tags": ["Small", "Rustic", "Incredible"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "9ebe1d9a74562f955f72f4652bb2a286",
+            "valueDate": "2023-02-07T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Robin Müller",
+            "amount": -900.0,
+            "currency": "EUR",
+            "category": "Computers",
+            "tags": ["Gorgeous", "Intelligent", "Incredible"],
+            "notes": "SecureGo plus",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "45ba3c58fb1252e878e0cc5cad833b8a",
+            "valueDate": "2023-02-07T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 894.05,
+            "currency": "EUR",
+            "category": "Books",
+            "tags": ["Awesome", "Rustic", "Incredible"],
+            "notes": "Etoro Withdrawal",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "dbea1d30baad831d47b8f6f13653de85",
+            "valueDate": "2023-02-05T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -273.69,
+            "currency": "EUR",
+            "category": "Industrial",
+            "tags": ["Rustic", "Sleek", "Fantastic"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "e886b02905b968b06fff654a9213b4f8",
+            "valueDate": "2023-01-30T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Tasty", "Ergonomic", "Rustic"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "1de40f1e29e4b50e6492eccfac5a9bef",
+            "valueDate": "2023-01-29T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Landesoberkasse BW",
+            "amount": -214.7,
+            "currency": "EUR",
+            "category": "Electronics",
+            "tags": ["Licensed", "Practical", "Handmade"],
+            "notes": "Rueckmeldung HS Esslingen",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "8ccbdde51a26090eea3bde8471ac55b7",
+            "valueDate": "2023-01-26T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 770.0,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Sleek", "Unbranded", "Incredible"],
+            "notes": "Lohn/Gehalt",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "95a98e5a34aef461928267d39951dfd1",
+            "valueDate": "2023-01-23T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Beauty",
+            "tags": ["Practical", "Generic", "Small"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "68059af903338c17cd95ef4d4629c51d",
+            "valueDate": "2023-01-15T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -121.16,
+            "currency": "EUR",
+            "category": "Electronics",
+            "tags": ["Generic", "Incredible", "Awesome"],
+            "notes": "BEITRAG 1222 - 1222",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "ad576c6ffafaefbc4f3e7b161e617eab",
+            "valueDate": "2023-01-11T23:00:00Z",
+            "payer": "",
+            "payee": "VOBADESSXXX",
+            "amount": 245.0,
+            "currency": "EUR",
+            "category": "Jewelery",
+            "tags": ["Intelligent", "Refined", "Rustic"],
+            "notes": "VOLKSBANK STUTTGART Filiale",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "ee6912677aae898932ebd1c885968089",
+            "valueDate": "2023-01-09T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Health",
+            "tags": ["Fantastic", "Intelligent", "Handcrafted"],
+            "notes": "Ihre Tarifrechnung",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "12161952f222fbfb67f7f46948d7d39f",
+            "valueDate": "2023-01-03T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "BARCLAYS",
+            "amount": -185.29,
+            "currency": "EUR",
+            "category": "Games",
+            "tags": ["Sleek", "Licensed", "Handcrafted"],
+            "notes": "LASTSCHRIFT BARCLAYS",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "1e6385035306769c46f1a858da708cab",
+            "valueDate": "2023-01-01T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -4.99,
+            "currency": "EUR",
+            "category": "Games",
+            "tags": ["Awesome", "Unbranded", "Small"],
+            "notes": "Spotify AB, Ihr Einkauf bei Spotify AB",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "e5db6cde09a761b2d621671ee81adca6",
+            "valueDate": "2022-12-30T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Müller",
+            "amount": 0.21,
+            "currency": "EUR",
+            "category": "Clothing",
+            "tags": ["Tasty", "Handcrafted", "Rustic"],
+            "notes": "ABSCHLUSS PER 31.12.2022",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "93413154a832035538749a01af4dc6b5",
+            "valueDate": "2022-12-29T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Robin Muller",
+            "amount": -505.0,
+            "currency": "EUR",
+            "category": "Garden",
+            "tags": ["Rustic", "Tasty", "Fantastic"],
+            "notes": "Scalable Instant",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "1c918feeae3354f01ed2de055a803815",
+            "valueDate": "2022-12-27T23:00:00Z",
+            "payer": "",
+            "payee": "Robin Mueller",
+            "amount": 770.0,
+            "currency": "EUR",
+            "category": "Sports",
+            "tags": ["Practical", "Unbranded", "Licensed"],
+            "notes": "Lohn/Gehalt",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "da0bc7c2e09e89d655e43c913e2c3da4",
+            "valueDate": "2022-12-27T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "PayPal Europe S.a.r.l. et Cie S.C.A",
+            "amount": -2.0,
+            "currency": "EUR",
+            "category": "Beauty",
+            "tags": ["Intelligent", "Gorgeous", "Unbranded"],
+            "notes": "The New York Times Co., Ihr Einkauf bei The New York Times Co.",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "cf3d21d757b35cf145bab408152806c3",
+            "valueDate": "2022-12-14T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "AOK Baden-Wuerttemberg",
+            "amount": -121.16,
+            "currency": "EUR",
+            "category": "Jewelery",
+            "tags": ["Licensed", "Refined", "Refined"],
+            "notes": "BEITRAG 1122 - 1122",
+            "__typename": "Transaction"
+          },
+          "__typename": "TransactionsEdge"
+        },
+        {
+          "node": {
+            "id": "eef19833783d41b62f687412bdc014f2",
+            "valueDate": "2022-12-07T23:00:00Z",
+            "payer": "Robin Müller",
+            "payee": "Telefonica Germany GmbH + Co. OHG",
+            "amount": -14.99,
+            "currency": "EUR",
+            "category": "Home",
+            "tags": ["Tasty", "Fantastic", "Unbranded"],
+            "notes": "Ihre Tarifrechnung",
             "__typename": "Transaction"
           },
           "__typename": "TransactionsEdge"
