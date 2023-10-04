@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import {
   CellClickedEvent,
   GridReadyEvent,
+  ICellRendererParams,
   ValueFormatterFunc,
   ValueFormatterParams,
 } from 'ag-grid-community';
@@ -55,11 +56,15 @@ export const Transactions = () => {
     };
   });
 
-  const MyRenderer = (params: any) => (
-    <Badge size="lg" variant="light" color="red">
-      {currencyFormatter.format(params.value)}
-    </Badge>
-  );
+  const MyRenderer = (params: ICellRendererParams<number, number>) => {
+    const activity = params.value ?? 0;
+    const debit = activity < 0;
+    return (
+      <Badge size="lg" variant="light" color={debit ? 'red' : 'green'}>
+        {currencyFormatter.format(activity)}
+      </Badge>
+    );
+  };
 
   const agDateFormatter: ValueFormatterFunc<Date> = (params: ValueFormatterParams): string =>
     dateFormatter.format(params.value);
