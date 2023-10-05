@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Shell } from './Shell';
 import { BrowserRouter } from 'react-router-dom';
+import { Shell } from './Shell';
 
 const meta: Meta<typeof Shell> = {
   component: Shell,
