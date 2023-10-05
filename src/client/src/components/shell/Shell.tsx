@@ -1,5 +1,5 @@
 import { Outlet, Link } from 'react-router-dom';
-import { AppShell, Stack } from '@mantine/core';
+import { AppShell, Box, Stack } from '@mantine/core';
 import { IconArrowsExchange, IconHome, IconWallet } from '@tabler/icons-react';
 
 import { AppHeader } from '@components/app-header/AppHeader';
@@ -50,7 +50,9 @@ export const Shell = () => (
         </Stack>
       </AppShell.Section>
       <AppShell.Section>
-        <AccountButton />
+        <Box className={classes['account-button-container']}>
+          <AccountButton />
+        </Box>
       </AppShell.Section>
     </AppShell.Navbar>
     <AppShell.Main className={classes['main-section']}>

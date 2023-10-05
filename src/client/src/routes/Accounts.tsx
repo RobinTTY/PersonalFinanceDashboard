@@ -50,7 +50,6 @@ export const Accounts = () => {
                 balance={account.balance!}
                 currency={account.currency!}
                 description={account.description!}
-                type={account.accountType!}
               />
             ))}
           </SimpleGrid>
