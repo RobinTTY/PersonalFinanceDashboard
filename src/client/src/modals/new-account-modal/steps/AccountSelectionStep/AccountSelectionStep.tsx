@@ -3,7 +3,7 @@ import { Box, Center, Loader, SimpleGrid, Text, Group, Badge, Button } from '@ma
 import { useForm } from '@mantine/form';
 
 import { GetAccountsQuery } from '@graphql-queries/GetAccounts';
-import { ContentCheckbox } from '@components/image-checkbox/ContentCheckbox';
+import { ContentCheckbox } from '@/components/content-checkbox/ContentCheckbox';
 import { AccountSelection, AccountSelectionStepProps } from './AccountSelectionStepProps';
 import { getCurrencyFormatter } from '@/utility/getCurrencyFormatter';
 
