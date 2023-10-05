@@ -10,8 +10,7 @@ const meta: Meta<typeof ModalOptionSearchList> = {
 
 type Story = StoryObj<typeof ModalOptionSearchList>;
 
-// TODO: This component is not reusable yet, layout (iconLeft) only applied if includeChevron is true
-// TODO: ModalButton and AccountButton could be combined into one component
+// TODO: padding should be on parent container not here!
 export const Default: Story = {
   render: () => (
     <ModalOptionSearchList
