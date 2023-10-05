@@ -4,6 +4,8 @@ import { AccountButton } from './AccountButton';
 
 const meta: Meta<typeof AccountButton> = {
   component: AccountButton,
+  title: 'Components/AccountButton',
+  tags: ['autodocs'],
 };
 
 type Story = StoryObj<typeof AccountButton>;

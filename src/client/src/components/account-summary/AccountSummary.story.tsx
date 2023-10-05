@@ -4,6 +4,7 @@ import { AccountSummary } from './AccountSummary';
 
 const meta: Meta<typeof AccountSummary> = {
   component: AccountSummary,
+  title: 'Components/AccountSummary',
 };
 
 type Story = StoryObj<typeof AccountSummary>;
