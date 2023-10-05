@@ -11,5 +11,5 @@ export interface ModalButtonProps {
   textWidth?: number;
   includeChevron?: boolean;
   padding?: StyleProp<MantineSpacing>;
-  action: () => void;
+  action?: () => void;
 }
