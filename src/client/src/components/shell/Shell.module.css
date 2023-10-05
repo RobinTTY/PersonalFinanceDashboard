@@ -6,3 +6,12 @@
     background-color: var(--mantine-color-dark-8);
   }
 }
+
+.account-button-container {
+  padding-top: var(--mantine-spacing-sm);
+  border-top: rem(1) solid var(--mantine-color-gray-2);
+
+  @mixin dark {
+    border-top: rem(1) solid var(--mantine-color-dark-4);
+  }
+}
