@@ -9,7 +9,6 @@ const meta: Meta<typeof SearchBox> = {
 
 type Story = StoryObj<typeof SearchBox>;
 
-// TODO: this is basically the same component as AccountButton, should be combined
 export const Default: Story = {
   render: () => <SearchBox />,
 };

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { NavigationLink } from './NavigationLink';
 import { IconHome } from '@tabler/icons-react';
+import { NavigationLink } from './NavigationLink';
 
 const meta: Meta<typeof NavigationLink> = {
   component: NavigationLink,
