@@ -13,6 +13,7 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// Data provider for banking data from <see href="https://gocardless.com/bank-account-data/"/>.
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
+// TODO: Cancellation token support
 public class GoCardlessDataProvider
 {
     private readonly NordigenClient _client;
@@ -23,7 +24,15 @@ public class GoCardlessDataProvider
         _client = new NordigenClient(httpClient, credentials);
     }
 
-    // TODO: Cancellation token support
+    public async Task<ThirdPartyResponse<BankingInstitution?, BasicError>> GetBankingInstitution(string institutionId)
+    {
+        var response = await _client.InstitutionsEndpoint.GetInstitution(institutionId);
+        BankingInstitution? result = null;
+        if(response.IsSuccess)
+            result = new BankingInstitution(response.Result.Id, response.Result.Bic, response.Result.Name, response.Result.Logo, response.Result.Countries);
+        return new ThirdPartyResponse<BankingInstitution?, BasicError>(response.IsSuccess, result, response.Error);
+    }
+
     /// <summary>
     /// Gets the banking institutions which are available via this data provider.
     /// </summary>
@@ -46,8 +55,8 @@ public class GoCardlessDataProvider
     /// <summary>
     /// Gets an existing authentication request (requisitions).
     /// </summary>
-    /// <param name="requisitionId">The id of the requisition to be retrieved.</param>
-    /// <returns>The <see cref="AuthenticationRequest"/> which matches the id, as far as it exists.</returns>
+    /// <param name="requisitionId">The institutionId of the requisition to be retrieved.</param>
+    /// <returns>The <see cref="AuthenticationRequest"/> which matches the institutionId, as far as it exists.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicError?>> GetAuthenticationRequest(string requisitionId)
     {
         var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId);
