@@ -26,9 +26,12 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddGraphQLServer()
     .AddQueryType<Query>()
-    .AddMutationType<Mutation>();
+    .AddMutationType<Mutation>()
+    .AddSubscriptionType<Subscription>()
+    .AddInMemorySubscriptions();
 
 var app = builder.Build();
 app.UseCors();
+app.UseWebSockets();
 app.MapGraphQL();
 app.Run();
