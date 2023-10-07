@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Database.Mock;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;
@@ -59,14 +60,22 @@ public class Query
     [UsePaging]
     public async Task<IQueryable<Transaction>> GetTransactions(string accountId)
     {
-        var transactions = await _dataProvider.GetTransactions(accountId);
-        return transactions.Result!.AsQueryable();
+        //var transactions = await _dataProvider.GetTransactions(accountId);
+        var mockedTransactions = MockDataAccessService.GetTransactions(100);
+        return mockedTransactions;
+        //return transactions.Result!.AsQueryable();
+    }
+
+    public async Task<BankingInstitution> GetBankingInstitution(string institutionId)
+    {
+        var request = await _dataProvider.GetBankingInstitution(institutionId);
+        return request.Result!;
     }
 
     // TODO: Investigate how to handle the return type (result/error) properly with paging
     [UsePaging(MaxPageSize = 3000)]
-    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions() {
-        var request = await _dataProvider.GetBankingInstitutions();
+    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions(string? countryCode = null) {
+        var request = await _dataProvider.GetBankingInstitutions(countryCode);
         return request.Result!;
     }
 
