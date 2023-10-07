@@ -26,6 +26,10 @@ public class BankAccount : Account
     /// Specifies the nature, or use, of the account.
     /// </summary>
     public string? AccountType { get; set; }
+    /// <summary>
+    /// The id of the banking institution this account belongs to.
+    /// </summary>
+    public string InstitutionId { get; set; }
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
@@ -43,8 +47,9 @@ public class BankAccount : Account
     /// <param name="ownerName">Name of the legal account owner. If there is more than one owner,
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
+    /// <param name="institutionId">The id of the banking institution this account belongs to.</param>
     public BankAccount(string id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions,
-        string? iban, string? bic, string? bban, string? ownerName, string? accountType)
+        string? iban, string? bic, string? bban, string? ownerName, string? accountType, string institutionId)
         : base(id, name, description, balance, currency, transactions)
     {
         Iban = iban;
@@ -52,5 +57,6 @@ public class BankAccount : Account
         Bban = bban;
         OwnerName = ownerName;
         AccountType = accountType;
+        InstitutionId = institutionId;
     }
 }
