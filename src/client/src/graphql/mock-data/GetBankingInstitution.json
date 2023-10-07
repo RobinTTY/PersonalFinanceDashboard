@@ -1,0 +1,30 @@
+{
+  "data": {
+    "bankingInstitution": {
+      "id": "ING_WB_INGBNL2A",
+      "name": "ING Wholesale Banking",
+      "bic": "INGBNL2AXXX",
+      "logoUri": "https://storage.googleapis.com/gc-prd-institution_icons-production/DE/PNG/ing.png",
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CZ",
+        "FR",
+        "DE",
+        "HU",
+        "IE",
+        "IT",
+        "LU",
+        "PT",
+        "RO",
+        "SK",
+        "ES",
+        "GB",
+        "NL"
+      ],
+      "__typename": "BankingInstitution"
+    },
+    "__typename": "Query"
+  }
+}

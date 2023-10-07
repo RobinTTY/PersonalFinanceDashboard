@@ -5,3 +5,12 @@
 a {
   text-decoration: inherit;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #6e6e6e;
+  border-radius: 1rem;
+}
