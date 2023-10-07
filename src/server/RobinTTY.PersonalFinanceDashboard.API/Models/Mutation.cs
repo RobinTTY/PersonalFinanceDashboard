@@ -1,7 +1,12 @@
-﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using System.Linq;
+using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.Subscriptions;
 using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Database.Mock;
+using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;
 
@@ -33,5 +38,12 @@ public class Mutation
     {
         var request = await _dataProvider.DeleteAuthenticationRequest(authenticationId);
         return request.Result!;
+    }
+
+    public async Task<Transaction> CreateTransaction([Service] ITopicEventSender topicEventSender)
+    {
+        var transaction = MockDataAccessService.GetTransactions(1).First();
+        await topicEventSender.SendAsync(nameof(Subscription.TransactionCreated), transaction);
+        return transaction;
     }
 }
