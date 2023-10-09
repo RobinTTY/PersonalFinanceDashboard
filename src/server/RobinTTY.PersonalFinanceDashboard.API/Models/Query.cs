@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Database.Mock;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;

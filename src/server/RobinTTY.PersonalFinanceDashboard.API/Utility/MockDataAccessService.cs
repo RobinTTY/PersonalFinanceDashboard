@@ -1,7 +1,9 @@
-﻿using Bogus;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Bogus;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.Database.Mock;
+namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
 public class MockDataAccessService
 {

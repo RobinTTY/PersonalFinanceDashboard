@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Subscriptions;
 using RobinTTY.NordigenApiClient.Models.Responses;
-using RobinTTY.PersonalFinanceDashboard.Database.Mock;
+using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Models;

@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="AutofacSerilogIntegration" Version="5.0.0" />
+    <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.5.1" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.5.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
@@ -25,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj" />
-    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Database\RobinTTY.PersonalFinanceDashboard.Database.csproj" />
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.csproj" />
   </ItemGroup>
 

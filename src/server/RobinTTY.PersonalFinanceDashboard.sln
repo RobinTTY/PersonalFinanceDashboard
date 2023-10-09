@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.API", "RobinTTY.PersonalFinanceDashboard.API\RobinTTY.PersonalFinanceDashboard.API.csproj", "{074309B6-9F66-4923-A038-5B332DF9E494}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinTTY.PersonalFinanceDashboard.Database", "RobinTTY.PersonalFinanceDashboard.Database\RobinTTY.PersonalFinanceDashboard.Database.csproj", "{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E91B20B-2D3A-436B-9D73-7B3C3413FC30}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -32,10 +30,6 @@ Global
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{074309B6-9F66-4923-A038-5B332DF9E494}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12FC85AC-CBF7-4C70-A0FC-687E69429BA4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{283FB4A0-C918-4527-9DD7-462E08A809DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
