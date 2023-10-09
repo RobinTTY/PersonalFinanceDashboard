@@ -17,7 +17,10 @@ public class MockDataAccessService
                 //currency: "f.Finance.Currency().Code",
                 currency: "USD",
                 category: f.Commerce.Categories(1).First(),
-                tags: f.Lorem.Words().ToList(),
+                tags: new List<Tag>
+                {
+                    new Tag(Guid.NewGuid().ToString(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(), f.Commerce.Color() ),
+                },
                 notes: f.Lorem.Sentence()
             )).Generate(amount).AsQueryable();
     }

@@ -5,7 +5,10 @@ global using Serilog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Autofac.Extensions.DependencyInjection;
+using HotChocolate.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using RobinTTY.PersonalFinanceDashboard.API;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.API.Models;
 
@@ -24,11 +27,16 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
-builder.Services.AddGraphQLServer()
+
+builder.Services.AddPooledDbContextFactory<ApplicationDbContext>(options => options.UseSqlite("Data Source=application.db"));
+builder.Services
+    .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
+    //TODO: .AddMutationConventions()
     .AddSubscriptionType<Subscription>()
-    .AddInMemorySubscriptions();
+    .AddInMemorySubscriptions()
+    .RegisterDbContext<ApplicationDbContext>(DbContextKind.Pooled);
 
 var app = builder.Build();
 app.UseCors();

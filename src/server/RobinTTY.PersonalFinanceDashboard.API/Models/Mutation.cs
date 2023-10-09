@@ -22,6 +22,12 @@ public class Mutation
         _dataProvider = dataProvider;
     }
 
+    // TODO
+    // https://relay.dev/docs/v1.5.0/graphql-server-specification/
+    // 1. By convention, mutations are named as verbs (done)
+    // 2. their inputs are the name with "Input" appended at the end
+    // 3. they return an object that is the name with "Payload" appended
+
     /// <summary>
     /// TODO
     /// </summary>

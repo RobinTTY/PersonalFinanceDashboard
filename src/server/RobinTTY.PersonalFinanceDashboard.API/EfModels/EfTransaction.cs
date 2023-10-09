@@ -1,9 +1,11 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using System.Collections.Generic;
+
+namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class Transaction
+public class EfTransaction
 {
     /// <summary>
     /// The id of the transaction.
@@ -28,7 +30,7 @@ public class Transaction
     /// <summary>
     /// The currency the amount is denominated in.
     /// </summary>
-    public string Currency { get; set ; }
+    public string Currency { get; set; }
     /// <summary>
     /// The category this transaction belongs to.
     /// </summary>
@@ -36,7 +38,7 @@ public class Transaction
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain sub-categories).
     /// </summary>
-    public List<Tag> Tags { get; set; }
+    public ICollection<EfTag> Tags { get; }
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
@@ -46,7 +48,7 @@ public class Transaction
     // how should I best handle this?
 
     /// <summary>
-    /// Creates a new instance of <see cref="Transaction"/>.
+    /// Creates a new instance of <see cref="EfTransaction"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
@@ -55,9 +57,8 @@ public class Transaction
     /// <param name="amount">The amount being transacted.</param>
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
-    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public Transaction(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, List<Tag> tags, string notes)
+    public EfTransaction(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
     {
         Id = id;
         ValueDate = valueDate;
@@ -66,7 +67,7 @@ public class Transaction
         Amount = amount;
         Currency = currency;
         Category = category;
-        Tags = tags;
+        Tags = new List<EfTag>();
         Notes = notes;
     }
 }
