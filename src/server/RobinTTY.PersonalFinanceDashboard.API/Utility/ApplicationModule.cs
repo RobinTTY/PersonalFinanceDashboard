@@ -21,7 +21,7 @@ public class ApplicationModule : Module
 
         builder.RegisterLogger(LoggerManager.GetDefaultLogger());
         builder.Register(c => c.Resolve<IHttpClientFactory>().CreateClient());
-        builder.Register(_ => new NordigenClientCredentials(appConfig.NordigenApi.SecretId, appConfig.NordigenApi.SecretKey));
+        builder.Register(_ => new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey));
         builder.RegisterType<GoCardlessDataProvider>().SingleInstance();
         builder.RegisterType<Query>().SingleInstance();
     }

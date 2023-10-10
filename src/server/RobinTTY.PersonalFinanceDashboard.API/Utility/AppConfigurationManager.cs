@@ -5,8 +5,14 @@ using RobinTTY.PersonalFinanceDashboard.API.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
+/// <summary>
+/// Manages the configuration of the application.
+/// </summary>
 public static class AppConfigurationManager
 {
+    /// <summary>
+    /// Creates a new instance of <see cref="AppConfiguration"/>.
+    /// </summary>
     public static AppConfiguration AppConfiguration
     {
         get
@@ -16,6 +22,10 @@ public static class AppConfigurationManager
         }
     }
 
+    /// <summary>
+    /// Creates a <see cref="ServiceProvider"/> from the provided configuration files.
+    /// </summary>
+    /// <returns>The created <see cref="IServiceProvider"/>.</returns>
     private static IServiceProvider GetServiceProvider()
     {
         var configuration =  new ConfigurationBuilder()

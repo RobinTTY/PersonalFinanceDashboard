@@ -46,6 +46,7 @@ public class Query
     /// <summary>
     /// Look up accounts by a list of ids.
     /// </summary>
+    /// <param name="accountIds">The ids of the accounts to retrieve.</param>
     [UsePaging]
     public async Task<IQueryable<BankAccount>> GetAccounts(IEnumerable<string> accountIds)
     {
@@ -56,35 +57,49 @@ public class Query
     /// <summary>
     /// Look up transactions of an account.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="accountId">The id of the account to retrieve.</param>
     [UsePaging]
     public async Task<IQueryable<Transaction>> GetTransactions(string accountId)
     {
         //var transactions = await _dataProvider.GetTransactions(accountId);
         var mockedTransactions = MockDataAccessService.GetTransactions(100);
-        return mockedTransactions;
+        return await Task.FromResult(mockedTransactions);
         //return transactions.Result!.AsQueryable();
     }
 
+    /// <summary>
+    /// Look up banking institutions by their id.
+    /// </summary>
+    /// <param name="institutionId">The id of the banking institution to retrieve.</param>
     public async Task<BankingInstitution> GetBankingInstitution(string institutionId)
     {
         var request = await _dataProvider.GetBankingInstitution(institutionId);
         return request.Result!;
     }
 
-    // TODO: Investigate how to handle the return type (result/error) properly with paging
+    /// <summary>
+    /// Look up banking institutions.
+    /// </summary>
+    /// <param name="countryCode">Optional filter by country the institution operates in.</param>
     [UsePaging(MaxPageSize = 3000)]
     public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions(string? countryCode = null) {
         var request = await _dataProvider.GetBankingInstitutions(countryCode);
         return request.Result!;
     }
 
+    /// <summary>
+    /// Look up authentication requests by their id.
+    /// </summary>
+    /// <param name="authenticationId">The id of the authentication request to retrieve.</param>
     public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId)
     {
         var requests = await _dataProvider.GetAuthenticationRequest(authenticationId);
         return requests.Result!;
     }
 
+    /// <summary>
+    /// Look up authentication requests.
+    /// </summary>
     public async Task<IQueryable<AuthenticationRequest>> GetAuthenticationRequests()
     {
         // TODO: Limit?

@@ -5,8 +5,16 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
+/// <summary>
+/// Provides mocked data for testing/demo purposes.
+/// </summary>
 public class MockDataAccessService
 {
+    /// <summary>
+    /// Provides mocked transactions.
+    /// </summary>
+    /// <param name="amount">The number of transactions to generate.</param>
+    /// <returns>The mocked transactions.</returns>
     public static IQueryable<Transaction> GetTransactions(int amount)
     {
         return new Faker<Transaction>()
@@ -27,6 +35,11 @@ public class MockDataAccessService
             )).Generate(amount).AsQueryable();
     }
 
+    /// <summary>
+    /// Provides mocked accounts.
+    /// </summary>
+    /// <param name="amount">The number of accounts to generate.</param>
+    /// <returns>The mocked accounts.</returns>
     public static IQueryable<Account> GetAccounts(int amount)
     {
         return new Faker<Account>()

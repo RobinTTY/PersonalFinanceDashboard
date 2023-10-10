@@ -34,11 +34,18 @@ builder.Services
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     //TODO: .AddMutationConventions()
-    .AddSubscriptionType<Subscription>()
-    .AddInMemorySubscriptions()
     .RegisterDbContext<ApplicationDbContext>(DbContextKind.Pooled);
 
 var app = builder.Build();
+
+// Apply database migrations at startup
+//using (var scope = app.Services.CreateScope())
+//{
+//    var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+//    using var context = contextFactory.CreateDbContext();
+//    context.Database.Migrate();
+//}
+
 app.UseCors();
 app.UseWebSockets();
 app.MapGraphQL();
