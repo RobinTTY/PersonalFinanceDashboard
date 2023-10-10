@@ -1,5 +1,6 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
+// TODO: Setup logger
 /// <summary>
 /// Manages the global logger instance.
 /// </summary>
