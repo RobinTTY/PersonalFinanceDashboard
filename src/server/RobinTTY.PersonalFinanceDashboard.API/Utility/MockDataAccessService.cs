@@ -15,7 +15,7 @@ public class MockDataAccessService
     /// </summary>
     /// <param name="amount">The number of transactions to generate.</param>
     /// <returns>The mocked transactions.</returns>
-    public static IQueryable<Transaction> GetTransactions(int amount)
+    public static List<Transaction> GetTransactions(int amount)
     {
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
@@ -32,7 +32,7 @@ public class MockDataAccessService
                     new Tag(Guid.NewGuid().ToString(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(), f.Commerce.Color() ),
                 },
                 notes: f.Lorem.Sentence()
-            )).Generate(amount).AsQueryable();
+            )).Generate(amount);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class MockDataAccessService
     /// </summary>
     /// <param name="amount">The number of accounts to generate.</param>
     /// <returns>The mocked accounts.</returns>
-    public static IQueryable<Account> GetAccounts(int amount)
+    public static List<Account> GetAccounts(int amount)
     {
         return new Faker<Account>()
             .CustomInstantiator(f => new Account(
@@ -51,6 +51,6 @@ public class MockDataAccessService
                 //currency: f.Finance.Currency().Code,
                 currency: "USD",
                 transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
-            )).Generate(amount).AsQueryable();
+            )).Generate(amount);
     }
 }

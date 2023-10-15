@@ -5,6 +5,8 @@
 /// </summary>
 public class Account
 {
+    // TODO: The graphql data model should use the id scalar type
+    // see: https://chillicream.com/docs/hotchocolate/v13/fetching-data/pagination#changing-the-node-type
     /// <summary>
     /// The id of the account.
     /// </summary>

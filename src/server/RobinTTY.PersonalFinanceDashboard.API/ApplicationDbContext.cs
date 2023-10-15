@@ -21,9 +21,7 @@ public class ApplicationDbContext : DbContext
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.
     /// </summary>
     /// <param name="options">The <see cref="DbContextOptions"/> to use.</param>
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, DbSet<EfTransaction> transactions, DbSet<EfTag> tags) : base(options)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
-        Transactions = transactions;
-        Tags = tags;
     }
 }

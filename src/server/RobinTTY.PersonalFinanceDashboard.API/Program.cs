@@ -1,8 +1,8 @@
 global using System;
 global using Serilog;
 
+using HotChocolate;
 using Microsoft.AspNetCore.Builder;
-using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.API;
@@ -10,24 +10,37 @@ using RobinTTY.PersonalFinanceDashboard.API.Models;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.NordigenApiClient.Models;
+using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var appConfig = AppConfigurationManager.AppConfiguration;
-builder.Services.AddSingleton(_ => new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey));
-builder.Services.AddSingleton<GoCardlessDataProvider>();
+
+// HTTP Setup
 builder.Services
     .AddHttpClient()
     .AddCors(options =>
     {
         // TODO: update to sensible policy
         options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-    })
-    .AddPooledDbContextFactory<ApplicationDbContext>(options => options.UseSqlite("Data Source=application.db"))
+    });
+
+// DB Setup
+builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
+    options.UseSqlite("Data Source=application.db"));
+
+// General Services
+builder.Services
+    .AddScoped<TransactionRepository>()
+    .AddSingleton(_ => new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
+    .AddSingleton<GoCardlessDataProvider>();
+
+// HotChocolate GraphQL Setup
+builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     //TODO: .AddMutationConventions()
-    .RegisterDbContext<ApplicationDbContext>(DbContextKind.Pooled);
+    .RegisterService<TransactionRepository>(ServiceKind.Resolver);
 
 var app = builder.Build();
 

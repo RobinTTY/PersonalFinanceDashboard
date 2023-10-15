@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types;
-using RobinTTY.PersonalFinanceDashboard.API.Utility;
+using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -59,12 +60,9 @@ public class Query
     /// </summary>
     /// <param name="accountId">The id of the account to retrieve.</param>
     [UsePaging]
-    public async Task<IQueryable<Transaction>> GetTransactions(string accountId)
+    public async Task<IReadOnlyList<Transaction>> GetTransactions(string accountId, TransactionRepository repository, CancellationToken cancellationToken)
     {
-        //var transactions = await _dataProvider.GetTransactions(accountId);
-        var mockedTransactions = MockDataAccessService.GetTransactions(100);
-        return await Task.FromResult(mockedTransactions);
-        //return transactions.Result!.AsQueryable();
+        return await repository.GetTransactions();
     }
 
     /// <summary>
