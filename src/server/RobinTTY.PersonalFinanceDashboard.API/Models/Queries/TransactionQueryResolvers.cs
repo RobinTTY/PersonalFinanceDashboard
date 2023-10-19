@@ -22,8 +22,8 @@ public class TransactionQueryResolvers
     /// </summary>
     /// <param name="accountId">The id of the account to retrieve.</param>
     [UsePaging]
-    public async Task<IReadOnlyList<Transaction>> GetTransactions(string accountId, TransactionRepository repository, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Transaction>> GetTransactions(string accountId, TransactionRepository repository, CancellationToken cancellationToken)
     {
-        return await repository.GetTransactions();
+        return await repository.GetAll();
     }
 }

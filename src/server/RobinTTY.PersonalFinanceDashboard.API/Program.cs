@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.API;
-using RobinTTY.PersonalFinanceDashboard.API.Models;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.NordigenApiClient.Models;
@@ -31,7 +30,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 // General Services
 builder.Services
     .AddScoped<TransactionRepository>()
-    .AddSingleton(_ => new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
+    .AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
     .AddSingleton<GoCardlessDataProvider>();
 
 // TODO: Create a high level overview of the architecture that should apply
@@ -45,8 +44,13 @@ builder.Services
 builder.Services
     .AddGraphQLServer()
     .AddQueryType()
-    .AddMutationType<Mutation>()
-    //TODO: .AddMutationConventions()
+    .AddMutationType()
+    // TODO
+    // https://relay.dev/docs/v1.5.0/graphql-server-specification/
+    // 1. By convention, mutations are named as verbs (done)
+    // 2. their inputs are the name with "Input" appended at the end
+    // 3. they return an object that is the name with "Payload" appended
+    // .AddMutationConventions()
     .AddApiTypes()
     .RegisterService<TransactionRepository>(ServiceKind.Resolver);
 
