@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>9f45828a-7036-4891-b820-3988e5f193a1</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>RobinTTY.PersonalFinanceDashboard.Api</AssemblyName>
+    <RootNamespace>RobinTTY.PersonalFinanceDashboard.Api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

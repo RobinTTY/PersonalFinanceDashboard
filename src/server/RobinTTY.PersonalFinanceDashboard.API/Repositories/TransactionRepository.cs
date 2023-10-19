@@ -5,10 +5,17 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
 
+/// <summary>
+/// Manages <see cref="Transaction"/> data retrieval.
+/// </summary>
 public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="TransactionRepository"/>.
+    /// </summary>
+    /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     public TransactionRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
