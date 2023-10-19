@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UserSecretsId>9f45828a-7036-4891-b820-3988e5f193a1</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -9,8 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.5.1" />
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.5.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.6.0-preview.31" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.6.0-preview.31" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="13.6.0-preview.31">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
