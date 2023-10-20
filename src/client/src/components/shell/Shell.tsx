@@ -1,4 +1,4 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { AppShell, Box, Stack } from '@mantine/core';
 import { IconArrowsExchange, IconHome, IconWallet } from '@tabler/icons-react';
 
@@ -34,19 +34,24 @@ export const Shell = () => (
       <AppShell.Section grow>
         <Stack justify="flex-end" h="100%" gap="xs" pb="md">
           {/* TODO: These links should probably be implemented via polymorphic components */}
-          <Link to="dashboard">
-            <NavigationLink icon={<IconHome size="1.25rem" />} color="blue" label="Dashboard" />
-          </Link>
-          <Link to="accounts">
-            <NavigationLink icon={<IconWallet size="1.25rem" />} color="violet" label="Accounts" />
-          </Link>
-          <Link to="transactions">
-            <NavigationLink
-              icon={<IconArrowsExchange size="1.25rem" />}
-              color="teal"
-              label="Transactions"
-            />
-          </Link>
+          <NavigationLink
+            icon={<IconHome size="1.25rem" />}
+            color="blue"
+            label="Dashboard"
+            to="dashboard"
+          />
+          <NavigationLink
+            icon={<IconWallet size="1.25rem" />}
+            color="violet"
+            label="Accounts"
+            to="accounts"
+          />
+          <NavigationLink
+            icon={<IconArrowsExchange size="1.25rem" />}
+            color="teal"
+            label="Transactions"
+            to="transactions"
+          />
         </Stack>
       </AppShell.Section>
       <AppShell.Section>
