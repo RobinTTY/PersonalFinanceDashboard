@@ -142,7 +142,7 @@ public class GoCardlessDataProvider
         var transactions = response.Result!.BookedTransactions.Select(transaction => 
             new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount, transaction.TransactionAmount.Currency,
-                "example-category", new List<string>(), "example-notes")
+                "example-category", new List<Tag>(), "example-notes")
         );
         return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions, response.Error);
     }

@@ -1,11 +1,21 @@
-﻿using Bogus;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Bogus;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.Database.Mock;
+namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
+/// <summary>
+/// Provides mocked data for testing/demo purposes.
+/// </summary>
 public class MockDataAccessService
 {
-    public static IQueryable<Transaction> GetTransactions(int amount)
+    /// <summary>
+    /// Provides mocked transactions.
+    /// </summary>
+    /// <param name="amount">The number of transactions to generate.</param>
+    /// <returns>The mocked transactions.</returns>
+    public static List<Transaction> GetTransactions(int amount)
     {
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
@@ -17,12 +27,20 @@ public class MockDataAccessService
                 //currency: "f.Finance.Currency().Code",
                 currency: "USD",
                 category: f.Commerce.Categories(1).First(),
-                tags: f.Lorem.Words().ToList(),
+                tags: new List<Tag>
+                {
+                    new Tag(Guid.NewGuid().ToString(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(), f.Commerce.Color() ),
+                },
                 notes: f.Lorem.Sentence()
-            )).Generate(amount).AsQueryable();
+            )).Generate(amount);
     }
 
-    public static IQueryable<Account> GetAccounts(int amount)
+    /// <summary>
+    /// Provides mocked accounts.
+    /// </summary>
+    /// <param name="amount">The number of accounts to generate.</param>
+    /// <returns>The mocked accounts.</returns>
+    public static List<Account> GetAccounts(int amount)
     {
         return new Faker<Account>()
             .CustomInstantiator(f => new Account(
@@ -33,6 +51,6 @@ public class MockDataAccessService
                 //currency: f.Finance.Currency().Code,
                 currency: "USD",
                 transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
-            )).Generate(amount).AsQueryable();
+            )).Generate(amount);
     }
 }
