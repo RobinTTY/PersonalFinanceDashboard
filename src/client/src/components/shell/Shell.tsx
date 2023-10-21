@@ -7,10 +7,11 @@ import { AccountButton } from '@components/account-button/AccountButton';
 import { NavigationLink } from '@components/navigation-link/NavigationLink';
 
 import classes from './Shell.module.css';
+import { AccountSummary } from '../account-summary/AccountSummary';
 
 // TODO: NavLinks aren't responsive yet
 export const Shell = () => (
-  // TODO: Mobile Burger menu
+  // TODO: Mobile layout
   <AppShell
     className={classes.shell}
     header={{ height: { base: 50, md: 70 } }}
@@ -32,26 +33,36 @@ export const Shell = () => (
     </AppShell.Header>
     <AppShell.Navbar p="md">
       <AppShell.Section grow>
-        <Stack justify="flex-end" h="100%" gap="xs" pb="md">
-          {/* TODO: These links should probably be implemented via polymorphic components */}
-          <NavigationLink
-            icon={<IconHome size="1.25rem" />}
-            color="blue"
-            label="Dashboard"
-            to="dashboard"
-          />
-          <NavigationLink
-            icon={<IconWallet size="1.25rem" />}
-            color="violet"
-            label="Accounts"
-            to="accounts"
-          />
-          <NavigationLink
-            icon={<IconArrowsExchange size="1.25rem" />}
-            color="teal"
-            label="Transactions"
-            to="transactions"
-          />
+        <Stack gap="md" justify="space-between" h="100%">
+          <Stack gap="md">
+            <AccountSummary
+              description="Checkings"
+              balance={1753.54}
+              currency="USD"
+              icon={<img src="/src/assets/img/testing/ing.png" alt="ING logo" />}
+            />
+          </Stack>
+          <Stack justify="flex-end" gap="xs" pb="md">
+            {/* TODO: These links should probably be implemented via polymorphic components */}
+            <NavigationLink
+              icon={<IconHome size="1.25rem" />}
+              color="blue"
+              label="Dashboard"
+              to="dashboard"
+            />
+            <NavigationLink
+              icon={<IconWallet size="1.25rem" />}
+              color="violet"
+              label="Accounts"
+              to="accounts"
+            />
+            <NavigationLink
+              icon={<IconArrowsExchange size="1.25rem" />}
+              color="teal"
+              label="Transactions"
+              to="transactions"
+            />
+          </Stack>
         </Stack>
       </AppShell.Section>
       <AppShell.Section>
