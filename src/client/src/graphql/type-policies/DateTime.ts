@@ -1,7 +1,5 @@
 import { FieldPolicy } from '@apollo/client';
-
-const isNullOrUndefined = <T>(obj: T | null | undefined): obj is null | undefined =>
-  typeof obj === 'undefined' || obj === null;
+import { isNullOrUndefined } from '@/utility/isNullOrUndefined';
 
 export const dateTimeTypePolicy: FieldPolicy<Date, string | Date> = {
   merge: (_, incoming) => {
