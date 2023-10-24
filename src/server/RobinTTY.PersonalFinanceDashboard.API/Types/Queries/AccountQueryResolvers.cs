@@ -1,13 +1,13 @@
-﻿using HotChocolate.Types;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Models.Queries;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
-[ExtendObjectType(OperationTypeNames.Query)]
+[QueryType]
 public sealed class AccountQueryResolvers
 {
     private readonly GoCardlessDataProvider _dataProvider;

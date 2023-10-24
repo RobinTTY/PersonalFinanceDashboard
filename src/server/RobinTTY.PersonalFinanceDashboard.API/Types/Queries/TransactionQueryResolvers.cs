@@ -5,9 +5,9 @@ using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Models.Queries;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
-[ExtendObjectType(OperationTypeNames.Query)]
+[QueryType]
 public class TransactionQueryResolvers
 {
     /// <summary>

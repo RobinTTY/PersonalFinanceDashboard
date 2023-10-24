@@ -3,9 +3,9 @@ using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Models.Mutations;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
 
-[ExtendObjectType(OperationTypeNames.Mutation)]
+[MutationType]
 public class TransactionMutationResolvers
 {
     /// <summary>

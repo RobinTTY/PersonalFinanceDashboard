@@ -1,7 +1,7 @@
 global using System;
 global using Serilog;
+global  using HotChocolate;
 
-using HotChocolate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,15 +43,13 @@ builder.Services
 // HotChocolate GraphQL Setup
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType()
-    .AddMutationType()
+    .AddTypes()
     // TODO
     // https://relay.dev/docs/v1.5.0/graphql-server-specification/
     // 1. By convention, mutations are named as verbs (done)
     // 2. their inputs are the name with "Input" appended at the end
     // 3. they return an object that is the name with "Payload" appended
     // .AddMutationConventions()
-    .AddApiTypes()
     .RegisterService<TransactionRepository>(ServiceKind.Resolver);
 
 var app = builder.Build();
@@ -65,6 +63,5 @@ var app = builder.Build();
 //}
 
 app.UseCors();
-app.UseWebSockets();
 app.MapGraphQL();
 app.Run();

@@ -4,9 +4,9 @@ using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Models.Mutations;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
 
-[ExtendObjectType(OperationTypeNames.Mutation)]
+[MutationType]
 public class AuthenticationMutationResolvers
 {
     private readonly GoCardlessDataProvider _dataProvider;

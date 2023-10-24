@@ -4,9 +4,9 @@ using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Models.Queries;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
-[ExtendObjectType(OperationTypeNames.Query)]
+[QueryType]
 public class AuthenticationRequestQueryResolvers
 {
     private readonly GoCardlessDataProvider _dataProvider;
