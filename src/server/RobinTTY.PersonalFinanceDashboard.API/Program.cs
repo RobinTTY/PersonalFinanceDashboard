@@ -1,6 +1,8 @@
 global using System;
+global using System.Collections.Generic;
+global using System.Threading.Tasks;
 global using Serilog;
-global  using HotChocolate;
+global using HotChocolate;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 // General Services
 builder.Services
     .AddScoped<TransactionRepository>()
+    .AddScoped<AuthenticationRequestRepository>()
     .AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
     .AddSingleton<GoCardlessDataProvider>();
 
@@ -45,7 +48,8 @@ builder.Services
     .AddGraphQLServer()
     .AddTypes()
     .AddMutationConventions()
-    .RegisterService<TransactionRepository>(ServiceKind.Resolver);
+    .RegisterService<TransactionRepository>(ServiceKind.Resolver)
+    .RegisterService<AuthenticationRequestRepository>(ServiceKind.Resolver);
 
 var app = builder.Build();
 

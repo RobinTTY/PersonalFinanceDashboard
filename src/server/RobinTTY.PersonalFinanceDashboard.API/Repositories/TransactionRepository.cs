@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.API.EfModels;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
