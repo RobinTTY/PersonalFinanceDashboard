@@ -24,7 +24,7 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
-    /// Gets the <see cref="AuthenticationRequest"/> matching the specified authentication id.
+    /// Gets the <see cref="AuthenticationRequest"/> matching the specified id.
     /// </summary>
     /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to retrieve.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>

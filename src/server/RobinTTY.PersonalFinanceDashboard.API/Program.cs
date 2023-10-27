@@ -31,10 +31,13 @@ builder.Services
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=application.db"));
 
+// TODO: automatic registration of repositories via codegen?
 // General Services
 builder.Services
-    .AddScoped<TransactionRepository>()
+    .AddScoped<AccountRepository>()
     .AddScoped<AuthenticationRequestRepository>()
+    .AddScoped<BankingInstitutionRepository>()
+    .AddScoped<TransactionRepository>()
     .AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
     .AddSingleton<GoCardlessDataProvider>();
 
@@ -50,8 +53,10 @@ builder.Services
     .AddGraphQLServer()
     .AddTypes()
     .AddMutationConventions()
-    .RegisterService<TransactionRepository>(ServiceKind.Resolver)
-    .RegisterService<AuthenticationRequestRepository>(ServiceKind.Resolver);
+    .RegisterService<AccountRepository>(ServiceKind.Resolver)
+    .RegisterService<AuthenticationRequestRepository>(ServiceKind.Resolver)
+    .RegisterService<BankingInstitutionRepository>(ServiceKind.Resolver)
+    .RegisterService<TransactionRepository>(ServiceKind.Resolver);
 
 var app = builder.Build();
 

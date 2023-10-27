@@ -15,7 +15,7 @@ public class AuthenticationRequestQueryResolvers
     /// </summary>
     /// <param name="authenticationId">The id of the authentication request to retrieve.</param>
     /// <param name="repository">The repository to use for data retrieval.</param>
-    public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId, AuthenticationRequestRepository repository)
+    public async Task<AuthenticationRequest> GetAuthenticationRequest(string authenticationId, AuthenticationRequestRepository repository)
     {
         return await repository.Get(authenticationId);
     }

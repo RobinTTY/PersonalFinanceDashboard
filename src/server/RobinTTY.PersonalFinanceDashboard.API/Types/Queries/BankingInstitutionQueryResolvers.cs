@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -11,7 +12,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 public class BankingInstitutionQueryResolvers
 {
     private readonly GoCardlessDataProvider _dataProvider;
-    
+
     /// <summary>
     /// TODO: Create repository
     /// </summary>
@@ -20,15 +21,15 @@ public class BankingInstitutionQueryResolvers
     {
         _dataProvider = dataProvider;
     }
-    
+
     /// <summary>
     /// Look up banking institutions by their id.
     /// </summary>
     /// <param name="institutionId">The id of the banking institution to retrieve.</param>
-    public async Task<BankingInstitution> GetBankingInstitution(string institutionId)
+    public async Task<BankingInstitution> GetBankingInstitution(string institutionId,
+        BankingInstitutionRepository repository)
     {
-        var request = await _dataProvider.GetBankingInstitution(institutionId);
-        return request.Result!;
+        return await repository.Get(institutionId);
     }
 
     /// <summary>
@@ -36,8 +37,9 @@ public class BankingInstitutionQueryResolvers
     /// </summary>
     /// <param name="countryCode">Optional filter by country the institution operates in.</param>
     [UsePaging(MaxPageSize = 3000)]
-    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions(string? countryCode = null) {
-        var request = await _dataProvider.GetBankingInstitutions(countryCode);
-        return request.Result!;
+    public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(BankingInstitutionRepository repository,
+        string? countryCode = null)
+    {
+        return await repository.GetAll(countryCode);
     }
 }
