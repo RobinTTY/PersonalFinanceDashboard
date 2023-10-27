@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using HotChocolate.Types;
+﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 

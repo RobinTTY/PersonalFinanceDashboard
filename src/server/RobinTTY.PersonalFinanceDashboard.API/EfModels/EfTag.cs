@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
+﻿namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
 
 /// <summary>
 /// A tag can be used to add additional information to transactions.

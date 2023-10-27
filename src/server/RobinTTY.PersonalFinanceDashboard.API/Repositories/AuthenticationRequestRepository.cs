@@ -9,20 +9,25 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
 /// </summary>
 public class AuthenticationRequestRepository
 {
-    private readonly GoCardlessDataProvider _dataProvider;
     private readonly ApplicationDbContext _dbContext;
+    private readonly GoCardlessDataProvider _dataProvider;
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequestRepository"/>.
     /// </summary>
-    /// <param name="dataProvider">The data provider to use for data retrieval.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    public AuthenticationRequestRepository(GoCardlessDataProvider dataProvider, ApplicationDbContext dbContext)
+    /// <param name="dataProvider">The data provider to use for data retrieval.</param>
+    public AuthenticationRequestRepository(ApplicationDbContext dbContext, GoCardlessDataProvider dataProvider)
     {
-        _dataProvider = dataProvider;
         _dbContext = dbContext;
+        _dataProvider = dataProvider;
     }
 
+    /// <summary>
+    /// Gets the <see cref="AuthenticationRequest"/> matching the specified authentication id.
+    /// </summary>
+    /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to return.</param>
+    /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<AuthenticationRequest?> Get(string authenticationId)
     {
         var requests = await _dataProvider.GetAuthenticationRequest(authenticationId);
