@@ -1,11 +1,12 @@
-﻿using System.Collections;
-using HotChocolate.Types;
+﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
+/// <summary>
+/// <see cref="BankAccount"/> related query resolvers.
+/// </summary>
 [QueryType]
 public sealed class AccountQueryResolvers
 {

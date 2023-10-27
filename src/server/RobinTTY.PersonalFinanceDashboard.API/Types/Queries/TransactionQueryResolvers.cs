@@ -4,6 +4,9 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
+/// <summary>
+/// <see cref="Transaction"/> related query resolvers.
+/// </summary>
 [QueryType]
 public class TransactionQueryResolvers
 {

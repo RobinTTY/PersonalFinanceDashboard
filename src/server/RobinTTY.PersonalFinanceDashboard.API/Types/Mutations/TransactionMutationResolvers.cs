@@ -4,12 +4,17 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
 
+/// <summary>
+/// <see cref="Transaction"/> related mutation resolvers.
+/// </summary>
 [MutationType]
 public class TransactionMutationResolvers
 {
     /// <summary>
     /// Create a new transaction.
     /// </summary>
+    /// <param name="transaction">The transaction to create.</param>
+    /// <param name="repository">The repository to use for data mutation.</param>
     /// TODO: Change param to CreateTransactionInput type
     public async Task<Transaction> CreateTransaction(Transaction transaction, TransactionRepository repository)
     {
@@ -17,6 +22,11 @@ public class TransactionMutationResolvers
         return transaction;
     }
 
+    /// <summary>
+    /// Delete an existing transaction.
+    /// </summary>
+    /// <param name="transactionId">The id of the transaction to delete.</param>
+    /// <param name="repository">The repository to use for data mutation.</param>
     public async Task<Response> DeleteTransaction(string transactionId, TransactionRepository repository)
     {
         var result = await repository.Delete(transactionId);
@@ -25,7 +35,13 @@ public class TransactionMutationResolvers
     }
 }
 
+/// <summary>
+/// TODO
+/// </summary>
 public class Response
 {
-    public string Id { get; set; }
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public required string Id { get; set; }
 }

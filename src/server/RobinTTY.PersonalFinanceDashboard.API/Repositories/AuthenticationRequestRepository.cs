@@ -26,7 +26,7 @@ public class AuthenticationRequestRepository
     /// <summary>
     /// Gets the <see cref="AuthenticationRequest"/> matching the specified authentication id.
     /// </summary>
-    /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to return.</param>
+    /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to retrieve.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<AuthenticationRequest?> Get(string authenticationId)
     {
@@ -34,6 +34,10 @@ public class AuthenticationRequestRepository
         return requests.Result!;
     }
 
+    /// <summary>
+    /// Gets all <see cref="AuthenticationRequest"/>s.
+    /// </summary>
+    /// <returns>A list of all <see cref="AuthenticationRequest"/>s.</returns>
     public async Task<IEnumerable<AuthenticationRequest>> GetAll()
     {
         // TODO: limit
@@ -41,12 +45,24 @@ public class AuthenticationRequestRepository
         return requests.Result!;
     }
 
+    /// <summary>
+    /// Adds a new <see cref="AuthenticationRequest"/>.
+    /// </summary>
+    /// <param name="institutionId">The id of the institution to create a <see cref="AuthenticationRequest"/> for.</param>
+    /// <param name="redirectUri">The URI of the page to redirect to after successful authentication.</param>
+    /// <returns>The added <see cref="AuthenticationRequest"/>.</returns>
     public async Task<AuthenticationRequest> Add(string institutionId, string redirectUri)
     {
+        // TODO: URI validation (here or in resolver?)
         var request = await _dataProvider.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
         return request.Result!;
     }
 
+    /// <summary>
+    /// Deletes an existing <see cref="AuthenticationRequest"/>.
+    /// </summary>
+    /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
+    /// <returns>TODO</returns>
     public async Task<BasicResponse> Delete(string authenticationId)
     {
         var request = await _dataProvider.DeleteAuthenticationRequest(authenticationId);

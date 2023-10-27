@@ -4,11 +4,18 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
+/// <summary>
+/// <see cref="BankingInstitution"/> related query resolvers.
+/// </summary>
 [QueryType]
 public class BankingInstitutionQueryResolvers
 {
     private readonly GoCardlessDataProvider _dataProvider;
     
+    /// <summary>
+    /// TODO: Create repository
+    /// </summary>
+    /// <param name="dataProvider"></param>
     public BankingInstitutionQueryResolvers(GoCardlessDataProvider dataProvider)
     {
         _dataProvider = dataProvider;
