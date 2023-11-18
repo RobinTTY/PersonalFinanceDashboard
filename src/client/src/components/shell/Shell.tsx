@@ -43,7 +43,6 @@ export const Shell = () => (
             />
           </Stack>
           <Stack justify="flex-end" gap="xs" pb="md">
-            {/* TODO: These links should probably be implemented via polymorphic components */}
             <NavigationLink
               icon={<IconHome size="1.25rem" />}
               color="blue"

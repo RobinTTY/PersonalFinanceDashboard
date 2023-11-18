@@ -1,4 +1,4 @@
-import { RequestHandler, graphql, rest } from 'msw';
+import { RequestHandler, graphql, delay, HttpResponse, http, passthrough } from 'msw';
 import {
   GetAccountsQueryVariables,
   GetAccountsQuery,
@@ -26,77 +26,92 @@ import { GetTransactionsQueryWire } from './wire-types';
 
 const defaultDelay = 500;
 export const handlers: Array<RequestHandler> = [
-  graphql.query<GetAccountQuery, GetAccountQueryVariables>('GetAccount', (req, res, ctx) => {
-    const { accountId } = req.variables;
+  graphql.query<GetAccountQuery, GetAccountQueryVariables>('GetAccount', async ({ variables }) => {
+    const { accountId } = variables;
     console.log(accountId);
 
-    ctx.delay(1000);
-    return res(ctx.data(MockAccount.data as GetAccountQuery));
+    await delay(1000);
+    return HttpResponse.json({
+      data: MockAccount.data as GetAccountQuery,
+    });
   }),
 
   graphql.query<GetMinimalAccountsQuery, GetMinimalAccountsQueryVariables>(
     'GetMinimalAccounts',
-    (req, res, ctx) => {
-      const { accountIds } = req.variables;
+    async ({ variables }) => {
+      const { accountIds } = variables;
       console.log(accountIds);
 
-      ctx.delay(1000);
-      return res(ctx.data(MockMinimalAccounts.data as GetMinimalAccountsQuery));
+      await delay(1000);
+      return HttpResponse.json({
+        data: MockMinimalAccounts.data as GetMinimalAccountsQuery,
+      });
     }
   ),
 
-  graphql.query<GetAccountsQuery, GetAccountsQueryVariables>('GetAccounts', (req, res, ctx) => {
-    const { accountIds } = req.variables;
-    console.log(accountIds);
+  graphql.query<GetAccountsQuery, GetAccountsQueryVariables>(
+    'GetAccounts',
+    async ({ variables }) => {
+      const { accountIds } = variables;
+      console.log(accountIds);
 
-    ctx.delay(1000);
-    return res(ctx.data(MockAccounts.data as GetAccountsQuery));
-  }),
+      await delay(1000);
+      return HttpResponse.json({
+        data: MockAccounts.data as GetAccountsQuery,
+      });
+    }
+  ),
 
   graphql.query<GetBankingInstitutionsQuery, GetBankingInstitutionsQueryVariables>(
     'GetBankingInstitutions',
-    (req, res, ctx) => {
-      const { countryCode, first } = req.variables;
+    async ({ variables }) => {
+      const { countryCode, first } = variables;
       console.log(countryCode, first);
 
-      ctx.delay(defaultDelay);
-      return res(ctx.data(MockBankingInstitutions.data as GetBankingInstitutionsQuery));
+      await delay(defaultDelay);
+      return HttpResponse.json({
+        data: MockBankingInstitutions.data as GetBankingInstitutionsQuery,
+      });
     }
   ),
 
   graphql.query<GetAuthenticationRequestQuery, GetAuthenticationRequestQueryVariables>(
     'GetAuthenticationRequest',
-    (req, res, ctx) => {
-      const { authenticationId } = req.variables;
+    async ({ variables }) => {
+      const { authenticationId } = variables;
       console.log(authenticationId);
 
-      ctx.delay(defaultDelay);
-      return res(ctx.data(MockGetAuthenticationRequest.data as GetAuthenticationRequestQuery));
+      await delay(defaultDelay);
+      return HttpResponse.json({
+        data: MockGetAuthenticationRequest.data as GetAuthenticationRequestQuery,
+      });
     }
   ),
 
   graphql.query<GetTransactionsQueryWire, GetTransactionsQueryVariables>(
     'GetTransactions',
-    (req, res, ctx) => {
-      const { accountId, first } = req.variables;
+    async ({ variables }) => {
+      const { accountId, first } = variables;
       console.log(accountId, first);
 
-      ctx.delay(defaultDelay);
-      return res(ctx.data(MockGetTransactions.data as GetTransactionsQueryWire));
+      await delay(defaultDelay);
+      return HttpResponse.json({
+        data: MockGetTransactions.data as GetTransactionsQueryWire,
+      });
     }
   ),
 
   graphql.mutation<
     CreateAuthenticationRequestMutation,
     CreateAuthenticationRequestMutationVariables
-  >('CreateAuthenticationRequest', (req, res, ctx) => {
-    const { institutionId, redirectUri } = req.variables;
+  >('CreateAuthenticationRequest', async ({ variables }) => {
+    const { institutionId, redirectUri } = variables;
     console.log(institutionId, redirectUri);
 
-    ctx.delay(defaultDelay);
-    return res(
-      ctx.data(MockCreateAuthenticationRequest.data as CreateAuthenticationRequestMutation)
-    );
+    await delay(defaultDelay);
+    return HttpResponse.json({
+      data: MockCreateAuthenticationRequest.data as CreateAuthenticationRequestMutation,
+    });
   }),
 
   // Don't pass through any unhandled graphql operations
@@ -105,5 +120,5 @@ export const handlers: Array<RequestHandler> = [
   }),
 
   // Ignore all get calls (non-graphql)
-  rest.get('*', (req) => req.passthrough()),
+  http.get('*', () => passthrough()),
 ];
