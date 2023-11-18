@@ -44,7 +44,7 @@ public class EtoroDividends
     public EtoroInstrumentType Type { get; set; }
     /// <summary>
     /// The International Securities Identification Number of the instrument for which this dividend payment was made.
-    /// </summary 
+    /// </summary>
     [Column("ISIN")]
     public string Isin { get; set; }
 

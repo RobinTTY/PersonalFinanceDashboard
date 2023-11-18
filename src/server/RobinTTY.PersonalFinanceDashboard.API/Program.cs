@@ -1,7 +1,11 @@
 global using System;
+global using System.Linq;
+global using System.Threading;
+global using System.Collections.Generic;
+global using System.Threading.Tasks;
 global using Serilog;
+global using HotChocolate;
 
-using HotChocolate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +31,12 @@ builder.Services
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=application.db"));
 
+// TODO: automatic registration of repositories via codegen?
 // General Services
 builder.Services
+    .AddScoped<AccountRepository>()
+    .AddScoped<AuthenticationRequestRepository>()
+    .AddScoped<BankingInstitutionRepository>()
     .AddScoped<TransactionRepository>()
     .AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
     .AddSingleton<GoCardlessDataProvider>();
@@ -43,15 +51,11 @@ builder.Services
 // HotChocolate GraphQL Setup
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType()
-    .AddMutationType()
-    // TODO
-    // https://relay.dev/docs/v1.5.0/graphql-server-specification/
-    // 1. By convention, mutations are named as verbs (done)
-    // 2. their inputs are the name with "Input" appended at the end
-    // 3. they return an object that is the name with "Payload" appended
-    // .AddMutationConventions()
-    .AddApiTypes()
+    .AddTypes()
+    .AddMutationConventions()
+    .RegisterService<AccountRepository>(ServiceKind.Resolver)
+    .RegisterService<AuthenticationRequestRepository>(ServiceKind.Resolver)
+    .RegisterService<BankingInstitutionRepository>(ServiceKind.Resolver)
     .RegisterService<TransactionRepository>(ServiceKind.Resolver);
 
 var app = builder.Build();
@@ -65,6 +69,5 @@ var app = builder.Build();
 //}
 
 app.UseCors();
-app.UseWebSockets();
 app.MapGraphQL();
 app.Run();

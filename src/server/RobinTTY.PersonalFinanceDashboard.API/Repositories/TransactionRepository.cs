@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.API.EfModels;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
@@ -23,6 +20,10 @@ public class TransactionRepository
         _dbContext = dbContext;
     }
 
+    /// <summary>
+    /// Gets all <see cref="Transaction"/>s.
+    /// </summary>
+    /// <returns>A list of all <see cref="Transaction"/>s.</returns>
     public async Task<IEnumerable<Transaction>> GetAll()
     {
         // TODO
@@ -37,6 +38,11 @@ public class TransactionRepository
         return transformed;
     }
 
+    /// <summary>
+    /// Adds a new <see cref="Transaction"/>.
+    /// </summary>
+    /// <param name="transaction">The <see cref="Transaction"/> to add.</param>
+    /// <returns>The added <see cref="Transaction"/>.</returns>
     public async Task<Transaction> Add(Transaction transaction)
     {
         // TODO: Automate mapping
@@ -48,6 +54,12 @@ public class TransactionRepository
         return transaction;
     }
 
+    /// <summary>
+    /// Updates an existing <see cref="Transaction"/>.
+    /// </summary>
+    /// <param name="transaction">The <see cref="Transaction"/> to update.</param>
+    /// <returns>The updated <see cref="Transaction"/>.</returns>
+    /// TODO: return Transaction not EfTransaction
     public async Task<EfTransaction> Update(EfTransaction transaction)
     {
         _dbContext.Transactions.Update(transaction);
@@ -55,6 +67,11 @@ public class TransactionRepository
         return transaction;
     }
 
+    /// <summary>
+    /// Deletes an existing <see cref="Transaction"/>.
+    /// </summary>
+    /// <param name="transactionId">The id of the transaction to delete.</param>
+    /// <returns>TODO</returns>
     public async Task<bool> Delete(string transactionId)
     {
         var result = await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync();

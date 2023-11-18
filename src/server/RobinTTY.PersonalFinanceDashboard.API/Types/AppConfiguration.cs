@@ -1,4 +1,4 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.API.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Api.Types;
 
 /// <summary>
 /// The configuration of the application server.

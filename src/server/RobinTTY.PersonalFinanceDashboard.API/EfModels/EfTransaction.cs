@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
+﻿namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
