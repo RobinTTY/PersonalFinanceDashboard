@@ -25,6 +25,7 @@ export const ContentCheckbox = ({
       size="md"
       pl="xl"
       {...checkboxProps}
+      onChange={() => {}}
     />
   </UnstyledButton>
 );

@@ -1,4 +1,3 @@
-// FILEPATH: /home/robin/projects/personal-finance-dashboard/src/client/src/components/modal-button/ModalButton.test.tsx
 import { render, fireEvent } from '@test-utils';
 import { Icon24Hours } from '@tabler/icons-react';
 import { ModalButton } from './ModalButton';
