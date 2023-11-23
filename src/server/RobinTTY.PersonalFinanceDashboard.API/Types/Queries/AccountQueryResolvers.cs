@@ -16,7 +16,7 @@ public sealed class AccountQueryResolvers
     /// </summary>
     /// <param name="accountId">The id of the account to lookup.</param>
     /// <param name="repository">The repository to use for data retrieval.</param>
-    public async Task<BankAccount> GetAccount(string accountId, AccountRepository repository)
+    public async Task<BankAccount?> GetAccount(string accountId, AccountRepository repository)
     {
         return await repository.Get(accountId);
     }

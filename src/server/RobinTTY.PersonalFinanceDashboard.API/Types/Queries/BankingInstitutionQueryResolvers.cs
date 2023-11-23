@@ -26,7 +26,7 @@ public class BankingInstitutionQueryResolvers
     /// Look up banking institutions by their id.
     /// </summary>
     /// <param name="institutionId">The id of the banking institution to retrieve.</param>
-    public async Task<BankingInstitution> GetBankingInstitution(string institutionId,
+    public async Task<BankingInstitution?> GetBankingInstitution(string institutionId,
         BankingInstitutionRepository repository)
     {
         return await repository.Get(institutionId);

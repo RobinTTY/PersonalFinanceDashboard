@@ -3,12 +3,16 @@
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class EfTransaction
+public class TransactionDto
 {
     /// <summary>
     /// The id of the transaction.
     /// </summary>
     public string Id { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public string AccountId { get; set; }
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
@@ -36,7 +40,7 @@ public class EfTransaction
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain sub-categories).
     /// </summary>
-    public ICollection<EfTag> Tags { get; }
+    public ICollection<TagDto> Tags { get; }
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
@@ -46,7 +50,7 @@ public class EfTransaction
     // how should I best handle this?
 
     /// <summary>
-    /// Creates a new instance of <see cref="EfTransaction"/>.
+    /// Creates a new instance of <see cref="TransactionDto"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
@@ -56,7 +60,7 @@ public class EfTransaction
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public EfTransaction(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
+    public TransactionDto(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
     {
         Id = id;
         ValueDate = valueDate;
@@ -65,7 +69,7 @@ public class EfTransaction
         Amount = amount;
         Currency = currency;
         Category = category;
-        Tags = new List<EfTag>();
+        Tags = new List<TagDto>();
         Notes = notes;
     }
 }

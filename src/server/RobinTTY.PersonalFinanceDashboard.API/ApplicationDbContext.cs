@@ -11,11 +11,11 @@ public sealed class ApplicationDbContext : DbContext
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding transactions of the application.
     /// </summary>
-    public DbSet<EfTransaction> Transactions => Set<EfTransaction>();
+    public DbSet<TransactionDto> Transactions => Set<TransactionDto>();
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding tags of the application.
     /// </summary>
-    public DbSet<EfTag> Tags => Set<EfTag>();
+    public DbSet<TagDto> Tags => Set<TagDto>();
 
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.

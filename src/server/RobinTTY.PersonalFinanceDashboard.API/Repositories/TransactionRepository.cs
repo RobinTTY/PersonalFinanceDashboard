@@ -24,7 +24,7 @@ public class TransactionRepository
     /// Gets all <see cref="Transaction"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetAll()
+    public async Task<IEnumerable<Transaction>> GetAll(CancellationToken cancellationToken)
     {
         // TODO
         //var transactions = await _dataProvider.GetTransactions(accountId);
@@ -32,8 +32,22 @@ public class TransactionRepository
 
         // var mockedTransactions = MockDataAccessService.GetTransactions(100);
         // return await Task.FromResult(mockedTransactions);
-        var transactions = await _dbContext.Transactions.ToListAsync();
+        var transactions = await _dbContext.Transactions.ToListAsync(cancellationToken);
         // TODO: tag mapping
+        var transformed = transactions.Select(t => new Transaction(t.Id, t.ValueDate, t.Payer!, t.Payee!, t.Amount, t.Currency, t.Category, new List<Tag>(), t.Notes)).ToList();
+        return transformed;
+    }
+
+    /// <summary>
+    /// Gets all transactions associated with an account.
+    /// </summary>
+    /// <param name="accountId">The account id the transactions are associated with.</param>
+    /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
+    public async Task<IEnumerable<Transaction>> GetByAccountId(string accountId)
+    {
+        var transactions = await _dbContext.Transactions.Where(transaction => transaction.AccountId == accountId)
+            .ToListAsync();
+        // TODO: mapping
         var transformed = transactions.Select(t => new Transaction(t.Id, t.ValueDate, t.Payer!, t.Payee!, t.Amount, t.Currency, t.Category, new List<Tag>(), t.Notes)).ToList();
         return transformed;
     }
@@ -46,7 +60,7 @@ public class TransactionRepository
     public async Task<Transaction> Add(Transaction transaction)
     {
         // TODO: Automate mapping
-        var efTransaction = new EfTransaction(transaction.Id, transaction.ValueDate, transaction.Payer!, transaction.Payee!, transaction.Amount, transaction.Currency, transaction.Category, transaction.Notes);
+        var efTransaction = new TransactionDto(transaction.Id, transaction.ValueDate, transaction.Payer!, transaction.Payee!, transaction.Amount, transaction.Currency, transaction.Category, transaction.Notes);
         _dbContext.Transactions.Add(efTransaction);
         await _dbContext.SaveChangesAsync();
 
@@ -57,14 +71,14 @@ public class TransactionRepository
     /// <summary>
     /// Updates an existing <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="transaction">The <see cref="Transaction"/> to update.</param>
+    /// <param name="transactionDto">The <see cref="Transaction"/> to update.</param>
     /// <returns>The updated <see cref="Transaction"/>.</returns>
     /// TODO: return Transaction not EfTransaction
-    public async Task<EfTransaction> Update(EfTransaction transaction)
+    public async Task<TransactionDto> Update(TransactionDto transactionDto)
     {
-        _dbContext.Transactions.Update(transaction);
+        _dbContext.Transactions.Update(transactionDto);
         await _dbContext.SaveChangesAsync();
-        return transaction;
+        return transactionDto;
     }
 
     /// <summary>
