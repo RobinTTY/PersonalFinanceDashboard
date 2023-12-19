@@ -24,8 +24,6 @@ test('calls the onChange function when clicked', () => {
 });
 
 test('checkbox is checked when checkboxProps.checked is true', () => {
-  const mockOnChange = vi.fn();
-
   const props = {
     checkboxProps: { checked: true },
     onChange: mockOnChange,

@@ -3,7 +3,7 @@ import { CheckboxProps } from '@mantine/core';
 
 export interface PartialContentCheckboxProps {
   checkboxProps: CheckboxProps;
-  onChange?(checked: boolean): void;
+  onChange?: (checked: boolean) => void;
 }
 
 export type ContentCheckboxProps = PropsWithChildren<PartialContentCheckboxProps> &
