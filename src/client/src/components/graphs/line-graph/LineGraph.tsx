@@ -1,117 +1,65 @@
-import { Text, Paper, useMantineTheme } from '@mantine/core';
-import { ResponsiveLine } from '@nivo/line';
-import { NivoGridWrapper } from '@components/graphs/nivo-grid-wrapper/NivoGridWrapper';
-import { SampleLineData as data } from './SampleLineData';
+import { useEffect, useRef } from 'react';
+import { Text, Paper } from '@mantine/core';
+import { type ECharts, init, getInstanceByDom } from 'echarts';
+import { EChartProps } from './EChartProps';
+
 import './LineGraph.css';
 
-// TODO: typing for data
-// TODO: theme color switch (light mode)
-export const LineGraph = () => {
-  const theme = useMantineTheme();
+// TODO: use mantine theme for dark/light mode
+export const LineGraph = ({
+  option,
+  style,
+  settings,
+  loading,
+  theme,
+}: EChartProps) => {
+  // const theme = useMantineTheme();
+  const chartRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+    // Initialize chart
+    let chart: ECharts | undefined;
+    if (chartRef.current !== null) {
+      chart = init(chartRef.current, theme);
+    }
+
+    // Add chart resize listener
+    // ResizeObserver is leading to a bit janky UX
+    function resizeChart() {
+      chart?.resize();
+    }
+    window.addEventListener('resize', resizeChart);
+
+    // Return cleanup function
+    return () => {
+      chart?.dispose();
+      window.removeEventListener('resize', resizeChart);
+    };
+    }, [theme]);
+
+    useEffect(() => {
+    if (chartRef.current !== null) {
+      const chart = getInstanceByDom(chartRef.current);
+      chart?.setOption(option, settings);
+    }
+  }, [option, settings, theme]); // Whenever theme changes we need to add option and setting due to it being deleted in cleanup function
+
+    useEffect(() => {
+    if (chartRef.current !== null) {
+      const chart = getInstanceByDom(chartRef.current);
+      loading === true ? chart?.showLoading() : chart?.hideLoading();
+    }
+  }, [loading, theme]);
 
   return (
     <Paper withBorder p="md" radius="md" h="50%">
       <div id="main-container">
-        <Text size="lg" pl="xl" c="white">
+        <Text id="graph-title" size="lg" pl="xl" c="white">
           Net Worth
         </Text>
-        <NivoGridWrapper>
-          <ResponsiveLine
-            data={data}
-            theme={{
-              axis: {
-                domain: {
-                  line: {
-                    stroke: theme.colors.gray[1],
-                  },
-                },
-                legend: {
-                  text: {
-                    fill: theme.colors.gray[1],
-                  },
-                },
-                ticks: {
-                  line: {
-                    stroke: theme.colors.gray[1],
-                    strokeWidth: 1,
-                  },
-                  text: {
-                    fill: theme.colors.gray[1],
-                  },
-                },
-              },
-              legends: {
-                text: {
-                  fill: theme.colors.gray[1],
-                },
-              },
-              tooltip: {
-                container: {
-                  color: theme.colors.dark[4],
-                },
-              },
-              crosshair: {
-                line: {
-                  stroke: '#afffff',
-                  strokeWidth: 1.5,
-                  strokeOpacity: 0.75,
-                },
-              },
-            }}
-            margin={{ top: 20, right: 110, bottom: 40, left: 60 }}
-            xScale={{ type: 'point' }}
-            yScale={{
-              type: 'linear',
-              min: 'auto',
-              max: 'auto',
-              stacked: false,
-              reverse: false,
-            }}
-            yFormat=" >-.2f"
-            axisTop={null}
-            axisRight={null}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: 'USD',
-              legendOffset: -50,
-              legendPosition: 'middle',
-            }}
-            pointSize={10}
-            pointColor={{ theme: 'background' }}
-            pointBorderWidth={2}
-            pointBorderColor={{ from: 'serieColor' }}
-            pointLabelYOffset={-12}
-            useMesh
-            legends={[
-              {
-                anchor: 'bottom-right',
-                direction: 'column',
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: 'left-to-right',
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: 'circle',
-                symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                effects: [
-                  {
-                    on: 'hover',
-                    style: {
-                      itemBackground: 'rgba(0, 0, 0, .03)',
-                      itemOpacity: 1,
-                    },
-                  },
-                ],
-              },
-            ]}
-          />
-        </NivoGridWrapper>
+        <div id="graph">
+          <div ref={chartRef} style={{ width: '100%', height: '100%', ...style }} />;
+        </div>
       </div>
     </Paper>
   );

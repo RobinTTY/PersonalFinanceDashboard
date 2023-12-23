@@ -1,3 +1,21 @@
+import { EChartProps } from '@components/graphs/line-graph/EChartProps';
+
+export const echartOptions: EChartProps["option"] = {
+  xAxis: {
+    type: 'category',
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      data: [150, 230, 224, 218, 135, 147, 260],
+      type: 'line'
+    },
+  ],
+};
+
 const endDate = new Date();
 const netWorth = [3360, 4241, 5816, 7115, 7567, 8374, 9564, 11835, 11532, 12315, 13147, 13421];
 

@@ -1,8 +1,8 @@
 import { Box, Space } from '@mantine/core';
-
 import { StatCardProps } from '@components/stat-card/StatCardProps';
 import { LineGraph } from '@components/graphs/line-graph/LineGraph';
 import { StatsGrid } from '@components/stat-grid/StatsGrid';
+import { echartOptions } from '@/components/graphs/line-graph/SampleLineData';
 
 export const Dashboard = () => {
   const gridprops: StatCardProps[] = [
@@ -19,7 +19,7 @@ export const Dashboard = () => {
 
   return (
     <Box p="md" style={{ height: '100%' }}>
-      <LineGraph />
+      <LineGraph option={echartOptions} />
       <Space h="md" />
       <StatsGrid data={gridprops} />
     </Box>
