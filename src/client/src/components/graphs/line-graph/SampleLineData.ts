@@ -39,6 +39,11 @@ export const SampleLineData: EChartProps['option'] = {
   tooltip: {
     trigger: 'axis',
   },
+  // legend: {
+  //   bottom: 10,
+  //   left: 'center',
+  //   data: ['Net Worth', 'Portfolio Value'],
+  // },
   xAxis: {
     type: 'category',
     data: dates,

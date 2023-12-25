@@ -6,25 +6,19 @@ import { EChartProps } from './EChartProps';
 import './LineGraph.css';
 
 // TODO: use mantine theme for dark/light mode
-export const LineGraph = ({
-  option,
-  style,
-  settings,
-  loading,
-  theme,
-}: EChartProps) => {
+export const LineGraph = ({ option, style, settings, loading, theme }: EChartProps) => {
   // const theme = useMantineTheme();
   const chartRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+  useEffect(() => {
     // Initialize chart
     let chart: ECharts | undefined;
     if (chartRef.current !== null) {
-      chart = init(chartRef.current, theme);
+      // TODO: canvas renderer looks blurry, why? Probably resizing issue
+      chart = init(chartRef.current, theme, { renderer: 'canvas' });
     }
 
-    // Add chart resize listener
-    // ResizeObserver is leading to a bit janky UX
+    // TODO: ResizeObserver is leading to a bit janky UX
     function resizeChart() {
       chart?.resize();
     }
@@ -35,16 +29,16 @@ export const LineGraph = ({
       chart?.dispose();
       window.removeEventListener('resize', resizeChart);
     };
-    }, [theme]);
+  }, [theme]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (chartRef.current !== null) {
       const chart = getInstanceByDom(chartRef.current);
       chart?.setOption(option, settings);
     }
-  }, [option, settings, theme]); // Whenever theme changes we need to add option and setting due to it being deleted in cleanup function
+  }, [option, settings, theme]); // Whenever theme changes we need to add options and settings due to it being deleted in cleanup function
 
-    useEffect(() => {
+  useEffect(() => {
     if (chartRef.current !== null) {
       const chart = getInstanceByDom(chartRef.current);
       loading === true ? chart?.showLoading() : chart?.hideLoading();
