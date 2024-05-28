@@ -24,13 +24,13 @@ public class GoCardlessDataProvider
         _client = new NordigenClient(httpClient, credentials);
     }
 
-    public async Task<ThirdPartyResponse<BankingInstitution?, BasicError>> GetBankingInstitution(string institutionId)
+    public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(string institutionId)
     {
         var response = await _client.InstitutionsEndpoint.GetInstitution(institutionId);
         BankingInstitution? result = null;
         if(response.IsSuccess)
             result = new BankingInstitution(response.Result.Id, response.Result.Bic, response.Result.Name, response.Result.Logo, response.Result.Countries);
-        return new ThirdPartyResponse<BankingInstitution?, BasicError>(response.IsSuccess, result, response.Error);
+        return new ThirdPartyResponse<BankingInstitution?, BasicResponse>(response.IsSuccess, result, response.Error);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class GoCardlessDataProvider
     /// </summary>
     /// <param name="country">Optional country filter to apply to the query.</param>
     /// <returns>The available banking <see cref="Institution"/>s.</returns>
-    public async Task<ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>> GetBankingInstitutions(string? country = null)
+    public async Task<ThirdPartyResponse<IQueryable<BankingInstitution>, BasicResponse>> GetBankingInstitutions(string? country = null)
     {
         var response = await _client.InstitutionsEndpoint.GetInstitutions(country);
 
@@ -46,10 +46,10 @@ public class GoCardlessDataProvider
         {
             var institutions =
                 response.Result.Select(inst => new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries));
-            return new ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>(true, institutions.AsQueryable(), null);
+            return new ThirdPartyResponse<IQueryable<BankingInstitution>, BasicResponse>(true, institutions.AsQueryable(), null);
         }
 
-        return new ThirdPartyResponse<IQueryable<BankingInstitution>, InstitutionsError>(false, null, response.Error);
+        return new ThirdPartyResponse<IQueryable<BankingInstitution>, BasicResponse>(false, null, response.Error);
     }
 
     /// <summary>
@@ -57,14 +57,14 @@ public class GoCardlessDataProvider
     /// </summary>
     /// <param name="requisitionId">The institutionId of the requisition to be retrieved.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> which matches the institutionId, as far as it exists.</returns>
-    public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicError?>> GetAuthenticationRequest(string requisitionId)
+    public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>> GetAuthenticationRequest(string requisitionId)
     {
         var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId);
         // TODO: handle request failure
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id.ToString(), requisition.Accounts.Select(guid => guid.ToString()),
             ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink);
-        return new ThirdPartyResponse<AuthenticationRequest?, BasicError?>(response.IsSuccess, result, response.Error);
+        return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result, response.Error);
     }
 
     // TODO: Cancellation token support
@@ -73,14 +73,14 @@ public class GoCardlessDataProvider
     /// </summary>
     /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
-    public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError?>> GetAuthenticationRequests(int requisitionLimit)
+    public async Task<ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicResponse?>> GetAuthenticationRequests(int requisitionLimit)
     {
         var response = await _client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
         // TODO: handle request failure
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
             req.Accounts.Select(guid => guid.ToString()), ConvertRequisitionStatus(req.Status), req.AuthenticationLink)).AsQueryable();
-        return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicError?>(response.IsSuccess, result, response.Error);
+        return new ThirdPartyResponse<IQueryable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result, response.Error);
 
     }
 
@@ -92,8 +92,7 @@ public class GoCardlessDataProvider
     /// <returns>The created <see cref="Requisition"/>.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> CreateAuthenticationRequest(string institutionId, Uri redirectUri)
     {
-        var requisitionRequest = new CreateRequisitionRequest(redirectUri, institutionId, Guid.NewGuid().ToString(), "EN");
-        var response = await _client.RequisitionsEndpoint.CreateRequisition(requisitionRequest);
+        var response = await _client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri, reference: Guid.NewGuid().ToString());
 
         if (response.IsSuccess)
         {
@@ -106,10 +105,10 @@ public class GoCardlessDataProvider
         return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null, response.Error);
     }
 
-    public async Task<ThirdPartyResponse<BasicResponse, BasicError>> DeleteAuthenticationRequest(string authenticationId)
+    public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(string authenticationId)
     {
         var response = await _client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
-        return new ThirdPartyResponse<BasicResponse, BasicError>(response.IsSuccess, response.Result, response.Error);
+        return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result, response.Error);
     }
 
     public async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(string accountId)
