@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Migrations
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

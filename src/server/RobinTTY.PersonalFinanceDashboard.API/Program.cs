@@ -14,6 +14,7 @@ using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);

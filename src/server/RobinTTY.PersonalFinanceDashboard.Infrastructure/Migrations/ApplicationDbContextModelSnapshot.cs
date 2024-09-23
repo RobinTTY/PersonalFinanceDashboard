@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RobinTTY.PersonalFinanceDashboard.API;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
 #nullable disable
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Migrations
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240923223514_AddAccountIdToTransaction")]
-    partial class AddAccountIdToTransaction
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");

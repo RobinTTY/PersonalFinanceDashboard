@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Migrations
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AddAccountIdToTransaction : Migration

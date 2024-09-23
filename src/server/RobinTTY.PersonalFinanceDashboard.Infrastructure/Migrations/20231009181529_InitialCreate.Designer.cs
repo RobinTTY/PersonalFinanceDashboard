@@ -2,22 +2,40 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RobinTTY.PersonalFinanceDashboard.API;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
 #nullable disable
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Migrations
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231009181529_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.API.EfModels.TagEntity", b =>
+            modelBuilder.Entity("EfTagEfTransaction", b =>
+                {
+                    b.Property<string>("TagsId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TransactionsId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TagsId", "TransactionsId");
+
+                    b.HasIndex("TransactionsId");
+
+                    b.ToTable("EfTagEfTransaction");
+                });
+
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.API.EfModels.EfTag", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -39,13 +57,9 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.API.EfModels.TransactionEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.API.EfModels.EfTransaction", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AccountId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Amount")
@@ -77,30 +91,15 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("TagEntityTransactionEntity", b =>
+            modelBuilder.Entity("EfTagEfTransaction", b =>
                 {
-                    b.Property<string>("TagsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TransactionsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("TagsId", "TransactionsId");
-
-                    b.HasIndex("TransactionsId");
-
-                    b.ToTable("TagEntityTransactionEntity");
-                });
-
-            modelBuilder.Entity("TagEntityTransactionEntity", b =>
-                {
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.API.EfModels.TagEntity", null)
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.API.EfModels.EfTag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.API.EfModels.TransactionEntity", null)
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.API.EfModels.EfTransaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionsId")
                         .OnDelete(DeleteBehavior.Cascade)

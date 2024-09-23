@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
-namespace RobinTTY.PersonalFinanceDashboard.API;
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
 /// <summary>
 /// The database context which provides access to the underlying data of the application.

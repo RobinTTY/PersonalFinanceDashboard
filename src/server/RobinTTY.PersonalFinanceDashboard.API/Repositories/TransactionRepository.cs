@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
