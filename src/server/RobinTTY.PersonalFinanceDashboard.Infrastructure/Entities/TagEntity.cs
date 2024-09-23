@@ -4,7 +4,7 @@
 /// A tag can be used to add additional information to transactions.
 /// E.g. a transaction could have the tags "home-entertainment" and "technology".
 /// </summary>
-public class TagDto
+public class TagEntity
 {
     /// <summary>
     /// The id of the tag.
@@ -25,21 +25,21 @@ public class TagDto
     /// <summary>
     /// The transactions which this tag is applied to.
     /// </summary>
-    public ICollection<TransactionDto> Transactions { get; }
+    public ICollection<TransactionEntity> Transactions { get; }
 
     /// <summary>
-    /// Creates a new instance of <see cref="TagDto"/>.
+    /// Creates a new instance of <see cref="TagEntity"/>.
     /// </summary>
     /// <param name="id">The id of the tag.</param>
     /// <param name="name">The name of the tag.</param>
     /// <param name="description">A description of the tag.</param>
     /// <param name="color">The color of the tag when displayed in a client application.</param>
-    public TagDto(string id, string name, string description, string color)
+    public TagEntity(string id, string name, string description, string color)
     {
         Id = id;
         Name = name;
         Description = description;
         Color = color;
-        Transactions = new List<TransactionDto>();
+        Transactions = new List<TransactionEntity>();
     }
 }

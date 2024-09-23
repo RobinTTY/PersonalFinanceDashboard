@@ -60,7 +60,7 @@ public class TransactionRepository
     public async Task<Transaction> Add(Transaction transaction)
     {
         // TODO: Automate mapping
-        var efTransaction = new TransactionDto(transaction.Id, transaction.ValueDate, transaction.Payer!, transaction.Payee!, transaction.Amount, transaction.Currency, transaction.Category, transaction.Notes);
+        var efTransaction = new TransactionEntity(transaction.Id, transaction.ValueDate, transaction.Payer!, transaction.Payee!, transaction.Amount, transaction.Currency, transaction.Category, transaction.Notes);
         _dbContext.Transactions.Add(efTransaction);
         await _dbContext.SaveChangesAsync();
 
@@ -73,8 +73,8 @@ public class TransactionRepository
     /// </summary>
     /// <param name="transactionDto">The <see cref="Transaction"/> to update.</param>
     /// <returns>The updated <see cref="Transaction"/>.</returns>
-    /// TODO: return Transaction not EfTransaction
-    public async Task<TransactionDto> Update(TransactionDto transactionDto)
+    /// TODO: return Transaction not TransactionEntity
+    public async Task<TransactionEntity> Update(TransactionEntity transactionDto)
     {
         _dbContext.Transactions.Update(transactionDto);
         await _dbContext.SaveChangesAsync();

@@ -11,11 +11,11 @@ public sealed class ApplicationDbContext : DbContext
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding transactions of the application.
     /// </summary>
-    public DbSet<TransactionDto> Transactions => Set<TransactionDto>();
+    public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding tags of the application.
     /// </summary>
-    public DbSet<TagDto> Tags => Set<TagDto>();
+    public DbSet<TagEntity> Tags => Set<TagEntity>();
 
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.

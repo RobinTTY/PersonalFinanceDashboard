@@ -3,7 +3,7 @@
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class TransactionDto
+public class TransactionEntity
 {
     /// <summary>
     /// The id of the transaction.
@@ -40,7 +40,7 @@ public class TransactionDto
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain sub-categories).
     /// </summary>
-    public ICollection<TagDto> Tags { get; }
+    public ICollection<TagEntity> Tags { get; }
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
@@ -50,7 +50,7 @@ public class TransactionDto
     // how should I best handle this?
 
     /// <summary>
-    /// Creates a new instance of <see cref="TransactionDto"/>.
+    /// Creates a new instance of <see cref="TransactionEntity"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
@@ -60,7 +60,7 @@ public class TransactionDto
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public TransactionDto(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
+    public TransactionEntity(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
     {
         Id = id;
         ValueDate = valueDate;
@@ -69,7 +69,7 @@ public class TransactionDto
         Amount = amount;
         Currency = currency;
         Category = category;
-        Tags = new List<TagDto>();
+        Tags = new List<TagEntity>();
         Notes = notes;
     }
 }
