@@ -1,4 +1,4 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 /// <summary>
 /// A tag can be used to add additional information to transactions.

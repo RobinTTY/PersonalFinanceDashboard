@@ -1,6 +1,6 @@
 ﻿using Riok.Mapperly.Abstractions;
-using RobinTTY.PersonalFinanceDashboard.API.EfModels;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 

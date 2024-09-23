@@ -1,4 +1,4 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.API.EfModels;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
