@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.API.EfModels;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
 
@@ -10,14 +11,17 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
 public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly TransactionMapper _transactionMapper;
 
     /// <summary>
     /// Creates a new instance of <see cref="TransactionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    public TransactionRepository(ApplicationDbContext dbContext)
+    /// <param name="transactionMapper">The mapper used to map ef entities to the domain model.</param>
+    public TransactionRepository(ApplicationDbContext dbContext, TransactionMapper transactionMapper)
     {
         _dbContext = dbContext;
+        _transactionMapper = transactionMapper;
     }
 
     /// <summary>
@@ -33,8 +37,9 @@ public class TransactionRepository
         // var mockedTransactions = MockDataAccessService.GetTransactions(100);
         // return await Task.FromResult(mockedTransactions);
         var transactions = await _dbContext.Transactions.ToListAsync(cancellationToken);
+        
         // TODO: tag mapping
-        var transformed = transactions.Select(t => new Transaction(t.Id, t.ValueDate, t.Payer!, t.Payee!, t.Amount, t.Currency, t.Category, new List<Tag>(), t.Notes)).ToList();
+        var transformed = transactions.Select(t => _transactionMapper.TransactionEntityToTransaction(t)).ToList();
         return transformed;
     }
 
@@ -47,8 +52,7 @@ public class TransactionRepository
     {
         var transactions = await _dbContext.Transactions.Where(transaction => transaction.AccountId == accountId)
             .ToListAsync();
-        // TODO: mapping
-        var transformed = transactions.Select(t => new Transaction(t.Id, t.ValueDate, t.Payer!, t.Payee!, t.Amount, t.Currency, t.Category, new List<Tag>(), t.Notes)).ToList();
+        var transformed = transactions.Select(t => _transactionMapper.TransactionEntityToTransaction(t)).ToList();
         return transformed;
     }
 
@@ -57,14 +61,15 @@ public class TransactionRepository
     /// </summary>
     /// <param name="transaction">The <see cref="Transaction"/> to add.</param>
     /// <returns>The added <see cref="Transaction"/>.</returns>
+    // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> Add(Transaction transaction)
     {
         // TODO: Automate mapping
-        var efTransaction = new TransactionEntity(transaction.Id, transaction.ValueDate, transaction.Payer!, transaction.Payee!, transaction.Amount, transaction.Currency, transaction.Category, transaction.Notes);
-        _dbContext.Transactions.Add(efTransaction);
+        var transactionEntity = _transactionMapper.TransactionToTransactionEntity(transaction);
+        await _dbContext.Transactions.AddAsync(transactionEntity);
         await _dbContext.SaveChangesAsync();
 
-        transaction.Id = efTransaction.Id;
+        transaction.Id = transactionEntity.Id;
         return transaction;
     }
 

@@ -139,7 +139,7 @@ public class GoCardlessDataProvider
         var response = await _client.AccountsEndpoint.GetTransactions(accountId);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction => 
-            new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), transaction.ValueDateTime ?? transaction.ValueDate,
+            new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId, transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount, transaction.TransactionAmount.Currency,
                 "example-category", new List<Tag>(), "example-notes")
         );

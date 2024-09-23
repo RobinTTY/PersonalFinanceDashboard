@@ -10,4 +10,8 @@
       <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Core\RobinTTY.PersonalFinanceDashboard.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Riok.Mapperly" Version="3.6.0" />
+    </ItemGroup>
+
 </Project>

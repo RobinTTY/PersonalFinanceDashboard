@@ -14,6 +14,7 @@ using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.API.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 var appConfig = AppConfigurationManager.AppConfiguration;
@@ -30,6 +31,9 @@ builder.Services
 // DB Setup
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=application.db"));
+
+// Mappers
+builder.Services.AddSingleton<TransactionMapper>();
 
 // TODO: automatic registration of repositories via codegen?
 // General Services

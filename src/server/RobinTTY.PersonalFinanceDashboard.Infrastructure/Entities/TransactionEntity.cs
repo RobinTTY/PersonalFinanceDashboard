@@ -10,7 +10,7 @@ public class TransactionEntity
     /// </summary>
     public string Id { get; set; }
     /// <summary>
-    /// 
+    /// The id of the account to which the transaction belongs.
     /// </summary>
     public string AccountId { get; set; }
     /// <summary>
@@ -53,6 +53,7 @@ public class TransactionEntity
     /// Creates a new instance of <see cref="TransactionEntity"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
+    /// <param name="accountId">The id of the account to which the transaction belongs.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
     /// <param name="payee">The name of the party which is owed the money.</param>
@@ -60,9 +61,10 @@ public class TransactionEntity
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public TransactionEntity(string id, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
+    public TransactionEntity(string id, string accountId, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, string notes)
     {
         Id = id;
+        AccountId = accountId;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;
