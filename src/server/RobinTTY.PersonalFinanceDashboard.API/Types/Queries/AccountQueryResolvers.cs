@@ -18,7 +18,7 @@ public sealed class AccountQueryResolvers
     /// <param name="repository">The repository to use for data retrieval.</param>
     public async Task<BankAccount?> GetAccount(string accountId, AccountRepository repository)
     {
-        return await repository.Get(accountId);
+        return await repository.GetAccount(accountId);
     }
 
     /// <summary>
@@ -29,6 +29,6 @@ public sealed class AccountQueryResolvers
     [UsePaging]
     public async Task<IEnumerable<BankAccount>> GetAccounts(IEnumerable<string> accountIds, AccountRepository repository)
     {
-        return await repository.Get(accountIds);
+        return await repository.GetAccounts(accountIds);
     }
 }

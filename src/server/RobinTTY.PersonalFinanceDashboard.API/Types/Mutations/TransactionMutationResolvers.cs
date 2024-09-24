@@ -18,7 +18,7 @@ public class TransactionMutationResolvers
     /// TODO: Change param to CreateTransactionInput type
     public async Task<Transaction> CreateTransaction(Transaction transaction, TransactionRepository repository)
     {
-        await repository.Add(transaction);
+        await repository.AddTransaction(transaction);
         return transaction;
     }
 
@@ -29,7 +29,7 @@ public class TransactionMutationResolvers
     /// <param name="repository">The repository to use for data mutation.</param>
     public async Task<Response> DeleteTransaction(string transactionId, TransactionRepository repository)
     {
-        var result = await repository.Delete(transactionId);
+        var result = await repository.DeleteTransaction(transactionId);
         // TODO: error if result false
         return new Response {Id = transactionId};
     }

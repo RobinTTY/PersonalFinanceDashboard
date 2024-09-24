@@ -27,7 +27,7 @@ public class BankingInstitutionRepository
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<BankingInstitution?> Get(string institutionId)
+    public async Task<BankingInstitution?> GetBankingInstitution(string institutionId)
     {
         var request = await _dataProvider.GetBankingInstitution(institutionId);
         return request.Result!;
@@ -37,7 +37,7 @@ public class BankingInstitutionRepository
     /// Gets all <see cref="BankingInstitution"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="BankingInstitution"/>s.</returns>
-    public async Task<IEnumerable<BankingInstitution>> GetAll(string? countryCode)
+    public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
     {
         var request = await _dataProvider.GetBankingInstitutions(countryCode);
         return request.Result!;

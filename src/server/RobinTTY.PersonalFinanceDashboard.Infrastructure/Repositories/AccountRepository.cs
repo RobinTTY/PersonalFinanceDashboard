@@ -27,7 +27,7 @@ public class AccountRepository
     /// </summary>
     /// <param name="accountId">The id of the account to retrieve.</param>
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<BankAccount?> Get(string accountId)
+    public async Task<BankAccount?> GetAccount(string accountId)
     {
         var account = await _dataProvider.GetBankAccount(accountId);
         return account.Result;
@@ -38,7 +38,7 @@ public class AccountRepository
     /// </summary>
     /// <param name="accountIds">The ids of the accounts to retrieve.</param>
     /// <returns>A list of the matched <see cref="BankAccount"/>s.</returns>
-    public async Task<IEnumerable<BankAccount>> Get(IEnumerable<string> accountIds)
+    public async Task<IEnumerable<BankAccount>> GetAccounts(IEnumerable<string> accountIds)
     {
         var accounts = await _dataProvider.GetBankAccounts(accountIds);
         return accounts.Select(query => query.Result)!;

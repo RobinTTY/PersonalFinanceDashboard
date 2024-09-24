@@ -28,7 +28,7 @@ public class TransactionRepository
     /// Gets all <see cref="Transaction"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetAll(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Transaction>> GetTransactions(CancellationToken cancellationToken)
     {
         // TODO: How should navigation properties be included programatically?
         var transactions = await _dbContext.Transactions
@@ -44,7 +44,7 @@ public class TransactionRepository
     /// </summary>
     /// <param name="accountId">The account id the transactions are associated with.</param>
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetByAccountId(string accountId)
+    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId)
     {
         var transactions = await _dbContext.Transactions.Where(transaction => transaction.AccountId == accountId)
             .ToListAsync();
@@ -58,7 +58,7 @@ public class TransactionRepository
     /// <param name="transaction">The <see cref="Transaction"/> to add.</param>
     /// <returns>The added <see cref="Transaction"/>.</returns>
     // TODO: This should use a TransactionRequest class not Transaction itself
-    public async Task<Transaction> Add(Transaction transaction)
+    public async Task<Transaction> AddTransaction(Transaction transaction)
     {
         var transactionEntity = _transactionMapper.TransactionToTransactionEntity(transaction);
         await _dbContext.Transactions.AddAsync(transactionEntity);
@@ -74,7 +74,7 @@ public class TransactionRepository
     /// <param name="transactionDto">The <see cref="Transaction"/> to update.</param>
     /// <returns>The updated <see cref="Transaction"/>.</returns>
     /// TODO: return Transaction not TransactionEntity
-    public async Task<TransactionEntity> Update(TransactionEntity transactionDto)
+    public async Task<TransactionEntity> UpdateTransaction(TransactionEntity transactionDto)
     {
         _dbContext.Transactions.Update(transactionDto);
         await _dbContext.SaveChangesAsync();
@@ -86,7 +86,7 @@ public class TransactionRepository
     /// </summary>
     /// <param name="transactionId">The id of the transaction to delete.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> Delete(string transactionId)
+    public async Task<bool> DeleteTransaction(string transactionId)
     {
         var result = await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync();
         return Convert.ToBoolean(result);

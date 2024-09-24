@@ -18,7 +18,7 @@ public class TransactionQueryResolvers
     public async Task<IEnumerable<Transaction>> GetTransactions(TransactionRepository repository,
         CancellationToken cancellationToken)
     {
-        return await repository.GetAll(cancellationToken);
+        return await repository.GetTransactions(cancellationToken);
     }
 
     /// <summary>
@@ -30,6 +30,6 @@ public class TransactionQueryResolvers
     [UsePaging]
     public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId, TransactionRepository repository, CancellationToken cancellationToken)
     {
-        return await repository.GetByAccountId(accountId);
+        return await repository.GetTransactionsByAccountId(accountId);
     }
 }

@@ -21,7 +21,7 @@ public class AuthenticationMutationResolvers
     // [Error<Exception>]
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(string institutionId, string redirectUri, AuthenticationRequestRepository repository)
     {
-        return await repository.Add(institutionId, redirectUri);
+        return await repository.AddAuthenticationRequest(institutionId, redirectUri);
     }
 
     /// <summary>
@@ -31,6 +31,6 @@ public class AuthenticationMutationResolvers
     /// <param name="repository">The repository to use for data retrieval.</param>
     public async Task<BasicResponse> DeleteAuthenticationRequest(string authenticationId, AuthenticationRequestRepository repository)
     {
-        return await repository.Delete(authenticationId);
+        return await repository.DeleteAuthenticationRequest(authenticationId);
     }
 }

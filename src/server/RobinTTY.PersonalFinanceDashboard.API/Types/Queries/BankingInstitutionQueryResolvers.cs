@@ -29,7 +29,7 @@ public class BankingInstitutionQueryResolvers
     public async Task<BankingInstitution?> GetBankingInstitution(string institutionId,
         BankingInstitutionRepository repository)
     {
-        return await repository.Get(institutionId);
+        return await repository.GetBankingInstitution(institutionId);
     }
 
     /// <summary>
@@ -40,6 +40,6 @@ public class BankingInstitutionQueryResolvers
     public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(BankingInstitutionRepository repository,
         string? countryCode = null)
     {
-        return await repository.GetAll(countryCode);
+        return await repository.GetBankingInstitutions(countryCode);
     }
 }
