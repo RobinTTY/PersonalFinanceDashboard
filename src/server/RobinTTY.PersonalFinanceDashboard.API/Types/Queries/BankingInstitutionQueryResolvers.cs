@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
-using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;

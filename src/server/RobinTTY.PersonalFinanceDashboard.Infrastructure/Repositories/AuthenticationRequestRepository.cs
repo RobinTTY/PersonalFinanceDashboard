@@ -1,9 +1,8 @@
 ﻿using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
 /// <summary>
 /// Manages <see cref="AuthenticationRequest"/> data retrieval.

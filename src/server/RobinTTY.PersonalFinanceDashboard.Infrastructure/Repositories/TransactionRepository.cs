@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
 /// <summary>
 /// Manages <see cref="Transaction"/> data retrieval.

@@ -1,8 +1,7 @@
 ﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Repositories;
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
 /// <summary>
 /// Manages <see cref="BankingInstitution"/> data retrieval.

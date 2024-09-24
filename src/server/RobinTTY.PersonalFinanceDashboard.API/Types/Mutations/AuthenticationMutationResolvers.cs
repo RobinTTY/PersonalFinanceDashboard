@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Types;
 using RobinTTY.NordigenApiClient.Models.Responses;
-using RobinTTY.PersonalFinanceDashboard.API.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
 
