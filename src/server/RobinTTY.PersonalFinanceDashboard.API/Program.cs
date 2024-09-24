@@ -9,7 +9,6 @@ global using HotChocolate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RobinTTY.PersonalFinanceDashboard.API;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.NordigenApiClient.Models;
@@ -30,8 +29,9 @@ builder.Services
     });
 
 // DB Setup
+// TODO: The filepath shouldn't be hardcoded
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
-    options.UseSqlite("Data Source=application.db"));
+    options.UseSqlite("Data Source=../RobinTTY.PersonalFinanceDashboard.Infrastructure/application.db"));
 
 // Mappers
 builder.Services.AddSingleton<TransactionMapper>();

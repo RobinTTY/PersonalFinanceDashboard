@@ -20,4 +20,10 @@
       <PackageReference Include="Riok.Mapperly" Version="3.6.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="application.db">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
