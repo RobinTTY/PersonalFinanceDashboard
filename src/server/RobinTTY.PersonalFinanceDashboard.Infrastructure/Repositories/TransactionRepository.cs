@@ -30,15 +30,11 @@ public class TransactionRepository
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
     public async Task<IEnumerable<Transaction>> GetAll(CancellationToken cancellationToken)
     {
-        // TODO
-        //var transactions = await _dataProvider.GetTransactions(accountId);
-        //return transactions.Result!.AsQueryable();
-
-        // var mockedTransactions = MockDataAccessService.GetTransactions(100);
-        // return await Task.FromResult(mockedTransactions);
-        var transactions = await _dbContext.Transactions.ToListAsync(cancellationToken);
+        // TODO: How should navigation properties be included programatically?
+        var transactions = await _dbContext.Transactions
+            .Include(t => t.Tags)
+            .ToListAsync(cancellationToken);
         
-        // TODO: tag mapping
         var transformed = transactions.Select(t => _transactionMapper.TransactionEntityToTransaction(t)).ToList();
         return transformed;
     }
@@ -64,7 +60,6 @@ public class TransactionRepository
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> Add(Transaction transaction)
     {
-        // TODO: Automate mapping
         var transactionEntity = _transactionMapper.TransactionToTransactionEntity(transaction);
         await _dbContext.Transactions.AddAsync(transactionEntity);
         await _dbContext.SaveChangesAsync();
@@ -90,7 +85,7 @@ public class TransactionRepository
     /// Deletes an existing <see cref="Transaction"/>.
     /// </summary>
     /// <param name="transactionId">The id of the transaction to delete.</param>
-    /// <returns>TODO</returns>
+    /// <returns>Boolean value indicating whether the operation was successful.</returns>
     public async Task<bool> Delete(string transactionId)
     {
         var result = await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync();
