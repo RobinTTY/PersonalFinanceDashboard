@@ -46,10 +46,14 @@ public class TransactionRepository
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
     public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId)
     {
-        var transactions = await _dbContext.Transactions.Where(transaction => transaction.AccountId == accountId)
+        var transactionEntity = await _dbContext.Transactions
+            .Where(transaction => transaction.AccountId == accountId)
             .ToListAsync();
-        var transformed = transactions.Select(t => _transactionMapper.TransactionEntityToTransaction(t)).ToList();
-        return transformed;
+        var transactionModel = transactionEntity
+            .Select(t => _transactionMapper.TransactionEntityToTransaction(t))
+            .ToList();
+        
+        return transactionModel;
     }
 
     /// <summary>

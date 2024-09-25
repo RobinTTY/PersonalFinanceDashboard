@@ -55,7 +55,8 @@ builder.Services
 
 // HotChocolate GraphQL Setup
 builder.Services
-    .AddGraphQLServer()
+    // TODO: Configure cost analyzer at some point
+    .AddGraphQLServer(disableCostAnalyzer: true)
     // TODO: Document what the different extensions methods do
     .AddTypes()
     // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg

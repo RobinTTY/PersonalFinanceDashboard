@@ -26,8 +26,8 @@ public class BankingInstitutionQueryResolvers
     /// Look up banking institutions by their id.
     /// </summary>
     /// <param name="institutionId">The id of the banking institution to retrieve.</param>
-    public async Task<BankingInstitution?> GetBankingInstitution(string institutionId,
-        BankingInstitutionRepository repository)
+    /// <param name="repository">The repository to use for data retrieval.</param>
+    public async Task<BankingInstitution?> GetBankingInstitution(BankingInstitutionRepository repository, string institutionId)
     {
         return await repository.GetBankingInstitution(institutionId);
     }
@@ -36,6 +36,7 @@ public class BankingInstitutionQueryResolvers
     /// Look up banking institutions.
     /// </summary>
     /// <param name="countryCode">Optional filter by country the institution operates in.</param>
+    /// <param name="repository">The repository to use for data retrieval.</param>
     [UsePaging(MaxPageSize = 3000)]
     public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(BankingInstitutionRepository repository,
         string? countryCode = null)
