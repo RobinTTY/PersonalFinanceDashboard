@@ -56,12 +56,11 @@ builder.Services
 // HotChocolate GraphQL Setup
 builder.Services
     .AddGraphQLServer()
+    // TODO: Document what the different extensions methods do
     .AddTypes()
-    .AddMutationConventions()
-    .RegisterService<AccountRepository>(ServiceKind.Resolver)
-    .RegisterService<AuthenticationRequestRepository>(ServiceKind.Resolver)
-    .RegisterService<BankingInstitutionRepository>(ServiceKind.Resolver)
-    .RegisterService<TransactionRepository>(ServiceKind.Resolver);
+    // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg
+    .AddQueryConventions()
+    .AddMutationConventions();
 
 var app = builder.Build();
 
