@@ -12,10 +12,16 @@ public sealed class ApplicationDbContext : DbContext
     /// <see cref="DbSet{TEntity}"/> holding transactions of the application.
     /// </summary>
     public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
+    
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding tags of the application.
     /// </summary>
     public DbSet<TagEntity> Tags => Set<TagEntity>();
+    
+    /// <summary>
+    /// <see cref="DbSet{TEntity}"/> holding banking institutions of the application.
+    /// </summary>
+    public DbSet<BankingInstitutionEntity> BankingInstitutions => Set<BankingInstitutionEntity>();
 
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.

@@ -8,8 +8,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 /// TODO
 /// </summary>
 [Mapper]
-public partial class TransactionMapper
+public partial class BankingInstitutionMapper
 {
-    public partial Transaction EntityToModel(TransactionEntity transaction);
-    public partial TransactionEntity ModelToEntity(Transaction transaction);
+    public partial BankingInstitution EntityToModel(BankingInstitutionEntity transaction);
+    public partial BankingInstitutionEntity ModelToEntity(BankingInstitution transaction);
 }

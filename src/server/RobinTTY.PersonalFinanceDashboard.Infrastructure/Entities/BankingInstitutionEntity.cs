@@ -1,9 +1,9 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 /// <summary>
 /// TODO
 /// </summary>
-public class BankingInstitution
+public class BankingInstitutionEntity
 {
     /// <summary>
     /// The identifier of the bank.
@@ -34,7 +34,7 @@ public class BankingInstitution
     /// <param name="name">The name of the institution.</param>
     /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution</param>
     /// <param name="countries">The countries the institution operates in.</param>
-    public BankingInstitution(string id, string bic, string name, Uri logoUri, List<string> countries)
+    public BankingInstitutionEntity(string id, string bic, string name, Uri logoUri, List<string> countries)
     {
         Id = id;
         Bic = bic;

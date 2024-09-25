@@ -35,6 +35,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 
 // Mappers
 builder.Services.AddSingleton<TransactionMapper>();
+builder.Services.AddSingleton<BankingInstitutionMapper>();
 
 // TODO: automatic registration of repositories via codegen?
 // General Services
@@ -55,7 +56,7 @@ builder.Services
 
 // HotChocolate GraphQL Setup
 builder.Services
-    // TODO: Configure cost analyzer at some point
+    // TODO: Configure cost analyzer at some point (enforces maximum query costs)
     .AddGraphQLServer(disableCostAnalyzer: true)
     // TODO: Document what the different extensions methods do
     .AddTypes()

@@ -31,12 +31,14 @@ public class TransactionRepository
     public async Task<IEnumerable<Transaction>> GetTransactions(CancellationToken cancellationToken)
     {
         // TODO: How should navigation properties be included programatically?
-        var transactions = await _dbContext.Transactions
+        var transactionEntities = await _dbContext.Transactions
             .Include(t => t.Tags)
             .ToListAsync(cancellationToken);
+        var transactionModels = transactionEntities
+            .Select(t => _transactionMapper.EntityToModel(t))
+            .ToList();
         
-        var transformed = transactions.Select(t => _transactionMapper.TransactionEntityToTransaction(t)).ToList();
-        return transformed;
+        return transactionModels;
     }
 
     /// <summary>
@@ -46,14 +48,14 @@ public class TransactionRepository
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
     public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId)
     {
-        var transactionEntity = await _dbContext.Transactions
+        var transactionEntities = await _dbContext.Transactions
             .Where(transaction => transaction.AccountId == accountId)
             .ToListAsync();
-        var transactionModel = transactionEntity
-            .Select(t => _transactionMapper.TransactionEntityToTransaction(t))
+        var transactionModels = transactionEntities
+            .Select(t => _transactionMapper.EntityToModel(t))
             .ToList();
         
-        return transactionModel;
+        return transactionModels;
     }
 
     /// <summary>
@@ -64,7 +66,7 @@ public class TransactionRepository
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> AddTransaction(Transaction transaction)
     {
-        var transactionEntity = _transactionMapper.TransactionToTransactionEntity(transaction);
+        var transactionEntity = _transactionMapper.ModelToEntity(transaction);
         await _dbContext.Transactions.AddAsync(transactionEntity);
         await _dbContext.SaveChangesAsync();
 
