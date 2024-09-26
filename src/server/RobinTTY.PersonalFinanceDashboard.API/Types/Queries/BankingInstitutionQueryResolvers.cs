@@ -1,7 +1,6 @@
 ﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 
@@ -11,17 +10,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 [QueryType]
 public class BankingInstitutionQueryResolvers
 {
-    private readonly GoCardlessDataProvider _dataProvider;
-
-    /// <summary>
-    /// TODO: Create repository
-    /// </summary>
-    /// <param name="dataProvider"></param>
-    public BankingInstitutionQueryResolvers(GoCardlessDataProvider dataProvider)
-    {
-        _dataProvider = dataProvider;
-    }
-
     /// <summary>
     /// Look up banking institutions by their id.
     /// </summary>
