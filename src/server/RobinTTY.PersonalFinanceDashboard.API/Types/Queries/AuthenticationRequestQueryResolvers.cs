@@ -13,9 +13,10 @@ public class AuthenticationRequestQueryResolvers
     /// <summary>
     /// Look up authentication requests by their id.
     /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="authenticationId">The id of the authentication request to retrieve.</param>
-    /// <param name="repository">The repository to use for data retrieval.</param>
-    public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId, AuthenticationRequestRepository repository)
+    public async Task<AuthenticationRequest?> GetAuthenticationRequest(AuthenticationRequestRepository repository,
+        string authenticationId)
     {
         return await repository.GetAuthenticationRequest(authenticationId);
     }
@@ -23,8 +24,9 @@ public class AuthenticationRequestQueryResolvers
     /// <summary>
     /// Look up authentication requests.
     /// </summary>
-    /// <param name="repository">The repository to use for data retrieval.</param>
-    public async Task<IEnumerable<AuthenticationRequest>> GetAuthenticationRequests(AuthenticationRequestRepository repository)
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    public async Task<IEnumerable<AuthenticationRequest>> GetAuthenticationRequests(
+        AuthenticationRequestRepository repository)
     {
         return await repository.GetAuthenticationRequests();
     }

@@ -14,9 +14,9 @@ public sealed class AccountQueryResolvers
     /// <summary>
     /// Look up an account by its id.
     /// </summary>
-    /// <param name="accountId">The id of the account to lookup.</param>
     /// <param name="repository">The repository to use for data retrieval.</param>
-    public async Task<BankAccount?> GetAccount(string accountId, AccountRepository repository)
+    /// <param name="accountId">The id of the account to lookup.</param>
+    public async Task<BankAccount?> GetAccount(AccountRepository repository, string accountId)
     {
         return await repository.GetAccount(accountId);
     }
@@ -24,10 +24,11 @@ public sealed class AccountQueryResolvers
     /// <summary>
     /// Look up accounts by a list of ids.
     /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="accountIds">The ids of the accounts to retrieve.</param>
-    /// <param name="repository">The repository to use for data retrieval.</param>
     [UsePaging]
-    public async Task<IEnumerable<BankAccount>> GetAccounts(IEnumerable<string> accountIds, AccountRepository repository)
+    public async Task<IEnumerable<BankAccount>> GetAccounts(AccountRepository repository,
+        IEnumerable<string> accountIds)
     {
         return await repository.GetAccounts(accountIds);
     }

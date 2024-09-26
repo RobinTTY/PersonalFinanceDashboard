@@ -13,7 +13,7 @@ public class TransactionQueryResolvers
     /// <summary>
     /// Look up transactions.
     /// </summary>
-    /// <param name="repository">The repository to use for data retrieval.</param>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
     public async Task<IEnumerable<Transaction>> GetTransactions(TransactionRepository repository,
         CancellationToken cancellationToken)
@@ -24,11 +24,12 @@ public class TransactionQueryResolvers
     /// <summary>
     /// Look up transactions of an account.
     /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="accountId">The id of the account to retrieve.</param>
-    /// <param name="repository">The repository to use for data retrieval.</param>
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
     [UsePaging]
-    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId, TransactionRepository repository, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(TransactionRepository repository,
+        string accountId, CancellationToken cancellationToken)
     {
         return await repository.GetTransactionsByAccountId(accountId);
     }
