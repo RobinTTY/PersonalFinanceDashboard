@@ -15,6 +15,7 @@ using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var appConfig = AppConfigurationManager.AppConfiguration;
@@ -38,12 +39,20 @@ builder.Services.AddSingleton<TransactionMapper>();
 builder.Services.AddSingleton<BankingInstitutionMapper>();
 
 // TODO: automatic registration of repositories via codegen?
-// General Services
+// Repositories
 builder.Services
     .AddScoped<AccountRepository>()
     .AddScoped<AuthenticationRequestRepository>()
     .AddScoped<BankingInstitutionRepository>()
     .AddScoped<TransactionRepository>()
+    .AddScoped<ThirdPartyDataRetrievalMetadataRepository>();
+    
+// Services
+builder.Services
+    .AddScoped<ThirdPartyDataRetrievalService>();
+
+// Others
+builder.Services
     .AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId, appConfig.NordigenApi.SecretKey))
     .AddSingleton<GoCardlessDataProvider>();
 

@@ -82,9 +82,9 @@ public class TransactionRepository
     /// TODO: return Transaction not TransactionEntity
     public async Task<TransactionEntity> UpdateTransaction(TransactionEntity transactionDto)
     {
-        _dbContext.Transactions.Update(transactionDto);
+        var updateEntry = _dbContext.Transactions.Update(transactionDto);
         await _dbContext.SaveChangesAsync();
-        return transactionDto;
+        return updateEntry.Entity;
     }
 
     /// <summary>

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -51,7 +53,7 @@ public class BankingInstitutionRepository
     /// <returns>A list of all <see cref="BankingInstitution"/>s.</returns>
     public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
     {
-        var dataRetrievalMetadata = new List<ThirdPartyDataRetrievalMetadata>
+        var dataRetrievalMetadata = new List<ThirdPartyDataRetrievalMetadataEntity>
         {
             new()
             {
@@ -61,36 +63,6 @@ public class BankingInstitutionRepository
                 RetrievalInterval = TimeSpan.FromSeconds(30) // TODO: should be something like 1 day or more
             }
         };
-
-        var institutionRetrievalMetadata =
-            dataRetrievalMetadata.Single(metadata => metadata.DataType == ThirdPartyDataType.BankingInstitutions);
-
-        var nextRetrievalTime = institutionRetrievalMetadata.LastRetrievalTime +
-                                institutionRetrievalMetadata.RetrievalInterval;
-
-
-        if (nextRetrievalTime < DateTime.Now)
-        {
-            var response = await _dataProvider.GetBankingInstitutions();
-            if (response.IsSuccessful)
-            {
-                // Delete existing rows in table
-                var affectedRows = await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
-
-                // Add the institutions returned in the API response
-                var institutionEntities =
-                    response.Result.Select(institution => _bankingInstitutionMapper.ModelToEntity(institution));
-                await _dbContext.BankingInstitutions.AddRangeAsync(institutionEntities);
-
-                // TODO: update LastRetrievalTime
-                
-                await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                // TODO: What to do in case of failure should depend on if we already have data
-            }
-        }
 
         var bankingInstitutionEntities = countryCode == null
             ? await _dbContext.BankingInstitutions
@@ -105,36 +77,22 @@ public class BankingInstitutionRepository
 
         return bankingInstitutionModels;
     }
-}
 
-public enum ThirdPartyDataSource
-{
-    Undefined,
-    GoCardless
-}
+    public async Task AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
+    {
+        var institutionEntities =
+            bankingInstitutions.Select(institution => _bankingInstitutionMapper.ModelToEntity(institution));
+        
+        await _dbContext.BankingInstitutions.AddRangeAsync(institutionEntities);
+        await _dbContext.SaveChangesAsync();
+    }
 
-public enum ThirdPartyDataType
-{
-    Undefined,
-    BankingInstitutions
-}
-
-public class ThirdPartyDataRetrievalMetadata
-{
     /// <summary>
-    /// The type of data being retrieved. 
+    /// TODO
     /// </summary>
-    public ThirdPartyDataType DataType { get; set; }
-    /// <summary>
-    /// The source of the data.
-    /// </summary>
-    public ThirdPartyDataSource DataSource { get; set; }
-    /// <summary>
-    /// The <see cref="DateTime"/> at which the data was retrieved last.
-    /// </summary>
-    public DateTime LastRetrievalTime { get; set; }
-    /// <summary>
-    /// The interval at which the data should be retrieved again from the data source.
-    /// </summary>
-    public TimeSpan RetrievalInterval { get; set; }
+    /// <returns></returns>
+    public async Task<int> DeleteBankingInstitutions()
+    {
+        return await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
+    }
 }
