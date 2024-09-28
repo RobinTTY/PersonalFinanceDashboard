@@ -20,7 +20,13 @@ using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 var appConfig = AppConfigurationManager.AppConfiguration;
 
-// HTTP Setup
+// Configure logging
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
+
+// HTTP setup
 builder.Services
     .AddHttpClient()
     .AddCors(options =>
@@ -29,7 +35,7 @@ builder.Services
         options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
     });
 
-// DB Setup
+// DB setup
 // TODO: The filepath shouldn't be hardcoded
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=../RobinTTY.PersonalFinanceDashboard.Infrastructure/application.db"));
@@ -63,7 +69,7 @@ builder.Services
 //      - Since the authentication/retrieval logic will differ from provider to provider, it will be difficult
 //        to abstract this logic away into one unified interface, so maybe I will need to refine/scrap this idea later...
 
-// HotChocolate GraphQL Setup
+// HotChocolate GraphQL setup
 builder.Services
     // TODO: Configure cost analyzer at some point (enforces maximum query costs)
     .AddGraphQLServer(disableCostAnalyzer: true)
@@ -82,6 +88,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+app.UseSerilogRequestLogging();
 app.UseCors();
 app.MapGraphQL();
 app.Run();
