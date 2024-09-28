@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
@@ -12,6 +13,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 /// </summary>
 public class BankingInstitutionRepository
 {
+    private readonly ILogger _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProvider _dataProvider;
     private readonly BankingInstitutionMapper _bankingInstitutionMapper;
@@ -20,14 +22,19 @@ public class BankingInstitutionRepository
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitutionRepository"/>.
     /// </summary>
+    /// <param name="logger">Logger used for monitoring purposes.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProvider">The data provider to use for data retrieval.</param>
     /// <param name="bankingInstitutionMapper">The mapper used to map ef entities to the domain model.</param>
     /// <param name="dataRetrievalMetadataService">TODO</param>
-    public BankingInstitutionRepository(ApplicationDbContext dbContext, GoCardlessDataProvider dataProvider,
+    public BankingInstitutionRepository(
+        ILogger<BankingInstitutionRepository> logger,
+        ApplicationDbContext dbContext,
+        GoCardlessDataProvider dataProvider,
         BankingInstitutionMapper bankingInstitutionMapper,
         ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
     {
+        _logger = logger;
         _dbContext = dbContext;
         _dataProvider = dataProvider;
         _bankingInstitutionMapper = bankingInstitutionMapper;
@@ -72,7 +79,7 @@ public class BankingInstitutionRepository
 
         return bankingInstitutionModels;
     }
-    
+
     /// <summary>
     /// TODO
     /// </summary>
@@ -110,9 +117,10 @@ public class BankingInstitutionRepository
                 await DeleteBankingInstitutions();
                 await AddBankingInstitutions(response.Result);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
-                
-                // TODO: Replace with logger
-                Console.WriteLine("Banking institutions have been refreshed.");
+
+                _logger.LogInformation(
+                    "Refreshed stale banking institution data. {updateRecords} records were updated.",
+                    response.Result.Count());
             }
             else
             {
