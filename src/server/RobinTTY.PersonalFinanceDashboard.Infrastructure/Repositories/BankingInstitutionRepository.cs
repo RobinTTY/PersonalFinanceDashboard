@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
@@ -15,6 +15,7 @@ public class BankingInstitutionRepository
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProvider _dataProvider;
     private readonly BankingInstitutionMapper _bankingInstitutionMapper;
+    private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitutionRepository"/>.
@@ -22,12 +23,15 @@ public class BankingInstitutionRepository
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProvider">The data provider to use for data retrieval.</param>
     /// <param name="bankingInstitutionMapper">The mapper used to map ef entities to the domain model.</param>
+    /// <param name="dataRetrievalMetadataService">TODO</param>
     public BankingInstitutionRepository(ApplicationDbContext dbContext, GoCardlessDataProvider dataProvider,
-        BankingInstitutionMapper bankingInstitutionMapper)
+        BankingInstitutionMapper bankingInstitutionMapper,
+        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
     {
         _dbContext = dbContext;
         _dataProvider = dataProvider;
         _bankingInstitutionMapper = bankingInstitutionMapper;
+        _dataRetrievalMetadataService = dataRetrievalMetadataService;
     }
 
     /// <summary>
@@ -53,16 +57,7 @@ public class BankingInstitutionRepository
     /// <returns>A list of all <see cref="BankingInstitution"/>s.</returns>
     public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
     {
-        var dataRetrievalMetadata = new List<ThirdPartyDataRetrievalMetadataEntity>
-        {
-            new()
-            {
-                DataType = ThirdPartyDataType.BankingInstitutions,
-                DataSource = ThirdPartyDataSource.GoCardless,
-                LastRetrievalTime = DateTime.MinValue,
-                RetrievalInterval = TimeSpan.FromSeconds(30) // TODO: should be something like 1 day or more
-            }
-        };
+        await RefreshBankingInstitutionsIfStale();
 
         var bankingInstitutionEntities = countryCode == null
             ? await _dbContext.BankingInstitutions
@@ -77,12 +72,16 @@ public class BankingInstitutionRepository
 
         return bankingInstitutionModels;
     }
-
+    
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="bankingInstitutions"></param>
     public async Task AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
     {
         var institutionEntities =
             bankingInstitutions.Select(institution => _bankingInstitutionMapper.ModelToEntity(institution));
-        
+
         await _dbContext.BankingInstitutions.AddRangeAsync(institutionEntities);
         await _dbContext.SaveChangesAsync();
     }
@@ -94,5 +93,32 @@ public class BankingInstitutionRepository
     public async Task<int> DeleteBankingInstitutions()
     {
         return await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
+    }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    private async Task RefreshBankingInstitutionsIfStale()
+    {
+        var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
+        if (dataIsStale)
+        {
+            var response = await _dataProvider.GetBankingInstitutions();
+            if (response.IsSuccessful)
+            {
+                await DeleteBankingInstitutions();
+                await AddBankingInstitutions(response.Result);
+                await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
+                
+                // TODO: Replace with logger
+                Console.WriteLine("Banking institutions have been refreshed.");
+            }
+            else
+            {
+                // TODO: What to do in case of failure should depend on if we already have data
+                throw new NotImplementedException();
+            }
+        }
     }
 }

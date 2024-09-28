@@ -5,7 +5,7 @@
 /// <summary>
 /// TODO
 /// </summary>
-public class BaseEntity
+public class BaseEntity(Guid id)
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = id;
 }

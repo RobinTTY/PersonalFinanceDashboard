@@ -25,14 +25,12 @@ public class BankingInstitutionQueryResolvers
     /// <summary>
     /// Look up banking institutions.
     /// </summary>
-    /// <param name="retrievalService">The injected repository to use for data retrieval.</param>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="countryCode">Optional filter by country the institution operates in.</param>
     [UsePaging(MaxPageSize = 3000)]
-    public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(ThirdPartyDataRetrievalService retrievalService,
+    public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(BankingInstitutionRepository repository,
         string? countryCode = null)
     {
-        // TODO: It isn't great that we need to inject different services here.
-        // The wrong service could be injected. Maybe there is a better solution.
-        return await retrievalService.GetBankingInstitutions(countryCode);
+        return await repository.GetBankingInstitutions(countryCode);
     }
 }

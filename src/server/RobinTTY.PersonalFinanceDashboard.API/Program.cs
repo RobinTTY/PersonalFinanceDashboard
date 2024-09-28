@@ -49,7 +49,7 @@ builder.Services
     
 // Services
 builder.Services
-    .AddScoped<ThirdPartyDataRetrievalService>();
+    .AddScoped<ThirdPartyDataRetrievalMetadataService>();
 
 // Others
 builder.Services
