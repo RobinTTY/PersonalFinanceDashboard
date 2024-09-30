@@ -5,7 +5,6 @@ global using System.Collections.Generic;
 global using System.Threading.Tasks;
 global using Serilog;
 global using HotChocolate;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +25,9 @@ builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration);
 });
 
+// Forward issues with Serilog itself to console
+Serilog.Debugging.SelfLog.Enable(Console.Error);
+
 // HTTP setup
 builder.Services
     .AddHttpClient()
@@ -43,11 +45,12 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 // Mappers
 builder.Services.AddSingleton<TransactionMapper>();
 builder.Services.AddSingleton<BankingInstitutionMapper>();
+builder.Services.AddSingleton<BankAccountMapper>();
 
 // TODO: automatic registration of repositories via codegen?
 // Repositories
 builder.Services
-    .AddScoped<AccountRepository>()
+    .AddScoped<BankAccountRepository>()
     .AddScoped<AuthenticationRequestRepository>()
     .AddScoped<BankingInstitutionRepository>()
     .AddScoped<TransactionRepository>()

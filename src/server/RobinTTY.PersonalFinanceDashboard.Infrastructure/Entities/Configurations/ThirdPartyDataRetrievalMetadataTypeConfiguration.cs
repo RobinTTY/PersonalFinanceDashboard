@@ -9,7 +9,7 @@ public class
 {
     public void Configure(EntityTypeBuilder<ThirdPartyDataRetrievalMetadataEntity> builder)
     {
-        builder.HasData(new ThirdPartyDataRetrievalMetadataEntity(Guid.NewGuid(),
+        builder.HasData(new ThirdPartyDataRetrievalMetadataEntity(new Guid("f948e52f-ad17-44b8-9cdf-e0b952f139b3"),
             ThirdPartyDataType.BankingInstitutions, ThirdPartyDataSource.GoCardless, DateTime.MinValue,
             TimeSpan.FromDays(7)));
     }

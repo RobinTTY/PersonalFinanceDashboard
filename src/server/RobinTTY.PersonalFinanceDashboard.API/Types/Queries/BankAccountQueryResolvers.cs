@@ -8,28 +8,25 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
 /// <see cref="BankAccount"/> related query resolvers.
 /// </summary>
 [QueryType]
-public sealed class AccountQueryResolvers
+public sealed class BankAccountQueryResolvers
 {
-    // TODO: probably should be GetBankAccount and then separate route for investment accounts
     /// <summary>
     /// Look up an account by its id.
     /// </summary>
     /// <param name="repository">The repository to use for data retrieval.</param>
     /// <param name="accountId">The id of the account to lookup.</param>
-    public async Task<BankAccount?> GetAccount(AccountRepository repository, string accountId)
+    public async Task<BankAccount?> GetAccount(BankAccountRepository repository, Guid accountId)
     {
-        return await repository.GetAccount(accountId);
+        return await repository.GetBankAccount(accountId);
     }
 
     /// <summary>
     /// Look up accounts by a list of ids.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="accountIds">The ids of the accounts to retrieve.</param>
     [UsePaging]
-    public async Task<IEnumerable<BankAccount>> GetAccounts(AccountRepository repository,
-        IEnumerable<string> accountIds)
+    public async Task<IEnumerable<BankAccount>> GetAccounts(BankAccountRepository repository)
     {
-        return await repository.GetAccounts(accountIds);
+        return await repository.GetBankAccounts();
     }
 }

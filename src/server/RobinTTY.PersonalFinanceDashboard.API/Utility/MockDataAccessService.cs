@@ -43,7 +43,7 @@ public class MockDataAccessService
     {
         return new Faker<Account>()
             .CustomInstantiator(f => new Account(
-                id: Guid.NewGuid().ToString(),
+                id: Guid.NewGuid(),
                 name: f.Person.FullName,
                 description: f.Finance.AccountName(),
                 balance: f.Finance.Amount(0, 5_000),
