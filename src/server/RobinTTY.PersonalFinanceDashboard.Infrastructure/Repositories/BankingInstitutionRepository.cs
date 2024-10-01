@@ -26,7 +26,7 @@ public class BankingInstitutionRepository
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProvider">The data provider to use for data retrieval.</param>
     /// <param name="bankingInstitutionMapper">The mapper used to map ef entities to the domain model.</param>
-    /// <param name="dataRetrievalMetadataService">TODO</param>
+    /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
     public BankingInstitutionRepository(
         ILogger<BankingInstitutionRepository> logger,
         ApplicationDbContext dbContext,
@@ -57,11 +57,10 @@ public class BankingInstitutionRepository
             : _bankingInstitutionMapper.EntityToModel(bankingInstitutionEntity);
     }
 
-    // TODO: Refactor this into appropriate classes
     /// <summary>
     /// Gets all <see cref="BankingInstitution"/>s.
     /// </summary>
-    /// <returns>A list of all <see cref="BankingInstitution"/>s.</returns>
+    /// <returns>A list of <see cref="BankingInstitution"/>s.</returns>
     public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
     {
         await RefreshBankingInstitutionsIfStale();
@@ -81,9 +80,9 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
-    /// TODO
+    /// Adds a list of new <see cref="BankingInstitution"/>s.
     /// </summary>
-    /// <param name="bankingInstitutions"></param>
+    /// <param name="bankingInstitutions">The list of <see cref="BankingInstitution"/>s to add.</param>
     public async Task AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
     {
         var institutionEntities =
@@ -92,20 +91,44 @@ public class BankingInstitutionRepository
         await _dbContext.BankingInstitutions.AddRangeAsync(institutionEntities);
         await _dbContext.SaveChangesAsync();
     }
+    
+    /// <summary>
+    /// Adds a new <see cref="BankingInstitution"/>.
+    /// </summary>
+    /// <param name="bankingInstitution">The <see cref="BankingInstitution"/> to add.</param>
+    public async Task<BankingInstitution> AddBankingInstitution(BankingInstitution bankingInstitution)
+    {
+        var institutionEntities =_bankingInstitutionMapper.ModelToEntity(bankingInstitution);
+        var result = await _dbContext.BankingInstitutions.AddAsync(institutionEntities);
+        await _dbContext.SaveChangesAsync();
+
+        return _bankingInstitutionMapper.EntityToModel(result.Entity);
+    }
 
     /// <summary>
-    /// TODO
+    /// Deletes all existing <see cref="BankingInstitution"/>s.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The number of deleted records.</returns>
     public async Task<int> DeleteBankingInstitutions()
     {
         return await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
     }
+    
+    /// <summary>
+    /// Deletes an existing <see cref="BankingInstitution"/>.
+    /// </summary>
+    /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to delete.</param>
+    /// <returns>Boolean value indicating whether the operation was successful.</returns>
+    public async Task<bool> DeleteBankingInstitution(string institutionId)
+    {
+        var result = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId).ExecuteDeleteAsync();
+        return Convert.ToBoolean(result);
+    }
 
     /// <summary>
-    /// TODO
+    /// Refreshes the list of banking institutions if the data has gone stale.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="NotImplementedException">TODO</exception>
     private async Task RefreshBankingInstitutionsIfStale()
     {
         var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);

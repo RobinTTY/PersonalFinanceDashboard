@@ -35,9 +35,9 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
-    /// Gets all <see cref="AuthenticationRequest"/>s.
+    /// Gets a list of <see cref="AuthenticationRequest"/>s.
     /// </summary>
-    /// <returns>A list of all <see cref="AuthenticationRequest"/>s.</returns>
+    /// <returns>A list of <see cref="AuthenticationRequest"/>s.</returns>
     public async Task<IEnumerable<AuthenticationRequest>> GetAuthenticationRequests()
     {
         // TODO: limit

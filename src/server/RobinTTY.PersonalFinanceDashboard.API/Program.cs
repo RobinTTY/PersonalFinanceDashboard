@@ -25,6 +25,7 @@ builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration);
 });
 
+// TODO: Only do in development
 // Forward issues with Serilog itself to console
 Serilog.Debugging.SelfLog.Enable(Console.Error);
 
