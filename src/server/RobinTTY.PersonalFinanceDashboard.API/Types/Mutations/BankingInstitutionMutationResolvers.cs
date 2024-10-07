@@ -10,17 +10,23 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
 [MutationType]
 public class BankingInstitutionMutationResolvers
 {
+    /// <summary>
+    /// Create a new banking institution.
+    /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="bankingInstitution">The banking institution to create.</param>
     public async Task<BankingInstitution> CreateBankingInstitution(BankingInstitutionRepository repository,
         BankingInstitution bankingInstitution)
     {
         return await repository.AddBankingInstitution(bankingInstitution);
     }
 
+    // TODO: Return something more than bool? Generalized response across all resolvers?
     /// <summary>
-    /// TODO: Return something more than bool? Generalized response across all resolvers?
+    /// Delete an existing banking institution.
     /// </summary>
-    /// <param name="repository"></param>
-    /// <param name="bankingInstitutionId"></param>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
     /// <returns></returns>
     public async Task<bool> DeleteBankingInstitution(BankingInstitutionRepository repository,
         string bankingInstitutionId)

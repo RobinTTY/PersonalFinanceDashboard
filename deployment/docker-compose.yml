@@ -2,7 +2,7 @@ name: PersonalFinanceDashboard
 
 services:
   seq:
-    image: datalust/seq
+    image: datalust/seq:latest
     container_name: seq
     environment:
       - ACCEPT_EULA=Y
