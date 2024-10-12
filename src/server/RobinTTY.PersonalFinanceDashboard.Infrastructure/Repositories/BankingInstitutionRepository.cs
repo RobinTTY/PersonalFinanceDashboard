@@ -48,6 +48,8 @@ public class BankingInstitutionRepository
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<BankingInstitution?> GetBankingInstitution(string institutionId)
     {
+        await RefreshBankingInstitutionsIfStale();
+        
         // var request = await _dataProvider.GetBankingInstitution(institutionId);
         var bankingInstitutionEntity = await _dbContext.BankingInstitutions
             .SingleOrDefaultAsync(institution => institution.Id == institutionId);
@@ -106,6 +108,20 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
+    /// Updates an existing <see cref="BankingInstitution"/>.
+    /// </summary>
+    /// <param name="bankingInstitution">The banking institution to update.</param>
+    /// <returns>The updated <see cref="BankingInstitution"/>.</returns>
+    public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitution bankingInstitution)
+    {
+        var institutionEntity = _bankingInstitutionMapper.ModelToEntity(bankingInstitution);
+        var updatedEntity = _dbContext.BankingInstitutions.Update(institutionEntity);
+        await _dbContext.SaveChangesAsync();
+
+        return _bankingInstitutionMapper.EntityToModel(updatedEntity.Entity);
+    }
+
+    /// <summary>
     /// Deletes all existing <see cref="BankingInstitution"/>s.
     /// </summary>
     /// <returns>The number of deleted records.</returns>
@@ -148,6 +164,7 @@ public class BankingInstitutionRepository
             else
             {
                 // TODO: What to do in case of failure should depend on if we already have data
+                // Log failure and continue, maybe also send a notification to frontend
                 throw new NotImplementedException();
             }
         }

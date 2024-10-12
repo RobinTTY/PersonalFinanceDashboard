@@ -21,13 +21,23 @@ public class BankingInstitutionMutationResolvers
         return await repository.AddBankingInstitution(bankingInstitution);
     }
 
+    /// <summary>
+    /// Update an existing banking institution.
+    /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="bankingInstitution">The banking institution to update.</param>
+    public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitutionRepository repository,
+        BankingInstitution bankingInstitution)
+    {
+        return await repository.UpdateBankingInstitution(bankingInstitution);
+    }
+
     // TODO: Return something more than bool? Generalized response across all resolvers?
     /// <summary>
     /// Delete an existing banking institution.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
-    /// <returns></returns>
     public async Task<bool> DeleteBankingInstitution(BankingInstitutionRepository repository,
         string bankingInstitutionId)
     {
