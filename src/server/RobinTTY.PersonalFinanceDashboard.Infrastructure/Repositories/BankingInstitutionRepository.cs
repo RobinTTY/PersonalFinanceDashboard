@@ -15,7 +15,7 @@ public class BankingInstitutionRepository
 {
     private readonly ILogger _logger;
     private readonly ApplicationDbContext _dbContext;
-    private readonly GoCardlessDataProvider _dataProvider;
+    private readonly GoCardlessDataProviderService _dataProviderService;
     private readonly BankingInstitutionMapper _bankingInstitutionMapper;
     private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
 
@@ -24,19 +24,19 @@ public class BankingInstitutionRepository
     /// </summary>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="dataProvider">The data provider to use for data retrieval.</param>
+    /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
     /// <param name="bankingInstitutionMapper">The mapper used to map ef entities to the domain model.</param>
     /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
     public BankingInstitutionRepository(
         ILogger<BankingInstitutionRepository> logger,
         ApplicationDbContext dbContext,
-        GoCardlessDataProvider dataProvider,
+        GoCardlessDataProviderService dataProviderService,
         BankingInstitutionMapper bankingInstitutionMapper,
         ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
     {
         _logger = logger;
         _dbContext = dbContext;
-        _dataProvider = dataProvider;
+        _dataProviderService = dataProviderService;
         _bankingInstitutionMapper = bankingInstitutionMapper;
         _dataRetrievalMetadataService = dataRetrievalMetadataService;
     }
@@ -150,7 +150,7 @@ public class BankingInstitutionRepository
         var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
         if (dataIsStale)
         {
-            var response = await _dataProvider.GetBankingInstitutions();
+            var response = await _dataProviderService.GetBankingInstitutions();
             if (response.IsSuccessful)
             {
                 await DeleteBankingInstitutions();

@@ -14,11 +14,11 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
 // TODO: Cancellation token support
-public class GoCardlessDataProvider
+public class GoCardlessDataProviderService
 {
     private readonly NordigenClient _client;
 
-    public GoCardlessDataProvider(HttpClient httpClient, NordigenClientCredentials credentials)
+    public GoCardlessDataProviderService(HttpClient httpClient, NordigenClientCredentials credentials)
     {
         // TODO: injection
         _client = new NordigenClient(httpClient, credentials);
