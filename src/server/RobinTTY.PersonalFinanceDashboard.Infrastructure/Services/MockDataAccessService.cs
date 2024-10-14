@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
+namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
 /// <summary>
 /// Provides mocked data for testing/demo purposes.
