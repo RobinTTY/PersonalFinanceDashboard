@@ -1,9 +1,8 @@
 ﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Queries;
 
 /// <summary>
 /// <see cref="BankingInstitution"/> related query resolvers.

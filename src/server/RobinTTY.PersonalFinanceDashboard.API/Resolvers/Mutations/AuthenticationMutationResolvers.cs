@@ -3,7 +3,7 @@ using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
 /// <summary>
 /// <see cref="AuthenticationRequest"/> related mutation resolvers.

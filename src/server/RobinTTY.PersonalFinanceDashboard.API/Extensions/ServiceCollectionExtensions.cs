@@ -56,7 +56,7 @@ public static class ServiceCollectionExtensions
             // TODO: Configure cost analyzer at some point (enforces maximum query costs)
             .AddGraphQLServer(disableCostAnalyzer: true)
             // Adds all GraphQL query and mutation types using the code generator (looks for attributes)
-            .AddTypes()
+            .AddResolvers()
             // TODO: Document what the different extensions methods do
             // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg
             .AddQueryConventions()

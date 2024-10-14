@@ -2,7 +2,7 @@
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Queries;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Queries;
 
 /// <summary>
 /// <see cref="AuthenticationRequest"/> related query resolvers.
