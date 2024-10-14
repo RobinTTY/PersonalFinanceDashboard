@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using RobinTTY.PersonalFinanceDashboard.Api.Types;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
