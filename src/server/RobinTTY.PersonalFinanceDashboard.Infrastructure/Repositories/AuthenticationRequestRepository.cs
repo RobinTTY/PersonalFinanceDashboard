@@ -10,17 +10,17 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class AuthenticationRequestRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly GoCardlessDataProvider _dataProvider;
+    private readonly GoCardlessDataProviderService _dataProviderService;
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequestRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="dataProvider">The data provider to use for data retrieval.</param>
-    public AuthenticationRequestRepository(ApplicationDbContext dbContext, GoCardlessDataProvider dataProvider)
+    /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
+    public AuthenticationRequestRepository(ApplicationDbContext dbContext, GoCardlessDataProviderService dataProviderService)
     {
         _dbContext = dbContext;
-        _dataProvider = dataProvider;
+        _dataProviderService = dataProviderService;
     }
     
     /// <summary>
@@ -30,18 +30,18 @@ public class AuthenticationRequestRepository
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId)
     {
-        var requests = await _dataProvider.GetAuthenticationRequest(authenticationId);
+        var requests = await _dataProviderService.GetAuthenticationRequest(authenticationId);
         return requests.Result!;
     }
 
     /// <summary>
-    /// Gets all <see cref="AuthenticationRequest"/>s.
+    /// Gets a list of <see cref="AuthenticationRequest"/>s.
     /// </summary>
-    /// <returns>A list of all <see cref="AuthenticationRequest"/>s.</returns>
+    /// <returns>A list of <see cref="AuthenticationRequest"/>s.</returns>
     public async Task<IEnumerable<AuthenticationRequest>> GetAuthenticationRequests()
     {
         // TODO: limit
-        var requests = await _dataProvider.GetAuthenticationRequests(100);
+        var requests = await _dataProviderService.GetAuthenticationRequests(100);
         return requests.Result!;
     }
     
@@ -54,7 +54,7 @@ public class AuthenticationRequestRepository
     public async Task<AuthenticationRequest> AddAuthenticationRequest(string institutionId, string redirectUri)
     {
         // TODO: URI validation (here or in resolver?)
-        var request = await _dataProvider.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
+        var request = await _dataProviderService.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
         return request.Result!;
     }
 
@@ -65,7 +65,7 @@ public class AuthenticationRequestRepository
     /// <returns>TODO</returns>
     public async Task<BasicResponse> DeleteAuthenticationRequest(string authenticationId)
     {
-        var request = await _dataProvider.DeleteAuthenticationRequest(authenticationId);
+        var request = await _dataProviderService.DeleteAuthenticationRequest(authenticationId);
         return request.Result!;
     }
 }

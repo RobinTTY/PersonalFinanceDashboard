@@ -10,7 +10,7 @@ public class Account
     /// <summary>
     /// The id of the account.
     /// </summary>
-    public string Id { get; set; }
+    public Guid Id { get; set; }
     /// <summary>
     /// The name of the account.
     /// </summary>
@@ -41,7 +41,7 @@ public class Account
     /// <param name="balance">The current balance of the account.</param>
     /// <param name="currency">The currency this account is denominated in.</param>
     /// <param name="transactions">Transactions that are associated with this account.</param>
-    public Account(string id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
+    public Account(Guid id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
     {
         Id = id;
         Name = name;
@@ -53,7 +53,7 @@ public class Account
 }
 
 /// <summary>
-/// Identifies the type of an account.
+/// Identifies the type of account.
 /// </summary>
 public enum AccountType
 {

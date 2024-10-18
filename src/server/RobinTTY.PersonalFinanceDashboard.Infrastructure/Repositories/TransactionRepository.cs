@@ -37,7 +37,7 @@ public class TransactionRepository
         var transactionModels = transactionEntities
             .Select(t => _transactionMapper.EntityToModel(t))
             .ToList();
-        
+
         return transactionModels;
     }
 
@@ -54,7 +54,7 @@ public class TransactionRepository
         var transactionModels = transactionEntities
             .Select(t => _transactionMapper.EntityToModel(t))
             .ToList();
-        
+
         return transactionModels;
     }
 
@@ -62,7 +62,7 @@ public class TransactionRepository
     /// Adds a new <see cref="Transaction"/>.
     /// </summary>
     /// <param name="transaction">The <see cref="Transaction"/> to add.</param>
-    /// <returns>The added <see cref="Transaction"/>.</returns>
+    /// <returns>The <see cref="Transaction"/> to add.</returns>
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> AddTransaction(Transaction transaction)
     {
@@ -77,20 +77,21 @@ public class TransactionRepository
     /// <summary>
     /// Updates an existing <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="transactionDto">The <see cref="Transaction"/> to update.</param>
+    /// <param name="transaction">The <see cref="Transaction"/> to update.</param>
     /// <returns>The updated <see cref="Transaction"/>.</returns>
-    /// TODO: return Transaction not TransactionEntity
-    public async Task<TransactionEntity> UpdateTransaction(TransactionEntity transactionDto)
+    public async Task<Transaction> UpdateTransaction(Transaction transaction)
     {
-        var updateEntry = _dbContext.Transactions.Update(transactionDto);
+        var transactionEntity = _transactionMapper.ModelToEntity(transaction);
+        var updateEntry = _dbContext.Transactions.Update(transactionEntity);
         await _dbContext.SaveChangesAsync();
-        return updateEntry.Entity;
+        
+        return _transactionMapper.EntityToModel(updateEntry.Entity);
     }
 
     /// <summary>
     /// Deletes an existing <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="transactionId">The id of the transaction to delete.</param>
+    /// <param name="transactionId">The id of the <see cref="Transaction"/> to delete.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
     public async Task<bool> DeleteTransaction(string transactionId)
     {

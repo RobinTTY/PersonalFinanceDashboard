@@ -7,11 +7,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>RobinTTY.PersonalFinanceDashboard.Api</AssemblyName>
     <RootNamespace>RobinTTY.PersonalFinanceDashboard.Api</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.1" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="14.0.0-rc.2" />
+    <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="14.0.0-rc.2" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="14.0.0-rc.2" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="14.0.0-rc.2">
         <PrivateAssets>all</PrivateAssets>

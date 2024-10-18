@@ -2,7 +2,7 @@
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-namespace RobinTTY.PersonalFinanceDashboard.Api.Types.Mutations;
+namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
 /// <summary>
 /// <see cref="Transaction"/> related mutation resolvers.
@@ -20,6 +20,17 @@ public class TransactionMutationResolvers
     {
         await repository.AddTransaction(transaction);
         return transaction;
+    }
+
+    /// <summary>
+    /// Update an existing transaction.
+    /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="transaction">The transaction to update.</param>
+    public async Task<Transaction> UpdateTransaction(TransactionRepository repository,
+        Transaction transaction)
+    {
+        return await repository.UpdateTransaction(transaction);
     }
 
     /// <summary>

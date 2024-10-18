@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using RobinTTY.PersonalFinanceDashboard.Api.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Utility;
 
@@ -28,6 +28,7 @@ public static class AppConfigurationManager
     /// <returns>The created <see cref="IServiceProvider"/>.</returns>
     private static IServiceProvider GetServiceProvider()
     {
+        // TODO: Add environment variables for configuration through Docker?
         var configuration =  new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile("appsettings.json", false, true)

@@ -26,6 +26,8 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<ThirdPartyDataRetrievalMetadataEntity> ThirdPartyDataRetrievalMetadata =>
         Set<ThirdPartyDataRetrievalMetadataEntity>();
 
+    public DbSet<BankAccountEntity> BankAccounts => Set<BankAccountEntity>();
+
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.
     /// </summary>
