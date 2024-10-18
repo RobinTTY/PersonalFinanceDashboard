@@ -23,6 +23,17 @@ public class TransactionMutationResolvers
     }
 
     /// <summary>
+    /// Update an existing transaction.
+    /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="transaction">The transaction to update.</param>
+    public async Task<Transaction> UpdateTransaction(TransactionRepository repository,
+        Transaction transaction)
+    {
+        return await repository.UpdateTransaction(transaction);
+    }
+
+    /// <summary>
     /// Delete an existing transaction.
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>

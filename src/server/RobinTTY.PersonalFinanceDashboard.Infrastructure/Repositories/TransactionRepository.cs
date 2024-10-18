@@ -77,14 +77,15 @@ public class TransactionRepository
     /// <summary>
     /// Updates an existing <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="transactionDto">The <see cref="Transaction"/> to update.</param>
+    /// <param name="transaction">The <see cref="Transaction"/> to update.</param>
     /// <returns>The updated <see cref="Transaction"/>.</returns>
-    /// TODO: return Transaction not TransactionEntity
-    public async Task<TransactionEntity> UpdateTransaction(TransactionEntity transactionDto)
+    public async Task<Transaction> UpdateTransaction(Transaction transaction)
     {
-        var updateEntry = _dbContext.Transactions.Update(transactionDto);
+        var transactionEntity = _transactionMapper.ModelToEntity(transaction);
+        var updateEntry = _dbContext.Transactions.Update(transactionEntity);
         await _dbContext.SaveChangesAsync();
-        return updateEntry.Entity;
+        
+        return _transactionMapper.EntityToModel(updateEntry.Entity);
     }
 
     /// <summary>
