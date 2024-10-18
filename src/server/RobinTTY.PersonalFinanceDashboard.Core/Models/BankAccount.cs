@@ -29,7 +29,7 @@ public class BankAccount : Account
     /// <summary>
     /// The banking institution this account belongs to.
     /// </summary>
-    public BankingInstitution AssociatedInstitution { get; set; }
+    public BankingInstitution? AssociatedInstitution { get; set; }
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
@@ -49,7 +49,7 @@ public class BankAccount : Account
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
     /// <param name="associatedInstitution">The banking institution this account belongs to.</param>
     public BankAccount(Guid id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions,
-        string? iban, string? bic, string? bban, string? ownerName, string? accountType, BankingInstitution associatedInstitution)
+        string? iban, string? bic, string? bban, string? ownerName, string? accountType, BankingInstitution? associatedInstitution)
         : base(id, name, description, balance, currency, transactions)
     {
         Iban = iban;

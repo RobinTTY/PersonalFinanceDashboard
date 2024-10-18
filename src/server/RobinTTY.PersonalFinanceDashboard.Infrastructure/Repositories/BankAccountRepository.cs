@@ -45,4 +45,42 @@ public class BankAccountRepository
         var accountEntities = await _dbContext.BankAccounts.ToListAsync();
         return accountEntities.Select(_bankAccountMapper.EntityToModel).ToList();
     }
+
+    /// <summary>
+    /// Adds a new <see cref="BankAccount"/>.
+    /// </summary>
+    /// <param name="bankAccount">The <see cref="BankAccount"/>s to add.</param>
+    public async Task<BankAccount> AddBankAccount(BankAccount bankAccount)
+    {
+        var bankAccountEntity = _bankAccountMapper.ModelToEntity(bankAccount);
+        var entityEntry = _dbContext.BankAccounts.Add(bankAccountEntity);
+        await _dbContext.SaveChangesAsync();
+
+        return _bankAccountMapper.EntityToModel(entityEntry.Entity);
+    }
+
+    /// <summary>
+    /// Updates an existing <see cref="BankAccount"/>.
+    /// </summary>
+    /// <param name="bankAccount">The bank account to update.</param>
+    /// <returns>The updated <see cref="BankAccount"/>.</returns>
+    public async Task<BankAccount> UpdateBankAccount(BankAccount bankAccount)
+    {
+        var accountEntity = _bankAccountMapper.ModelToEntity(bankAccount);
+        var entityEntry = _dbContext.BankAccounts.Update(accountEntity);
+        await _dbContext.SaveChangesAsync();
+
+        return _bankAccountMapper.EntityToModel(entityEntry.Entity);
+    }
+
+    /// <summary>
+    /// Deletes an existing <see cref="BankAccount"/>.
+    /// </summary>
+    /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to delete.</param>
+    /// <returns>Boolean value indicating whether the operation was successful.</returns>
+    public async Task<bool> DeleteBankAccount(Guid bankAccountId)
+    {
+        var result = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId).ExecuteDeleteAsync();
+        return Convert.ToBoolean(result);
+    }
 }

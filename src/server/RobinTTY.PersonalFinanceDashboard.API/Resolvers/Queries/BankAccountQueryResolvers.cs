@@ -15,17 +15,18 @@ public sealed class BankAccountQueryResolvers
     /// </summary>
     /// <param name="repository">The repository to use for data retrieval.</param>
     /// <param name="accountId">The id of the account to lookup.</param>
-    public async Task<BankAccount?> GetAccount(BankAccountRepository repository, Guid accountId)
+    public async Task<BankAccount?> GetBankAccount(BankAccountRepository repository, Guid accountId)
     {
         return await repository.GetBankAccount(accountId);
     }
 
+    // TODO: there is no input here like the comment indicates
     /// <summary>
     /// Look up accounts by a list of ids.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     [UsePaging]
-    public async Task<IEnumerable<BankAccount>> GetAccounts(BankAccountRepository repository)
+    public async Task<IEnumerable<BankAccount>> GetBankAccounts(BankAccountRepository repository)
     {
         return await repository.GetBankAccounts();
     }
