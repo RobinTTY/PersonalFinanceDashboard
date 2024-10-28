@@ -60,7 +60,13 @@ public static class ServiceCollectionExtensions
             // TODO: Document what the different extensions methods do
             // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg
             .AddQueryConventions()
-            .AddMutationConventions();
+            .AddMutationConventions()
+            // Enables efficient querying of the underlying db via projections
+            .AddProjections()
+            .ModifyOptions(options =>
+            {
+                options.StripLeadingIFromInterface = true;
+            });
 
         return requestExecutorBuilder.Services;
     }

@@ -4,13 +4,14 @@ using RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureSerilog();
 
-builder.Services.AddDatabase();
-builder.Services.AddConfiguredHttpClient();
-builder.Services.AddApplicationConfiguration();
-builder.Services.AddApplicationServices();
-builder.Services.AddEntityMappers();
-builder.Services.AddRepositories();
-builder.Services.AddGraphQlServices();
+builder.Services
+    .AddDatabase()
+    .AddConfiguredHttpClient()
+    .AddApplicationConfiguration()
+    .AddApplicationServices()
+    .AddEntityMappers()
+    .AddRepositories()
+    .AddGraphQlServices();
 
 var app = builder.Build();
 

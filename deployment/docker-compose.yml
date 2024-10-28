@@ -9,3 +9,4 @@ services:
     ports:
       - "5341:5341"
       - "8001:80"
+    restart: unless-stopped
