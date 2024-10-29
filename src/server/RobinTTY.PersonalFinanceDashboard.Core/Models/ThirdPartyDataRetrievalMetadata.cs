@@ -1,6 +1,6 @@
 ﻿using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
-namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 public class ThirdPartyDataRetrievalMetadata(
     Guid id,
