@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -11,34 +9,24 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly TransactionMapper _transactionMapper;
 
     /// <summary>
     /// Creates a new instance of <see cref="TransactionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="transactionMapper">The mapper used to map ef entities to the domain model.</param>
-    public TransactionRepository(ApplicationDbContext dbContext, TransactionMapper transactionMapper)
+    public TransactionRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
-        _transactionMapper = transactionMapper;
     }
 
     /// <summary>
     /// Gets all <see cref="Transaction"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetTransactions(CancellationToken cancellationToken)
+    public IQueryable<Transaction> GetTransactions(CancellationToken cancellationToken)
     {
         // TODO: How should navigation properties be included programatically?
-        var transactionEntities = await _dbContext.Transactions
-            .Include(t => t.Tags)
-            .ToListAsync(cancellationToken);
-        var transactionModels = transactionEntities
-            .Select(t => _transactionMapper.EntityToModel(t))
-            .ToList();
-
-        return transactionModels;
+        return _dbContext.Transactions;
     }
 
     /// <summary>
@@ -52,7 +40,6 @@ public class TransactionRepository
             .Where(transaction => transaction.AccountId == accountId)
             .ToListAsync();
         var transactionModels = transactionEntities
-            .Select(t => _transactionMapper.EntityToModel(t))
             .ToList();
 
         return transactionModels;
@@ -66,11 +53,10 @@ public class TransactionRepository
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> AddTransaction(Transaction transaction)
     {
-        var transactionEntity = _transactionMapper.ModelToEntity(transaction);
-        await _dbContext.Transactions.AddAsync(transactionEntity);
+        var entityEntry = await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
 
-        transaction.Id = transactionEntity.Id;
+        transaction.Id = entityEntry.Entity.Id;
         return transaction;
     }
 
@@ -81,11 +67,10 @@ public class TransactionRepository
     /// <returns>The updated <see cref="Transaction"/>.</returns>
     public async Task<Transaction> UpdateTransaction(Transaction transaction)
     {
-        var transactionEntity = _transactionMapper.ModelToEntity(transaction);
-        var updateEntry = _dbContext.Transactions.Update(transactionEntity);
+        var updateEntry = _dbContext.Transactions.Update(transaction);
         await _dbContext.SaveChangesAsync();
-        
-        return _transactionMapper.EntityToModel(updateEntry.Entity);
+
+        return updateEntry.Entity;
     }
 
     /// <summary>

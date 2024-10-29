@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -30,19 +29,6 @@ public static class ServiceCollectionExtensions
             .AddScoped<BankingInstitutionRepository>()
             .AddScoped<TransactionRepository>()
             .AddScoped<ThirdPartyDataRetrievalMetadataRepository>();
-    }
-
-    /// <summary>
-    /// Registers all entity mappers in the service collection.
-    /// </summary>
-    /// <param name="services">The service collection to which to add the services.</param>
-    /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-    public static IServiceCollection AddEntityMappers(this IServiceCollection services)
-    {
-        return services
-            .AddSingleton<TransactionMapper>()
-            .AddSingleton<BankingInstitutionMapper>()
-            .AddSingleton<BankAccountMapper>();
     }
 
     /// <summary>

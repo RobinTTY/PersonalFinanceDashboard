@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -10,17 +9,14 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly BankAccountMapper _bankAccountMapper;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccountRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="bankAccountMapper">The mapper used to map ef entities to the domain model.</param>
-    public BankAccountRepository(ApplicationDbContext dbContext, BankAccountMapper bankAccountMapper)
+    public BankAccountRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
-        _bankAccountMapper = bankAccountMapper;
     }
 
     /// <summary>
@@ -30,10 +26,7 @@ public class BankAccountRepository
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<BankAccount?> GetBankAccount(Guid accountId)
     {
-        var accountEntity =
-            await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == accountId);
-
-        return accountEntity is not null ? _bankAccountMapper.EntityToModel(accountEntity) : null;
+        return await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == accountId);
     }
 
     /// <summary>
@@ -42,8 +35,7 @@ public class BankAccountRepository
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
     public async Task<List<BankAccount>> GetBankAccounts()
     {
-        var accountEntities = await _dbContext.BankAccounts.ToListAsync();
-        return accountEntities.Select(_bankAccountMapper.EntityToModel).ToList();
+        return await _dbContext.BankAccounts.ToListAsync();
     }
 
     /// <summary>
@@ -52,11 +44,10 @@ public class BankAccountRepository
     /// <param name="bankAccount">The <see cref="BankAccount"/>s to add.</param>
     public async Task<BankAccount> AddBankAccount(BankAccount bankAccount)
     {
-        var bankAccountEntity = _bankAccountMapper.ModelToEntity(bankAccount);
-        var entityEntry = _dbContext.BankAccounts.Add(bankAccountEntity);
+        var entityEntry = _dbContext.BankAccounts.Add(bankAccount);
         await _dbContext.SaveChangesAsync();
 
-        return _bankAccountMapper.EntityToModel(entityEntry.Entity);
+        return entityEntry.Entity;
     }
 
     /// <summary>
@@ -66,11 +57,10 @@ public class BankAccountRepository
     /// <returns>The updated <see cref="BankAccount"/>.</returns>
     public async Task<BankAccount> UpdateBankAccount(BankAccount bankAccount)
     {
-        var accountEntity = _bankAccountMapper.ModelToEntity(bankAccount);
-        var entityEntry = _dbContext.BankAccounts.Update(accountEntity);
+        var entityEntry = _dbContext.BankAccounts.Update(bankAccount);
         await _dbContext.SaveChangesAsync();
 
-        return _bankAccountMapper.EntityToModel(entityEntry.Entity);
+        return entityEntry.Entity;
     }
 
     /// <summary>

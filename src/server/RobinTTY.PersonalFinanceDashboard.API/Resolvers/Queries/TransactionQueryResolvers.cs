@@ -1,4 +1,5 @@
-﻿using HotChocolate.Types;
+﻿using HotChocolate.Data;
+using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -15,10 +16,11 @@ public class TransactionQueryResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
-    public async Task<IEnumerable<Transaction>> GetTransactions(TransactionRepository repository,
+    [UseProjection]
+    public IQueryable<Transaction> GetTransactions(TransactionRepository repository,
         CancellationToken cancellationToken)
     {
-        return await repository.GetTransactions(cancellationToken);
+        return repository.GetTransactions(cancellationToken);
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankAccountEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +60,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.ToTable("BankAccounts");
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankingInstitutionEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -86,7 +86,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.ToTable("BankingInstitutions");
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.TagEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -103,12 +103,60 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.ThirdPartyDataRetrievalMetadataEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AccountId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("BankAccountId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Payee")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Payer")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ValueDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankAccountId");
+
+                    b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.ThirdPartyDataRetrievalMetadata", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,98 +189,37 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("BankAccountEntityId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Payee")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Payer")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ValueDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankAccountEntityId");
-
-                    b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("TagEntityTransactionEntity", b =>
-                {
-                    b.Property<string>("TagsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TransactionsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("TagsId", "TransactionsId");
-
-                    b.HasIndex("TransactionsId");
-
-                    b.ToTable("TagEntityTransactionEntity");
-                });
-
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankAccountEntity", b =>
-                {
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankingInstitutionEntity", "AssociatedInstitution")
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", "AssociatedInstitution")
                         .WithMany()
                         .HasForeignKey("AssociatedInstitutionId");
 
                     b.Navigation("AssociatedInstitution");
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", b =>
                 {
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankAccountEntity", null)
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("TransactionId");
+                });
+
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", b =>
+                {
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("BankAccountEntityId");
+                        .HasForeignKey("BankAccountId");
                 });
 
-            modelBuilder.Entity("TagEntityTransactionEntity", b =>
-                {
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.TagEntity", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.TransactionEntity", null)
-                        .WithMany()
-                        .HasForeignKey("TransactionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.BankAccountEntity", b =>
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

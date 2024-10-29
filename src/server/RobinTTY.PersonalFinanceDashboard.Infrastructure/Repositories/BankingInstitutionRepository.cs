@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Mappers;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
@@ -16,7 +15,6 @@ public class BankingInstitutionRepository
     private readonly ILogger _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
-    private readonly BankingInstitutionMapper _bankingInstitutionMapper;
     private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
 
     /// <summary>
@@ -25,19 +23,16 @@ public class BankingInstitutionRepository
     /// <param name="logger">Logger used for monitoring purposes.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
-    /// <param name="bankingInstitutionMapper">The mapper used to map ef entities to the domain model.</param>
     /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
     public BankingInstitutionRepository(
         ILogger<BankingInstitutionRepository> logger,
         ApplicationDbContext dbContext,
         GoCardlessDataProviderService dataProviderService,
-        BankingInstitutionMapper bankingInstitutionMapper,
         ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
     {
         _logger = logger;
         _dbContext = dbContext;
         _dataProviderService = dataProviderService;
-        _bankingInstitutionMapper = bankingInstitutionMapper;
         _dataRetrievalMetadataService = dataRetrievalMetadataService;
     }
 
@@ -51,12 +46,8 @@ public class BankingInstitutionRepository
         await RefreshBankingInstitutionsIfStale();
         
         // var request = await _dataProvider.GetBankingInstitution(institutionId);
-        var bankingInstitutionEntity = await _dbContext.BankingInstitutions
+        return await _dbContext.BankingInstitutions
             .SingleOrDefaultAsync(institution => institution.Id == institutionId);
-
-        return bankingInstitutionEntity == null
-            ? null
-            : _bankingInstitutionMapper.EntityToModel(bankingInstitutionEntity);
     }
 
     /// <summary>
@@ -67,18 +58,12 @@ public class BankingInstitutionRepository
     {
         await RefreshBankingInstitutionsIfStale();
 
-        var bankingInstitutionEntities = countryCode == null
+        return countryCode == null
             ? await _dbContext.BankingInstitutions
                 .ToListAsync()
             : await _dbContext.BankingInstitutions
                 .Where(institution => institution.Countries.Contains(countryCode))
                 .ToListAsync();
-
-        var bankingInstitutionModels = bankingInstitutionEntities
-            .Select(institution => _bankingInstitutionMapper.EntityToModel(institution))
-            .ToList();
-
-        return bankingInstitutionModels;
     }
 
     /// <summary>
@@ -87,10 +72,7 @@ public class BankingInstitutionRepository
     /// <param name="bankingInstitutions">The list of <see cref="BankingInstitution"/>s to add.</param>
     public async Task AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
     {
-        var institutionEntities =
-            bankingInstitutions.Select(institution => _bankingInstitutionMapper.ModelToEntity(institution));
-
-        await _dbContext.BankingInstitutions.AddRangeAsync(institutionEntities);
+        await _dbContext.BankingInstitutions.AddRangeAsync(bankingInstitutions);
         await _dbContext.SaveChangesAsync();
     }
     
@@ -100,11 +82,10 @@ public class BankingInstitutionRepository
     /// <param name="bankingInstitution">The <see cref="BankingInstitution"/> to add.</param>
     public async Task<BankingInstitution> AddBankingInstitution(BankingInstitution bankingInstitution)
     {
-        var institutionEntities =_bankingInstitutionMapper.ModelToEntity(bankingInstitution);
-        var result = await _dbContext.BankingInstitutions.AddAsync(institutionEntities);
+        var result = await _dbContext.BankingInstitutions.AddAsync(bankingInstitution);
         await _dbContext.SaveChangesAsync();
 
-        return _bankingInstitutionMapper.EntityToModel(result.Entity);
+        return result.Entity;
     }
 
     /// <summary>
@@ -114,11 +95,10 @@ public class BankingInstitutionRepository
     /// <returns>The updated <see cref="BankingInstitution"/>.</returns>
     public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitution bankingInstitution)
     {
-        var institutionEntity = _bankingInstitutionMapper.ModelToEntity(bankingInstitution);
-        var updatedEntity = _dbContext.BankingInstitutions.Update(institutionEntity);
+        var updatedEntity = _dbContext.BankingInstitutions.Update(bankingInstitution);
         await _dbContext.SaveChangesAsync();
 
-        return _bankingInstitutionMapper.EntityToModel(updatedEntity.Entity);
+        return updatedEntity.Entity;
     }
 
     /// <summary>

@@ -48,6 +48,7 @@ public class Transaction
 
     // TODO: Information provided by your bank (e.g. SEPA mandate ids)
     // how should I best handle this?
+    public Transaction(){}
 
     /// <summary>
     /// Creates a new instance of <see cref="Transaction"/>.

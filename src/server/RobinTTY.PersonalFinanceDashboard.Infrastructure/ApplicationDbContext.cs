@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure;
@@ -11,22 +12,22 @@ public sealed class ApplicationDbContext : DbContext
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding transactions of the application.
     /// </summary>
-    public DbSet<TransactionEntity> Transactions => Set<TransactionEntity>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
 
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding tags of the application.
     /// </summary>
-    public DbSet<TagEntity> Tags => Set<TagEntity>();
+    public DbSet<Tag> Tags => Set<Tag>();
 
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding banking institutions of the application.
     /// </summary>
-    public DbSet<BankingInstitutionEntity> BankingInstitutions => Set<BankingInstitutionEntity>();
+    public DbSet<BankingInstitution> BankingInstitutions => Set<BankingInstitution>();
 
-    public DbSet<ThirdPartyDataRetrievalMetadataEntity> ThirdPartyDataRetrievalMetadata =>
-        Set<ThirdPartyDataRetrievalMetadataEntity>();
+    public DbSet<ThirdPartyDataRetrievalMetadata> ThirdPartyDataRetrievalMetadata =>
+        Set<ThirdPartyDataRetrievalMetadata>();
 
-    public DbSet<BankAccountEntity> BankAccounts => Set<BankAccountEntity>();
+    public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
 
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.

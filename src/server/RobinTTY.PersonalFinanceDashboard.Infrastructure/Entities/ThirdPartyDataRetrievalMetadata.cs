@@ -2,13 +2,17 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
-public class ThirdPartyDataRetrievalMetadataEntity(
+public class ThirdPartyDataRetrievalMetadata(
     Guid id,
     ThirdPartyDataType dataType,
     ThirdPartyDataSource dataSource,
     DateTime lastRetrievalTime,
-    TimeSpan retrievalInterval) : BaseEntity(id)
+    TimeSpan retrievalInterval)
 {
+    /// <summary>
+    /// Distinct id identifying this entity.
+    /// </summary>
+    public Guid Id { get; set; } = id;
     /// <summary>
     /// The type of data being retrieved. 
     /// </summary>

@@ -13,15 +13,15 @@ public class ThirdPartyDataRetrievalMetadataRepository
         _dbContext = dbContext;
     }
 
-    public async Task<ThirdPartyDataRetrievalMetadataEntity> GetThirdPartyDataRetrievalMetadata(
+    public async Task<ThirdPartyDataRetrievalMetadata> GetThirdPartyDataRetrievalMetadata(
         ThirdPartyDataType dataType)
     {
         return await _dbContext.ThirdPartyDataRetrievalMetadata
             .SingleAsync(metadata => metadata.DataType == dataType);
     }
 
-    public async Task<ThirdPartyDataRetrievalMetadataEntity> UpdateThirdPartyDataRetrievalMetadata(
-        ThirdPartyDataRetrievalMetadataEntity metadata)
+    public async Task<ThirdPartyDataRetrievalMetadata> UpdateThirdPartyDataRetrievalMetadata(
+        ThirdPartyDataRetrievalMetadata metadata)
     {
         var updateEntry = _dbContext.ThirdPartyDataRetrievalMetadata.Update(metadata);
         await _dbContext.SaveChangesAsync();

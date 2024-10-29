@@ -9,7 +9,6 @@ builder.Services
     .AddConfiguredHttpClient()
     .AddApplicationConfiguration()
     .AddApplicationServices()
-    .AddEntityMappers()
     .AddRepositories()
     .AddGraphQlServices();
 

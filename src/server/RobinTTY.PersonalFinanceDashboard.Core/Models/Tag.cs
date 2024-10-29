@@ -22,6 +22,18 @@ public class Tag
     /// The color of the tag when displayed in a client application.
     /// </summary>
     public string Color { get; set; }
+    
+    /// <summary>
+    /// Creates a new instance of <see cref="Tag"/>.
+    /// Default constructor necessary for GraphQL projections.
+    /// </summary>
+    public Tag()
+    {
+        Id = string.Empty;
+        Name = string.Empty;
+        Description = string.Empty;
+        Color = string.Empty;
+    }
 
     /// <summary>
     /// Creates a new instance of <see cref="Tag"/>.

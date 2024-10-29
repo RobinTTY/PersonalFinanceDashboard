@@ -5,11 +5,11 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities.Configurations;
 
 public class
-    ThirdPartyDataRetrievalMetadataTypeConfiguration : IEntityTypeConfiguration<ThirdPartyDataRetrievalMetadataEntity>
+    ThirdPartyDataRetrievalMetadataTypeConfiguration : IEntityTypeConfiguration<ThirdPartyDataRetrievalMetadata>
 {
-    public void Configure(EntityTypeBuilder<ThirdPartyDataRetrievalMetadataEntity> builder)
+    public void Configure(EntityTypeBuilder<ThirdPartyDataRetrievalMetadata> builder)
     {
-        builder.HasData(new ThirdPartyDataRetrievalMetadataEntity(new Guid("f948e52f-ad17-44b8-9cdf-e0b952f139b3"),
+        builder.HasData(new ThirdPartyDataRetrievalMetadata(new Guid("f948e52f-ad17-44b8-9cdf-e0b952f139b3"),
             ThirdPartyDataType.BankingInstitutions, ThirdPartyDataSource.GoCardless, DateTime.MinValue,
             TimeSpan.FromDays(7)));
     }
