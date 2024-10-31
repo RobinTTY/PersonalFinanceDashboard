@@ -34,15 +34,10 @@ public class TransactionRepository
     /// </summary>
     /// <param name="accountId">The account id the transactions are associated with.</param>
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId)
+    public IQueryable<Transaction> GetTransactionsByAccountId(string accountId)
     {
-        var transactionEntities = await _dbContext.Transactions
-            .Where(transaction => transaction.AccountId == accountId)
-            .ToListAsync();
-        var transactionModels = transactionEntities
-            .ToList();
-
-        return transactionModels;
+        return _dbContext.Transactions
+            .Where(transaction => transaction.AccountId == accountId);
     }
 
     /// <summary>

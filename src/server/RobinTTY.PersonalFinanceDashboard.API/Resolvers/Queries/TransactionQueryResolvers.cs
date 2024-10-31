@@ -30,9 +30,10 @@ public class TransactionQueryResolvers
     /// <param name="accountId">The id of the account to retrieve.</param>
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
     [UsePaging]
-    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(TransactionRepository repository,
+    [UseProjection]
+    public IQueryable<Transaction> GetTransactionsByAccountId(TransactionRepository repository,
         string accountId, CancellationToken cancellationToken)
     {
-        return await repository.GetTransactionsByAccountId(accountId);
+        return repository.GetTransactionsByAccountId(accountId);
     }
 }
