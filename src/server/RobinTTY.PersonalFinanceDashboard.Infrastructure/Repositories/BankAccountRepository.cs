@@ -24,18 +24,18 @@ public class BankAccountRepository
     /// </summary>
     /// <param name="accountId">The id of the <see cref="BankAccount"/> to retrieve.</param>
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<BankAccount?> GetBankAccount(Guid accountId)
+    public IQueryable<BankAccount?> GetBankAccount(Guid accountId)
     {
-        return await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == accountId);
+        return _dbContext.BankAccounts.Where(account => account.Id == accountId);
     }
 
     /// <summary>
     /// Gets a list of <see cref="BankAccount"/>s.
     /// </summary>
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
-    public async Task<List<BankAccount>> GetBankAccounts()
+    public IQueryable<BankAccount> GetBankAccounts()
     {
-        return await _dbContext.BankAccounts.ToListAsync();
+        return _dbContext.BankAccounts;
     }
 
     /// <summary>

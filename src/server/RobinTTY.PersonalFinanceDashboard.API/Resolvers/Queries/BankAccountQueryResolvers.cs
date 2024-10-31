@@ -1,4 +1,5 @@
-﻿using HotChocolate.Types;
+﻿using HotChocolate.Data;
+using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -15,19 +16,21 @@ public sealed class BankAccountQueryResolvers
     /// </summary>
     /// <param name="repository">The repository to use for data retrieval.</param>
     /// <param name="accountId">The id of the account to lookup.</param>
-    public async Task<BankAccount?> GetBankAccount(BankAccountRepository repository, Guid accountId)
+    [UseSingleOrDefault]
+    [UseProjection]
+    public IQueryable<BankAccount?> GetBankAccount(BankAccountRepository repository, Guid accountId)
     {
-        return await repository.GetBankAccount(accountId);
+        return repository.GetBankAccount(accountId);
     }
 
-    // TODO: there is no input here like the comment indicates
     /// <summary>
-    /// Look up accounts by a list of ids.
+    /// Look up accounts.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     [UsePaging]
-    public async Task<IEnumerable<BankAccount>> GetBankAccounts(BankAccountRepository repository)
+    [UseProjection]
+    public IQueryable<BankAccount> GetBankAccounts(BankAccountRepository repository)
     {
-        return await repository.GetBankAccounts();
+        return repository.GetBankAccounts();
     }
 }
