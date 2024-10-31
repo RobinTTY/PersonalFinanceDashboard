@@ -41,29 +41,24 @@ public class BankingInstitutionRepository
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<BankingInstitution?> GetBankingInstitution(string institutionId)
+    public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(string institutionId)
     {
         await RefreshBankingInstitutionsIfStale();
-        
-        // var request = await _dataProvider.GetBankingInstitution(institutionId);
-        return await _dbContext.BankingInstitutions
-            .SingleOrDefaultAsync(institution => institution.Id == institutionId);
+
+        return _dbContext.BankingInstitutions.Where(institution => institution.Id == institutionId);
     }
 
     /// <summary>
     /// Gets all <see cref="BankingInstitution"/>s.
     /// </summary>
     /// <returns>A list of <see cref="BankingInstitution"/>s.</returns>
-    public async Task<IEnumerable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
+    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions(string? countryCode)
     {
         await RefreshBankingInstitutionsIfStale();
 
         return countryCode == null
-            ? await _dbContext.BankingInstitutions
-                .ToListAsync()
-            : await _dbContext.BankingInstitutions
-                .Where(institution => institution.Countries.Contains(countryCode))
-                .ToListAsync();
+            ? _dbContext.BankingInstitutions
+            : _dbContext.BankingInstitutions.Where(institution => institution.Countries.Contains(countryCode));
     }
 
     /// <summary>
@@ -75,7 +70,7 @@ public class BankingInstitutionRepository
         await _dbContext.BankingInstitutions.AddRangeAsync(bankingInstitutions);
         await _dbContext.SaveChangesAsync();
     }
-    
+
     /// <summary>
     /// Adds a new <see cref="BankingInstitution"/>.
     /// </summary>
@@ -109,7 +104,7 @@ public class BankingInstitutionRepository
     {
         return await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
     }
-    
+
     /// <summary>
     /// Deletes an existing <see cref="BankingInstitution"/>.
     /// </summary>

@@ -29,6 +29,18 @@ public class BankingInstitution
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitution"/>.
     /// </summary>
+    public BankingInstitution()
+    {
+        Id = string.Empty;
+        Bic = string.Empty;
+        Name = string.Empty;
+        LogoUri = new Uri("https://example.com");
+        Countries = [];
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="BankingInstitution"/>.
+    /// </summary>
     /// <param name="id">The identifier of the bank.</param>
     /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
     /// <param name="name">The name of the institution.</param>
