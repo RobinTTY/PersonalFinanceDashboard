@@ -32,23 +32,36 @@ public class Transaction
     /// <summary>
     /// The currency the amount is denominated in.
     /// </summary>
-    public string Currency { get; set ; }
+    public string Currency { get; set; }
     /// <summary>
     /// The category this transaction belongs to.
     /// </summary>
+    // TODO: Shouldn't this be nullable?
     public string Category { get; set; }
+    /// <summary>
+    /// User created notes for this transaction.
+    /// </summary>
+    // TODO: Shouldn't this be nullable?
+    public string Notes { get; set; }
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain sub-categories).
     /// </summary>
     public List<Tag> Tags { get; set; }
-    /// <summary>
-    /// User created notes for this transaction.
-    /// </summary>
-    public string Notes { get; set; }
 
-    // TODO: Information provided by your bank (e.g. SEPA mandate ids)
-    // how should I best handle this?
-    public Transaction(){}
+    // TODO: default values 
+    public Transaction()
+    {
+        Id = string.Empty;
+        AccountId = string.Empty;
+        ValueDate = null;
+        Payer = null;
+        Payee = null;
+        Amount = decimal.MinValue;
+        Currency = string.Empty;
+        Category = string.Empty;
+        Notes = string.Empty;
+        Tags = [];
+    }
 
     /// <summary>
     /// Creates a new instance of <see cref="Transaction"/>.
@@ -61,9 +74,10 @@ public class Transaction
     /// <param name="amount">The amount being transacted.</param>
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
-    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public Transaction(string id, string accountId, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, List<Tag> tags, string notes)
+    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
+    public Transaction(string id, string accountId, DateTime? valueDate, string payer, string payee, decimal amount,
+        string currency, string category, string notes, List<Tag> tags)
     {
         Id = id;
         ValueDate = valueDate;

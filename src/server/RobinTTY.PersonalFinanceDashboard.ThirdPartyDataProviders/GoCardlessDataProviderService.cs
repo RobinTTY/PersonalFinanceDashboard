@@ -163,7 +163,7 @@ public class GoCardlessDataProviderService
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,
-                "example-category", new List<Tag>(), "example-notes")
+                "example-category", "example-notes", [])
         );
         return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
             response.Error);
