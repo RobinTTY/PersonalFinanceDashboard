@@ -17,7 +17,7 @@ public class AuthenticationRequest
     /// <summary>
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
-    public List<BankAccount> AssociatedAccounts { get; set; }
+    public ICollection<BankAccount> AssociatedAccounts { get; set; } = new List<BankAccount>();
     
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
@@ -31,7 +31,6 @@ public class AuthenticationRequest
         Id = id;
         Status = status;
         AuthenticationLink = authenticationLink;
-        AssociatedAccounts = [];
     }
 
     /// <summary>
@@ -42,7 +41,7 @@ public class AuthenticationRequest
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
     public AuthenticationRequest(string id, AuthenticationStatus status, Uri authenticationLink,
-        List<BankAccount> associatedAccounts)
+        ICollection<BankAccount> associatedAccounts)
     {
         Id = id;
         Status = status;

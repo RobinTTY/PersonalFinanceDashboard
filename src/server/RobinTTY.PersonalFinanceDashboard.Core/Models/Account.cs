@@ -31,6 +31,12 @@ public class Account
     /// Transactions that are associated with this account.
     /// </summary>
     public List<Transaction> Transactions { get; set; }
+
+    // TODO
+    public Account()
+    {
+        
+    }
     
     /// <summary>
     /// Creates a new instance of <see cref="Account"/>.

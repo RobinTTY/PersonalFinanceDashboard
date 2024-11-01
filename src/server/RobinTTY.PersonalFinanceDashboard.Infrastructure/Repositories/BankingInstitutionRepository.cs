@@ -12,7 +12,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 /// </summary>
 public class BankingInstitutionRepository
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<BankingInstitutionRepository> _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
     private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
@@ -65,16 +65,18 @@ public class BankingInstitutionRepository
     /// Adds a list of new <see cref="BankingInstitution"/>s.
     /// </summary>
     /// <param name="bankingInstitutions">The list of <see cref="BankingInstitution"/>s to add.</param>
-    public async Task AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
+    /// <returns>The number of records that were added.</returns>
+    public async Task<int> AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
     {
         await _dbContext.BankingInstitutions.AddRangeAsync(bankingInstitutions);
-        await _dbContext.SaveChangesAsync();
+        return await _dbContext.SaveChangesAsync();
     }
 
     /// <summary>
     /// Adds a new <see cref="BankingInstitution"/>.
     /// </summary>
     /// <param name="bankingInstitution">The <see cref="BankingInstitution"/> to add.</param>
+    /// <returns>The added <see cref="BankingInstitution"/>.</returns>
     public async Task<BankingInstitution> AddBankingInstitution(BankingInstitution bankingInstitution)
     {
         var result = await _dbContext.BankingInstitutions.AddAsync(bankingInstitution);
@@ -128,6 +130,7 @@ public class BankingInstitutionRepository
             var response = await _dataProviderService.GetBankingInstitutions();
             if (response.IsSuccessful)
             {
+                // TODO: This needs to be updated to account for user generated banking institutions
                 await DeleteBankingInstitutions();
                 await AddBankingInstitutions(response.Result);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);

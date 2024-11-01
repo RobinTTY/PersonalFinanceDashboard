@@ -31,6 +31,11 @@ public class BankAccount : Account
     /// </summary>
     public BankingInstitution? AssociatedInstitution { get; set; }
 
+    // TODO
+    public BankAccount()
+    {
+    }
+
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
     /// </summary>
@@ -46,8 +51,9 @@ public class BankAccount : Account
     /// <param name="ownerName">Name of the legal account owner. If there is more than one owner,
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
-    public BankAccount(Guid id, string? name, string? description, decimal? balance, string? currency, string? iban,
-        string? bic, string? bban, string? ownerName, string? accountType) : base(id, name, description, balance, currency)
+    public BankAccount(Guid id, string? name = null, string? description = null, decimal? balance = null,
+        string? currency = null, string? iban = null, string? bic = null, string? bban = null, string? ownerName = null,
+        string? accountType = null) : base(id, name, description, balance, currency)
     {
         Iban = iban;
         Bic = bic;

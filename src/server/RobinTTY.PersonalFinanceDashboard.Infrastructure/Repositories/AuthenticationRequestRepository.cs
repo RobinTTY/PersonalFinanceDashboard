@@ -1,6 +1,10 @@
-﻿using RobinTTY.NordigenApiClient.Models.Responses;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -9,42 +13,54 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 /// </summary>
 public class AuthenticationRequestRepository
 {
+    private readonly ILogger<AuthenticationRequestRepository> _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
+    private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequestRepository"/>.
     /// </summary>
+    /// <param name="logger">Logger used for monitoring purposes.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
-    public AuthenticationRequestRepository(ApplicationDbContext dbContext, GoCardlessDataProviderService dataProviderService)
+    /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
+    public AuthenticationRequestRepository(
+        ILogger<AuthenticationRequestRepository> logger,
+        ApplicationDbContext dbContext,
+        GoCardlessDataProviderService dataProviderService,
+        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
     {
+        _logger = logger;
         _dbContext = dbContext;
         _dataProviderService = dataProviderService;
+        _dataRetrievalMetadataService = dataRetrievalMetadataService;
     }
-    
+
     /// <summary>
     /// Gets the <see cref="AuthenticationRequest"/> matching the specified id.
     /// </summary>
     /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to retrieve.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<AuthenticationRequest?> GetAuthenticationRequest(string authenticationId)
+    public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(string authenticationId)
     {
-        var requests = await _dataProviderService.GetAuthenticationRequest(authenticationId);
-        return requests.Result!;
+        await RefreshAuthenticationRequestsIfStale();
+
+        return _dbContext.AuthenticationRequests.Where(authentication => authentication.Id == authenticationId);
     }
 
     /// <summary>
     /// Gets a list of <see cref="AuthenticationRequest"/>s.
     /// </summary>
     /// <returns>A list of <see cref="AuthenticationRequest"/>s.</returns>
-    public async Task<IEnumerable<AuthenticationRequest>> GetAuthenticationRequests()
+    public async Task<IQueryable<AuthenticationRequest>> GetAuthenticationRequests()
     {
+        await RefreshAuthenticationRequestsIfStale();
+
         // TODO: limit
-        var requests = await _dataProviderService.GetAuthenticationRequests(100);
-        return requests.Result!;
+        return _dbContext.AuthenticationRequests;
     }
-    
+
     /// <summary>
     /// Adds a new <see cref="AuthenticationRequest"/>.
     /// </summary>
@@ -67,5 +83,68 @@ public class AuthenticationRequestRepository
     {
         var request = await _dataProviderService.DeleteAuthenticationRequest(authenticationId);
         return request.Result!;
+    }
+
+    /// <summary>
+    /// Adds a list of new <see cref="AuthenticationRequest"/>s.
+    /// </summary>
+    /// <param name="authenticationRequests">The list of <see cref="AuthenticationRequest"/>s to add.</param>
+    /// <returns>The number of records that were added.</returns>
+    private async Task<int> AddAuthenticationRequests(IEnumerable<AuthenticationRequest> authenticationRequests)
+    {
+        await _dbContext.AuthenticationRequests.AddRangeAsync(authenticationRequests);
+        return await _dbContext.SaveChangesAsync();
+    }
+
+    private async Task Test(AuthenticationRequest authenticationRequest)
+    {
+        await _dbContext.AuthenticationRequests.AddAsync(authenticationRequest);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Deletes all existing <see cref="AuthenticationRequest"/>s.
+    /// </summary>
+    /// <returns>The number of deleted records.</returns>
+    private async Task<int> DeleteAuthenticationRequests()
+    {
+        return await _dbContext.AuthenticationRequests.ExecuteDeleteAsync();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <exception cref="NotImplementedException">TODO</exception>
+    // TODO: This is basically the same logic as other repositories with external data
+    // Can this be generalized enough even with small differences in the way the database is updated?
+    // e.g. full deletion of current data and reinsert vs upsert...
+    private async Task RefreshAuthenticationRequestsIfStale()
+    {
+        var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
+        if (dataIsStale)
+        {
+            var response = await _dataProviderService.GetAuthenticationRequests(100);
+            if (response.IsSuccessful)
+            {
+                await DeleteAuthenticationRequests();
+                foreach (var authenticationRequest in response.Result)
+                {
+                    await Test(authenticationRequest);
+                }
+
+                await AddAuthenticationRequests(response.Result);
+                await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
+
+                _logger.LogInformation(
+                    "Refreshed stale Authentication request data. {updateRecords} records were updated.",
+                    response.Result.Count());
+            }
+            else
+            {
+                // TODO: What to do in case of failure should depend on if we already have data
+                // Log failure and continue, maybe also send a notification to frontend
+                throw new NotImplementedException();
+            }
+        }
     }
 }
