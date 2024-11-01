@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Entities;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
@@ -28,6 +27,11 @@ public sealed class ApplicationDbContext : DbContext
         Set<ThirdPartyDataRetrievalMetadata>();
 
     public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
+
+    /// <summary>
+    /// <see cref="DbSet{TEntity}"/> holding authentication requests of the application.
+    /// </summary>
+    public DbSet<AuthenticationRequest> AuthenticationRequests => Set<AuthenticationRequest>();
 
     /// <summary>
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.

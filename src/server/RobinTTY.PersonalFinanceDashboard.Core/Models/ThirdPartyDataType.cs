@@ -3,5 +3,6 @@
 public enum ThirdPartyDataType
 {
     Undefined,
-    BankingInstitutions
+    BankingInstitutions,
+    AuthenticationRequests
 }
