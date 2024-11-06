@@ -17,8 +17,6 @@ public class AuthenticationMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="institutionId">The id of the institution which the authentication request should be created for.</param>
     /// <param name="redirectUri">The URI to redirect to after the authentication is completed.</param>
-    // TODO: Exceptions
-    // [Error<Exception>]
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository, string institutionId, string redirectUri)
     {
         return await repository.AddAuthenticationRequest(institutionId, redirectUri);

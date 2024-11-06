@@ -25,7 +25,6 @@ public class TransactionRepository
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
     public IQueryable<Transaction> GetTransactions(CancellationToken cancellationToken)
     {
-        // TODO: How should navigation properties be included programatically?
         return _dbContext.Transactions;
     }
 
@@ -48,7 +47,7 @@ public class TransactionRepository
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> AddTransaction(Transaction transaction)
     {
-        var entityEntry = await _dbContext.Transactions.AddAsync(transaction);
+        await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
 
         return transaction;
