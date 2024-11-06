@@ -51,7 +51,6 @@ public class TransactionRepository
         var entityEntry = await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
 
-        transaction.Id = entityEntry.Entity.Id;
         return transaction;
     }
 

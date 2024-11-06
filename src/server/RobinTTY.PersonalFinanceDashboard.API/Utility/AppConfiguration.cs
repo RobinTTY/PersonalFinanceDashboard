@@ -8,21 +8,18 @@ public class AppConfiguration
     /// <summary>
     /// Configuration parameters for the Nordigen API client.
     /// </summary>
-    public NordigenApiClientConfiguration? NordigenApi { get; set; }
+    public required NordigenApiClientConfiguration NordigenApiConfiguration { get; set; }
+
+    /// <summary>
+    /// Configuration parameters for the database.
+    /// </summary>
+    public required DatabaseConfiguration DatabaseConfiguration { get; set; }
 
     /// <summary>
     /// Creates a new instance of <see cref="AppConfiguration"/>.
+    /// Necessary for 
     /// </summary>
     public AppConfiguration() { }
-
-    /// <summary>
-    /// Creates a new instance of <see cref="AppConfiguration"/>.
-    /// </summary>
-    /// <param name="nordigenApi">Configuration parameters for the Nordigen API client.</param>
-    public AppConfiguration(NordigenApiClientConfiguration nordigenApi)
-    {
-        NordigenApi = nordigenApi;
-    }
 }
 
 /// <summary>
@@ -44,7 +41,7 @@ public class NordigenApiClientConfiguration
     public string SecretKey { get; set; }
 
     /// <summary>
-    /// 
+    /// Creates a new instance of <see cref="NordigenApiClientConfiguration"/>.
     /// </summary>
     /// <param name="url">The nordigen API endpoint to use.</param>
     /// <param name="secretId">The secret id to access the Nordigen API.</param>
@@ -54,5 +51,25 @@ public class NordigenApiClientConfiguration
         Url = url;
         SecretId = secretId;
         SecretKey = secretKey;
+    }
+}
+
+/// <summary>
+/// Configuration parameters for the database.
+/// </summary>
+public class DatabaseConfiguration
+{
+    /// <summary>
+    /// The connection string of the database.
+    /// </summary>
+    public string ConnectionString { get; set; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="DatabaseConfiguration"/>.
+    /// </summary>
+    /// <param name="connectionString">The connection string of the database.</param>
+    public DatabaseConfiguration(string connectionString)
+    {
+        ConnectionString = connectionString;
     }
 }
