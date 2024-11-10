@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
@@ -70,6 +71,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         return services
+            .AddSingleton<NordigenClient>()
             .AddSingleton<GoCardlessDataProviderService>()
             .AddScoped<ThirdPartyDataRetrievalMetadataService>();
     }

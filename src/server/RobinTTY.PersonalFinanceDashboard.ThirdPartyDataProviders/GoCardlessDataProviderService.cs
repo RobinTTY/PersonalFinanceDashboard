@@ -13,20 +13,12 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
 // TODO: Cancellation token support
-public class GoCardlessDataProviderService
+public class GoCardlessDataProviderService(NordigenClient client)
 {
-    private readonly NordigenClient _client;
-
-    public GoCardlessDataProviderService(HttpClient httpClient, NordigenClientCredentials credentials)
-    {
-        // TODO: injection
-        _client = new NordigenClient(httpClient, credentials);
-    }
-
     public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
         string institutionId)
     {
-        var response = await _client.InstitutionsEndpoint.GetInstitution(institutionId);
+        var response = await client.InstitutionsEndpoint.GetInstitution(institutionId);
         BankingInstitution? result = null;
         if (response.IsSuccess)
             result = new BankingInstitution(response.Result.Id, response.Result.Bic, response.Result.Name,
@@ -42,7 +34,7 @@ public class GoCardlessDataProviderService
     public async Task<ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>> GetBankingInstitutions(
         string? country = null)
     {
-        var response = await _client.InstitutionsEndpoint.GetInstitutions(country);
+        var response = await client.InstitutionsEndpoint.GetInstitutions(country);
 
         if (response.IsSuccess)
         {
@@ -64,7 +56,7 @@ public class GoCardlessDataProviderService
     public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>> GetAuthenticationRequest(
         string requisitionId)
     {
-        var response = await _client.RequisitionsEndpoint.GetRequisition(requisitionId);
+        var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId);
         // TODO: handle request failure
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id.ToString(),
@@ -83,7 +75,7 @@ public class GoCardlessDataProviderService
     public async Task<ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>> GetAuthenticationRequests(
         int requisitionLimit)
     {
-        var response = await _client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
+        var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
         // TODO: handle request failure
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
@@ -103,7 +95,7 @@ public class GoCardlessDataProviderService
         string institutionId, Uri redirectUri)
     {
         var response =
-            await _client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri,
+            await client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri,
                 reference: Guid.NewGuid().ToString());
 
         if (response.IsSuccess)
@@ -124,15 +116,15 @@ public class GoCardlessDataProviderService
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
         string authenticationId)
     {
-        var response = await _client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
+        var response = await client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
         return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result,
             response.Error);
     }
 
     public async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId)
     {
-        var accountDetailsTask = _client.AccountsEndpoint.GetAccountDetails(accountId);
-        var balanceTask = _client.AccountsEndpoint.GetBalances(accountId);
+        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId);
+        var balanceTask = client.AccountsEndpoint.GetBalances(accountId);
 
         // TODO: Handle possible null values
         var accountDetailsRequest = await accountDetailsTask;
@@ -155,7 +147,7 @@ public class GoCardlessDataProviderService
 
     public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(string accountId)
     {
-        var response = await _client.AccountsEndpoint.GetTransactions(accountId);
+        var response = await client.AccountsEndpoint.GetTransactions(accountId);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
             new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
