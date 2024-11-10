@@ -57,7 +57,6 @@ public class AuthenticationRequestRepository
     {
         await RefreshAuthenticationRequestsIfStale();
 
-        // TODO: limit
         return _dbContext.AuthenticationRequests;
     }
 

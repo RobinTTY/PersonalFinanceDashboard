@@ -1,7 +1,7 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
-/// TODO
+/// A banking institution to which <see cref="BankAccount"/>s belong.
 /// </summary>
 public class BankingInstitution
 {
