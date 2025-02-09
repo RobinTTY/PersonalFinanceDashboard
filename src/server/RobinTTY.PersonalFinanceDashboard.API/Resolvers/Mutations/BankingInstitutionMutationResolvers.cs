@@ -39,7 +39,7 @@ public class BankingInstitutionMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
     public async Task<bool> DeleteBankingInstitution(BankingInstitutionRepository repository,
-        string bankingInstitutionId)
+        Guid bankingInstitutionId)
     {
         return await repository.DeleteBankingInstitution(bankingInstitutionId);
     }

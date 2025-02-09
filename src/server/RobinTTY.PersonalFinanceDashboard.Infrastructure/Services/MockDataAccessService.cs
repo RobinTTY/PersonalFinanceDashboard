@@ -17,7 +17,8 @@ public class MockDataAccessService
     {
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
-                id: Guid.NewGuid().ToString(),
+                id: Guid.NewGuid(),
+                thirdPartyId: Guid.NewGuid().ToString(),
                 accountId: Guid.NewGuid().ToString(),
                 valueDate: f.Date.Between(new DateTime(2018, 01, 01), DateTime.Today),
                 payer: f.Person.FullName,
@@ -28,7 +29,8 @@ public class MockDataAccessService
                 category: f.Commerce.Categories(1).First(),
                 tags: new List<Tag>
                 {
-                    new Tag(Guid.NewGuid().ToString(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(), f.Commerce.Color() ),
+                    new Tag(Guid.NewGuid(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(),
+                        f.Commerce.Color()),
                 },
                 notes: f.Lorem.Sentence()
             )).Generate(amount);

@@ -5,7 +5,7 @@ public class AuthenticationRequest
     /// <summary>
     /// The id of this authentication request.
     /// </summary>
-    public string Id { get; set; }
+    public Guid Id { get; set; }
     /// <summary>
     /// The status of this authentication request.
     /// </summary>
@@ -26,7 +26,7 @@ public class AuthenticationRequest
     /// <param name="id">The id of this authentication request.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
-    public AuthenticationRequest(string id, AuthenticationStatus status, Uri authenticationLink)
+    public AuthenticationRequest(Guid id, AuthenticationStatus status, Uri authenticationLink)
     {
         Id = id;
         Status = status;
@@ -40,7 +40,7 @@ public class AuthenticationRequest
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
-    public AuthenticationRequest(string id, AuthenticationStatus status, Uri authenticationLink,
+    public AuthenticationRequest(Guid id, AuthenticationStatus status, Uri authenticationLink,
         ICollection<BankAccount> associatedAccounts)
     {
         Id = id;

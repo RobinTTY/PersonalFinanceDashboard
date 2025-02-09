@@ -41,7 +41,7 @@ public class BankingInstitutionRepository
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(string institutionId)
+    public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(Guid institutionId)
     {
         await RefreshBankingInstitutionsIfStale();
 
@@ -112,7 +112,7 @@ public class BankingInstitutionRepository
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to delete.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteBankingInstitution(string institutionId)
+    public async Task<bool> DeleteBankingInstitution(Guid institutionId)
     {
         var result = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId).ExecuteDeleteAsync();
         return Convert.ToBoolean(result);

@@ -42,7 +42,7 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to retrieve.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(string authenticationId)
+    public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(Guid authenticationId)
     {
         await RefreshAuthenticationRequestsIfStale();
 

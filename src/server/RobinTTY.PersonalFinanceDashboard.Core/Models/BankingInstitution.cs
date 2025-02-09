@@ -3,12 +3,12 @@
 /// <summary>
 /// A banking institution to which <see cref="BankAccount"/>s belong.
 /// </summary>
-public class BankingInstitution
+public class BankingInstitution : DatabaseEntity
 {
     /// <summary>
-    /// The identifier of the bank.
+    /// The unique id assigned by the third party data retrieval service.
     /// </summary>
-    public string Id { get; set; }
+    public string ThirdPartyId { get; set; }
     /// <summary>
     /// The Business Identifier Code (BIC) of the institution.
     /// </summary>
@@ -31,7 +31,7 @@ public class BankingInstitution
     /// </summary>
     public BankingInstitution()
     {
-        Id = string.Empty;
+        ThirdPartyId = string.Empty;
         Bic = string.Empty;
         Name = string.Empty;
         LogoUri = new Uri("https://example.com");
@@ -41,14 +41,14 @@ public class BankingInstitution
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitution"/>.
     /// </summary>
-    /// <param name="id">The identifier of the bank.</param>
+    /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
     /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
     /// <param name="name">The name of the institution.</param>
     /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution</param>
     /// <param name="countries">The countries the institution operates in.</param>
-    public BankingInstitution(string id, string bic, string name, Uri logoUri, List<string> countries)
+    public BankingInstitution(string thirdPartyId, string bic, string name, Uri logoUri, List<string> countries)
     {
-        Id = id;
+        ThirdPartyId = thirdPartyId;
         Bic = bic;
         Name = name;
         LogoUri = logoUri;

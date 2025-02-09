@@ -1,9 +1,9 @@
 ﻿using RobinTTY.NordigenApiClient;
-using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
+using Guid = System.Guid;
 using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -19,10 +19,15 @@ public class GoCardlessDataProviderService(NordigenClient client)
         string institutionId)
     {
         var response = await client.InstitutionsEndpoint.GetInstitution(institutionId);
+        
+        // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
         BankingInstitution? result = null;
         if (response.IsSuccess)
             result = new BankingInstitution(response.Result.Id, response.Result.Bic, response.Result.Name,
-                response.Result.Logo, response.Result.Countries);
+                response.Result.Logo, response.Result.Countries)
+            {
+                Id = Guid.NewGuid()
+            };
         return new ThirdPartyResponse<BankingInstitution?, BasicResponse>(response.IsSuccess, result, response.Error);
     }
 
@@ -38,9 +43,13 @@ public class GoCardlessDataProviderService(NordigenClient client)
 
         if (response.IsSuccess)
         {
+            // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
             var institutions =
                 response.Result.Select(inst =>
-                    new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries));
+                    new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries)
+                    {
+                        Id = Guid.NewGuid()
+                    });
             return new ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>(true,
                 institutions, null);
         }
@@ -59,7 +68,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId);
         // TODO: handle request failure
         var requisition = response.Result!;
-        var result = new AuthenticationRequest(requisition.Id.ToString(),
+        var result = new AuthenticationRequest(requisition.Id,
             ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
             requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
@@ -78,7 +87,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
         // TODO: handle request failure
         var requisitions = response.Result!.Results;
-        var result = requisitions.Select(req => new AuthenticationRequest(req.Id.ToString(),
+        var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
             ConvertRequisitionStatus(req.Status),
             req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)).ToList()));
         return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result,
@@ -101,7 +110,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         if (response.IsSuccess)
         {
             var requisition = response.Result;
-            var authenticationRequest = new AuthenticationRequest(requisition.Id.ToString(),
+            var authenticationRequest = new AuthenticationRequest(requisition.Id,
                 ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
                 requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
 
@@ -150,7 +159,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var response = await client.AccountsEndpoint.GetTransactions(accountId);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
+            new Transaction(Guid.NewGuid(), transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,
@@ -200,6 +209,8 @@ public class GoCardlessDataProviderService(NordigenClient client)
             ownerName: account.OwnerName,
             transactions: [],
             associatedInstitution: new BankingInstitution("id", "bic", "name", new Uri("http://www.example.com"), [])
-        );
+            {
+                Id = Guid.NewGuid()
+            });
     }
 }

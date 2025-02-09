@@ -19,7 +19,7 @@ public class AuthenticationRequestQueryResolvers
     [UseSingleOrDefault]
     [UseProjection]
     public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(
-        AuthenticationRequestRepository repository, string authenticationId)
+        AuthenticationRequestRepository repository, Guid authenticationId)
     {
         return await repository.GetAuthenticationRequest(authenticationId);
     }

@@ -19,7 +19,7 @@ public class BankingInstitutionQueryResolvers
     [UseSingleOrDefault]
     [UseProjection]
     public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(BankingInstitutionRepository repository,
-        string institutionId)
+        Guid institutionId)
     {
         return await repository.GetBankingInstitution(institutionId);
     }
