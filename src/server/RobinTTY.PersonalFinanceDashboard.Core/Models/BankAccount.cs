@@ -30,6 +30,10 @@ public class BankAccount : Account
     /// The banking institution this account belongs to.
     /// </summary>
     public BankingInstitution? AssociatedInstitution { get; set; }
+    /// <summary>
+    /// Authentication requests made for this bank account.
+    /// </summary>
+    public ICollection<AuthenticationRequest> AssociatedAuthenticationRequests { get; set; }
 
     // TODO
     public BankAccount()
@@ -51,9 +55,11 @@ public class BankAccount : Account
     /// <param name="ownerName">Name of the legal account owner. If there is more than one owner,
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
+    /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     public BankAccount(Guid id, string? name = null, string? description = null, decimal? balance = null,
         string? currency = null, string? iban = null, string? bic = null, string? bban = null, string? ownerName = null,
-        string? accountType = null) : base(id, name, description, balance, currency)
+        string? accountType = null, ICollection<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(id,
+        name, description, balance, currency)
     {
         Iban = iban;
         Bic = bic;
@@ -61,6 +67,7 @@ public class BankAccount : Account
         OwnerName = ownerName;
         AccountType = accountType;
         AssociatedInstitution = null;
+        AssociatedAuthenticationRequests = associatedAuthenticationRequests ?? new List<AuthenticationRequest>();
     }
 
     /// <summary>
@@ -80,10 +87,11 @@ public class BankAccount : Account
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
     /// <param name="associatedInstitution">The banking institution this account belongs to.</param>
+    /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     public BankAccount(Guid id, string? name, string? description, decimal? balance, string? currency,
         List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType,
-        BankingInstitution? associatedInstitution)
+        BankingInstitution? associatedInstitution, ICollection<AuthenticationRequest> associatedAuthenticationRequests)
         : base(id, name, description, balance, currency, transactions)
     {
         Iban = iban;
@@ -92,5 +100,6 @@ public class BankAccount : Account
         OwnerName = ownerName;
         AccountType = accountType;
         AssociatedInstitution = associatedInstitution;
+        AssociatedAuthenticationRequests = associatedAuthenticationRequests;
     }
 }

@@ -210,7 +210,8 @@ public class GoCardlessDataProviderService(NordigenClient client)
             transactions: [],
             associatedInstitution: new BankingInstitution("id", "bic", "name", new Uri("http://www.example.com"), [])
             {
-                Id = Guid.NewGuid()
-            });
+                Id = Guid.Empty
+            },
+            associatedAuthenticationRequests: (List<AuthenticationRequest>) []);
     }
 }
