@@ -8,7 +8,11 @@ public class Transaction
     /// <summary>
     /// The id of the transaction.
     /// </summary>
-    public string Id { get; set; }
+    public Guid Id { get; set; }
+    /// <summary>
+    /// The id of the transaction provided by the third party data retrieval service.
+    /// </summary>
+    public string? ThirdPartyId { get; set; }
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
@@ -51,7 +55,7 @@ public class Transaction
     // TODO: default values 
     public Transaction()
     {
-        Id = string.Empty;
+        ThirdPartyId = null;
         AccountId = string.Empty;
         ValueDate = null;
         Payer = null;
@@ -67,6 +71,7 @@ public class Transaction
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
+    /// <param name="thirdPartyId">The id of the transaction provided by the third party data retrieval service.</param>
     /// <param name="accountId">The id of the account to which the transaction belongs.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
@@ -76,10 +81,11 @@ public class Transaction
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
-    public Transaction(string id, string accountId, DateTime? valueDate, string payer, string payee, decimal amount,
+    public Transaction(Guid id, string thirdPartyId, string accountId, DateTime? valueDate, string payer, string payee, decimal amount,
         string currency, string category, string notes, List<Tag> tags)
     {
         Id = id;
+        ThirdPartyId = thirdPartyId;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;

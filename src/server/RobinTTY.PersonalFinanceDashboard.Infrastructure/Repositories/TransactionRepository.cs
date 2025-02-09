@@ -71,7 +71,7 @@ public class TransactionRepository
     /// </summary>
     /// <param name="transactionId">The id of the <see cref="Transaction"/> to delete.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteTransaction(string transactionId)
+    public async Task<bool> DeleteTransaction(Guid transactionId)
     {
         var result = await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync();
         return Convert.ToBoolean(result);

@@ -1,4 +1,5 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// A tag can be used to add additional information to transactions.
@@ -9,7 +10,7 @@ public class Tag
     /// <summary>
     /// The id of the tag.
     /// </summary>
-    public string Id { get; set; }
+    public Guid Id { get; set; }
     /// <summary>
     /// The name of the tag.
     /// </summary>
@@ -22,6 +23,10 @@ public class Tag
     /// The color of the tag when displayed in a client application.
     /// </summary>
     public string Color { get; set; }
+    /// <summary>
+    /// Transactions which this tag is applied to.
+    /// </summary>
+    public List<Transaction> Transactions { get; set; } = [];
     
     /// <summary>
     /// Creates a new instance of <see cref="Tag"/>.
@@ -29,7 +34,6 @@ public class Tag
     /// </summary>
     public Tag()
     {
-        Id = string.Empty;
         Name = string.Empty;
         Description = string.Empty;
         Color = string.Empty;
@@ -42,7 +46,7 @@ public class Tag
     /// <param name="name">The name of the tag.</param>
     /// <param name="description">A description of the tag.</param>
     /// <param name="color">The color of the tag when displayed in a client application.</param>
-    public Tag(string id, string name, string description, string color)
+    public Tag(Guid id, string name, string description, string color)
     {
         Id = id;
         Name = name;

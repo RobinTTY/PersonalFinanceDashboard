@@ -13,7 +13,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 /// <param name="thirdPartyDataRetrievalMetadataRepository">The repository which holds the
 /// <see cref="ThirdPartyDataRetrievalMetadata"/> used to determine when data is stale.</param>
 public class ThirdPartyDataRetrievalMetadataService(
-    ILogger logger,
+    ILogger<ThirdPartyDataRetrievalMetadataService> logger,
     ThirdPartyDataRetrievalMetadataRepository thirdPartyDataRetrievalMetadataRepository)
 {
     /// <summary>
