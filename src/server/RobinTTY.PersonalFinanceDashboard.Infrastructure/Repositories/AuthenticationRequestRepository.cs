@@ -88,23 +88,23 @@ public class AuthenticationRequestRepository
     /// Adds a list of new <see cref="AuthenticationRequest"/>s.
     /// </summary>
     /// <param name="authenticationRequests">The list of <see cref="AuthenticationRequest"/>s to add.</param>
-    /// <returns>The number of records that were added.</returns>
-    private async Task<int> AddAuthenticationRequests(IEnumerable<AuthenticationRequest> authenticationRequests)
+    private async Task AddAuthenticationRequests(IEnumerable<AuthenticationRequest> authenticationRequests)
     {
         foreach (var authenticationRequest in authenticationRequests)
         {
             var associatedAccounts = authenticationRequest.AssociatedAccounts.ToList();
             authenticationRequest.AssociatedAccounts.Clear();
-            _dbContext.AuthenticationRequests.Add(authenticationRequest);
+            await _dbContext.AuthenticationRequests.AddAsync(authenticationRequest);
 
             foreach (var associatedAccount in associatedAccounts)
             {
-                var matchingAccount = _dbContext.BankAccounts
-                    .SingleOrDefault(account => account.Id == associatedAccount.Id);
+                var matchingAccount = await _dbContext.BankAccounts
+                    .SingleOrDefaultAsync(account => account.Id == associatedAccount.Id);
 
                 if (matchingAccount is null)
                 {
                     var result = await _dbContext.BankAccounts.AddAsync(associatedAccount);
+                    await _dbContext.SaveChangesAsync();
                     matchingAccount = result.Entity;
                 }
 
@@ -112,7 +112,7 @@ public class AuthenticationRequestRepository
             }
         }
 
-        return await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 
     /// <summary>
