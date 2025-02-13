@@ -18,6 +18,14 @@ public class AuthenticationRequest
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
     public ICollection<BankAccount> AssociatedAccounts { get; set; } = new List<BankAccount>();
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public AuthenticationRequest()
+    {
+        
+    }
     
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.

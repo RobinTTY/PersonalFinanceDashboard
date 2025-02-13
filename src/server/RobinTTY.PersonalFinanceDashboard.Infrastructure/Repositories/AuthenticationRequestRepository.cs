@@ -91,14 +91,28 @@ public class AuthenticationRequestRepository
     /// <returns>The number of records that were added.</returns>
     private async Task<int> AddAuthenticationRequests(IEnumerable<AuthenticationRequest> authenticationRequests)
     {
-        await _dbContext.AuthenticationRequests.AddRangeAsync(authenticationRequests);
-        return await _dbContext.SaveChangesAsync();
-    }
+        foreach (var authenticationRequest in authenticationRequests)
+        {
+            var associatedAccounts = authenticationRequest.AssociatedAccounts.ToList();
+            authenticationRequest.AssociatedAccounts.Clear();
+            _dbContext.AuthenticationRequests.Add(authenticationRequest);
 
-    private async Task Test(AuthenticationRequest authenticationRequest)
-    {
-        await _dbContext.AuthenticationRequests.AddAsync(authenticationRequest);
-        await _dbContext.SaveChangesAsync();
+            foreach (var associatedAccount in associatedAccounts)
+            {
+                var matchingAccount = _dbContext.BankAccounts
+                    .SingleOrDefault(account => account.Id == associatedAccount.Id);
+
+                if (matchingAccount is null)
+                {
+                    var result = await _dbContext.BankAccounts.AddAsync(associatedAccount);
+                    matchingAccount = result.Entity;
+                }
+
+                authenticationRequest.AssociatedAccounts.Add(matchingAccount);
+            }
+        }
+
+        return await _dbContext.SaveChangesAsync();
     }
 
     /// <summary>
@@ -126,11 +140,6 @@ public class AuthenticationRequestRepository
             if (response.IsSuccessful)
             {
                 await DeleteAuthenticationRequests();
-                foreach (var authenticationRequest in response.Result)
-                {
-                    await Test(authenticationRequest);
-                }
-
                 await AddAuthenticationRequests(response.Result);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
