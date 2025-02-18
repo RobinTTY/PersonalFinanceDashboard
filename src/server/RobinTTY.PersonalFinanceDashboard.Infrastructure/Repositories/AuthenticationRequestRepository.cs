@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Logging;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -85,17 +85,21 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
-    /// Adds a list of new <see cref="AuthenticationRequest"/>s.
+    /// Adds a list of new <see cref="AuthenticationRequest"/>s that were retrieved by a third party data retrieval service.
     /// </summary>
     /// <param name="authenticationRequests">The list of <see cref="AuthenticationRequest"/>s to add.</param>
-    private async Task AddAuthenticationRequests(IEnumerable<AuthenticationRequest> authenticationRequests)
+    private async Task AddOrUpdateExternalAuthenticationRequests(
+        IEnumerable<AuthenticationRequest> authenticationRequests)
     {
         foreach (var authenticationRequest in authenticationRequests)
         {
+            // We don't want to add the associated accounts here because they might already be in the db
             var associatedAccounts = authenticationRequest.AssociatedAccounts.ToList();
             authenticationRequest.AssociatedAccounts.Clear();
-            await _dbContext.AuthenticationRequests.AddAsync(authenticationRequest);
+            _dbContext.InsertOrUpdate(authenticationRequest);
+            await _dbContext.SaveChangesAsync();
 
+            // Add the links to the associated accounts and add any that aren't already in the db
             foreach (var associatedAccount in associatedAccounts)
             {
                 var matchingAccount = await _dbContext.BankAccounts
@@ -139,8 +143,7 @@ public class AuthenticationRequestRepository
             var response = await _dataProviderService.GetAuthenticationRequests(100);
             if (response.IsSuccessful)
             {
-                await DeleteAuthenticationRequests();
-                await AddAuthenticationRequests(response.Result);
+                await AddOrUpdateExternalAuthenticationRequests(response.Result);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
                 _logger.LogInformation(

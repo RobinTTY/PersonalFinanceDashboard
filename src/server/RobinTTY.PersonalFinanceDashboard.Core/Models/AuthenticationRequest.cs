@@ -1,11 +1,11 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-public class AuthenticationRequest
+public class AuthenticationRequest : DatabaseEntity
 {
     /// <summary>
-    /// The id of this authentication request.
+    /// The unique id assigned by the third party data retrieval service.
     /// </summary>
-    public Guid Id { get; set; }
+    public Guid ThirdPartyId { get; set; }
     /// <summary>
     /// The status of this authentication request.
     /// </summary>
@@ -31,12 +31,13 @@ public class AuthenticationRequest
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// Required constructor for Ef Core.
     /// </summary>
-    /// <param name="id">The id of this authentication request.</param>
+    /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
-    public AuthenticationRequest(Guid id, AuthenticationStatus status, Uri authenticationLink)
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink)
     {
-        Id = id;
+        Id = null;
+        ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
     }
@@ -44,14 +45,15 @@ public class AuthenticationRequest
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// </summary>
-    /// <param name="id">The id of this authentication request.</param>
+    /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
-    public AuthenticationRequest(Guid id, AuthenticationStatus status, Uri authenticationLink,
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
         ICollection<BankAccount> associatedAccounts)
     {
-        Id = id;
+        Id = null;
+        ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
         AssociatedAccounts = associatedAccounts;

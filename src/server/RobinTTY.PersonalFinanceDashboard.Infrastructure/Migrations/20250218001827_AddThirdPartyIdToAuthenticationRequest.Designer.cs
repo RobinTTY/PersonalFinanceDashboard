@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
@@ -10,9 +11,11 @@ using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250218001827_AddThirdPartyIdToAuthenticationRequest")]
+    partial class AddThirdPartyIdToAuthenticationRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -45,7 +48,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("ThirdPartyId")
+                    b.Property<Guid>("ThirdPartyThirdPartyId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

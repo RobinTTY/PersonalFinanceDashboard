@@ -70,7 +70,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id,
             ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
-            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
+            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+        {
+            Id = null
+        };
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -89,7 +92,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
             ConvertRequisitionStatus(req.Status),
-            req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)).ToList()));
+            req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+        {
+            Id = null
+        });
         return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -112,7 +118,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
             var requisition = response.Result;
             var authenticationRequest = new AuthenticationRequest(requisition.Id,
                 ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
-                requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
+                requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+            {
+                Id = null
+            };
 
             return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess,
                 authenticationRequest, null);
