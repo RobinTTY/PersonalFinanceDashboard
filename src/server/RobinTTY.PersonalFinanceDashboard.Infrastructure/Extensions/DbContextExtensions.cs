@@ -13,7 +13,7 @@ public static class DbContextExtensions
     /// <param name="context"></param>
     /// <param name="externalAuthRequest"></param>
     /// <returns></returns>
-    public static OperationType InsertOrUpdate(this ApplicationDbContext context,
+    public static async Task<OperationType> AddOrUpdateAuthenticationRequest(this ApplicationDbContext context,
         AuthenticationRequest externalAuthRequest)
     {
         var existingAuthRequest =
@@ -28,7 +28,7 @@ public static class DbContextExtensions
             return OperationType.Update;
         }
 
-        context.AuthenticationRequests.Add(externalAuthRequest);
+        await context.AuthenticationRequests.AddAsync(externalAuthRequest);
         return OperationType.Insert;
     }
 

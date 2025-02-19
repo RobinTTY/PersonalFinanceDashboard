@@ -5,6 +5,7 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
+using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -85,38 +86,68 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
-    /// Adds a list of new <see cref="AuthenticationRequest"/>s that were retrieved by a third party data retrieval service.
+    /// Syncs the authentication requests the database contains with the external data provider.
     /// </summary>
     /// <param name="authenticationRequests">The list of <see cref="AuthenticationRequest"/>s to add.</param>
-    private async Task AddOrUpdateExternalAuthenticationRequests(
+    private async Task SyncAuthenticationRequestEntities(
         IEnumerable<AuthenticationRequest> authenticationRequests)
     {
-        foreach (var authenticationRequest in authenticationRequests)
+        var authRequests = authenticationRequests.ToList();
+        await AddOrUpdateAuthRequests(authRequests);
+        await DeleteOutdatedAuthenticationRequests(authRequests);
+    }
+
+    /// <summary>
+    /// Adds or updates authentication requests based on the information retrieved from the third party data provider.
+    /// </summary>
+    /// <param name="authRequests">The authentication requests retrieved from the third party data provider.</param>
+    private async Task AddOrUpdateAuthRequests(List<AuthenticationRequest> authRequests)
+    {
+        foreach (var authenticationRequest in authRequests)
         {
             // We don't want to add the associated accounts here because they might already be in the db
             var associatedAccounts = authenticationRequest.AssociatedAccounts.ToList();
             authenticationRequest.AssociatedAccounts.Clear();
-            _dbContext.InsertOrUpdate(authenticationRequest);
+
+            await _dbContext.AddOrUpdateAuthenticationRequest(authenticationRequest);
+            await LinkAssociatedAccountsToAuthRequests(authenticationRequest, associatedAccounts);
             await _dbContext.SaveChangesAsync();
-
-            // Add the links to the associated accounts and add any that aren't already in the db
-            foreach (var associatedAccount in associatedAccounts)
-            {
-                var matchingAccount = await _dbContext.BankAccounts
-                    .SingleOrDefaultAsync(account => account.Id == associatedAccount.Id);
-
-                if (matchingAccount is null)
-                {
-                    var result = await _dbContext.BankAccounts.AddAsync(associatedAccount);
-                    await _dbContext.SaveChangesAsync();
-                    matchingAccount = result.Entity;
-                }
-
-                authenticationRequest.AssociatedAccounts.Add(matchingAccount);
-            }
         }
+    }
 
-        await _dbContext.SaveChangesAsync();
+    /// <summary>
+    /// Adds relationships between an authentication request and the associated accounts.
+    /// </summary>
+    /// <param name="authenticationRequest">The authentication request to which to link the accounts.</param>
+    /// <param name="associatedAccounts">The associated accounts to link.</param>
+    private async Task LinkAssociatedAccountsToAuthRequests(AuthenticationRequest authenticationRequest,
+        List<BankAccount> associatedAccounts)
+    {
+        foreach (var associatedAccount in associatedAccounts)
+        {
+            var matchingAccount = await _dbContext.BankAccounts
+                .SingleOrDefaultAsync(account => account.Id == associatedAccount.Id);
+
+            if (matchingAccount is null)
+            {
+                var result = await _dbContext.BankAccounts.AddAsync(associatedAccount);
+                matchingAccount = result.Entity;
+            }
+
+            authenticationRequest.AssociatedAccounts.Add(matchingAccount);
+        }
+    }
+    
+    /// <summary>
+    /// Removes authentication requests which are no longer tracked by the third party data provider from the db.
+    /// </summary>
+    /// <param name="authRequests">The authentication requests as retrieved from the third party data provider.</param>
+    private async Task DeleteOutdatedAuthenticationRequests(List<AuthenticationRequest> authRequests)
+    {
+        var updatedAuthReqIds = authRequests.Select(req => req.ThirdPartyId).ToList();
+        await _dbContext.AuthenticationRequests
+            .Where(dbReq => updatedAuthReqIds.All(updatedReqId => updatedReqId != dbReq.ThirdPartyId))
+            .ExecuteDeleteAsync();
     }
 
     /// <summary>
@@ -133,17 +164,16 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <exception cref="NotImplementedException">TODO</exception>
     // TODO: This is basically the same logic as other repositories with external data
-    // Can this be generalized enough even with small differences in the way the database is updated?
-    // e.g. full deletion of current data and reinsert vs upsert...
     private async Task RefreshAuthenticationRequestsIfStale()
     {
         var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
         if (dataIsStale)
         {
+            // TODO: Remove limit, use paging
             var response = await _dataProviderService.GetAuthenticationRequests(100);
             if (response.IsSuccessful)
             {
-                await AddOrUpdateExternalAuthenticationRequests(response.Result);
+                await SyncAuthenticationRequestEntities(response.Result);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
                 _logger.LogInformation(
