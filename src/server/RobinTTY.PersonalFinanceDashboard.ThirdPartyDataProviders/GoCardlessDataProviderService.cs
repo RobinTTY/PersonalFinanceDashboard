@@ -132,7 +132,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
     }
 
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
-        string authenticationId)
+        Guid authenticationId)
     {
         var response = await client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
         return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result,

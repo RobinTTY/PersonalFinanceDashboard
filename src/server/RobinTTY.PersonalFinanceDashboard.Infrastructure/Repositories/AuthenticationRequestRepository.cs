@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
@@ -71,18 +72,51 @@ public class AuthenticationRequestRepository
     {
         // TODO: URI validation (here or in resolver?)
         var request = await _dataProviderService.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
-        return request.Result!;
+
+        if (request.IsSuccessful)
+        {
+            await _dbContext.AuthenticationRequests.AddAsync(request.Result);
+            await _dbContext.SaveChangesAsync();
+            return request.Result;
+        }
+
+        _logger.LogError(
+            "Creation of new authentication request failed. The data provider returned the following error: " +
+            "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+
+        //TODO: return error
+        throw new NotImplementedException();
     }
 
     /// <summary>
     /// Deletes an existing <see cref="AuthenticationRequest"/>.
     /// </summary>
-    /// <param name="authenticationId">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
-    /// <returns>TODO</returns>
-    public async Task<BasicResponse> DeleteAuthenticationRequest(string authenticationId)
+    /// <param name="id">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
+    /// <returns>The deleted <see cref="AuthenticationRequest"/>.</returns>
+    public async Task<BasicResponse> DeleteAuthenticationRequest(Guid id)
     {
-        var request = await _dataProviderService.DeleteAuthenticationRequest(authenticationId);
-        return request.Result!;
+        var authRequest =
+            await _dbContext.AuthenticationRequests.SingleOrDefaultAsync(authRequest => authRequest.Id == id);
+
+        if (authRequest is null)
+        {
+            _logger.LogError(
+                "Deletion of authentication request failed. Authentication request with id {id} does not exist.", id);
+            throw new NotImplementedException();
+        }
+
+        var request = await _dataProviderService.DeleteAuthenticationRequest(authRequest.ThirdPartyId);
+        if (request.IsSuccessful)
+        {
+            _dbContext.AuthenticationRequests.Remove(authRequest);
+            await _dbContext.SaveChangesAsync();
+            return request.Result;
+        }
+
+        _logger.LogError(
+            "Deletion of authentication request failed. The data provider returned the following error: " +
+            "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -137,7 +171,7 @@ public class AuthenticationRequestRepository
             authenticationRequest.AssociatedAccounts.Add(matchingAccount);
         }
     }
-    
+
     /// <summary>
     /// Removes authentication requests which are no longer tracked by the third party data provider from the db.
     /// </summary>

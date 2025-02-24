@@ -27,7 +27,7 @@ public class AuthenticationMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="authenticationId">The id of the authentication request to delete.</param>
-    public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, string authenticationId)
+    public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, Guid authenticationId)
     {
         return await repository.DeleteAuthenticationRequest(authenticationId);
     }
