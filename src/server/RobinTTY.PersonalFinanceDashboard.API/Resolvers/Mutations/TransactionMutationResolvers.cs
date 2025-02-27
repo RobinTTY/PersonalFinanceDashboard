@@ -20,7 +20,7 @@ public class TransactionMutationResolvers
     {
         var transaction = new Transaction
         {
-            ThirdPartyId = null,
+            ThirdPartyTransactionId = null,
             AccountId = input.AccountId,
             Amount = input.Amount,
             Category = input.Category,
@@ -28,7 +28,8 @@ public class TransactionMutationResolvers
             Notes = input.Notes,
             Payee = input.Payee,
             Payer = input.Payer,
-            ValueDate = input.ValueDate
+            ValueDate = input.ValueDate,
+            Id = null
         };
         await repository.AddTransaction(transaction);
         return transaction;

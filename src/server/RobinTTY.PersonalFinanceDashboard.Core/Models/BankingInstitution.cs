@@ -1,4 +1,6 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
+
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// A banking institution to which <see cref="BankAccount"/>s belong.

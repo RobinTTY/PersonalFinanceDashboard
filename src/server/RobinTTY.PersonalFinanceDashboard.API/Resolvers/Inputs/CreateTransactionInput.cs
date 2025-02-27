@@ -4,7 +4,7 @@
 /// TODO
 /// </summary>
 public record CreateTransactionInput(
-    string AccountId,
+    Guid AccountId,
     DateTime? ValueDate,
     string? Payer,
     string? Payee,
@@ -16,7 +16,7 @@ public record CreateTransactionInput(
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
-    public string AccountId { get; set; } = AccountId;
+    public Guid AccountId { get; set; } = AccountId;
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>

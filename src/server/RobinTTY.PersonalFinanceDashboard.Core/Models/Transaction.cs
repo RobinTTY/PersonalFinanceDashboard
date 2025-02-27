@@ -1,22 +1,20 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
+
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class Transaction
+public class Transaction : DatabaseEntity
 {
-    /// <summary>
-    /// The id of the transaction.
-    /// </summary>
-    public Guid Id { get; set; }
     /// <summary>
     /// The id of the transaction provided by the third party data retrieval service.
     /// </summary>
-    public string? ThirdPartyId { get; set; }
+    public string? ThirdPartyTransactionId { get; set; }
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
-    public string AccountId { get; set; }
+    public Guid AccountId { get; set; }
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
@@ -55,8 +53,8 @@ public class Transaction
     // TODO: default values 
     public Transaction()
     {
-        ThirdPartyId = null;
-        AccountId = string.Empty;
+        ThirdPartyTransactionId = null;
+        AccountId = Guid.Empty;
         ValueDate = null;
         Payer = null;
         Payee = null;
@@ -71,7 +69,7 @@ public class Transaction
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
-    /// <param name="thirdPartyId">The id of the transaction provided by the third party data retrieval service.</param>
+    /// <param name="thirdPartyTransactionId">The id of the transaction provided by the third party data retrieval service.</param>
     /// <param name="accountId">The id of the account to which the transaction belongs.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
@@ -81,11 +79,11 @@ public class Transaction
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
-    public Transaction(Guid id, string thirdPartyId, string accountId, DateTime? valueDate, string payer, string payee, decimal amount,
+    public Transaction(Guid id, string thirdPartyTransactionId, Guid accountId, DateTime? valueDate, string payer, string payee, decimal amount,
         string currency, string category, string notes, List<Tag> tags)
     {
         Id = id;
-        ThirdPartyId = thirdPartyId;
+        ThirdPartyTransactionId = thirdPartyTransactionId;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;

@@ -70,7 +70,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id,
             ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
-            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+            requisition.Accounts.Select(accountId => new BankAccount(accountId)
+            {
+                Id = null
+            }).ToList())
         {
             Id = null
         };
@@ -92,7 +95,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
             ConvertRequisitionStatus(req.Status),
-            req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+            req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)
+            {
+                Id = null
+            }).ToList())
         {
             Id = null
         });
@@ -118,7 +124,10 @@ public class GoCardlessDataProviderService(NordigenClient client)
             var requisition = response.Result;
             var authenticationRequest = new AuthenticationRequest(requisition.Id,
                 ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
-                requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList())
+                requisition.Accounts.Select(accountId => new BankAccount(accountId)
+                {
+                    Id = null
+                }).ToList())
             {
                 Id = null
             };
@@ -163,7 +172,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return tasks.Select(task => task.Result).ToList();
     }
 
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(string accountId)
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId)
     {
         var response = await client.AccountsEndpoint.GetTransactions(accountId);
         // TODO: Also return pending transactions
@@ -173,7 +182,9 @@ public class GoCardlessDataProviderService(NordigenClient client)
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,
                 "example-category", "example-notes", [])
-        );
+            {
+                Id = null
+            });
         return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
             response.Error);
     }
@@ -201,7 +212,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return new BankAccount
         (
             // TODO: Convert Account
-            id: accountId,
+            thirdPartyId: accountId,
             accountType: account.CashAccountType.HasValue
                 ? Enum.GetName(typeof(CashAccountType), account.CashAccountType)
                 : null,
@@ -221,6 +232,9 @@ public class GoCardlessDataProviderService(NordigenClient client)
             {
                 Id = Guid.Empty
             },
-            associatedAuthenticationRequests: (List<AuthenticationRequest>) []);
+            associatedAuthenticationRequests: (List<AuthenticationRequest>) [])
+        {
+            Id = null
+        };
     }
 }

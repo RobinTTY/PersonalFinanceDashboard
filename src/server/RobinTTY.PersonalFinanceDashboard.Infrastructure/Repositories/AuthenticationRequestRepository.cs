@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
@@ -188,13 +187,11 @@ public class AuthenticationRequestRepository
     /// Deletes all existing <see cref="AuthenticationRequest"/>s.
     /// </summary>
     /// <returns>The number of deleted records.</returns>
-    private async Task<int> DeleteAuthenticationRequests()
-    {
-        return await _dbContext.AuthenticationRequests.ExecuteDeleteAsync();
-    }
+    private async Task<int> DeleteAuthenticationRequests() =>
+        await _dbContext.AuthenticationRequests.ExecuteDeleteAsync();
 
     /// <summary>
-    /// 
+    /// Refreshes the list of authentication requests if the data has gone stale.
     /// </summary>
     /// <exception cref="NotImplementedException">TODO</exception>
     // TODO: This is basically the same logic as other repositories with external data

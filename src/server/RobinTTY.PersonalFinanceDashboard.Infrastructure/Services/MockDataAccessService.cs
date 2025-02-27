@@ -18,8 +18,8 @@ public class MockDataAccessService
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
                 id: Guid.NewGuid(),
-                thirdPartyId: Guid.NewGuid().ToString(),
-                accountId: Guid.NewGuid().ToString(),
+                thirdPartyTransactionId: Guid.NewGuid().ToString(),
+                accountId: Guid.NewGuid(),
                 valueDate: f.Date.Between(new DateTime(2018, 01, 01), DateTime.Today),
                 payer: f.Person.FullName,
                 payee: f.Company.CompanyName(),
@@ -27,13 +27,16 @@ public class MockDataAccessService
                 //currency: "f.Finance.Currency().Code",
                 currency: "USD",
                 category: f.Commerce.Categories(1).First(),
-                tags: new List<Tag>
-                {
+                tags:
+                [
                     new Tag(Guid.NewGuid(), f.Commerce.ProductAdjective(), f.Commerce.ProductDescription(),
-                        f.Commerce.Color()),
-                },
+                        f.Commerce.Color())
+                ],
                 notes: f.Lorem.Sentence()
-            )).Generate(amount);
+            )
+            {
+                Id = null
+            }).Generate(amount);
     }
 
     /// <summary>
@@ -45,13 +48,16 @@ public class MockDataAccessService
     {
         return new Faker<Account>()
             .CustomInstantiator(f => new Account(
-                id: Guid.NewGuid(),
+                thirdPartyId: Guid.NewGuid(),
                 name: f.Person.FullName,
                 description: f.Finance.AccountName(),
                 balance: f.Finance.Amount(0, 5_000),
                 //currency: f.Finance.Currency().Code,
                 currency: "USD",
                 transactions: GetTransactions(f.Random.Number(0, 100)).ToList()
-            )).Generate(amount);
+            )
+            {
+                Id = Guid.NewGuid()
+            }).Generate(amount);
     }
 }

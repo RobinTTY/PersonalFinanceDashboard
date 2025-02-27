@@ -55,7 +55,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -87,6 +87,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OwnerName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ThirdPartyId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -193,12 +196,11 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Amount")
@@ -225,7 +227,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("Payer")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ThirdPartyId")
+                    b.Property<string>("ThirdPartyTransactionId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ValueDate")

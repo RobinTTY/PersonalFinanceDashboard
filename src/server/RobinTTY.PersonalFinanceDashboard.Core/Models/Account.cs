@@ -1,16 +1,12 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
+
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// An account is an entity that represents for instance a checking account at a bank or an investment account.
 /// </summary>
-public class Account
+public class Account : ThirdPartyEntity
 {
-    // TODO: The graphql data model should use the id scalar type
-    // see: https://chillicream.com/docs/hotchocolate/v13/fetching-data/pagination#changing-the-node-type
-    /// <summary>
-    /// The id of the account.
-    /// </summary>
-    public Guid Id { get; set; }
     /// <summary>
     /// The name of the account.
     /// </summary>
@@ -41,14 +37,14 @@ public class Account
     /// <summary>
     /// Creates a new instance of <see cref="Account"/>.
     /// </summary>
-    /// <param name="id">The id of the account.</param>
+    /// <param name="thirdPartyId">The third party id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
     /// <param name="currency">The currency this account is denominated in.</param>
-    public Account(Guid id, string? name, string? description, decimal? balance, string? currency)
+    public Account(Guid thirdPartyId, string? name, string? description, decimal? balance, string? currency)
     {
-        Id = id;
+        ThirdPartyId = thirdPartyId;
         Name = name;
         Description = description;
         Balance = balance;
@@ -59,34 +55,19 @@ public class Account
     /// <summary>
     /// Creates a new instance of <see cref="Account"/>.
     /// </summary>
-    /// <param name="id">The id of the account.</param>
+    /// <param name="thirdPartyId">The third party id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
     /// <param name="currency">The currency this account is denominated in.</param>
     /// <param name="transactions">Transactions that are associated with this account.</param>
-    public Account(Guid id, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
+    public Account(Guid thirdPartyId, string? name, string? description, decimal? balance, string? currency, List<Transaction> transactions)
     {
-        Id = id;
+        ThirdPartyId = thirdPartyId;
         Name = name;
         Description = description;
         Balance = balance;
         Currency = currency;
         Transactions = transactions;
     }
-}
-
-/// <summary>
-/// Identifies the type of account.
-/// </summary>
-public enum AccountType
-{
-    /// <summary>
-    /// Account for which the value only changes through transactions (e.g. checking account at a bank).
-    /// </summary>
-    General,
-    /// <summary>
-    /// Account for which the value can change without any transaction occurring (e.g. investment account holding stocks).
-    /// </summary>
-    Investment
 }

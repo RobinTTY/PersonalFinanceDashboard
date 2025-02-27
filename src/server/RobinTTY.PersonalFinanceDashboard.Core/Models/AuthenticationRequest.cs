@@ -1,11 +1,9 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
 
-public class AuthenticationRequest : DatabaseEntity
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+
+public class AuthenticationRequest : ThirdPartyEntity
 {
-    /// <summary>
-    /// The unique id assigned by the third party data retrieval service.
-    /// </summary>
-    public Guid ThirdPartyId { get; set; }
     /// <summary>
     /// The status of this authentication request.
     /// </summary>
@@ -36,7 +34,6 @@ public class AuthenticationRequest : DatabaseEntity
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink)
     {
-        Id = null;
         ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
@@ -52,7 +49,6 @@ public class AuthenticationRequest : DatabaseEntity
     public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
         ICollection<BankAccount> associatedAccounts)
     {
-        Id = null;
         ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;

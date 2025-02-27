@@ -1,4 +1,4 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
 
 /// <summary>
 /// An entity which is stored in a database.
