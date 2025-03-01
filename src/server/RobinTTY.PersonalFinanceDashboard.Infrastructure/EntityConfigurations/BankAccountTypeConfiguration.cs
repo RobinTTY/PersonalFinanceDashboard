@@ -8,6 +8,6 @@ public class BankAccountTypeConfiguration : IEntityTypeConfiguration<BankAccount
 {
     public void Configure(EntityTypeBuilder<BankAccount> builder)
     {
-        builder.HasIndex(entity => entity.ThirdPartyId);
+        builder.HasIndex(entity => entity.ThirdPartyId).IsUnique();
     }
 }

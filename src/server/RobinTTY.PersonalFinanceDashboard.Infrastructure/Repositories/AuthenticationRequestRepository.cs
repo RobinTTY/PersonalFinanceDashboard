@@ -190,7 +190,7 @@ public class AuthenticationRequestRepository
         foreach (var associatedAccount in associatedAccounts)
         {
             var matchingAccount = await _dbContext.BankAccounts
-                .SingleOrDefaultAsync(account => account.Id == associatedAccount.Id);
+                .SingleOrDefaultAsync(account => account.ThirdPartyId == associatedAccount.ThirdPartyId);
 
             if (matchingAccount is null)
             {
