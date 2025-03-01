@@ -120,7 +120,6 @@ public class BankingInstitutionRepository
     /// <summary>
     /// Refreshes the list of banking institutions if the data has gone stale.
     /// </summary>
-    /// <exception cref="NotImplementedException">TODO</exception>
     private async Task RefreshBankingInstitutionsIfStale()
     {
         var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
@@ -140,9 +139,12 @@ public class BankingInstitutionRepository
             }
             else
             {
+                _logger.LogError(
+                    "Refreshing stale banking institutions failed. Error summary: \"{message}\" Error details: \"{details}\"",
+                    response.Error.Summary, response.Error.Detail);
+
                 // TODO: What to do in case of failure should depend on if we already have data
-                // Log failure and continue, maybe also send a notification to frontend
-                throw new NotImplementedException();
+                // Log failure and continue, maybe also send a notification to frontend, maybe through SignalR endpoint
             }
         }
     }
