@@ -184,17 +184,8 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
-    /// Deletes all existing <see cref="AuthenticationRequest"/>s.
-    /// </summary>
-    /// <returns>The number of deleted records.</returns>
-    private async Task<int> DeleteAuthenticationRequests() =>
-        await _dbContext.AuthenticationRequests.ExecuteDeleteAsync();
-
-    /// <summary>
     /// Refreshes the list of authentication requests if the data has gone stale.
     /// </summary>
-    /// <exception cref="NotImplementedException">TODO</exception>
-    // TODO: This is basically the same logic as other repositories with external data
     private async Task RefreshAuthenticationRequestsIfStale()
     {
         var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
@@ -208,14 +199,17 @@ public class AuthenticationRequestRepository
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
                 _logger.LogInformation(
-                    "Refreshed stale Authentication request data. {updateRecords} records were updated.",
+                    "Refreshed stale authentication request data. {updateRecords} records were updated.",
                     response.Result.Count());
             }
             else
             {
+                _logger.LogError(
+                    "Refreshing stale authentication requests failed. Error summary: \"{message}\" Error details: \"{details}\"",
+                    response.Error.Summary, response.Error.Detail);
+                
                 // TODO: What to do in case of failure should depend on if we already have data
-                // Log failure and continue, maybe also send a notification to frontend
-                throw new NotImplementedException();
+                // Log failure and continue, maybe also send a notification to frontend, maybe through SignalR endpoint
             }
         }
     }

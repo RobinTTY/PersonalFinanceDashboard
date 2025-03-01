@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 

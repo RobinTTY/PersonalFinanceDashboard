@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.EntityConfigurations;
 
