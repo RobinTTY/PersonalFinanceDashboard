@@ -45,7 +45,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGraphQlServices(this IServiceCollection services)
     {
         var requestExecutorBuilder = services
-            // TODO: Configure cost analyzer at some point (enforces maximum query costs)
             .AddGraphQLServer()
             // Adds all GraphQL query and mutation types using the code generator (looks for attributes)
             .AddResolvers()
@@ -57,6 +56,11 @@ public static class ServiceCollectionExtensions
             .ModifyOptions(options =>
             {
                 options.StripLeadingIFromInterface = true;
+            })
+            // TODO: Configure cost analyzer at some point (enforces maximum query costs)
+            .ModifyCostOptions(options =>
+            {
+                options.EnforceCostLimits = false;
             });
 
         return requestExecutorBuilder.Services;
