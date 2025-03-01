@@ -49,8 +49,7 @@ public static class ServiceCollectionExtensions
             .AddGraphQLServer(disableCostAnalyzer: true)
             // Adds all GraphQL query and mutation types using the code generator (looks for attributes)
             .AddResolvers()
-            // TODO: Document what the different extensions methods do
-            // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg
+            // Enables returning FieldResult type errors
             .AddQueryConventions()
             .AddMutationConventions()
             // Enables efficient querying of the underlying db via projections

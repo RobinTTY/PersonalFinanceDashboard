@@ -48,9 +48,11 @@ public class Transaction : DatabaseEntity
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain sub-categories).
     /// </summary>
-    public List<Tag> Tags { get; set; }
+    public List<Tag> Tags { get; set; } = [];
 
-    // TODO: default values 
+    /// <summary>
+    /// Creates a new instance of <see cref="Transaction"/>.
+    /// </summary>
     public Transaction()
     {
         ThirdPartyTransactionId = null;
@@ -62,7 +64,6 @@ public class Transaction : DatabaseEntity
         Currency = string.Empty;
         Category = string.Empty;
         Notes = string.Empty;
-        Tags = [];
     }
 
     /// <summary>

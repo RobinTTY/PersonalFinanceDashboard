@@ -23,15 +23,22 @@ public class Account : ThirdPartyEntity
     /// The currency this account is denominated in.
     /// </summary>
     public string? Currency { get; set; }
+
     /// <summary>
     /// Transactions that are associated with this account.
     /// </summary>
-    public List<Transaction> Transactions { get; set; }
+    public List<Transaction> Transactions { get; set; } = [];
 
-    // TODO
+    /// <summary>
+    /// Creates a new instance of <see cref="Account"/>.
+    /// </summary>
     public Account()
     {
-        
+        ThirdPartyId = Guid.Empty;
+        Name = string.Empty;
+        Description = string.Empty;
+        Balance = null;
+        Currency = string.Empty;
     }
     
     /// <summary>
@@ -49,7 +56,6 @@ public class Account : ThirdPartyEntity
         Description = description;
         Balance = balance;
         Currency = currency;
-        Transactions = [];
     }
 
     /// <summary>

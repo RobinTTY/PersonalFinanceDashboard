@@ -23,10 +23,11 @@ public class BankingInstitution : DatabaseEntity
     /// A <see cref="Uri"/> for the logo of the institution
     /// </summary>
     public Uri LogoUri { get; set; }
+
     /// <summary>
     /// The countries the institution operates in.
     /// </summary>
-    public List<string> Countries { get; set; }
+    public List<string> Countries { get; set; } = [];
 
     /// <summary>
     /// Creates a new instance of <see cref="BankingInstitution"/>.
@@ -37,7 +38,6 @@ public class BankingInstitution : DatabaseEntity
         Bic = string.Empty;
         Name = string.Empty;
         LogoUri = new Uri("https://example.com");
-        Countries = [];
     }
 
     /// <summary>

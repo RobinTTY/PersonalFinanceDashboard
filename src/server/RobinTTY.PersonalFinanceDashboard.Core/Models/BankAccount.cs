@@ -33,11 +33,20 @@ public class BankAccount : Account
     /// <summary>
     /// Authentication requests made for this bank account.
     /// </summary>
-    public ICollection<AuthenticationRequest> AssociatedAuthenticationRequests { get; set; }
+    public List<AuthenticationRequest> AssociatedAuthenticationRequests { get; set; } = [];
 
-    // TODO
+    /// <summary>
+    /// Creates a new instance of <see cref="BankAccount"/>.
+    /// </summary>
     public BankAccount()
     {
+        Id = Guid.Empty;
+        Iban = null;
+        Bic = null;
+        Bban = null;
+        OwnerName = null;
+        AccountType = null;
+        AssociatedInstitution = null;
     }
 
     /// <summary>
@@ -58,7 +67,7 @@ public class BankAccount : Account
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     public BankAccount(Guid thirdPartyId, string? name = null, string? description = null, decimal? balance = null,
         string? currency = null, string? iban = null, string? bic = null, string? bban = null, string? ownerName = null,
-        string? accountType = null, ICollection<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(thirdPartyId,
+        string? accountType = null, List<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(thirdPartyId,
         name, description, balance, currency)
     {
         Iban = iban;
@@ -67,7 +76,7 @@ public class BankAccount : Account
         OwnerName = ownerName;
         AccountType = accountType;
         AssociatedInstitution = null;
-        AssociatedAuthenticationRequests = associatedAuthenticationRequests ?? new List<AuthenticationRequest>();
+        AssociatedAuthenticationRequests = associatedAuthenticationRequests ?? [];
     }
 
     /// <summary>
@@ -91,7 +100,7 @@ public class BankAccount : Account
     public BankAccount(Guid thirdPartyId, string? name, string? description, decimal? balance, string? currency,
         List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType,
-        BankingInstitution? associatedInstitution, ICollection<AuthenticationRequest> associatedAuthenticationRequests)
+        BankingInstitution? associatedInstitution, List<AuthenticationRequest> associatedAuthenticationRequests)
         : base(thirdPartyId, name, description, balance, currency, transactions)
     {
         Iban = iban;

@@ -30,7 +30,6 @@ public class Tag
     
     /// <summary>
     /// Creates a new instance of <see cref="Tag"/>.
-    /// Default constructor necessary for GraphQL projections.
     /// </summary>
     public Tag()
     {

@@ -12,17 +12,20 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// A <see cref="Uri"/> which can be used to start the authentication via the third party provider.
     /// </summary>
     public Uri AuthenticationLink { get; set; }
+
     /// <summary>
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
-    public ICollection<BankAccount> AssociatedAccounts { get; set; } = new List<BankAccount>();
+    public List<BankAccount> AssociatedAccounts { get; set; } = [];
 
     /// <summary>
-    /// TODO
+    /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// </summary>
     public AuthenticationRequest()
     {
-        
+        ThirdPartyId = Guid.Empty;
+        Status = AuthenticationStatus.Unknown;
+        AuthenticationLink = new Uri("https://www.placeholder.example/");
     }
     
     /// <summary>
@@ -47,7 +50,7 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
     public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
-        ICollection<BankAccount> associatedAccounts)
+        List<BankAccount> associatedAccounts)
     {
         ThirdPartyId = thirdPartyId;
         Status = status;
@@ -61,6 +64,11 @@ public class AuthenticationRequest : ThirdPartyEntity
 /// </summary>
 public enum AuthenticationStatus
 {
+    /// <summary>
+    /// Assigned if the status of the authentication request couldn't be determined.
+    /// </summary>
+    Unknown,
+    
     /// <summary>
     /// A user action is required for the authentication to proceed.
     /// </summary>
