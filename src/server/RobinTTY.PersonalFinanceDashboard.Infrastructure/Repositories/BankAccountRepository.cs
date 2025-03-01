@@ -89,4 +89,18 @@ public class BankAccountRepository
         var result = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId).ExecuteDeleteAsync();
         return Convert.ToBoolean(result);
     }
+
+    /// <summary>
+    /// Refreshes the list of bank accounts if the data has gone stale.
+    /// </summary>
+    private async Task RefreshBankAccountsIfStale()
+    {
+        var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts);
+        // var test = await _dbContext.BankAccounts.Where(account => account.ThirdPartyId == null)
+        
+        if (dataIsStale)
+        {
+            // var response = await _dataProviderService.GetBankAccounts()
+        }
+    }
 }
