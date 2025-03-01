@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
     {
         var requestExecutorBuilder = services
             // TODO: Configure cost analyzer at some point (enforces maximum query costs)
-            .AddGraphQLServer(disableCostAnalyzer: true)
+            .AddGraphQLServer()
             // Adds all GraphQL query and mutation types using the code generator (looks for attributes)
             .AddResolvers()
             // Enables returning FieldResult type errors
