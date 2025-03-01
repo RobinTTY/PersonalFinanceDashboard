@@ -14,28 +14,29 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 /// </summary>
 public class AuthenticationRequestRepository
 {
-    private readonly ILogger<AuthenticationRequestRepository> _logger;
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
     private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
+    private readonly ILogger<AuthenticationRequestRepository> _logger;
+
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequestRepository"/>.
     /// </summary>
-    /// <param name="logger">Logger used for monitoring purposes.</param>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
     /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
+    /// <param name="logger">Logger used for monitoring purposes.</param>
     public AuthenticationRequestRepository(
-        ILogger<AuthenticationRequestRepository> logger,
         ApplicationDbContext dbContext,
         GoCardlessDataProviderService dataProviderService,
-        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService)
+        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
+        ILogger<AuthenticationRequestRepository> logger)
     {
-        _logger = logger;
         _dbContext = dbContext;
         _dataProviderService = dataProviderService;
         _dataRetrievalMetadataService = dataRetrievalMetadataService;
+        _logger = logger;
     }
 
     /// <summary>
