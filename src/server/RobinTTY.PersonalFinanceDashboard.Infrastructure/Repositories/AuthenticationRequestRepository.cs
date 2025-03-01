@@ -119,15 +119,45 @@ public class AuthenticationRequestRepository
     }
 
     /// <summary>
+    /// Refreshes the list of authentication requests if the data has gone stale.
+    /// </summary>
+    private async Task RefreshAuthenticationRequestsIfStale()
+    {
+        var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
+        if (dataIsStale)
+        {
+            // TODO: Remove limit, use paging
+            var response = await _dataProviderService.GetAuthenticationRequests(100);
+            if (response.IsSuccessful)
+            {
+                var requests = response.Result.ToList();
+                await SyncAuthenticationRequestEntities(requests);
+                await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
+
+                _logger.LogInformation(
+                    "Refreshed stale authentication request data. {updateRecords} records were updated.",
+                    response.Result.Count());
+            }
+            else
+            {
+                _logger.LogError(
+                    "Refreshing stale authentication requests failed. Error summary: \"{message}\" Error details: \"{details}\"",
+                    response.Error.Summary, response.Error.Detail);
+
+                // TODO: What to do in case of failure should depend on if we already have data
+                // Log failure and continue, maybe also send a notification to frontend, maybe through SignalR endpoint
+            }
+        }
+    }
+
+    /// <summary>
     /// Syncs the authentication requests the database contains with the external data provider.
     /// </summary>
     /// <param name="authenticationRequests">The list of <see cref="AuthenticationRequest"/>s to add.</param>
-    private async Task SyncAuthenticationRequestEntities(
-        IEnumerable<AuthenticationRequest> authenticationRequests)
+    private async Task SyncAuthenticationRequestEntities(List<AuthenticationRequest> authenticationRequests)
     {
-        var authRequests = authenticationRequests.ToList();
-        await AddOrUpdateAuthRequests(authRequests);
-        await DeleteOutdatedAuthenticationRequests(authRequests);
+        await AddOrUpdateAuthRequests(authenticationRequests);
+        await DeleteOutdatedAuthenticationRequests(authenticationRequests);
     }
 
     /// <summary>
@@ -181,36 +211,5 @@ public class AuthenticationRequestRepository
         await _dbContext.AuthenticationRequests
             .Where(dbReq => updatedAuthReqIds.All(updatedReqId => updatedReqId != dbReq.ThirdPartyId))
             .ExecuteDeleteAsync();
-    }
-
-    /// <summary>
-    /// Refreshes the list of authentication requests if the data has gone stale.
-    /// </summary>
-    private async Task RefreshAuthenticationRequestsIfStale()
-    {
-        var dataIsStale = await _dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
-        if (dataIsStale)
-        {
-            // TODO: Remove limit, use paging
-            var response = await _dataProviderService.GetAuthenticationRequests(100);
-            if (response.IsSuccessful)
-            {
-                await SyncAuthenticationRequestEntities(response.Result);
-                await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
-
-                _logger.LogInformation(
-                    "Refreshed stale authentication request data. {updateRecords} records were updated.",
-                    response.Result.Count());
-            }
-            else
-            {
-                _logger.LogError(
-                    "Refreshing stale authentication requests failed. Error summary: \"{message}\" Error details: \"{details}\"",
-                    response.Error.Summary, response.Error.Detail);
-                
-                // TODO: What to do in case of failure should depend on if we already have data
-                // Log failure and continue, maybe also send a notification to frontend, maybe through SignalR endpoint
-            }
-        }
     }
 }

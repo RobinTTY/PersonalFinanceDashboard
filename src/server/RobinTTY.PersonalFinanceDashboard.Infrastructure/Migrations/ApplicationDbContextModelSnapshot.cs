@@ -29,7 +29,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasIndex("AssociatedAuthenticationRequestsId");
 
-                    b.ToTable("AuthenticationRequestBankAccount");
+                    b.ToTable("AuthenticationRequestBankAccount", (string)null);
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.AuthenticationRequest", b =>
@@ -50,7 +50,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuthenticationRequests");
+                    b.ToTable("AuthenticationRequests", (string)null);
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
@@ -96,7 +96,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasIndex("AssociatedInstitutionId");
 
-                    b.ToTable("BankAccounts");
+                    b.ToTable("BankAccounts", (string)null);
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", b =>
@@ -127,7 +127,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BankingInstitutions");
+                    b.ToTable("BankingInstitutions", (string)null);
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", b =>
@@ -150,7 +150,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.ThirdPartyDataRetrievalMetadata", b =>
@@ -173,7 +173,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ThirdPartyDataRetrievalMetadata");
+                    b.ToTable("ThirdPartyDataRetrievalMetadata", (string)null);
 
                     b.HasData(
                         new
@@ -237,7 +237,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasIndex("BankAccountId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("TagTransaction", b =>
@@ -252,7 +252,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasIndex("TransactionsId");
 
-                    b.ToTable("TagTransaction");
+                    b.ToTable("TagTransaction", (string)null);
                 });
 
             modelBuilder.Entity("AuthenticationRequestBankAccount", b =>

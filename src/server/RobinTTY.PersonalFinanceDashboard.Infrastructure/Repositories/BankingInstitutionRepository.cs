@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -98,15 +99,6 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
-    /// Deletes all existing <see cref="BankingInstitution"/>s.
-    /// </summary>
-    /// <returns>The number of deleted records.</returns>
-    public async Task<int> DeleteBankingInstitutions()
-    {
-        return await _dbContext.BankingInstitutions.ExecuteDeleteAsync();
-    }
-
-    /// <summary>
     /// Deletes an existing <see cref="BankingInstitution"/>.
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to delete.</param>
@@ -129,8 +121,8 @@ public class BankingInstitutionRepository
             if (response.IsSuccessful)
             {
                 // TODO: This needs to be updated to account for user generated banking institutions
-                await DeleteBankingInstitutions();
-                await AddBankingInstitutions(response.Result);
+                var institutions = response.Result.ToList();
+                await SyncBankingInstitutionEntities(institutions);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
 
                 _logger.LogInformation(
@@ -147,5 +139,43 @@ public class BankingInstitutionRepository
                 // Log failure and continue, maybe also send a notification to frontend, maybe through SignalR endpoint
             }
         }
+    }
+
+    /// <summary>
+    /// Syncs the banking institutions the database contains with the external data provider.
+    /// </summary>
+    /// <param name="bankingInstitutions">The list of <see cref="BankingInstitution"/>s to add.</param>
+    private async Task SyncBankingInstitutionEntities(List<BankingInstitution> bankingInstitutions)
+    {
+        await AddOrUpdateBankingInstitutions(bankingInstitutions);
+        await DeleteOutdatedBankingInstitutions(bankingInstitutions);
+    }
+
+    /// <summary>
+    /// Adds or updates banking institutions based on the information retrieved from the third party data provider.
+    /// </summary>
+    /// <param name="bankingInstitutions">The banking institutions retrieved from the third party data provider.</param>
+    private async Task AddOrUpdateBankingInstitutions(List<BankingInstitution> bankingInstitutions)
+    {
+        foreach (var bankingInstitution in bankingInstitutions)
+        {
+            await _dbContext.AddOrUpdateBankingInstitution(bankingInstitution);
+        }
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Removes banking institutions which are no longer tracked by the third party data provider from the db.
+    /// </summary>
+    /// <param name="bankingInstitutions">The banking institutions as retrieved from the third party data provider.</param>
+    private async Task DeleteOutdatedBankingInstitutions(List<BankingInstitution> bankingInstitutions)
+    {
+        var updatedBankingInstitutionIds = bankingInstitutions.Select(inst => inst.ThirdPartyId).ToList();
+        await _dbContext.BankingInstitutions
+            .Where(dbInstitution =>
+                updatedBankingInstitutionIds.All(updatedInstitutionId =>
+                    updatedInstitutionId != dbInstitution.ThirdPartyId))
+            .ExecuteDeleteAsync();
     }
 }
