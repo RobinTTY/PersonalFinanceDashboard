@@ -3,7 +3,6 @@ using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
-using Guid = System.Guid;
 using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -19,7 +18,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         string institutionId)
     {
         var response = await client.InstitutionsEndpoint.GetInstitution(institutionId);
-        
+
         // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
         BankingInstitution? result = null;
         if (response.IsSuccess)
@@ -147,23 +146,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result,
             response.Error);
     }
-
-    public async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId)
-    {
-        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId);
-        var balanceTask = client.AccountsEndpoint.GetBalances(accountId);
-
-        // TODO: Handle possible null values
-        var accountDetailsRequest = await accountDetailsTask;
-        var balanceRequest = await balanceTask;
-        var accountDetailsResult = accountDetailsRequest.Result!;
-        var balanceResult = balanceRequest.Result!;
-        var bankAccount = ConvertAccount(accountId, accountDetailsResult, balanceResult);
-
-        return new ThirdPartyResponse<BankAccount, AccountsError>(
-            accountDetailsRequest.IsSuccess && balanceRequest.IsSuccess, bankAccount, accountDetailsRequest.Error);
-    }
-
+    
     public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(
         IEnumerable<Guid> accountIds)
     {
@@ -171,7 +154,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         await Task.WhenAll(tasks);
         return tasks.Select(task => task.Result).ToList();
     }
-
+    
     public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId)
     {
         var response = await client.AccountsEndpoint.GetTransactions(accountId);
@@ -189,7 +172,26 @@ public class GoCardlessDataProviderService(NordigenClient client)
             response.Error);
     }
 
-    private AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
+    private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId)
+    {
+        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId);
+        var balanceTask = client.AccountsEndpoint.GetBalances(accountId);
+        var accountDetailsResponse = await accountDetailsTask;
+        var balanceResponse = await balanceTask;
+
+        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess)
+            return new ThirdPartyResponse<BankAccount, AccountsError>(
+                accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, null, accountDetailsResponse.Error);
+        
+        var accountDetailsResult = accountDetailsResponse.Result!;
+        var balanceResult = balanceResponse.Result!;
+        var bankAccount = ConvertAccount(accountId, accountDetailsResult, balanceResult);
+
+        return new ThirdPartyResponse<BankAccount, AccountsError>(
+            accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);
+    }
+
+    private static AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
     {
         return status switch
         {
@@ -201,7 +203,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
             RequisitionStatus.Undefined => AuthenticationStatus.Failed,
             RequisitionStatus.Suspended => AuthenticationStatus.Failed,
             RequisitionStatus.Rejected => AuthenticationStatus.Failed,
-            RequisitionStatus.Linked => AuthenticationStatus.Successful,
+            RequisitionStatus.Linked => AuthenticationStatus.Active,
             RequisitionStatus.Expired => AuthenticationStatus.Expired,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
@@ -232,7 +234,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
             {
                 Id = Guid.Empty
             },
-            associatedAuthenticationRequests: (List<AuthenticationRequest>) [])
+            associatedAuthenticationRequests: [])
         {
             Id = null
         };

@@ -82,7 +82,7 @@ public enum AuthenticationStatus
     /// <summary>
     /// The authentication was successful and associated accounts can be used.
     /// </summary>
-    Successful,
+    Active,
 
     /// <summary>
     /// The authentication failed.

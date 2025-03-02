@@ -171,10 +171,12 @@ public class BankAccountRepository
             bankAccount.AssociatedInstitution = null;
             bankAccount.AssociatedAuthenticationRequests.Clear();
 
+            if (associatedAuthenticationRequests.All(request => request.Status != AuthenticationStatus.Active))
+                continue;
+            
             await _dbContext.AddOrUpdateBankAccount(bankAccount);
             await LinkAssociatedInstitutionToBankAccount(bankAccount, associatedInstitution);
             await LinkAssociatedAuthenticationRequestsToBankAccount(bankAccount, associatedAuthenticationRequests);
-            await _dbContext.SaveChangesAsync();
         }
 
         await _dbContext.SaveChangesAsync();
