@@ -15,6 +15,9 @@ public class
                 TimeSpan.FromDays(7)),
             new ThirdPartyDataRetrievalMetadata(new Guid("0b53ec13-5a8c-4910-bfff-1ba06c3f3859"),
                 ThirdPartyDataType.AuthenticationRequests, ThirdPartyDataSource.GoCardless, DateTime.MinValue,
+                TimeSpan.FromDays(7)),
+            new ThirdPartyDataRetrievalMetadata(new Guid("6a7aa33d-1a81-46fe-80b2-d449ba851861"),
+                ThirdPartyDataType.BankAccounts, ThirdPartyDataSource.GoCardless, DateTime.MinValue,
                 TimeSpan.FromDays(7))
         );
     }

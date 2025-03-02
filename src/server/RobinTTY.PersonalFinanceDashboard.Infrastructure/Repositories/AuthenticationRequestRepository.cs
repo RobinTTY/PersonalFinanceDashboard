@@ -131,13 +131,13 @@ public class AuthenticationRequestRepository
             var response = await _dataProviderService.GetAuthenticationRequests(100);
             if (response.IsSuccessful)
             {
-                var requests = response.Result.ToList();
-                await SyncAuthenticationRequestEntities(requests);
+                var authRequests = response.Result.ToList();
+                await SyncAuthenticationRequestEntities(authRequests);
                 await _dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
                 _logger.LogInformation(
                     "Refreshed stale authentication request data. {updateRecords} records were updated.",
-                    response.Result.Count());
+                    authRequests.Count);
             }
             else
             {

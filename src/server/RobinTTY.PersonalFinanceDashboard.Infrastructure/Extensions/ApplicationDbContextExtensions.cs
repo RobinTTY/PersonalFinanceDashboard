@@ -56,6 +56,32 @@ public static class ApplicationDbContextExtensions
         return OperationType.Insert;
     }
 
+    public static async Task<OperationType> AddOrUpdateBankAccount(this ApplicationDbContext context,
+        BankAccount bankAccount)
+    {
+        var existingBankAccount = context.BankAccounts
+            .SingleOrDefault(account => account.ThirdPartyId == bankAccount.ThirdPartyId);
+
+        if (existingBankAccount != null)
+        {
+            existingBankAccount.Name = bankAccount.Name;
+            existingBankAccount.Iban = bankAccount.Iban;
+            existingBankAccount.Bic = bankAccount.Bic;
+            existingBankAccount.Bban = bankAccount.Bban;
+            existingBankAccount.Balance = bankAccount.Balance;
+            existingBankAccount.Currency = bankAccount.Currency;
+            existingBankAccount.OwnerName = bankAccount.OwnerName;
+            existingBankAccount.AccountType = bankAccount.AccountType;
+            existingBankAccount.Description = bankAccount.Description;
+            existingBankAccount.AssociatedInstitution = bankAccount.AssociatedInstitution;
+            
+            return OperationType.Update;
+        }
+
+        await context.BankAccounts.AddAsync(bankAccount);
+        return OperationType.Insert;
+    }
+
     public enum OperationType
     {
         Undefined,

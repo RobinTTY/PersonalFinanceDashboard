@@ -127,7 +127,7 @@ public class BankingInstitutionRepository
 
                 _logger.LogInformation(
                     "Refreshed stale banking institution data. {updateRecords} records were updated.",
-                    response.Result.Count());
+                    institutions.Count);
             }
             else
             {
