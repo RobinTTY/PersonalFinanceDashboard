@@ -15,9 +15,9 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 public class GoCardlessDataProviderService(NordigenClient client)
 {
     public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
-        string institutionId)
+        string institutionId, CancellationToken cancellationToken = default)
     {
-        var response = await client.InstitutionsEndpoint.GetInstitution(institutionId);
+        var response = await client.InstitutionsEndpoint.GetInstitution(institutionId, cancellationToken);
 
         // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
         BankingInstitution? result = null;
@@ -34,11 +34,12 @@ public class GoCardlessDataProviderService(NordigenClient client)
     /// Gets the banking institutions which are available via this data provider.
     /// </summary>
     /// <param name="country">Optional country filter to apply to the query.</param>
+    /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The available banking <see cref="Institution"/>s.</returns>
     public async Task<ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>> GetBankingInstitutions(
-        string? country = null)
+        string? country = null, CancellationToken cancellationToken = default)
     {
-        var response = await client.InstitutionsEndpoint.GetInstitutions(country);
+        var response = await client.InstitutionsEndpoint.GetInstitutions(country, cancellationToken: cancellationToken);
 
         if (response.IsSuccess)
         {
@@ -60,16 +61,16 @@ public class GoCardlessDataProviderService(NordigenClient client)
     /// Gets an existing authentication request (requisitions).
     /// </summary>
     /// <param name="requisitionId">The institutionId of the requisition to be retrieved.</param>
+    /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> which matches the institutionId, as far as it exists.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>> GetAuthenticationRequest(
-        string requisitionId)
+        string requisitionId, CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId);
+        var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId, cancellationToken);
         // TODO: handle request failure
         var requisition = response.Result!;
-        var result = new AuthenticationRequest(requisition.Id,
-            ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
-            requisition.Accounts.Select(accountId => new BankAccount(accountId)
+        var result = new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
+            requisition.AuthenticationLink, requisition.Accounts.Select(accountId => new BankAccount(accountId)
             {
                 Id = null
             }).ToList())
@@ -85,19 +86,20 @@ public class GoCardlessDataProviderService(NordigenClient client)
     /// Gets existing authentication requests (requisitions) for all banking institutions.
     /// </summary>
     /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
+    /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
     public async Task<ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>> GetAuthenticationRequests(
-        int requisitionLimit)
+        int requisitionLimit, CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0);
+        var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0, cancellationToken);
         // TODO: handle request failure
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
-            ConvertRequisitionStatus(req.Status),
-            req.AuthenticationLink, req.Accounts.Select(accountId => new BankAccount(accountId)
-            {
-                Id = null
-            }).ToList())
+            req.Status.ToAuthenticationStatus(), req.AuthenticationLink, req.Accounts.Select(accountId =>
+                new BankAccount(accountId)
+                {
+                    Id = null
+                }).ToList())
         {
             Id = null
         });
@@ -110,19 +112,20 @@ public class GoCardlessDataProviderService(NordigenClient client)
     /// </summary>
     /// <param name="institutionId">Id of the institution for which to create the requisition.</param>
     /// <param name="redirectUri"><see cref="Uri"/> which will be redirected too when the user completes authentication for the given requisition.</param>
+    /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The created <see cref="Requisition"/>.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> CreateAuthenticationRequest(
-        string institutionId, Uri redirectUri)
+        string institutionId, Uri redirectUri, CancellationToken cancellationToken = default)
     {
         var response =
             await client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri,
-                reference: Guid.NewGuid().ToString());
+                reference: Guid.NewGuid().ToString(), cancellationToken: cancellationToken);
 
         if (response.IsSuccess)
         {
             var requisition = response.Result;
             var authenticationRequest = new AuthenticationRequest(requisition.Id,
-                ConvertRequisitionStatus(requisition.Status), requisition.AuthenticationLink,
+                requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink,
                 requisition.Accounts.Select(accountId => new BankAccount(accountId)
                 {
                     Id = null
@@ -140,24 +143,25 @@ public class GoCardlessDataProviderService(NordigenClient client)
     }
 
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
-        Guid authenticationId)
+        Guid authenticationId, CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.DeleteRequisition(authenticationId);
+        var response = await client.RequisitionsEndpoint.DeleteRequisition(authenticationId, cancellationToken);
         return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result,
             response.Error);
     }
-    
+
     public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(
-        IEnumerable<Guid> accountIds)
+        IEnumerable<Guid> accountIds, CancellationToken cancellationToken = default)
     {
-        var tasks = accountIds.Select(GetBankAccount).ToList();
+        var tasks = accountIds.Select(accountId => GetBankAccount(accountId, cancellationToken)).ToList();
         await Task.WhenAll(tasks);
         return tasks.Select(task => task.Result).ToList();
     }
-    
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId)
+
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId,
+        CancellationToken cancellationToken = default)
     {
-        var response = await client.AccountsEndpoint.GetTransactions(accountId);
+        var response = await client.AccountsEndpoint.GetTransactions(accountId, cancellationToken: cancellationToken);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
             new Transaction(Guid.NewGuid(), transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
@@ -172,71 +176,23 @@ public class GoCardlessDataProviderService(NordigenClient client)
             response.Error);
     }
 
-    private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId)
+    private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
+        CancellationToken cancellationToken = default)
     {
-        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId);
-        var balanceTask = client.AccountsEndpoint.GetBalances(accountId);
+        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId, cancellationToken);
+        var balanceTask = client.AccountsEndpoint.GetBalances(accountId, cancellationToken);
         var accountDetailsResponse = await accountDetailsTask;
         var balanceResponse = await balanceTask;
 
         if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess)
             return new ThirdPartyResponse<BankAccount, AccountsError>(
                 accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, null, accountDetailsResponse.Error);
-        
-        var accountDetailsResult = accountDetailsResponse.Result!;
-        var balanceResult = balanceResponse.Result!;
-        var bankAccount = ConvertAccount(accountId, accountDetailsResult, balanceResult);
+
+        var accountDetailsResult = accountDetailsResponse.Result;
+        var balanceResult = balanceResponse.Result;
+        var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, accountDetailsResult, balanceResult);
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);
-    }
-
-    private static AuthenticationStatus ConvertRequisitionStatus(RequisitionStatus status)
-    {
-        return status switch
-        {
-            RequisitionStatus.Created => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.GivingConsent => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.UndergoingAuthentication => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.SelectingAccounts => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.Undefined => AuthenticationStatus.Failed,
-            RequisitionStatus.Suspended => AuthenticationStatus.Failed,
-            RequisitionStatus.Rejected => AuthenticationStatus.Failed,
-            RequisitionStatus.Linked => AuthenticationStatus.Active,
-            RequisitionStatus.Expired => AuthenticationStatus.Expired,
-            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
-        };
-    }
-
-    private BankAccount ConvertAccount(Guid accountId, BankAccountDetails account, List<Balance> balances)
-    {
-        return new BankAccount
-        (
-            // TODO: Convert Account
-            thirdPartyId: accountId,
-            accountType: account.CashAccountType.HasValue
-                ? Enum.GetName(typeof(CashAccountType), account.CashAccountType)
-                : null,
-            name: account.Product,
-            description: account.Details,
-            // TODO: The balance type could be something different (which one should be grabbed?)
-            balance: balances.First(bal =>
-                    bal.BalanceType is BalanceType.ClosingBooked or BalanceType.InterimAvailable)
-                .BalanceAmount.Amount,
-            currency: account.Currency,
-            iban: account.Iban,
-            bic: account.Bic,
-            bban: account.Bban,
-            ownerName: account.OwnerName,
-            transactions: [],
-            associatedInstitution: new BankingInstitution("id", "bic", "name", new Uri("http://www.example.com"), [])
-            {
-                Id = Guid.Empty
-            },
-            associatedAuthenticationRequests: [])
-        {
-            Id = null
-        };
     }
 }
