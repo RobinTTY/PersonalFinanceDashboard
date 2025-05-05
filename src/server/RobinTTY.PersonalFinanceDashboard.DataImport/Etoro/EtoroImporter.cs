@@ -142,7 +142,6 @@ public class EtoroImporter : IEtoroImporter
     private EtoroFinancialSummary GetFinancialSummary(IWorkbook workbook)
     {
         var financialSummarySheet = workbook.GetSheet("Financial Summary");
-        // TODO: this structure already changed once, it should be detected and can't be hardcoded (extend Npoi.Mapper)
         var documentCategoryStructure = new Dictionary<string, int>
         {
             { "CFDs (Profit or Loss)", 1 },
@@ -213,7 +212,6 @@ public class EtoroImporter : IEtoroImporter
         const int amountIndex = 1;
         const int taxRateIndex = 2;
         var amount = sheet.GetCell(rowIndex, amountIndex).NumericCellValue;
-        // TODO: introduce method to read both en-US/de number format correctly
         var taxRateString = sheet.GetCell(rowIndex, taxRateIndex).StringCellValue;
         var taxRate = decimal.Parse(taxRateString, NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"));
 
@@ -256,7 +254,7 @@ public class EtoroImporter : IEtoroImporter
                     _ => EtoroAccountActivityType.Unknown
                 };
             }
-            // TODO: should this return false?
+
             return true;
         });
         mapper.Map<EtoroDividends>("Withholding Tax Rate (%)", dividend => dividend.WithholdingTaxRate,
@@ -279,7 +277,6 @@ public class EtoroImporter : IEtoroImporter
     /// </summary>
     private void ReplaceDecimalSeparatorOfUnitsColumn(ISheet closedPositionsSheet)
     {
-        // TODO: All these row/cell numbers should be constants and only be changed in one place
         var usCulture = new CultureInfo("en-US");
         var unitsHeader = closedPositionsSheet.GetRow(0).GetCell(3).StringCellValue;
         if (unitsHeader != "Units")

@@ -1,7 +1,7 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 
 /// <summary>
-/// TODO
+/// Payload required to create a transaction through the API.
 /// </summary>
 public record CreateTransactionInput(
     Guid AccountId,

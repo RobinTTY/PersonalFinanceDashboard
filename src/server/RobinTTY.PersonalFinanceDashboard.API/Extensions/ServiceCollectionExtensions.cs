@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection to which to add the services.</param>
     /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-    // TODO: automatic registration of repositories via codegen?
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         return services

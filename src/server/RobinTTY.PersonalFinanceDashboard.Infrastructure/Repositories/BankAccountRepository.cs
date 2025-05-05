@@ -117,6 +117,7 @@ public class BankAccountRepository
 
         if (accountsToUpdate.Count > 0)
         {
+            // TODO: only accounts which have a valid agreement should be updated
             var accountIdsToUpdate = accountsToUpdate
                 .Select(bankAccount => bankAccount.ThirdPartyId).ToList();
             var responses = await _dataProviderService.GetBankAccounts(accountIdsToUpdate);
