@@ -15,7 +15,6 @@ public static class WebApplicationBuilderExtensions
     /// <returns>A reference to the <see cref="IHostBuilder"/> after the operation has completed.</returns>
     public static IHostBuilder ConfigureSerilog(this WebApplicationBuilder webApplicationBuilder)
     {
-        // TODO: Only do in development
         // Forward issues with Serilog itself to console
         if (webApplicationBuilder.Environment.IsDevelopment())
         {

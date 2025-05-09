@@ -28,11 +28,11 @@ public static class AppConfigurationManager
     /// <returns>The created <see cref="IServiceProvider"/>.</returns>
     private static IServiceProvider GetServiceProvider()
     {
-        // TODO: Add environment variables for configuration through Docker?
         var configuration =  new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile("appsettings.json", false, true)
             .AddUserSecrets<AppConfiguration>(false, true)
+            .AddEnvironmentVariables()
             .Build();
 
         return new ServiceCollection()

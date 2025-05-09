@@ -1,7 +1,11 @@
 ﻿using System.Net.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models;
+using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -15,12 +19,13 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+    private static readonly AppConfiguration AppConfig = AppConfigurationManager.AppConfiguration;
+    
     /// <summary>
     /// Registers all repositories in the service collection.
     /// </summary>
     /// <param name="services">The service collection to which to add the services.</param>
     /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-    // TODO: automatic registration of repositories via codegen?
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         return services
@@ -39,12 +44,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGraphQlServices(this IServiceCollection services)
     {
         var requestExecutorBuilder = services
-            // TODO: Configure cost analyzer at some point (enforces maximum query costs)
-            .AddGraphQLServer(disableCostAnalyzer: true)
+            .AddGraphQLServer()
             // Adds all GraphQL query and mutation types using the code generator (looks for attributes)
             .AddResolvers()
-            // TODO: Document what the different extensions methods do
-            // AddQueryConventions: https://www.youtube.com/watch?v=yoW2Mt6C0Cg
+            // Enables returning FieldResult type errors
             .AddQueryConventions()
             .AddMutationConventions()
             // Enables efficient querying of the underlying db via projections
@@ -52,6 +55,11 @@ public static class ServiceCollectionExtensions
             .ModifyOptions(options =>
             {
                 options.StripLeadingIFromInterface = true;
+            })
+            // TODO: Configure cost analyzer at some point (enforces maximum query costs)
+            .ModifyCostOptions(options =>
+            {
+                options.EnforceCostLimits = false;
             });
 
         return requestExecutorBuilder.Services;
@@ -65,6 +73,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         return services
+            .AddSingleton<NordigenClient>()
             .AddSingleton<GoCardlessDataProviderService>()
             .AddScoped<ThirdPartyDataRetrievalMetadataService>();
     }
@@ -76,9 +85,8 @@ public static class ServiceCollectionExtensions
     /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
     public static IServiceCollection AddApplicationConfiguration(this IServiceCollection services)
     {
-        var appConfig = AppConfigurationManager.AppConfiguration;
-        return services.AddSingleton(new NordigenClientCredentials(appConfig.NordigenApi!.SecretId,
-            appConfig.NordigenApi.SecretKey));
+        return services.AddSingleton(new NordigenClientCredentials(AppConfig.NordigenApiConfiguration!.SecretId,
+            AppConfig.NordigenApiConfiguration.SecretKey));
     }
 
     /// <summary>
@@ -101,11 +109,16 @@ public static class ServiceCollectionExtensions
     /// Adds the database the application uses to the service collection.
     /// </summary>
     /// <param name="services">The service collection to which to add the services.</param>
+    /// <param name="environment">The environment options of the application.</param>
     /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-    public static IServiceCollection AddDatabase(this IServiceCollection services)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IWebHostEnvironment environment)
     {
-        // TODO: The filepath shouldn't be hardcoded => configuration
         return services.AddDbContextPool<ApplicationDbContext>(options =>
-            options.UseSqlite("Data Source=../RobinTTY.PersonalFinanceDashboard.Infrastructure/application.db"));
+        {
+            options.UseSqlite(AppConfig.DatabaseConfiguration.ConnectionString);
+            
+            if(environment.IsDevelopment())
+                options.EnableDetailedErrors();
+        });
     }
 }

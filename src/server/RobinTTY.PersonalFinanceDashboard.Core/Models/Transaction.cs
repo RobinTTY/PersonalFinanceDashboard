@@ -1,18 +1,20 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
+
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class Transaction
+public class Transaction : DatabaseEntity
 {
     /// <summary>
-    /// The id of the transaction.
+    /// The id of the transaction provided by the third party data retrieval service.
     /// </summary>
-    public string Id { get; set; }
+    public string? ThirdPartyTransactionId { get; set; }
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
-    public string AccountId { get; set; }
+    public Guid AccountId { get; set; }
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
@@ -32,28 +34,43 @@ public class Transaction
     /// <summary>
     /// The currency the amount is denominated in.
     /// </summary>
-    public string Currency { get; set ; }
+    public string Currency { get; set; }
     /// <summary>
     /// The category this transaction belongs to.
     /// </summary>
+    // TODO: Shouldn't this be nullable?
     public string Category { get; set; }
-    /// <summary>
-    /// Tags associated with the transaction (to associate expenses with certain sub-categories).
-    /// </summary>
-    public List<Tag> Tags { get; set; }
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
+    // TODO: Shouldn't this be nullable?
     public string Notes { get; set; }
+    /// <summary>
+    /// Tags associated with the transaction (to associate expenses with certain sub-categories).
+    /// </summary>
+    public List<Tag> Tags { get; set; } = [];
 
-    // TODO: Information provided by your bank (e.g. SEPA mandate ids)
-    // how should I best handle this?
-    public Transaction(){}
+    /// <summary>
+    /// Creates a new instance of <see cref="Transaction"/>.
+    /// </summary>
+    public Transaction()
+    {
+        ThirdPartyTransactionId = null;
+        AccountId = Guid.Empty;
+        ValueDate = null;
+        Payer = null;
+        Payee = null;
+        Amount = decimal.MinValue;
+        Currency = string.Empty;
+        Category = string.Empty;
+        Notes = string.Empty;
+    }
 
     /// <summary>
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
+    /// <param name="thirdPartyTransactionId">The id of the transaction provided by the third party data retrieval service.</param>
     /// <param name="accountId">The id of the account to which the transaction belongs.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
@@ -61,11 +78,13 @@ public class Transaction
     /// <param name="amount">The amount being transacted.</param>
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
-    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    public Transaction(string id, string accountId, DateTime? valueDate, string payer, string payee, decimal amount, string currency, string category, List<Tag> tags, string notes)
+    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
+    public Transaction(Guid id, string thirdPartyTransactionId, Guid accountId, DateTime? valueDate, string payer, string payee, decimal amount,
+        string currency, string category, string notes, List<Tag> tags)
     {
         Id = id;
+        ThirdPartyTransactionId = thirdPartyTransactionId;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;

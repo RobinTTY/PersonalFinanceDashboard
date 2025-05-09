@@ -17,8 +17,6 @@ public class AuthenticationMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="institutionId">The id of the institution which the authentication request should be created for.</param>
     /// <param name="redirectUri">The URI to redirect to after the authentication is completed.</param>
-    // TODO: Exceptions
-    // [Error<Exception>]
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository, string institutionId, string redirectUri)
     {
         return await repository.AddAuthenticationRequest(institutionId, redirectUri);
@@ -29,7 +27,7 @@ public class AuthenticationMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="authenticationId">The id of the authentication request to delete.</param>
-    public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, string authenticationId)
+    public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, Guid authenticationId)
     {
         return await repository.DeleteAuthenticationRequest(authenticationId);
     }

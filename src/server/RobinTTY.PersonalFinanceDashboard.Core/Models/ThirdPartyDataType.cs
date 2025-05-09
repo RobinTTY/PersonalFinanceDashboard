@@ -1,7 +1,9 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 public enum ThirdPartyDataType
 {
     Undefined,
-    BankingInstitutions
+    BankingInstitutions,
+    AuthenticationRequests,
+    BankAccounts
 }

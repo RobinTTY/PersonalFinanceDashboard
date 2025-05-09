@@ -1,6 +1,4 @@
-﻿using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Models;
-
-namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 public class ThirdPartyDataRetrievalMetadata(
     Guid id,
@@ -12,7 +10,7 @@ public class ThirdPartyDataRetrievalMetadata(
     /// <summary>
     /// Distinct id identifying this entity.
     /// </summary>
-    public Guid Id { get; set; } = id;
+    public Guid Id { get; init; } = id;
     /// <summary>
     /// The type of data being retrieved. 
     /// </summary>

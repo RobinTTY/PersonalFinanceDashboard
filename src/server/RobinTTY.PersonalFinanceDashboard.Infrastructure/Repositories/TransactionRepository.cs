@@ -25,7 +25,6 @@ public class TransactionRepository
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
     public IQueryable<Transaction> GetTransactions(CancellationToken cancellationToken)
     {
-        // TODO: How should navigation properties be included programatically?
         return _dbContext.Transactions;
     }
 
@@ -34,15 +33,10 @@ public class TransactionRepository
     /// </summary>
     /// <param name="accountId">The account id the transactions are associated with.</param>
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
-    public async Task<IEnumerable<Transaction>> GetTransactionsByAccountId(string accountId)
+    public IQueryable<Transaction> GetTransactionsByAccountId(Guid accountId)
     {
-        var transactionEntities = await _dbContext.Transactions
-            .Where(transaction => transaction.AccountId == accountId)
-            .ToListAsync();
-        var transactionModels = transactionEntities
-            .ToList();
-
-        return transactionModels;
+        return _dbContext.Transactions
+            .Where(transaction => transaction.AccountId == accountId);
     }
 
     /// <summary>
@@ -53,10 +47,9 @@ public class TransactionRepository
     // TODO: This should use a TransactionRequest class not Transaction itself
     public async Task<Transaction> AddTransaction(Transaction transaction)
     {
-        var entityEntry = await _dbContext.Transactions.AddAsync(transaction);
+        await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
 
-        transaction.Id = entityEntry.Entity.Id;
         return transaction;
     }
 
@@ -78,7 +71,7 @@ public class TransactionRepository
     /// </summary>
     /// <param name="transactionId">The id of the <see cref="Transaction"/> to delete.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteTransaction(string transactionId)
+    public async Task<bool> DeleteTransaction(Guid transactionId)
     {
         var result = await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync();
         return Convert.ToBoolean(result);

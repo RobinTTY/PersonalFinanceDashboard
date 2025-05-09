@@ -30,11 +30,29 @@ public class BankAccount : Account
     /// The banking institution this account belongs to.
     /// </summary>
     public BankingInstitution? AssociatedInstitution { get; set; }
+    /// <summary>
+    /// Authentication requests made for this bank account.
+    /// </summary>
+    public List<AuthenticationRequest> AssociatedAuthenticationRequests { get; set; } = [];
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
     /// </summary>
-    /// <param name="id">The id of the account.</param>
+    public BankAccount()
+    {
+        Id = Guid.Empty;
+        Iban = null;
+        Bic = null;
+        Bban = null;
+        OwnerName = null;
+        AccountType = null;
+        AssociatedInstitution = null;
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="BankAccount"/>.
+    /// </summary>
+    /// <param name="thirdPartyId">The id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
@@ -46,8 +64,11 @@ public class BankAccount : Account
     /// <param name="ownerName">Name of the legal account owner. If there is more than one owner,
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
-    public BankAccount(Guid id, string? name, string? description, decimal? balance, string? currency, string? iban,
-        string? bic, string? bban, string? ownerName, string? accountType) : base(id, name, description, balance, currency)
+    /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
+    public BankAccount(Guid thirdPartyId, string? name = null, string? description = null, decimal? balance = null,
+        string? currency = null, string? iban = null, string? bic = null, string? bban = null, string? ownerName = null,
+        string? accountType = null, List<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(thirdPartyId,
+        name, description, balance, currency)
     {
         Iban = iban;
         Bic = bic;
@@ -55,12 +76,13 @@ public class BankAccount : Account
         OwnerName = ownerName;
         AccountType = accountType;
         AssociatedInstitution = null;
+        AssociatedAuthenticationRequests = associatedAuthenticationRequests ?? [];
     }
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccount"/>.
     /// </summary>
-    /// <param name="id">The id of the account.</param>
+    /// <param name="thirdPartyId">The id of the account.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
     /// <param name="balance">The current balance of the account.</param>
@@ -74,11 +96,12 @@ public class BankAccount : Account
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
     /// <param name="associatedInstitution">The banking institution this account belongs to.</param>
-    public BankAccount(Guid id, string? name, string? description, decimal? balance, string? currency,
+    /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
+    public BankAccount(Guid thirdPartyId, string? name, string? description, decimal? balance, string? currency,
         List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType,
-        BankingInstitution? associatedInstitution)
-        : base(id, name, description, balance, currency, transactions)
+        BankingInstitution? associatedInstitution, List<AuthenticationRequest> associatedAuthenticationRequests)
+        : base(thirdPartyId, name, description, balance, currency, transactions)
     {
         Iban = iban;
         Bic = bic;
@@ -86,5 +109,6 @@ public class BankAccount : Account
         OwnerName = ownerName;
         AccountType = accountType;
         AssociatedInstitution = associatedInstitution;
+        AssociatedAuthenticationRequests = associatedAuthenticationRequests;
     }
 }

@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Builder;
 using RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var environment = builder.Environment;
+
 builder.ConfigureSerilog();
 
 builder.Services
-    .AddDatabase()
+    .AddDatabase(environment)
     .AddConfiguredHttpClient()
     .AddApplicationConfiguration()
     .AddApplicationServices()
