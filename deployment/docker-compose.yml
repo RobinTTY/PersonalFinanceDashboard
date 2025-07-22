@@ -10,3 +10,11 @@ services:
       - "5341:5341"
       - "8001:80"
     restart: unless-stopped
+#  postgres:
+#    image: 17.5-alpine3.22
+#    container_name: postgres
+#    environment:
+#      - POSTGRES_PASSWORD=admin
+#    ports:
+#      - 5432:5432
+#    restart: unless-stopped
