@@ -28,10 +28,6 @@ public class AppConfiguration
 public class NordigenApiClientConfiguration
 {
     /// <summary>
-    /// The nordigen API endpoint to use.
-    /// </summary>
-    public string Url { get; set; }
-    /// <summary>
     /// The secret id to access the Nordigen API.
     /// </summary>
     public string SecretId { get; set; }
@@ -43,12 +39,10 @@ public class NordigenApiClientConfiguration
     /// <summary>
     /// Creates a new instance of <see cref="NordigenApiClientConfiguration"/>.
     /// </summary>
-    /// <param name="url">The nordigen API endpoint to use.</param>
     /// <param name="secretId">The secret id to access the Nordigen API.</param>
     /// <param name="secretKey">The secret key to access the Nordigen API.</param>
-    public NordigenApiClientConfiguration(string url, string secretId, string secretKey)
+    public NordigenApiClientConfiguration(string secretId, string secretKey)
     {
-        Url = url;
         SecretId = secretId;
         SecretKey = secretKey;
     }

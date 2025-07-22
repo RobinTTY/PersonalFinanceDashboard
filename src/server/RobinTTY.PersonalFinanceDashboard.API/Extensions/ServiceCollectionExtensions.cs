@@ -85,7 +85,7 @@ public static class ServiceCollectionExtensions
     /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
     public static IServiceCollection AddApplicationConfiguration(this IServiceCollection services)
     {
-        return services.AddSingleton(new NordigenClientCredentials(AppConfig.NordigenApiConfiguration!.SecretId,
+        return services.AddSingleton(new NordigenClientCredentials(AppConfig.NordigenApiConfiguration.SecretId,
             AppConfig.NordigenApiConfiguration.SecretKey));
     }
 
