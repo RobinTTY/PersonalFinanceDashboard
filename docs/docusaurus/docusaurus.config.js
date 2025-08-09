@@ -16,6 +16,10 @@ const config = {
   projectName: "PersonalFinanceDashboard",
   deploymentBranch: "docs",
   trailingSlash: false,
+  markdown: {
+    mermaid: true,
+  },
+  themes: ["@docusaurus/theme-mermaid"],
   i18n: {
     defaultLocale: "en",
     locales: ["en"],
@@ -30,6 +34,7 @@ const config = {
         },
         blog: {
           showReadingTime: true,
+          onUntruncatedBlogPosts: "ignore",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
