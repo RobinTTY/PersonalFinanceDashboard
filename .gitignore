@@ -369,6 +369,6 @@ FodyWeavers.xsd
 resources/
 
 # Database
-application.db
-application.db-shm
-application.db-wal
+PersonalFinanceDashboard.db
+PersonalFinanceDashboard.db-shm
+PersonalFinanceDashboard.db-wal

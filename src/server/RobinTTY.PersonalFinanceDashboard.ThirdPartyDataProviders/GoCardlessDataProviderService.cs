@@ -11,7 +11,6 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// Data provider for banking data from <see href="https://gocardless.com/bank-account-data/"/>.
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
-// TODO: Cancellation token support
 public class GoCardlessDataProviderService(NordigenClient client)
 {
     public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
