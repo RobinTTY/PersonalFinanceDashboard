@@ -5,5 +5,6 @@ public enum ThirdPartyDataType
     Undefined,
     BankingInstitutions,
     AuthenticationRequests,
-    BankAccounts
+    BankAccounts,
+    Transactions
 }
