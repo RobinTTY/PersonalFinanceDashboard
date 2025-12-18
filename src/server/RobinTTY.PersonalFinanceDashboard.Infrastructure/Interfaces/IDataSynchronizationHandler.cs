@@ -5,6 +5,6 @@ public interface IDataSynchronizationHandler
     /// <summary>
     /// Synchronizes data from the third party data source.
     /// </summary>
-    /// <returns>Returns a Task that represents the asynchronous data synchronization operation.</returns>
-    Task SynchronizeData();
+    /// <returns>Returns true if the sync was successful, otherwise returns false. </returns>
+    Task<bool> SynchronizeData();
 }
