@@ -13,10 +13,11 @@ public class BankingInstitutionSyncHandler(
     ILogger<BankingInstitutionSyncHandler> logger)
     : IDataSyncHandler
 {
-    public async Task<bool> SynchronizeData()
+    /// <inheritdoc />
+    public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
-        if (dataIsStale)
+        if (dataIsStale || forceThirdPartySync)
         {
             var institutions = await GetBankingInstitutions();
             if (institutions == null)

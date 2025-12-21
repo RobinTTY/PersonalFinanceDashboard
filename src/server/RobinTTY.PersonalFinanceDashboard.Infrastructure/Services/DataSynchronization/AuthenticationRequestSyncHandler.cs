@@ -12,10 +12,13 @@ public class AuthenticationRequestSyncHandler(
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     ILogger<AuthenticationRequestSyncHandler> logger) : IDataSyncHandler
 {
-    public async Task<bool> SynchronizeData()
+    // TODO: There should probably be a SynchronizeAll and Synchronize distinction to optimize response times
+    // So we can distinguish between updating a single entity and all entities
+    /// <inheritdoc />
+    public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
-        if (dataIsStale)
+        if (dataIsStale || forceThirdPartySync)
         {
             var authenticationRequests = await GetAuthenticationRequests();
             if (authenticationRequests == null)

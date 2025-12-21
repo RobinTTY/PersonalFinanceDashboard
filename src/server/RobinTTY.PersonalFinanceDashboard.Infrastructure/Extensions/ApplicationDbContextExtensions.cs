@@ -33,7 +33,6 @@ public static class ApplicationDbContextExtensions
             foreach (var authenticationRequest in authenticationRequests)
             {
                 var existingRequest = context.AuthenticationRequests
-                    .Include(req => req.AssociatedAccounts)
                     .SingleOrDefault(req => req.ThirdPartyId == authenticationRequest.ThirdPartyId);
 
                 if (existingRequest == null)
@@ -46,10 +45,15 @@ public static class ApplicationDbContextExtensions
                 existingRequest.Status = authenticationRequest.Status;
                 existingRequest.AuthenticationLink = authenticationRequest.AuthenticationLink;
 
+                var associatedAccountIds = authenticationRequest.AssociatedAccounts
+                    .Select(acc => acc.ThirdPartyId).Distinct();
+                var accounts = context.BankAccounts
+                    .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
+
                 authenticationRequest.AssociatedAccounts.ForEach(account =>
                 {
-                    var linkedAccount = existingRequest.AssociatedAccounts
-                        .SingleOrDefault(existingAccount => existingAccount.ThirdPartyId == account.ThirdPartyId);
+                    var linkedAccount = accounts.SingleOrDefault(existingAccount =>
+                        existingAccount.ThirdPartyId == account.ThirdPartyId);
 
                     linkedAccount?.UpdateProperties(account);
 

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -15,7 +14,6 @@ public class AuthenticationRequestRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
-    private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
     private readonly AuthenticationRequestSyncHandler _authenticationRequestSyncHandler;
     private readonly ILogger<AuthenticationRequestRepository> _logger;
 
@@ -25,19 +23,16 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
-    /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
     /// <param name="authenticationRequestSyncHandler"></param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public AuthenticationRequestRepository(
         ApplicationDbContext dbContext,
         GoCardlessDataProviderService dataProviderService,
-        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
         AuthenticationRequestSyncHandler authenticationRequestSyncHandler,
         ILogger<AuthenticationRequestRepository> logger)
     {
         _dbContext = dbContext;
         _dataProviderService = dataProviderService;
-        _dataRetrievalMetadataService = dataRetrievalMetadataService;
         _authenticationRequestSyncHandler = authenticationRequestSyncHandler;
         _logger = logger;
     }
@@ -49,7 +44,8 @@ public class AuthenticationRequestRepository
     /// <returns>The <see cref="AuthenticationRequest"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(Guid authenticationId)
     {
-        await _authenticationRequestSyncHandler.SynchronizeData();
+        // TODO: Maybe let the API consumer choose whether to force the third party data sync
+        await _authenticationRequestSyncHandler.SynchronizeData(true);
 
         return _dbContext.AuthenticationRequests.Where(authentication => authentication.Id == authenticationId);
     }
