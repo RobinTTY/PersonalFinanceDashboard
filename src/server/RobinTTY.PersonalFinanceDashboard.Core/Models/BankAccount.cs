@@ -9,27 +9,33 @@ public class BankAccount : Account
     /// The IBAN of the bank account.
     /// </summary>
     public string? Iban { get; set; }
+
     /// <summary>
     /// The BIC (Business Identifier Code) associated with the account.
     /// </summary>
     public string? Bic { get; set; }
+
     /// <summary>
     /// Basic Bank Account Number represents a country-specific bank account number.
     /// This data element is used for payment accounts which have no IBAN.
     /// </summary>
     public string? Bban { get; set; }
+
     /// <summary>
     /// Name of the legal account owner. If there is more than one owner, then two names might be noted here.
     /// </summary>
     public string? OwnerName { get; set; }
+
     /// <summary>
     /// Specifies the nature, or use, of the account.
     /// </summary>
     public string? AccountType { get; set; }
+
     /// <summary>
     /// The banking institution this account belongs to.
     /// </summary>
     public BankingInstitution? AssociatedInstitution { get; set; }
+
     /// <summary>
     /// Authentication requests made for this bank account.
     /// </summary>
@@ -67,7 +73,8 @@ public class BankAccount : Account
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     public BankAccount(Guid thirdPartyId, string? name = null, string? description = null, decimal? balance = null,
         string? currency = null, string? iban = null, string? bic = null, string? bban = null, string? ownerName = null,
-        string? accountType = null, List<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(thirdPartyId,
+        string? accountType = null, List<AuthenticationRequest>? associatedAuthenticationRequests = null) : base(
+        thirdPartyId,
         name, description, balance, currency)
     {
         Iban = iban;
@@ -110,5 +117,24 @@ public class BankAccount : Account
         AccountType = accountType;
         AssociatedInstitution = associatedInstitution;
         AssociatedAuthenticationRequests = associatedAuthenticationRequests;
+    }
+
+    /// <summary>
+    /// Updates the (non-navigation) properties of the current <see cref="BankAccount"/> instance with the values
+    /// provided in the specified <paramref name="updatedAccount"/>.
+    /// </summary>
+    /// <param name="updatedAccount">The <see cref="BankAccount"/> instance whose properties are used to update the current object.</param>
+    /// <returns>The updated <see cref="BankAccount"/> instance.</returns>
+    public void UpdateProperties(BankAccount updatedAccount)
+    {
+        Name = updatedAccount.Name;
+        Iban = updatedAccount.Iban;
+        Bic = updatedAccount.Bic;
+        Bban = updatedAccount.Bban;
+        Balance = updatedAccount.Balance;
+        Currency = updatedAccount.Currency;
+        OwnerName = updatedAccount.OwnerName;
+        AccountType = updatedAccount.AccountType;
+        Description = updatedAccount.Description;
     }
 }

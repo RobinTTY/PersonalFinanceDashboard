@@ -173,7 +173,7 @@ public class AuthenticationRequestRepository
             var associatedAccounts = authenticationRequest.AssociatedAccounts.ToList();
             authenticationRequest.AssociatedAccounts.Clear();
 
-            await _dbContext.AddOrUpdateAuthenticationRequest(authenticationRequest);
+            await _dbContext.AddOrUpdateAuthenticationRequests(authenticationRequest);
             await LinkAssociatedAccountsToAuthRequests(authenticationRequest, associatedAccounts);
             await _dbContext.SaveChangesAsync();
         }

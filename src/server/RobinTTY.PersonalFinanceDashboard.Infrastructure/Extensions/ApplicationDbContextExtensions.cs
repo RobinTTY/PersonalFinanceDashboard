@@ -11,70 +11,46 @@ public static class ApplicationDbContextExtensions
     /// <param name="context">The database context to use.</param>
     extension(ApplicationDbContext context)
     {
-        /// <summary>
-        /// Adds the provided authentication request to the database if it doesn't exist yet.
-        /// If it already exists, the existing entity will be updated.
-        /// Does not execute a <see cref="DbContext.SaveChanges()"/>.
-        /// </summary>
-        /// <param name="authRequest">The authentication request to persist in the database.</param>
-        /// <returns>The type of operation that was performed.</returns>
-        public async Task<OperationType> AddOrUpdateAuthenticationRequest(AuthenticationRequest authRequest)
-        {
-            var existingAuthRequest = context.AuthenticationRequests
-                .SingleOrDefault(authReq => authReq.ThirdPartyId == authRequest.ThirdPartyId);
-
-            if (existingAuthRequest != null)
-            {
-                existingAuthRequest.Status = authRequest.Status;
-                existingAuthRequest.ThirdPartyId = authRequest.ThirdPartyId;
-                existingAuthRequest.AuthenticationLink = authRequest.AuthenticationLink;
-                return OperationType.Update;
-            }
-
-            await context.AuthenticationRequests.AddAsync(authRequest);
-            return OperationType.Insert;
-        }
-
         public async Task ReplaceBankingInstitutions(List<BankingInstitution> bankingInstitutions)
         {
             await context.BankingInstitutions.ExecuteDeleteAsync();
             await context.BankingInstitutions.AddRangeAsync(bankingInstitutions);
+            await context.SaveChangesAsync();
         }
 
-        public async Task<OperationType> AddOrUpdateBankAccount(BankAccount bankAccount)
+        public async Task AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
         {
-            var existingBankAccount = context.BankAccounts
-                .SingleOrDefault(account => account.ThirdPartyId == bankAccount.ThirdPartyId);
-
-            if (existingBankAccount != null)
+            foreach (var authenticationRequest in authenticationRequests)
             {
-                existingBankAccount.Name = bankAccount.Name;
-                existingBankAccount.Iban = bankAccount.Iban;
-                existingBankAccount.Bic = bankAccount.Bic;
-                existingBankAccount.Bban = bankAccount.Bban;
-                existingBankAccount.Balance = bankAccount.Balance;
-                existingBankAccount.Currency = bankAccount.Currency;
-                existingBankAccount.OwnerName = bankAccount.OwnerName;
-                existingBankAccount.AccountType = bankAccount.AccountType;
-                existingBankAccount.Description = bankAccount.Description;
-                existingBankAccount.AssociatedInstitution = bankAccount.AssociatedInstitution;
-            
-                return OperationType.Update;
+                var existingRequest = context.AuthenticationRequests
+                    .Include(req => req.AssociatedAccounts)
+                    .SingleOrDefault(req => req.ThirdPartyId == authenticationRequest.ThirdPartyId);
+
+                if (existingRequest == null)
+                {
+                    await context.AuthenticationRequests.AddAsync(authenticationRequest);
+                    await context.SaveChangesAsync();
+                    return;
+                }
+
+                existingRequest.Status = authenticationRequest.Status;
+                existingRequest.AuthenticationLink = authenticationRequest.AuthenticationLink;
+
+                authenticationRequest.AssociatedAccounts.ForEach(account =>
+                {
+                    var linkedAccount = existingRequest.AssociatedAccounts
+                        .SingleOrDefault(existingAccount => existingAccount.ThirdPartyId == account.ThirdPartyId);
+
+                    linkedAccount?.UpdateProperties(account);
+
+                    if (linkedAccount == null)
+                    {
+                        existingRequest.AssociatedAccounts.Add(account);
+                    }
+                });
+
+                await context.SaveChangesAsync();
             }
-
-            await context.BankAccounts.AddAsync(bankAccount);
-            return OperationType.Insert;
         }
-    }
-
-    // TODO: For now only support institutions from third party data provider, no custom institutions, replace whole list on sync to speed up the process
-    // accept models that implement interface which updates all properties
-    // accept dbset that should be updated
-
-    public enum OperationType
-    {
-        Undefined,
-        Insert,
-        Update
     }
 }

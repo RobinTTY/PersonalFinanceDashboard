@@ -6,37 +6,35 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
-public class BankingInstitutionSyncHandler(
+public class AuthenticationRequestSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
-    ILogger<BankingInstitutionSyncHandler> logger)
-    : IDataSyncHandler
+    ILogger<AuthenticationRequestSyncHandler> logger) : IDataSyncHandler
 {
     public async Task<bool> SynchronizeData()
     {
-        var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
+        var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
         if (dataIsStale)
         {
-            var institutions = await GetBankingInstitutions();
-            if (institutions == null)
+            var authenticationRequests = await GetAuthenticationRequests();
+            if (authenticationRequests == null)
             {
                 return false;
             }
 
-            await dbContext.ReplaceBankingInstitutions(institutions);
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
-            await dbContext.SaveChangesAsync();
-            
-            logger.LogInformation("Synced {Count} banking institutions", institutions.Count);
+            await dbContext.AddOrUpdateAuthenticationRequests(authenticationRequests);
+            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
+
+            logger.LogInformation("Synced {Count} banking institutions", authenticationRequests.Count);
         }
 
         return true;
     }
     
-    private async Task<List<BankingInstitution>?> GetBankingInstitutions()
+    private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests()
     {
-        var response = await dataProvider.GetBankingInstitutions();
+        var response = await dataProvider.GetAuthenticationRequests(100);
         return !response.IsSuccessful ? null : response.Result.ToList();
     }
 }

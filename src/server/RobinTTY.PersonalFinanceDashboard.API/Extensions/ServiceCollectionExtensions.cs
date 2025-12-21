@@ -77,6 +77,7 @@ public static class ServiceCollectionExtensions
                 .AddSingleton<NordigenClient>()
                 .AddSingleton<GoCardlessDataProviderService>()
                 .AddScoped<BankingInstitutionSyncHandler>()
+                .AddScoped<AuthenticationRequestSyncHandler>()
                 .AddScoped<ThirdPartyDataRetrievalMetadataService>();
         }
 

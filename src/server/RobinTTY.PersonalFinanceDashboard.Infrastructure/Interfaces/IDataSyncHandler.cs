@@ -1,6 +1,6 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Interfaces;
 
-public interface IDataSynchronizationHandler
+public interface IDataSyncHandler
 {
     /// <summary>
     /// Synchronizes data from the third party data source.
