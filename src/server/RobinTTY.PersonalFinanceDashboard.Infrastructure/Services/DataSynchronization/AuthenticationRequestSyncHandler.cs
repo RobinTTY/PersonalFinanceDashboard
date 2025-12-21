@@ -24,6 +24,7 @@ public class AuthenticationRequestSyncHandler(
             }
 
             await dbContext.AddOrUpdateAuthenticationRequests(authenticationRequests);
+            await dbContext.RemoveNotIncludedAuthenticationRequests(authenticationRequests);
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
             logger.LogInformation("Synced {Count} banking institutions", authenticationRequests.Count);
@@ -34,6 +35,7 @@ public class AuthenticationRequestSyncHandler(
     
     private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests()
     {
+        // TODO: Limit should be different
         var response = await dataProvider.GetAuthenticationRequests(100);
         return !response.IsSuccessful ? null : response.Result.ToList();
     }

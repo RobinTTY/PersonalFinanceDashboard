@@ -44,7 +44,6 @@ public class BankingInstitutionRepository
     /// <summary>
     /// Gets the <see cref="BankingInstitution"/> matching the specified id.
     /// </summary>
-    /// <param name="syncHandler">Handler for the synchronization of third party data.</param>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(Guid institutionId)
