@@ -12,7 +12,8 @@ builder.Services
     .AddApplicationConfiguration()
     .AddApplicationServices()
     .AddRepositories()
-    .AddGraphQlServices();
+    .AddGraphQlServices()
+    .AddThirdPartyDataSynchronizationServices();
 
 var app = builder.Build();
 

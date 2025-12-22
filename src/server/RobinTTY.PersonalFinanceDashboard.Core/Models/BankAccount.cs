@@ -127,14 +127,14 @@ public class BankAccount : Account
     /// <returns>The updated <see cref="BankAccount"/> instance.</returns>
     public void UpdateProperties(BankAccount updatedAccount)
     {
-        Name = updatedAccount.Name;
-        Iban = updatedAccount.Iban;
-        Bic = updatedAccount.Bic;
-        Bban = updatedAccount.Bban;
-        Balance = updatedAccount.Balance;
-        Currency = updatedAccount.Currency;
-        OwnerName = updatedAccount.OwnerName;
-        AccountType = updatedAccount.AccountType;
-        Description = updatedAccount.Description;
+        Name ??= updatedAccount.Name;
+        Iban ??= updatedAccount.Iban;
+        Bic ??= updatedAccount.Bic;
+        Bban ??= updatedAccount.Bban;
+        Balance ??= updatedAccount.Balance;
+        Currency ??= updatedAccount.Currency;
+        OwnerName ??= updatedAccount.OwnerName;
+        AccountType ??= updatedAccount.AccountType;
+        Description ??= updatedAccount.Description;
     }
 }

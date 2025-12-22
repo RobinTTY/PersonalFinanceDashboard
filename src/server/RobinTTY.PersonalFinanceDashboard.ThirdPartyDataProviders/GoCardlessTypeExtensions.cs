@@ -1,6 +1,7 @@
 ﻿using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
+using NordigenBankAccount = RobinTTY.NordigenApiClient.Models.Responses.BankAccount;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
@@ -23,12 +24,13 @@ public static class GoCardlessTypeExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }
-    
-    public static BankAccount CreateBankAccount(Guid accountId, BankAccountDetails account, List<Balance> balances)
+
+    public static BankAccount CreateBankAccount(Guid accountId, NordigenBankAccount bankAccount,
+        BankAccountDetails account,
+        List<Balance> balances)
     {
         return new BankAccount
         (
-            // TODO: Convert Account
             thirdPartyId: accountId,
             accountType: account.CashAccountType.HasValue
                 ? Enum.GetName(typeof(CashAccountType), account.CashAccountType)
@@ -45,10 +47,8 @@ public static class GoCardlessTypeExtensions
             bban: account.Bban,
             ownerName: account.OwnerName,
             transactions: [],
-            associatedInstitution: new BankingInstitution("id", "bic", "name", new Uri("http://www.example.com"), [])
-            {
-                Id = Guid.Empty
-            },
+            associatedInstitution: new BankingInstitution
+                { Id = Guid.Empty, ThirdPartyId = bankAccount.InstitutionId },
             associatedAuthenticationRequests: [])
         {
             Id = null

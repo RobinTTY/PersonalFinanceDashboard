@@ -30,7 +30,7 @@ public class AuthenticationRequestSyncHandler(
             await dbContext.RemoveNotIncludedAuthenticationRequests(authenticationRequests);
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
-            logger.LogInformation("Synced {Count} banking institutions", authenticationRequests.Count);
+            logger.LogInformation("Synced {Count} authentication requests", authenticationRequests.Count);
         }
 
         return true;

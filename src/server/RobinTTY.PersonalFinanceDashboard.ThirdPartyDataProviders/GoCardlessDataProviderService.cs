@@ -11,6 +11,7 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// Data provider for banking data from <see href="https://gocardless.com/bank-account-data/"/>.
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
+// TODO: These methods need to be reworked quite a bit
 public class GoCardlessDataProviderService(NordigenClient client)
 {
     public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
@@ -178,18 +179,24 @@ public class GoCardlessDataProviderService(NordigenClient client)
     private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
         CancellationToken cancellationToken = default)
     {
+        var generalAccountInfoTask = client.AccountsEndpoint.GetAccount(accountId, cancellationToken);
         var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId, cancellationToken);
         var balanceTask = client.AccountsEndpoint.GetBalances(accountId, cancellationToken);
+
+        var generalAccountInfoResponse = await generalAccountInfoTask;
         var accountDetailsResponse = await accountDetailsTask;
         var balanceResponse = await balanceTask;
 
-        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess)
+        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess || !generalAccountInfoResponse.IsSuccess)
             return new ThirdPartyResponse<BankAccount, AccountsError>(
-                accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, null, accountDetailsResponse.Error);
+                false, null, accountDetailsResponse.Error);
 
+        var generalAccountInfoResult = generalAccountInfoResponse.Result;
         var accountDetailsResult = accountDetailsResponse.Result;
         var balanceResult = balanceResponse.Result;
-        var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, accountDetailsResult, balanceResult);
+        var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, generalAccountInfoResult,
+            accountDetailsResult, balanceResult);
+
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);

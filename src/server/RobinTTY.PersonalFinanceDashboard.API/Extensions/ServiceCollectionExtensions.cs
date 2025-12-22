@@ -75,10 +75,21 @@ public static class ServiceCollectionExtensions
         {
             return services
                 .AddSingleton<NordigenClient>()
-                .AddSingleton<GoCardlessDataProviderService>()
+                .AddSingleton<GoCardlessDataProviderService>();
+        }
+
+        /// <summary>
+        /// Registers services required for synchronizing third-party data in the service collection.
+        /// </summary>
+        /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
+        public IServiceCollection AddThirdPartyDataSynchronizationServices()
+        {
+            return services
                 .AddScoped<BankingInstitutionSyncHandler>()
                 .AddScoped<AuthenticationRequestSyncHandler>()
+                .AddScoped<BankAccountSyncHandler>()
                 .AddScoped<ThirdPartyDataRetrievalMetadataService>();
+            
         }
 
         /// <summary>

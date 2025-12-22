@@ -8,6 +8,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 /// </summary>
 public static class ApplicationDbContextExtensions
 {
+    // TODO: Convert to methods in respective SyncHandlers, don't need to be extensions
     /// <param name="context">The database context to use.</param>
     extension(ApplicationDbContext context)
     {
@@ -33,38 +34,56 @@ public static class ApplicationDbContextExtensions
             foreach (var authenticationRequest in authenticationRequests)
             {
                 var existingRequest = context.AuthenticationRequests
+                    .Include(req => req.AssociatedAccounts)
                     .SingleOrDefault(req => req.ThirdPartyId == authenticationRequest.ThirdPartyId);
 
                 if (existingRequest == null)
                 {
-                    await context.AuthenticationRequests.AddAsync(authenticationRequest);
-                    await context.SaveChangesAsync();
-                    return;
+                    var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(authenticationRequest);
+                    var entry = await context.AuthenticationRequests.AddAsync(insertEntity);
+                    existingRequest = entry.Entity;
+                }
+                else
+                {
+                    existingRequest.Status = authenticationRequest.Status;
+                    existingRequest.AuthenticationLink = authenticationRequest.AuthenticationLink;
                 }
 
-                existingRequest.Status = authenticationRequest.Status;
-                existingRequest.AuthenticationLink = authenticationRequest.AuthenticationLink;
-
-                var associatedAccountIds = authenticationRequest.AssociatedAccounts
-                    .Select(acc => acc.ThirdPartyId).Distinct();
-                var accounts = context.BankAccounts
-                    .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
-
-                authenticationRequest.AssociatedAccounts.ForEach(account =>
-                {
-                    var linkedAccount = accounts.SingleOrDefault(existingAccount =>
-                        existingAccount.ThirdPartyId == account.ThirdPartyId);
-
-                    linkedAccount?.UpdateProperties(account);
-
-                    if (linkedAccount == null)
-                    {
-                        existingRequest.AssociatedAccounts.Add(account);
-                    }
-                });
-
+                context.UpdateAssociatedBankAccounts(authenticationRequest, existingRequest);
                 await context.SaveChangesAsync();
             }
+        }
+
+        private void UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
+            AuthenticationRequest existingRequest)
+        {
+            var associatedAccountIds = updatedAuthenticationRequest.AssociatedAccounts
+                .Select(acc => acc.ThirdPartyId).Distinct();
+            var accounts = context.BankAccounts
+                .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
+
+            updatedAuthenticationRequest.AssociatedAccounts.ForEach(account =>
+            {
+                // First, check if the associated account already exists in the database
+                var linkedAccount = accounts.SingleOrDefault(existingAccount =>
+                    existingAccount.ThirdPartyId == account.ThirdPartyId);
+
+                if (linkedAccount == null)
+                {
+                    // If it doesn't exist yet, we need to create it first and then link it
+                    var entry = context.BankAccounts.Add(account);
+                    existingRequest.AssociatedAccounts.Add(account);
+                    context.SaveChanges();
+                    
+                    // We also need to update the accounts variable from the outer loop, since we changed the existing accounts
+                    accounts.Add(entry.Entity);
+                }
+                else
+                {
+                    // If it already exists, we only need to add it as an association
+                    existingRequest.AssociatedAccounts.Add(account);
+                }
+            });
         }
 
         /// <summary>
