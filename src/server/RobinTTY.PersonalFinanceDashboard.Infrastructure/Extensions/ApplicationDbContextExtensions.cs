@@ -58,32 +58,27 @@ public static class ApplicationDbContextExtensions
             AuthenticationRequest existingRequest)
         {
             var associatedAccountIds = updatedAuthenticationRequest.AssociatedAccounts
-                .Select(acc => acc.ThirdPartyId).Distinct();
-            var accounts = context.BankAccounts
+                .Select(acc => acc.ThirdPartyId).Distinct().ToList();
+            var trackedAccounts = context.BankAccounts
                 .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
 
-            updatedAuthenticationRequest.AssociatedAccounts.ForEach(account =>
+            foreach (var account in updatedAuthenticationRequest.AssociatedAccounts)
             {
-                // First, check if the associated account already exists in the database
-                var linkedAccount = accounts.SingleOrDefault(existingAccount =>
-                    existingAccount.ThirdPartyId == account.ThirdPartyId);
+                var trackedAccount = trackedAccounts.SingleOrDefault(a => a.ThirdPartyId == account.ThirdPartyId);
 
-                if (linkedAccount == null)
+                if (trackedAccount == null)
                 {
-                    // If it doesn't exist yet, we need to create it first and then link it
                     var entry = context.BankAccounts.Add(account);
-                    existingRequest.AssociatedAccounts.Add(account);
-                    context.SaveChanges();
-                    
-                    // We also need to update the accounts variable from the outer loop, since we changed the existing accounts
-                    accounts.Add(entry.Entity);
+                    trackedAccount = entry.Entity;
+                    trackedAccounts.Add(trackedAccount);
                 }
-                else
+
+                // If the account is already tracked, check first if it already contains the association
+                if (existingRequest.AssociatedAccounts.All(a => a.ThirdPartyId != trackedAccount.ThirdPartyId))
                 {
-                    // If it already exists, we only need to add it as an association
-                    existingRequest.AssociatedAccounts.Add(account);
+                    existingRequest.AssociatedAccounts.Add(trackedAccount);
                 }
-            });
+            }
         }
 
         /// <summary>
