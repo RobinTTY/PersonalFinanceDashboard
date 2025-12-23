@@ -14,7 +14,7 @@
 
     <ItemGroup>
       <PackageReference Include="Bogus" Version="35.6.5" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" />
     </ItemGroup>
 
 </Project>

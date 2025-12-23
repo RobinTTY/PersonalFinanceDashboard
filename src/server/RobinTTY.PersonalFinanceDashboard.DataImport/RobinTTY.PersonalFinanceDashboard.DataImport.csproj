@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPOI" Version="2.7.4" />
+    <PackageReference Include="NPOI" Version="2.7.5" />
     <PackageReference Include="Npoi.Mapper" Version="6.2.2" />
   </ItemGroup>
 
