@@ -31,25 +31,25 @@ public static class ApplicationDbContextExtensions
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
         {
-            foreach (var authenticationRequest in authenticationRequests)
+            foreach (var updatedAuthenticationRequest in authenticationRequests)
             {
                 var existingRequest = context.AuthenticationRequests
                     .Include(req => req.AssociatedAccounts)
-                    .SingleOrDefault(req => req.ThirdPartyId == authenticationRequest.ThirdPartyId);
+                    .SingleOrDefault(req => req.ThirdPartyId == updatedAuthenticationRequest.ThirdPartyId);
 
                 if (existingRequest == null)
                 {
-                    var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(authenticationRequest);
+                    var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
                     var entry = await context.AuthenticationRequests.AddAsync(insertEntity);
                     existingRequest = entry.Entity;
                 }
                 else
                 {
-                    existingRequest.Status = authenticationRequest.Status;
-                    existingRequest.AuthenticationLink = authenticationRequest.AuthenticationLink;
+                    existingRequest.Status = updatedAuthenticationRequest.Status;
+                    existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
                 }
 
-                context.UpdateAssociatedBankAccounts(authenticationRequest, existingRequest);
+                context.UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
                 await context.SaveChangesAsync();
             }
         }
@@ -73,8 +73,10 @@ public static class ApplicationDbContextExtensions
                     trackedAccounts.Add(trackedAccount);
                 }
 
-                // If the account is already tracked, check first if it already contains the association
-                if (existingRequest.AssociatedAccounts.All(a => a.ThirdPartyId != trackedAccount.ThirdPartyId))
+                // If the account is already tracked, check first if the existing authentication request already contains the association
+                var associationDoesNotExistYet = existingRequest.AssociatedAccounts
+                    .All(bankAccount => bankAccount.ThirdPartyId != trackedAccount.ThirdPartyId);
+                if (associationDoesNotExistYet)
                 {
                     existingRequest.AssociatedAccounts.Add(trackedAccount);
                 }

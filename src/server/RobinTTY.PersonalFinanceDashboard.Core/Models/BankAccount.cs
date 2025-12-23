@@ -119,6 +119,13 @@ public class BankAccount : Account
         AssociatedAuthenticationRequests = associatedAuthenticationRequests;
     }
 
+    public static BankAccount CreateWithoutNavigationProperties(BankAccount bankAccount)
+    {
+        return new BankAccount(bankAccount.ThirdPartyId, bankAccount.Name, bankAccount.Description, bankAccount.Balance,
+            bankAccount.Currency, bankAccount.Iban, bankAccount.Bic, bankAccount.Bban, bankAccount.OwnerName,
+            bankAccount.AccountType);
+    }
+
     /// <summary>
     /// Updates the (non-navigation) properties of the current <see cref="BankAccount"/> instance with the values
     /// provided in the specified <paramref name="updatedAccount"/>.

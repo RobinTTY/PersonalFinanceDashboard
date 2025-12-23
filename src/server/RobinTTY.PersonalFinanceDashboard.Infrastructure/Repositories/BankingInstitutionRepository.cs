@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -14,8 +13,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class BankingInstitutionRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly GoCardlessDataProviderService _dataProviderService;
-    private readonly ThirdPartyDataRetrievalMetadataService _dataRetrievalMetadataService;
     private readonly BankingInstitutionSyncHandler _bankingInstitutionSyncHandler;
     private readonly ILogger<BankingInstitutionRepository> _logger;
 
@@ -23,20 +20,14 @@ public class BankingInstitutionRepository
     /// Creates a new instance of <see cref="BankingInstitutionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
-    /// <param name="dataRetrievalMetadataService">Service used to determine if the database data is stale.</param>
     /// <param name="bankingInstitutionSyncHandler">Handles the synchronization of third party data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public BankingInstitutionRepository(
         ApplicationDbContext dbContext,
-        GoCardlessDataProviderService dataProviderService,
-        ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
         BankingInstitutionSyncHandler bankingInstitutionSyncHandler,
         ILogger<BankingInstitutionRepository> logger)
     {
         _dbContext = dbContext;
-        _dataProviderService = dataProviderService;
-        _dataRetrievalMetadataService = dataRetrievalMetadataService;
         _bankingInstitutionSyncHandler = bankingInstitutionSyncHandler;
         _logger = logger;
     }

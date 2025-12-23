@@ -6,6 +6,7 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
+// TODO: Should contain methods to update a single entity as well to optimize efficiency
 public class BankAccountSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
@@ -72,20 +73,23 @@ public class BankAccountSyncHandler(
 
             if (existingBankAccount == null)
             {
-                await dbContext.BankAccounts.AddAsync(updatedBankAccount);
-                await dbContext.SaveChangesAsync();
-                return;
+                // TODO: Update like with ApplicationDbContextExtensions
+                var insertEntity = BankAccount.CreateWithoutNavigationProperties(updatedBankAccount);
+                var entry = await dbContext.BankAccounts.AddAsync(insertEntity);
+                existingBankAccount = entry.Entity;
             }
-
-            existingBankAccount.UpdateProperties(updatedBankAccount);
-            UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);
-            UpdateAssociatedInstitution(updatedBankAccount, existingBankAccount);
-
+            else
+            {
+                existingBankAccount.UpdateProperties(updatedBankAccount);
+            }
+            
+            await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);
+            await UpdateAssociatedInstitution(updatedBankAccount, existingBankAccount);
             await dbContext.SaveChangesAsync();
         }
     }
 
-    private void UpdateAssociatedAuthenticationRequests(BankAccount updatedBankAccount,
+    private async Task UpdateAssociatedAuthenticationRequests(BankAccount updatedBankAccount,
         BankAccount existingBankAccount)
     {
         var associatedAuthenticationRequestIds = updatedBankAccount.AssociatedAuthenticationRequests
@@ -93,31 +97,48 @@ public class BankAccountSyncHandler(
         var authRequests = dbContext.AuthenticationRequests
             .Where(request => associatedAuthenticationRequestIds.Contains(request.ThirdPartyId)).ToList();
         
-        updatedBankAccount.AssociatedAuthenticationRequests.ForEach(request =>
+        foreach (var request in updatedBankAccount.AssociatedAuthenticationRequests)
         {
             var linkedRequest = authRequests.SingleOrDefault(existingRequest =>
                 existingRequest.ThirdPartyId == request.ThirdPartyId);
            
             if (linkedRequest == null)
             {
+                var entry = await dbContext.AuthenticationRequests.AddAsync(request);
+                linkedRequest = entry.Entity;
                 existingBankAccount.AssociatedAuthenticationRequests.Add(request);
             }
-        });
+
+            var associationAlreadyExists = existingBankAccount.AssociatedAuthenticationRequests
+                .All(req => req.ThirdPartyId != linkedRequest.ThirdPartyId);
+            if (associationAlreadyExists)
+            {
+                existingBankAccount.AssociatedAuthenticationRequests.Add(linkedRequest);
+            }
+        }
     }
     
-    private void UpdateAssociatedInstitution(BankAccount updatedBankAccount,
+    private async Task UpdateAssociatedInstitution(BankAccount updatedBankAccount,
         BankAccount existingBankAccount)
     {
         var associatedInstitutionId = updatedBankAccount.AssociatedInstitution?.ThirdPartyId;
 
         if (associatedInstitutionId != null)
         {
-            var linkedInstitution = dbContext.BankingInstitutions
+            var trackedInstitution = dbContext.BankingInstitutions
                 .SingleOrDefault(institution => institution.ThirdPartyId == associatedInstitutionId);
         
-            if (linkedInstitution == null)
+            if (trackedInstitution == null && updatedBankAccount.AssociatedInstitution != null)
             {
-                existingBankAccount.AssociatedInstitution = linkedInstitution;
+                var entry = await dbContext.BankingInstitutions.AddAsync(updatedBankAccount.AssociatedInstitution);
+                trackedInstitution = entry.Entity;
+            }
+            
+            var associationDoesNotExistYet =
+                existingBankAccount.AssociatedInstitution?.ThirdPartyId != trackedInstitution?.ThirdPartyId;
+            if (associationDoesNotExistYet)
+            {
+                existingBankAccount.AssociatedInstitution = trackedInstitution;
             }
         }
     }

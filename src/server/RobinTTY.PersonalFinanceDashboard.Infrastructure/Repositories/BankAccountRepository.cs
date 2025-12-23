@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -13,18 +11,22 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly BankAccountSyncHandler _bankAccountSyncHandler;
     private readonly ILogger<BankAccountRepository> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccountRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
+    /// <param name="bankAccountSyncHandler">Handles the synchronization of third party data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public BankAccountRepository(
         ApplicationDbContext dbContext,
+        BankAccountSyncHandler bankAccountSyncHandler,
         ILogger<BankAccountRepository> logger)
     {
         _dbContext = dbContext;
+        _bankAccountSyncHandler = bankAccountSyncHandler;
         _logger = logger;
     }
 
@@ -35,6 +37,8 @@ public class BankAccountRepository
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<IQueryable<BankAccount?>> GetBankAccount(Guid accountId)
     {
+        await _bankAccountSyncHandler.SynchronizeData(true);
+        
         return _dbContext.BankAccounts.Where(account => account.Id == accountId);
     }
 
@@ -44,6 +48,8 @@ public class BankAccountRepository
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
     public async Task<IQueryable<BankAccount>> GetBankAccounts()
     {
+        await _bankAccountSyncHandler.SynchronizeData();
+        
         return _dbContext.BankAccounts;
     }
 
