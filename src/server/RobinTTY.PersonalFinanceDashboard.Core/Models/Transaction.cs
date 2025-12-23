@@ -5,12 +5,12 @@ namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class Transaction : DatabaseEntity
+public class Transaction : ThirdPartyEntity
 {
     /// <summary>
-    /// The id of the transaction provided by the third party data retrieval service.
+    /// The id of the transaction provided by the banking institution.
     /// </summary>
-    public string? ThirdPartyTransactionId { get; set; }
+    public string? BankTransactionId { get; set; }
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
@@ -55,7 +55,7 @@ public class Transaction : DatabaseEntity
     /// </summary>
     public Transaction()
     {
-        ThirdPartyTransactionId = null;
+        BankTransactionId = null;
         AccountId = Guid.Empty;
         ValueDate = null;
         Payer = null;
@@ -70,7 +70,8 @@ public class Transaction : DatabaseEntity
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
     /// <param name="id">The id of the transaction.</param>
-    /// <param name="thirdPartyTransactionId">The id of the transaction provided by the third party data retrieval service.</param>
+    /// <param name="thirdPartyId">The id of the transaction provided by the third party data provider.</param>
+    /// <param name="bankTransactionId">The id of the transaction provided by the third party data retrieval service.</param>
     /// <param name="accountId">The id of the account to which the transaction belongs.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
@@ -80,11 +81,12 @@ public class Transaction : DatabaseEntity
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain sub-categories).</param>
-    public Transaction(Guid id, string thirdPartyTransactionId, Guid accountId, DateTime? valueDate, string payer, string payee, decimal amount,
+    public Transaction(Guid id, Guid thirdPartyId, string? bankTransactionId, Guid accountId, DateTime? valueDate, string? payer, string? payee, decimal amount,
         string currency, string category, string notes, List<Tag> tags)
     {
         Id = id;
-        ThirdPartyTransactionId = thirdPartyTransactionId;
+        ThirdPartyId = thirdPartyId;
+        BankTransactionId = bankTransactionId;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;

@@ -18,7 +18,8 @@ public class MockDataAccessService
         return new Faker<Transaction>()
             .CustomInstantiator(f => new Transaction(
                 id: Guid.NewGuid(),
-                thirdPartyTransactionId: Guid.NewGuid().ToString(),
+                thirdPartyId: Guid.NewGuid(),
+                bankTransactionId: Guid.NewGuid().ToString(),
                 accountId: Guid.NewGuid(),
                 valueDate: f.Date.Between(new DateTime(2018, 01, 01), DateTime.Today),
                 payer: f.Person.FullName,

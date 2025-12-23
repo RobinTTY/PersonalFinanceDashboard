@@ -11,6 +11,7 @@ using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
@@ -88,6 +89,7 @@ public static class ServiceCollectionExtensions
                 .AddScoped<BankingInstitutionSyncHandler>()
                 .AddScoped<AuthenticationRequestSyncHandler>()
                 .AddScoped<BankAccountSyncHandler>()
+                .AddScoped<ITransactionSyncHandler, TransactionSyncHandler>()
                 .AddScoped<ThirdPartyDataRetrievalMetadataService>();
             
         }

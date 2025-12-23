@@ -164,7 +164,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var response = await client.AccountsEndpoint.GetTransactions(accountId, cancellationToken: cancellationToken);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(Guid.NewGuid(), transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
+            new Transaction(Guid.NewGuid(), Guid.Parse(transaction.InternalTransactionId), transaction.TransactionId ?? null, accountId,
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,

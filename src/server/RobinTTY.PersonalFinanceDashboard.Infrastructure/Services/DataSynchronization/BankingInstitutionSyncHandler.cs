@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Interfaces;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -10,10 +10,8 @@ public class BankingInstitutionSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
-    ILogger<BankingInstitutionSyncHandler> logger)
-    : IDataSyncHandler
+    ILogger<BankingInstitutionSyncHandler> logger) : IBankingInstitutionSyncHandler
 {
-    /// <inheritdoc />
     public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
@@ -22,22 +20,24 @@ public class BankingInstitutionSyncHandler(
             var institutions = await GetBankingInstitutions();
             if (institutions == null)
             {
+                logger.LogWarning("Could not retrieve banking institutions from {dataProvider}",
+                    nameof(GoCardlessDataProviderService));
                 return false;
             }
 
             await dbContext.ReplaceBankingInstitutions(institutions);
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
             await dbContext.SaveChangesAsync();
-            
+
             logger.LogInformation("Synced {Count} banking institutions", institutions.Count);
         }
 
         return true;
     }
-    
+
     private async Task<List<BankingInstitution>?> GetBankingInstitutions()
     {
         var response = await dataProvider.GetBankingInstitutions();
-        return !response.IsSuccessful ? null : response.Result.ToList();
+        return response.IsSuccessful ? response.Result.ToList() : null;
     }
 }

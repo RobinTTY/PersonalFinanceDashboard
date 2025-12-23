@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Interfaces;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -11,9 +11,8 @@ public class BankAccountSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
-    ILogger<BankAccountSyncHandler> logger) : IDataSyncHandler
+    ILogger<BankAccountSyncHandler> logger) : IBankAccountSyncHandler
 {
-    /// <inheritdoc />
     public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts);

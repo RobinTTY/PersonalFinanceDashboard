@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -9,14 +11,21 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly ITransactionSyncHandler _transactionSyncHandler;
+    private readonly ILogger<TransactionRepository> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="TransactionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    public TransactionRepository(ApplicationDbContext dbContext)
+    /// <param name="transactionSyncHandler">Handles the synchronization of third party data.</param>
+    /// <param name="logger">Logger used for monitoring purposes.</param>
+    public TransactionRepository(ApplicationDbContext dbContext, ITransactionSyncHandler transactionSyncHandler,
+        ILogger<TransactionRepository> logger)
     {
         _dbContext = dbContext;
+        _transactionSyncHandler = transactionSyncHandler;
+        _logger = logger;
     }
 
     /// <summary>
@@ -35,6 +44,8 @@ public class TransactionRepository
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
     public IQueryable<Transaction> GetTransactionsByAccountId(Guid accountId)
     {
+        _transactionSyncHandler.SynchronizeData(accountId);
+        
         return _dbContext.Transactions
             .Where(transaction => transaction.AccountId == accountId);
     }
