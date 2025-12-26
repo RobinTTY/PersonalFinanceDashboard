@@ -32,8 +32,9 @@ public class TransactionRepository
     /// Gets all <see cref="Transaction"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
-    public IQueryable<Transaction> GetTransactions(CancellationToken cancellationToken)
+    public async Task<IQueryable<Transaction>> GetTransactions(CancellationToken cancellationToken)
     {
+        await _transactionSyncHandler.SynchronizeData();
         return _dbContext.Transactions;
     }
 
@@ -42,9 +43,9 @@ public class TransactionRepository
     /// </summary>
     /// <param name="accountId">The account id the transactions are associated with.</param>
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
-    public IQueryable<Transaction> GetTransactionsByAccountId(Guid accountId)
+    public async Task<IQueryable<Transaction>> GetTransactionsByAccountId(Guid accountId)
     {
-        _transactionSyncHandler.SynchronizeData(accountId);
+        await _transactionSyncHandler.SynchronizeData(accountId);
         
         return _dbContext.Transactions
             .Where(transaction => transaction.AccountId == accountId);

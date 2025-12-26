@@ -2,5 +2,5 @@
 
 public interface ITransactionSyncHandler
 {
-    Task<bool> SynchronizeData(Guid internalAccountId, bool forceThirdPartySync = false);
+    Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false);
 }

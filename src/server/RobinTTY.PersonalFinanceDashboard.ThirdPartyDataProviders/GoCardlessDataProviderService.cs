@@ -158,13 +158,16 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return tasks.Select(task => task.Result).ToList();
     }
 
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId,
-        CancellationToken cancellationToken = default)
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
+        Guid internalAccountId, Guid goCardlessAccountId, CancellationToken cancellationToken = default)
     {
-        var response = await client.AccountsEndpoint.GetTransactions(accountId, cancellationToken: cancellationToken);
+        var response =
+            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(Guid.NewGuid(), Guid.Parse(transaction.InternalTransactionId), transaction.TransactionId ?? null, accountId,
+            new Transaction(Guid.NewGuid(),
+                transaction.InternalTransactionId != null ? Guid.Parse(transaction.InternalTransactionId) : Guid.Empty,
+                transaction.TransactionId ?? null, internalAccountId,
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,

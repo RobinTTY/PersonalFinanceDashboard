@@ -17,8 +17,8 @@ public class TransactionQueryResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
     [UseProjection]
-    public IQueryable<Transaction> GetTransactions(TransactionRepository repository,
-        CancellationToken cancellationToken) => repository.GetTransactions(cancellationToken);
+    public async Task<IQueryable<Transaction>> GetTransactions(TransactionRepository repository,
+        CancellationToken cancellationToken) => await repository.GetTransactions(cancellationToken);
 
     /// <summary>
     /// Look up transactions of an account.
@@ -28,6 +28,6 @@ public class TransactionQueryResolvers
     /// <param name="cancellationToken">Optional token to signal cancellation of the operation.</param>
     [UsePaging]
     [UseProjection]
-    public IQueryable<Transaction> GetTransactionsByAccountId(TransactionRepository repository,
-        Guid accountId, CancellationToken cancellationToken) => repository.GetTransactionsByAccountId(accountId);
+    public async Task<IQueryable<Transaction>> GetTransactionsByAccountId(TransactionRepository repository,
+        Guid accountId, CancellationToken cancellationToken) => await repository.GetTransactionsByAccountId(accountId);
 }
