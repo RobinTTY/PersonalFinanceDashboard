@@ -11,7 +11,7 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// Data provider for banking data from <see href="https://gocardless.com/bank-account-data/"/>.
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
-// TODO: Cancellation token support
+// TODO: These methods need to be reworked quite a bit
 public class GoCardlessDataProviderService(NordigenClient client)
 {
     public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
@@ -158,13 +158,16 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return tasks.Select(task => task.Result).ToList();
     }
 
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid accountId,
-        CancellationToken cancellationToken = default)
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
+        Guid internalAccountId, Guid goCardlessAccountId, CancellationToken cancellationToken = default)
     {
-        var response = await client.AccountsEndpoint.GetTransactions(accountId, cancellationToken: cancellationToken);
+        var response =
+            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(Guid.NewGuid(), transaction.InternalTransactionId ?? Guid.NewGuid().ToString(), accountId,
+            new Transaction(Guid.NewGuid(),
+                transaction.InternalTransactionId != null ? Guid.Parse(transaction.InternalTransactionId) : Guid.Empty,
+                transaction.TransactionId ?? null, internalAccountId,
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,
@@ -179,18 +182,24 @@ public class GoCardlessDataProviderService(NordigenClient client)
     private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
         CancellationToken cancellationToken = default)
     {
+        var generalAccountInfoTask = client.AccountsEndpoint.GetAccount(accountId, cancellationToken);
         var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId, cancellationToken);
         var balanceTask = client.AccountsEndpoint.GetBalances(accountId, cancellationToken);
+
+        var generalAccountInfoResponse = await generalAccountInfoTask;
         var accountDetailsResponse = await accountDetailsTask;
         var balanceResponse = await balanceTask;
 
-        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess)
+        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess || !generalAccountInfoResponse.IsSuccess)
             return new ThirdPartyResponse<BankAccount, AccountsError>(
-                accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, null, accountDetailsResponse.Error);
+                false, null, accountDetailsResponse.Error);
 
+        var generalAccountInfoResult = generalAccountInfoResponse.Result;
         var accountDetailsResult = accountDetailsResponse.Result;
         var balanceResult = balanceResponse.Result;
-        var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, accountDetailsResult, balanceResult);
+        var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, generalAccountInfoResult,
+            accountDetailsResult, balanceResult);
+
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);

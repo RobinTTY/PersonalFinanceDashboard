@@ -3,25 +3,18 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-public class ThirdPartyDataRetrievalMetadataRepository
+public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext)
 {
-    private readonly ApplicationDbContext _dbContext;
-
-    public ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public async Task<ThirdPartyDataRetrievalMetadata> GetThirdPartyDataRetrievalMetadata(
         ThirdPartyDataType dataType)
     {
-        return await _dbContext.ThirdPartyDataRetrievalMetadata
+        return await dbContext.ThirdPartyDataRetrievalMetadata
             .SingleAsync(metadata => metadata.DataType == dataType);
     }
 
     public async Task<bool> ResetLastRetrievalTime(ThirdPartyDataType currentDataType)
     {
-        var changedRows = await _dbContext.ThirdPartyDataRetrievalMetadata
+        var changedRows = await dbContext.ThirdPartyDataRetrievalMetadata
             .Where(metadata => metadata.DataType == currentDataType)
             .ExecuteUpdateAsync(update => update
                 .SetProperty(metadata => metadata.LastRetrievalTime, DateTime.Now));

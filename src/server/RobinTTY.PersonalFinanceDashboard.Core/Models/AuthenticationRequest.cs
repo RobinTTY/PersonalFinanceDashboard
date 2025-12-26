@@ -57,6 +57,12 @@ public class AuthenticationRequest : ThirdPartyEntity
         AuthenticationLink = authenticationLink;
         AssociatedAccounts = associatedAccounts;
     }
+    
+    public static AuthenticationRequest CreateWithoutNavigationProperties(AuthenticationRequest authenticationRequest)
+    {
+        return new AuthenticationRequest(authenticationRequest.ThirdPartyId, authenticationRequest.Status,
+            authenticationRequest.AuthenticationLink);
+    }
 }
 
 /// <summary>

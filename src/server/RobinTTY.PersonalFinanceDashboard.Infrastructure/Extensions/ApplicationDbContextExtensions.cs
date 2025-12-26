@@ -8,84 +8,94 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Extensions;
 /// </summary>
 public static class ApplicationDbContextExtensions
 {
-    /// <summary>
-    /// Adds the provided authentication request to the database if it doesn't exist yet.
-    /// If it already exists, the existing entity will be updated.
-    /// Does not execute a <see cref="DbContext.SaveChanges()"/>.
-    /// </summary>
+    // TODO: Convert to methods in respective SyncHandlers, don't need to be extensions
     /// <param name="context">The database context to use.</param>
-    /// <param name="authRequest">The authentication request to persist in the database.</param>
-    /// <returns>The type of operation that was performed.</returns>
-    public static async Task<OperationType> AddOrUpdateAuthenticationRequest(this ApplicationDbContext context,
-        AuthenticationRequest authRequest)
+    extension(ApplicationDbContext context)
     {
-        var existingAuthRequest = context.AuthenticationRequests
-            .SingleOrDefault(authReq => authReq.ThirdPartyId == authRequest.ThirdPartyId);
-
-        if (existingAuthRequest != null)
+        /// <summary>
+        /// Replaces all existing banking institutions in the database with the provided list of banking institutions.
+        /// </summary>
+        /// <param name="bankingInstitutions">A list of banking institutions to be saved in the database, replacing the existing entries.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ReplaceBankingInstitutions(List<BankingInstitution> bankingInstitutions)
         {
-            existingAuthRequest.Status = authRequest.Status;
-            existingAuthRequest.ThirdPartyId = authRequest.ThirdPartyId;
-            existingAuthRequest.AuthenticationLink = authRequest.AuthenticationLink;
-            return OperationType.Update;
+            await context.BankingInstitutions.ExecuteDeleteAsync();
+            await context.BankingInstitutions.AddRangeAsync(bankingInstitutions);
+            await context.SaveChangesAsync();
         }
 
-        await context.AuthenticationRequests.AddAsync(authRequest);
-        return OperationType.Insert;
-    }
-
-    // TODO: this can be made generic?!
-    // accept models that implement interface which updates all properties
-    // accept dbset that should be updated
-    public static async Task<OperationType> AddOrUpdateBankingInstitution(this ApplicationDbContext context,
-        BankingInstitution bankingInstitution)
-    {
-        var existingBankingInstitution = context.BankingInstitutions
-            .SingleOrDefault(institution => institution.ThirdPartyId == bankingInstitution.ThirdPartyId);
-
-        if (existingBankingInstitution != null)
+        /// <summary>
+        /// Adds new authentication requests to the database or updates existing ones based on their third-party IDs.
+        /// </summary>
+        /// <param name="authenticationRequests">A list of authentication requests to add or update in the database.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
         {
-            existingBankingInstitution.Name = bankingInstitution.Name;
-            existingBankingInstitution.Bic = bankingInstitution.Bic;
-            existingBankingInstitution.LogoUri = bankingInstitution.LogoUri;
-            existingBankingInstitution.Countries = bankingInstitution.Countries;
-            return OperationType.Update;
+            foreach (var updatedAuthenticationRequest in authenticationRequests)
+            {
+                var existingRequest = context.AuthenticationRequests
+                    .Include(req => req.AssociatedAccounts)
+                    .SingleOrDefault(req => req.ThirdPartyId == updatedAuthenticationRequest.ThirdPartyId);
+
+                if (existingRequest == null)
+                {
+                    var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
+                    var entry = await context.AuthenticationRequests.AddAsync(insertEntity);
+                    existingRequest = entry.Entity;
+                }
+                else
+                {
+                    existingRequest.Status = updatedAuthenticationRequest.Status;
+                    existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
+                }
+
+                context.UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
+                await context.SaveChangesAsync();
+            }
         }
 
-        await context.BankingInstitutions.AddAsync(bankingInstitution);
-        return OperationType.Insert;
-    }
-
-    public static async Task<OperationType> AddOrUpdateBankAccount(this ApplicationDbContext context,
-        BankAccount bankAccount)
-    {
-        var existingBankAccount = context.BankAccounts
-            .SingleOrDefault(account => account.ThirdPartyId == bankAccount.ThirdPartyId);
-
-        if (existingBankAccount != null)
+        private void UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
+            AuthenticationRequest existingRequest)
         {
-            existingBankAccount.Name = bankAccount.Name;
-            existingBankAccount.Iban = bankAccount.Iban;
-            existingBankAccount.Bic = bankAccount.Bic;
-            existingBankAccount.Bban = bankAccount.Bban;
-            existingBankAccount.Balance = bankAccount.Balance;
-            existingBankAccount.Currency = bankAccount.Currency;
-            existingBankAccount.OwnerName = bankAccount.OwnerName;
-            existingBankAccount.AccountType = bankAccount.AccountType;
-            existingBankAccount.Description = bankAccount.Description;
-            existingBankAccount.AssociatedInstitution = bankAccount.AssociatedInstitution;
-            
-            return OperationType.Update;
+            var associatedAccountIds = updatedAuthenticationRequest.AssociatedAccounts
+                .Select(acc => acc.ThirdPartyId).Distinct().ToList();
+            var trackedAccounts = context.BankAccounts
+                .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
+
+            foreach (var account in updatedAuthenticationRequest.AssociatedAccounts)
+            {
+                var trackedAccount = trackedAccounts.SingleOrDefault(a => a.ThirdPartyId == account.ThirdPartyId);
+
+                if (trackedAccount == null)
+                {
+                    var entry = context.BankAccounts.Add(account);
+                    trackedAccount = entry.Entity;
+                    trackedAccounts.Add(trackedAccount);
+                }
+
+                // If the account is already tracked, check first if the existing authentication request already contains the association
+                var associationDoesNotExistYet = existingRequest.AssociatedAccounts
+                    .All(bankAccount => bankAccount.ThirdPartyId != trackedAccount.ThirdPartyId);
+                if (associationDoesNotExistYet)
+                {
+                    existingRequest.AssociatedAccounts.Add(trackedAccount);
+                }
+            }
         }
 
-        await context.BankAccounts.AddAsync(bankAccount);
-        return OperationType.Insert;
-    }
+        /// <summary>
+        /// Removes all authentication requests from the database that are not included in the provided collection
+        /// of authentication requests.
+        /// </summary>
+        /// <param name="authenticationRequests">The authentication requests to compare the ones stored in the
+        /// database to.</param>
+        public async Task RemoveNotIncludedAuthenticationRequests(List<AuthenticationRequest> authenticationRequests)
+        {
+            var thirdPartyIds = authenticationRequests.Select(req => req.ThirdPartyId);
 
-    public enum OperationType
-    {
-        Undefined,
-        Insert,
-        Update
+            await context.AuthenticationRequests
+                .Where(req => !thirdPartyIds.Contains(req.ThirdPartyId))
+                .ExecuteDeleteAsync();
+        }
     }
 }

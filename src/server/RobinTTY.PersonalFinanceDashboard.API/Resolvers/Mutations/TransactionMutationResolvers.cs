@@ -20,7 +20,7 @@ public class TransactionMutationResolvers
     {
         var transaction = new Transaction
         {
-            ThirdPartyTransactionId = null,
+            BankTransactionId = null,
             AccountId = input.AccountId,
             Amount = input.Amount,
             Category = input.Category,

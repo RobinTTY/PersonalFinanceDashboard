@@ -8,5 +8,5 @@ public abstract class DatabaseEntity
     /// <summary>
     /// The id of this database entity.
     /// </summary>
-    public required Guid? Id { get; init; }
+    public Guid? Id { get; init; }
 }

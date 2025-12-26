@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -9,22 +11,30 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly ITransactionSyncHandler _transactionSyncHandler;
+    private readonly ILogger<TransactionRepository> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="TransactionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    public TransactionRepository(ApplicationDbContext dbContext)
+    /// <param name="transactionSyncHandler">Handles the synchronization of third party data.</param>
+    /// <param name="logger">Logger used for monitoring purposes.</param>
+    public TransactionRepository(ApplicationDbContext dbContext, ITransactionSyncHandler transactionSyncHandler,
+        ILogger<TransactionRepository> logger)
     {
         _dbContext = dbContext;
+        _transactionSyncHandler = transactionSyncHandler;
+        _logger = logger;
     }
 
     /// <summary>
     /// Gets all <see cref="Transaction"/>s.
     /// </summary>
     /// <returns>A list of all <see cref="Transaction"/>s.</returns>
-    public IQueryable<Transaction> GetTransactions(CancellationToken cancellationToken)
+    public async Task<IQueryable<Transaction>> GetTransactions(CancellationToken cancellationToken)
     {
+        await _transactionSyncHandler.SynchronizeData();
         return _dbContext.Transactions;
     }
 
@@ -33,8 +43,10 @@ public class TransactionRepository
     /// </summary>
     /// <param name="accountId">The account id the transactions are associated with.</param>
     /// <returns>A list of matched <see cref="Transaction"/>s.</returns>
-    public IQueryable<Transaction> GetTransactionsByAccountId(Guid accountId)
+    public async Task<IQueryable<Transaction>> GetTransactionsByAccountId(Guid accountId)
     {
+        await _transactionSyncHandler.SynchronizeData(accountId);
+        
         return _dbContext.Transactions
             .Where(transaction => transaction.AccountId == accountId);
     }

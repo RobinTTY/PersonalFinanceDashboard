@@ -1,3 +1,9 @@
+---
+id: database-schema
+title: Database Schema
+sidebar_position: 6
+---
+
 # Database Schema
 
 The application uses a relational database to store financial data. Below is the entity-relationship diagram showing the main entities and their relationships:

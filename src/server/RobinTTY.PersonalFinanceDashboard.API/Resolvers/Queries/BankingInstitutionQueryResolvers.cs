@@ -2,7 +2,7 @@
 using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
-
+ 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Queries;
 
 /// <summary>
