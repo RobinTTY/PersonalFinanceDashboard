@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Box, Center, Loader, SimpleGrid, Text, Group, Badge, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 

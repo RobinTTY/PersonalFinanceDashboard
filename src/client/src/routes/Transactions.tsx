@@ -6,16 +6,18 @@ import {
   ICellRendererParams,
   ValueFormatterFunc,
   ValueFormatterParams,
+  ModuleRegistry,
+  AllCommunityModule
 } from 'ag-grid-community';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Badge } from '@mantine/core';
 import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
 import { getCurrencyFormatter } from '@/utility/getCurrencyFormatter';
 
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 import './GlobalGridStyles.css';
 import { getDateFormatter } from '@/utility/getDateFormatter';
+
+ModuleRegistry.registerModules([ AllCommunityModule ]);
 
 export const Transactions = () => {
   const gridRef = useRef<AgGridReact>(null);

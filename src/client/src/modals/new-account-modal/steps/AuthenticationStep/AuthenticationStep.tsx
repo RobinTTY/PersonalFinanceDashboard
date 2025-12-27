@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { useDisclosure } from '@mantine/hooks';
 import { Button, Center, Stack, Text } from '@mantine/core';
 import { CreateAuthenticationRequestMutation } from '@graphql-mutations/CreateAuthenticationRequest';

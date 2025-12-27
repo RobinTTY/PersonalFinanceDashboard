@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { useDisclosure } from '@mantine/hooks';
 import { Center, Loader, SimpleGrid, Button, Box } from '@mantine/core';
 
@@ -45,12 +45,12 @@ export const Accounts = () => {
           <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }}>
             {accounts.map((account) => (
               // TODO: handle null
-              <AccountSummary
+              (<AccountSummary
                 key={account.id}
                 balance={account.balance!}
                 currency={account.currency!}
                 description={account.description!}
-              />
+              />)
             ))}
           </SimpleGrid>
         </div>

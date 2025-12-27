@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { StatsGrid } from './StatsGrid';
 import { StatCardProps } from '../stat-card/StatCardProps';
 

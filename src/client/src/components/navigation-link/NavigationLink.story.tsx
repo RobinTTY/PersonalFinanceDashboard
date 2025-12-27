@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { IconHome } from '@tabler/icons-react';
 import { BrowserRouter } from 'react-router-dom';
 import { NavigationLink } from './NavigationLink';

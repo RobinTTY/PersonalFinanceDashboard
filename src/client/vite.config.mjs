@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    checker({ typescript: true, eslint: { lintCommand: 'eslint src' } }),
+    checker({ typescript: true, eslint: { lintCommand: 'eslint src', useFlatConfig: true } }),
   ],
   test: {
     globals: true,

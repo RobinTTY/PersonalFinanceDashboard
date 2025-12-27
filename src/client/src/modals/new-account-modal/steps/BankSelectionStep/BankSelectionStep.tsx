@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Center, Loader } from '@mantine/core';
 import { ModalOptionSearchList } from '@components/modal-option-search-list/ModalOptionSearchList';
 import { GetBankingInstitutionsQuery } from '@/graphql/queries/GetBankingInstitutions';
