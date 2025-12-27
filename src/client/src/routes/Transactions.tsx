@@ -7,7 +7,7 @@ import {
   ValueFormatterFunc,
   ValueFormatterParams,
 } from 'ag-grid-community';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Badge } from '@mantine/core';
 import { GetTransactionsQuery } from '@/graphql/queries/GetTransactions';
 import { getCurrencyFormatter } from '@/utility/getCurrencyFormatter';

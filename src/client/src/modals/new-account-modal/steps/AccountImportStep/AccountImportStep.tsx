@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Box, Center, Loader, Text, Button, Stack } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 import { GetTransactionsQuery } from '@graphql-queries/GetTransactions';
