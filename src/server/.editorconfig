@@ -11,5 +11,8 @@ indent_size = 2
 [*.cs]
 csharp_style_namespace_declarations = file_scoped:warning
 
+[*.csproj]
+indent_size = 2
+
 [*/Migrations/*]
 generated_code = true

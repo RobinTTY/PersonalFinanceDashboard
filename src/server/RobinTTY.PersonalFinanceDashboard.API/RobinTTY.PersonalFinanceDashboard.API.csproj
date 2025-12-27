@@ -35,4 +35,10 @@
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+      <Content Update="@(Content)">
+          <Visible Condition="'%(NuGetItemType)' == 'Content'">false</Visible>
+      </Content>
+  </ItemGroup>
+
 </Project>
