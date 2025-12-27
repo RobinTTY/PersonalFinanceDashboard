@@ -29,7 +29,7 @@
     "@mantine/notifications": "^8.3.10",
     "@mantine/spotlight": "^8.3.10",
     "@mantine/tiptap": "^8.3.10",
-    "@tabler/icons-react": "^2.46.0",
+    "@tabler/icons-react": "^3.36.0",
     "@tiptap/extension-link": "^2.1.16",
     "@tiptap/react": "^2.1.16",
     "@tiptap/starter-kit": "^2.1.16",
@@ -39,11 +39,11 @@
     "dayjs": "^1.11.10",
     "echarts": "^6.0.0",
     "graphql": "^16.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3",
-    "react-virtualized-auto-sizer": "^1.0.21",
-    "react-window": "^1.8.10"
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router-dom": "^7.11.0",
+    "react-virtualized-auto-sizer": "^2.0.0",
+    "react-window": "^1.8.8"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.0",
@@ -56,14 +56,13 @@
     "@storybook/addon-themes": "^10.1.10",
     "@storybook/react": "^10.1.10",
     "@storybook/react-vite": "^10.1.10",
-    "@storybook/testing-library": "^0.2.2",
-    "@testing-library/dom": "^9.3.4",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.2.1",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.11",
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@types/react-window": "^1.8.8",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
@@ -81,7 +80,7 @@
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "jsdom": "^27.4.0",
-    "msw": "^2.1.3",
+    "msw": "2.12.7",
     "postcss": "^8.4.33",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
@@ -96,6 +95,9 @@
     "vitest": "^1.2.1"
   },
   "msw": {
-    "workerDirectory": "dist"
+    "workerDirectory": [
+      "/dist",
+      "dist"
+    ]
   }
 }
