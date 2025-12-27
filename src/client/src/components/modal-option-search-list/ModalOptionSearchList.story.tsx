@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CZ, DK, FI, FR, GB, IT, SE } from 'country-flag-icons/react/3x2';
 import { ModalOptionSearchList } from './ModalOptionSearchList';
 
