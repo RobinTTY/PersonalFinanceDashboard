@@ -92,6 +92,9 @@ export default [
     rules: {
       'no-redeclare': 'off',
     },
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
   },
   {
     files: ['**/graphql/types/graphql.ts'],

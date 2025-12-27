@@ -44,7 +44,7 @@ export const ModalOptionSearchList = ({
           action={() => onOptionSelect && onOptionSelect(option.key)}
         />
       ),
-      [onOptionSelect, truncateOptionDescription, optionDescriptionWidth]
+      []
     );
 
     return (
