@@ -13,7 +13,7 @@ export interface ModalOptionSearchListProps {
 export interface Option {
   key: string;
   description: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 }
 
 export interface ModalOptionSearchDisplayOptions {

@@ -6,7 +6,7 @@ import classes from './ContentCheckbox.module.css';
 
 // TODO: Can this be simplified so onChange is not necessary?
 export const ContentCheckbox = ({
-  className,
+  className: _className,
   children,
   checkboxProps,
   onChange,

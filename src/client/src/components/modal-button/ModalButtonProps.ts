@@ -1,8 +1,9 @@
+import React from 'react';
 import { StyleProp, MantineSpacing } from '@mantine/core';
 import { CSSProperties } from 'react';
 
 export interface ModalButtonProps {
-  icon: JSX.Element;
+  icon: React.ReactElement;
   iconPosition?: 'left' | 'right' | 'top' | 'bottom';
   iconHeight?: StyleProp<CSSProperties['height']>;
   iconWidth?: StyleProp<CSSProperties['width']>;
