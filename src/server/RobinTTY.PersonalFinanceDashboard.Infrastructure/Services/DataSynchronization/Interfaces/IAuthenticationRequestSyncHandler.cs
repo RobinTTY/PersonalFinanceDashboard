@@ -2,5 +2,5 @@
 
 public interface IAuthenticationRequestSyncHandler
 {
-    Task<bool> SynchronizeData(bool forceThirdPartySync = false);
+    Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false);
 }

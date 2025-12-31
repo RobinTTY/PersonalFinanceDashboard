@@ -12,14 +12,16 @@ public class AuthenticationRequestSyncHandler(
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     ILogger<AuthenticationRequestSyncHandler> logger) : IAuthenticationRequestSyncHandler
 {
-    // TODO: There should probably be a SynchronizeAll and Synchronize distinction to optimize response times
-    // So we can distinguish between updating a single entity and all entities
-    public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
         if (dataIsStale || forceThirdPartySync)
         {
-            var authenticationRequests = await GetAuthenticationRequests();
+            if (authenticationRequestId != null)
+                authenticationRequestId = dbContext.AuthenticationRequests
+                    .SingleOrDefault(authRequest => authRequest.Id == authenticationRequestId)?.ThirdPartyId;
+            
+            var authenticationRequests = await GetAuthenticationRequests(authenticationRequestId);
             if (authenticationRequests == null)
             {
                 return false;
@@ -34,11 +36,25 @@ public class AuthenticationRequestSyncHandler(
 
         return true;
     }
-    
-    private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests()
+
+    private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests(Guid? authenticationRequestId)
     {
-        // TODO: Limit should be different
-        var response = await dataProvider.GetAuthenticationRequests(100);
-        return response.IsSuccessful ? response.Result.ToList() : null;
+        List<AuthenticationRequest>? authRequests = null;
+
+        if (authenticationRequestId.HasValue)
+        {
+            var response = await dataProvider.GetAuthenticationRequest(authenticationRequestId.Value);
+            if (response.IsSuccessful)
+                authRequests = [response.Result];
+        }
+        else
+        {
+            // TODO: Limit should be different
+            var response = await dataProvider.GetAuthenticationRequests(100);
+            if (response.IsSuccessful)
+                authRequests = [..response.Result];
+        }
+
+        return authRequests;
     }
 }

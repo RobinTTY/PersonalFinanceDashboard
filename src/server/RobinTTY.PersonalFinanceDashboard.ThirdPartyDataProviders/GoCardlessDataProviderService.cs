@@ -60,11 +60,11 @@ public class GoCardlessDataProviderService(NordigenClient client)
     /// <summary>
     /// Gets an existing authentication request (requisitions).
     /// </summary>
-    /// <param name="requisitionId">The institutionId of the requisition to be retrieved.</param>
+    /// <param name="requisitionId">The id of the requisition to be retrieved.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> which matches the institutionId, as far as it exists.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>> GetAuthenticationRequest(
-        string requisitionId, CancellationToken cancellationToken = default)
+        Guid requisitionId, CancellationToken cancellationToken = default)
     {
         var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId, cancellationToken);
         // TODO: handle request failure
