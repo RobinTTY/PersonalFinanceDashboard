@@ -158,27 +158,6 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return tasks.Select(task => task.Result).ToList();
     }
 
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
-        Guid internalAccountId, Guid goCardlessAccountId, CancellationToken cancellationToken = default)
-    {
-        var response =
-            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
-        // TODO: Also return pending transactions
-        var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(Guid.NewGuid(),
-                transaction.InternalTransactionId != null ? Guid.Parse(transaction.InternalTransactionId) : Guid.Empty,
-                transaction.TransactionId ?? null, internalAccountId,
-                transaction.ValueDateTime ?? transaction.ValueDate,
-                transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
-                transaction.TransactionAmount.Currency,
-                "example-category", "example-notes", [])
-            {
-                Id = null
-            });
-        return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
-            response.Error);
-    }
-
     private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
         CancellationToken cancellationToken = default)
     {
@@ -203,5 +182,26 @@ public class GoCardlessDataProviderService(NordigenClient client)
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
             accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);
+    }
+
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
+        Guid internalAccountId, Guid goCardlessAccountId, CancellationToken cancellationToken = default)
+    {
+        var response =
+            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
+        // TODO: Also return pending transactions
+        var transactions = response.Result!.BookedTransactions.Select(transaction =>
+            new Transaction(Guid.NewGuid(),
+                transaction.InternalTransactionId != null ? Guid.Parse(transaction.InternalTransactionId) : Guid.Empty,
+                transaction.TransactionId ?? null, internalAccountId,
+                transaction.ValueDateTime ?? transaction.ValueDate,
+                transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
+                transaction.TransactionAmount.Currency,
+                "example-category", "example-notes", [])
+            {
+                Id = null
+            });
+        return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
+            response.Error);
     }
 }
