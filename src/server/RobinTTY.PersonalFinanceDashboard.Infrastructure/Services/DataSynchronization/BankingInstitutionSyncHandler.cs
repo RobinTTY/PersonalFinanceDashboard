@@ -87,6 +87,7 @@ public class BankingInstitutionSyncHandler(
         // Institutions to delete
         var institutionsToDelete = allInstitutionsInDb
             .Where(db => !incomingInstitutionsDict.ContainsKey(db.ThirdPartyId)).ToList();
+        // TODO: if there are still relations this won't work
         dbContext.BankingInstitutions.RemoveRange(institutionsToDelete);
 
         await AddOrUpdateBankingInstitutions(bankingInstitutions, dbInstitutionsDict);
