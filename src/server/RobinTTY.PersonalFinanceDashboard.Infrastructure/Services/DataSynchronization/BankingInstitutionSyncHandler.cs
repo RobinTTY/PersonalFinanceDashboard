@@ -33,7 +33,7 @@ public class BankingInstitutionSyncHandler(
             if (bankingInstitutionId.HasValue)
                 await AddOrUpdateBankingInstitutions(institutions);
             else
-                await ReplaceBankingInstitutions(institutions);
+                await AddUpdateOrDeleteBankingInstitutions(institutions);
 
             await dbContext.SaveChangesAsync();
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
@@ -65,14 +65,15 @@ public class BankingInstitutionSyncHandler(
     }
 
     /// <summary>
-    /// Replaces all existing banking institutions in the database with the provided list of banking institutions.
+    /// Uses the provided banking institutions to update the database. Upserts existing entries and removes any existing entities that are
+    /// not contained in the provided data.
     /// </summary>
-    /// <param name="bankingInstitutions">A list of banking institutions to be saved in the database, replacing the existing entries.</param>
+    /// <param name="bankingInstitutions">A list of banking institutions to be saved in the database.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task ReplaceBankingInstitutions(List<BankingInstitution> bankingInstitutions)
+    private async Task AddUpdateOrDeleteBankingInstitutions(List<BankingInstitution> bankingInstitutions)
     {
         var allInstitutionsInDb = await dbContext.BankingInstitutions.ToListAsync();
-        // Optimization for initial seeding
+        // Optimization for initial seeding (empty db)
         if (allInstitutionsInDb.Count == 0)
         {
             dbContext.AddRange(bankingInstitutions);
@@ -84,7 +85,6 @@ public class BankingInstitutionSyncHandler(
             .ToDictionary(bi => bi.ThirdPartyId);
         var dbInstitutionsDict = allInstitutionsInDb.ToDictionary(bi => bi.ThirdPartyId);
 
-        // Institutions to delete
         var institutionsToDelete = allInstitutionsInDb
             .Where(db => !incomingInstitutionsDict.ContainsKey(db.ThirdPartyId)).ToList();
         // TODO: if there are still relations this won't work

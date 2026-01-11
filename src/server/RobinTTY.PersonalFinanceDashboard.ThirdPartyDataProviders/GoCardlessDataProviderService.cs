@@ -71,10 +71,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
             requisition.AuthenticationLink, requisition.Accounts.Select(accountId => new BankAccount(accountId)
             {
                 Id = null
-            }).ToList())
-        {
-            Id = null
-        };
+            }).ToList());
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -90,17 +87,11 @@ public class GoCardlessDataProviderService(NordigenClient client)
         int requisitionLimit, CancellationToken cancellationToken = default)
     {
         var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0, cancellationToken);
-        // TODO: handle request failure
+        // TODO: handle request failure + use paged responses
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
             req.Status.ToAuthenticationStatus(), req.AuthenticationLink, req.Accounts.Select(accountId =>
-                new BankAccount(accountId)
-                {
-                    Id = null
-                }).ToList())
-        {
-            Id = null
-        });
+                new BankAccount(accountId)).ToList()));
         return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -124,13 +115,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
             var requisition = response.Result;
             var authenticationRequest = new AuthenticationRequest(requisition.Id,
                 requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink,
-                requisition.Accounts.Select(accountId => new BankAccount(accountId)
-                {
-                    Id = null
-                }).ToList())
-            {
-                Id = null
-            };
+                requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
 
             return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess,
                 authenticationRequest, null);
@@ -195,10 +180,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
                 transaction.ValueDateTime ?? transaction.ValueDate,
                 transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency,
-                "example-category", "example-notes", [])
-            {
-                Id = null
-            });
+                "example-category", "example-notes", []));
         return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
             response.Error);
     }
