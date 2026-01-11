@@ -37,7 +37,7 @@ public class BankingInstitutionRepository
     /// <returns>The <see cref="BankingInstitution"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(Guid institutionId)
     {
-        await _bankingInstitutionSyncHandler.SynchronizeData();
+        await _bankingInstitutionSyncHandler.SynchronizeData(institutionId);
 
         return _dbContext.BankingInstitutions.Where(institution => institution.Id == institutionId);
     }

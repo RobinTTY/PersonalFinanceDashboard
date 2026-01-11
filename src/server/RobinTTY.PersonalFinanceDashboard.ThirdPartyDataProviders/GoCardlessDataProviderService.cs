@@ -14,20 +14,21 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 // TODO: These methods need to be reworked quite a bit
 public class GoCardlessDataProviderService(NordigenClient client)
 {
-    public async Task<ThirdPartyResponse<BankingInstitution?, BasicResponse>> GetBankingInstitution(
-        string institutionId, CancellationToken cancellationToken = default)
+    public async Task<ThirdPartyResponse<BankingInstitution, BasicResponse>> GetBankingInstitution(string institutionId,
+        CancellationToken cancellationToken = default)
     {
         var response = await client.InstitutionsEndpoint.GetInstitution(institutionId, cancellationToken);
-
-        // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
-        BankingInstitution? result = null;
+        
         if (response.IsSuccess)
-            result = new BankingInstitution(response.Result.Id, response.Result.Bic, response.Result.Name,
-                response.Result.Logo, response.Result.Countries)
-            {
-                Id = Guid.NewGuid()
-            };
-        return new ThirdPartyResponse<BankingInstitution?, BasicResponse>(response.IsSuccess, result, response.Error);
+        {
+            var inst = response.Result;
+            var institution = new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries);
+            
+            return new ThirdPartyResponse<BankingInstitution, BasicResponse>(true,
+                institution, null);
+        }
+        
+        return new ThirdPartyResponse<BankingInstitution, BasicResponse>(false, null, response.Error);
     }
 
     /// <summary>
@@ -46,10 +47,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
             // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
             var institutions =
                 response.Result.Select(inst =>
-                    new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries)
-                    {
-                        Id = Guid.NewGuid()
-                    });
+                    new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries));
             return new ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>(true,
                 institutions, null);
         }

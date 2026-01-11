@@ -13,18 +13,6 @@ public static class ApplicationDbContextExtensions
     extension(ApplicationDbContext context)
     {
         /// <summary>
-        /// Replaces all existing banking institutions in the database with the provided list of banking institutions.
-        /// </summary>
-        /// <param name="bankingInstitutions">A list of banking institutions to be saved in the database, replacing the existing entries.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ReplaceBankingInstitutions(List<BankingInstitution> bankingInstitutions)
-        {
-            await context.BankingInstitutions.ExecuteDeleteAsync();
-            await context.BankingInstitutions.AddRangeAsync(bankingInstitutions);
-            await context.SaveChangesAsync();
-        }
-
-        /// <summary>
         /// Adds new authentication requests to the database or updates existing ones based on their third-party IDs.
         /// </summary>
         /// <param name="authenticationRequests">A list of authentication requests to add or update in the database.</param>
