@@ -68,10 +68,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         // TODO: handle request failure
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
-            requisition.AuthenticationLink, requisition.Accounts.Select(accountId => new BankAccount(accountId)
-            {
-                Id = null
-            }).ToList());
+            requisition.AuthenticationLink, requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -141,6 +138,8 @@ public class GoCardlessDataProviderService(NordigenClient client)
         return tasks.Select(task => task.Result).ToList();
     }
 
+    // TODO #85: This could probably optimized to only execute requests based on what data has already been fetched once
+    // e.g. once the general details have been fetched they usually don't change often, so omit those requests after
     private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
         CancellationToken cancellationToken = default)
     {
