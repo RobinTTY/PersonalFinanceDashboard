@@ -89,7 +89,7 @@ public class BankAccountSyncHandler(
             }
             else
             {
-                existingBankAccount.UpdateProperties(updatedBankAccount);
+                existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
             }
             
             await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);

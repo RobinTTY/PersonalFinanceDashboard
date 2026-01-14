@@ -119,6 +119,11 @@ public class BankAccount : Account
         AssociatedAuthenticationRequests = associatedAuthenticationRequests;
     }
 
+    /// <summary>
+    /// Creates a new instance from the supplied bank account without the navigation properties set.
+    /// </summary>
+    /// <param name="bankAccount">The bank account to mutate.</param>
+    /// <returns>New instance of <see cref="BankAccount"/> without navigation properties set.</returns>
     public static BankAccount CreateWithoutNavigationProperties(BankAccount bankAccount)
     {
         return new BankAccount(bankAccount.ThirdPartyId, bankAccount.Name, bankAccount.Description, bankAccount.Balance,
@@ -132,7 +137,7 @@ public class BankAccount : Account
     /// </summary>
     /// <param name="updatedAccount">The <see cref="BankAccount"/> instance whose properties are used to update the current object.</param>
     /// <returns>The updated <see cref="BankAccount"/> instance.</returns>
-    public void UpdateProperties(BankAccount updatedAccount)
+    public void UpdateNonNavigationProperties(BankAccount updatedAccount)
     {
         Name ??= updatedAccount.Name;
         Iban ??= updatedAccount.Iban;

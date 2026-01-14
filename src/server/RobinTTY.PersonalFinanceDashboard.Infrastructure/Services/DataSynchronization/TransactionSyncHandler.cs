@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -76,5 +77,53 @@ public class TransactionSyncHandler(
         // TODO: set account association
         dbContext.Transactions.AddRange(newTransactions);
         await dbContext.SaveChangesAsync();
+    }
+
+    private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)
+    {
+        foreach (var updatedTransaction in updatedTransactions)
+        {
+            var existingTransaction = dbContext.Transactions
+                .Include(t => t.BankAccount)
+                .SingleOrDefault(t => t.ThirdPartyId == updatedTransaction.ThirdPartyId);
+            
+            if (existingTransaction == null)
+            {
+                var insertEntity = Transaction.CreateWithoutNavigationProperties(updatedTransaction);
+                var entry = await dbContext.Transactions.AddAsync(insertEntity);
+                existingTransaction = entry.Entity;
+            }
+            else
+            {
+                existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
+            }
+            
+            await UpdateAssociatedBankAccount(updatedTransaction, existingTransaction);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    private async Task UpdateAssociatedBankAccount(Transaction updatedTransaction, Transaction existingTransaction)
+    {
+        var associatedBankAccountId = updatedTransaction.BankAccount?.ThirdPartyId;
+
+        if (associatedBankAccountId != null)
+        {
+            var trackedBankAccount = dbContext.BankAccounts
+                .SingleOrDefault(bankAccount => bankAccount.ThirdPartyId == associatedBankAccountId);
+
+            if (trackedBankAccount == null && updatedTransaction.BankAccount != null)
+            {
+                var entry = await dbContext.BankAccounts.AddAsync(updatedTransaction.BankAccount);
+                trackedBankAccount = entry.Entity;
+            }
+
+            var associationDoesNotExistYet =
+                existingTransaction.BankAccount?.ThirdPartyId != trackedBankAccount?.ThirdPartyId;
+            if (associationDoesNotExistYet)
+            {
+                existingTransaction.BankAccount = trackedBankAccount;
+            }
+        }
     }
 }

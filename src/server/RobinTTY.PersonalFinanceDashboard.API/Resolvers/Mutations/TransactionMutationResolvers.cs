@@ -21,7 +21,6 @@ public class TransactionMutationResolvers
         var transaction = new Transaction
         {
             BankTransactionId = null,
-            AccountId = input.AccountId,
             Amount = input.Amount,
             Category = input.Category,
             Currency = input.Currency,

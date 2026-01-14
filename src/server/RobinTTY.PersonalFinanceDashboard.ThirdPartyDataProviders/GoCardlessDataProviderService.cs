@@ -18,16 +18,16 @@ public class GoCardlessDataProviderService(NordigenClient client)
         CancellationToken cancellationToken = default)
     {
         var response = await client.InstitutionsEndpoint.GetInstitution(institutionId, cancellationToken);
-        
+
         if (response.IsSuccess)
         {
             var inst = response.Result;
             var institution = new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries);
-            
+
             return new ThirdPartyResponse<BankingInstitution, BasicResponse>(true,
                 institution, null);
         }
-        
+
         return new ThirdPartyResponse<BankingInstitution, BasicResponse>(false, null, response.Error);
     }
 
@@ -68,7 +68,8 @@ public class GoCardlessDataProviderService(NordigenClient client)
         // TODO: handle request failure
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
-            requisition.AuthenticationLink, requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
+            requisition.AuthenticationLink,
+            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
             response.Error);
     }
@@ -171,15 +172,22 @@ public class GoCardlessDataProviderService(NordigenClient client)
     {
         var response =
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
+
         // TODO: Also return pending transactions
         var transactions = response.Result!.BookedTransactions.Select(transaction =>
-            new Transaction(Guid.NewGuid(),
-                transaction.InternalTransactionId != null ? Guid.Parse(transaction.InternalTransactionId) : Guid.Empty,
-                transaction.TransactionId ?? null, internalAccountId,
-                transaction.ValueDateTime ?? transaction.ValueDate,
-                transaction.CreditorName, transaction.DebtorName, transaction.TransactionAmount.Amount,
-                transaction.TransactionAmount.Currency,
-                "example-category", "example-notes", []));
+        {
+            var thirdPartyId = transaction.InternalTransactionId != null
+                ? Guid.Parse(transaction.InternalTransactionId)
+                : Guid.Empty;
+            var transactionId = transaction.TransactionId ?? null;
+            var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
+
+            return new Transaction(thirdPartyId, transactionId, valueDate, transaction.CreditorName,
+                transaction.DebtorName, transaction.TransactionAmount.Amount,
+                transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
+                new BankAccount { Id = internalAccountId });
+        });
+
         return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
             response.Error);
     }
