@@ -6,50 +6,64 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
-// TODO: Should contain methods to update a single entity as well to optimize efficiency
 public class BankAccountSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     ILogger<BankAccountSyncHandler> logger) : IBankAccountSyncHandler
 {
-    public async Task<bool> SynchronizeData(bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(Guid? bankAccountId = null, bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts);
         if (dataIsStale || forceThirdPartySync)
         {
-            var bankAccounts = await GetBankAccounts();
-            if (bankAccounts.Count == 0)
+            if (bankAccountId.HasValue)
+                bankAccountId = dbContext.BankAccounts
+                    .SingleOrDefault(bankAccount => bankAccount.Id == bankAccountId)?.ThirdPartyId;
+            
+            var bankAccounts = await GetBankAccounts(bankAccountId);
+            if (bankAccounts == null || bankAccounts.Count == 0)
             {
                 return false;
             }
 
             await AddOrUpdateBankAccounts(bankAccounts);
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankAccounts);
-
+            
+            // If we are updating only one account, do not reset the data expiry
+            if (!bankAccountId.HasValue)
+                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankAccounts);
+            
             logger.LogInformation("Synced {Count} bank accounts", bankAccounts.Count);
         }
 
         return true;
     }
 
-    private async Task<List<BankAccount>> GetBankAccounts()
+    private async Task<List<BankAccount>?> GetBankAccounts(Guid? bankAccountId)
     {
-        var authRequests = dbContext.AuthenticationRequests
-            .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToList();
-
-        var activeLinkedAccountIds = new List<Guid>();
-        foreach (var authenticationRequest in authRequests)
+        var accountsToFetch = new List<Guid>();
+        
+        if (bankAccountId.HasValue)
         {
-            if (authenticationRequest.Status == AuthenticationStatus.Active)
+            accountsToFetch.Add(bankAccountId.Value);
+        }
+        else
+        {
+            var authRequests = dbContext.AuthenticationRequests
+                .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToList();
+
+            foreach (var authenticationRequest in authRequests)
             {
-                var ids = authenticationRequest.AssociatedAccounts.Select(acc => acc.ThirdPartyId);
-                activeLinkedAccountIds.AddRange(ids);
+                if (authenticationRequest.Status == AuthenticationStatus.Active)
+                {
+                    var ids = authenticationRequest.AssociatedAccounts.Select(acc => acc.ThirdPartyId);
+                    accountsToFetch.AddRange(ids);
+                }
             }
         }
 
         var bankAccounts = new List<BankAccount>();
-        var responses = await dataProvider.GetBankAccounts(activeLinkedAccountIds);
+        var responses = await dataProvider.GetBankAccounts(accountsToFetch);
         foreach (var response in responses)
         {
             if (response.IsSuccessful)
@@ -72,14 +86,13 @@ public class BankAccountSyncHandler(
 
             if (existingBankAccount == null)
             {
-                // TODO: Update like with ApplicationDbContextExtensions
                 var insertEntity = BankAccount.CreateWithoutNavigationProperties(updatedBankAccount);
                 var entry = await dbContext.BankAccounts.AddAsync(insertEntity);
                 existingBankAccount = entry.Entity;
             }
             else
             {
-                existingBankAccount.UpdateProperties(updatedBankAccount);
+                existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
             }
             
             await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -27,9 +28,9 @@ public class TransactionSyncHandler(
                     .Where(id => id.HasValue)
                     .Cast<Guid>();
                 
-                foreach (var accountId in accountIds)
+                foreach (var internAccountId in accountIds)
                 {
-                    var transactionForAccount = await GetTransactions(accountId);
+                    var transactionForAccount = await GetTransactions(internAccountId);
                     if (transactionForAccount != null)
                         transactions.AddRange(transactionForAccount);
                 }
@@ -43,7 +44,7 @@ public class TransactionSyncHandler(
                 return false;
             }
 
-            await AddNewTransactions(transactions);
+            await AddOrUpdateTransactions(transactions);
 
             // TODO: Maybe optimize to be able to save sync metadata for individual accounts
             // If we are updating only one account, do not reset the data expiry
@@ -56,25 +57,62 @@ public class TransactionSyncHandler(
         return true;
     }
 
-    private async Task<List<Transaction>?> GetTransactions(Guid accountId)
+    private async Task<List<Transaction>?> GetTransactions(Guid internalAccountId)
     {
         var thirdPartyAccountId =
-            dbContext.BankAccounts.SingleOrDefault(account => account.Id == accountId)?.ThirdPartyId;
+            dbContext.BankAccounts.SingleOrDefault(account => account.Id == internalAccountId)?.ThirdPartyId;
         if (thirdPartyAccountId == null)
             return null;
 
-        var response = await dataProvider.GetTransactions(accountId, thirdPartyAccountId.Value);
+        var response = await dataProvider.GetTransactions(thirdPartyAccountId.Value);
         return response.IsSuccessful ? response.Result.ToList() : null;
     }
 
-    // TODO: Should transactions ever be updated after they are added? For now only add them
-    private async Task AddNewTransactions(List<Transaction> transactions)
+    private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)
     {
-        var existingIds = dbContext.Transactions.Select(transaction => transaction.ThirdPartyId);
-        var newTransactions = transactions.Where(transaction => !existingIds.Contains(transaction.ThirdPartyId));
+        foreach (var updatedTransaction in updatedTransactions)
+        {
+            var existingTransaction = dbContext.Transactions
+                .Include(t => t.BankAccount)
+                .SingleOrDefault(t => t.ThirdPartyId == updatedTransaction.ThirdPartyId);
+            
+            if (existingTransaction == null)
+            {
+                var insertEntity = Transaction.CreateWithoutNavigationProperties(updatedTransaction);
+                var entry = await dbContext.Transactions.AddAsync(insertEntity);
+                existingTransaction = entry.Entity;
+            }
+            else
+            {
+                existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
+            }
+            
+            await UpdateAssociatedBankAccount(updatedTransaction, existingTransaction);
+            await dbContext.SaveChangesAsync();
+        }
+    }
 
-        // TODO: set account association
-        dbContext.Transactions.AddRange(newTransactions);
-        await dbContext.SaveChangesAsync();
+    private async Task UpdateAssociatedBankAccount(Transaction updatedTransaction, Transaction existingTransaction)
+    {
+        var associatedBankAccountId = updatedTransaction.BankAccount?.ThirdPartyId;
+
+        if (associatedBankAccountId != null)
+        {
+            var trackedBankAccount = dbContext.BankAccounts
+                .SingleOrDefault(bankAccount => bankAccount.ThirdPartyId == associatedBankAccountId);
+
+            if (trackedBankAccount == null && updatedTransaction.BankAccount != null)
+            {
+                var entry = await dbContext.BankAccounts.AddAsync(updatedTransaction.BankAccount);
+                trackedBankAccount = entry.Entity;
+            }
+
+            var associationDoesNotExistYet =
+                existingTransaction.BankAccount?.ThirdPartyId != trackedBankAccount?.ThirdPartyId;
+            if (associationDoesNotExistYet)
+            {
+                existingTransaction.BankAccount = trackedBankAccount;
+            }
+        }
     }
 }

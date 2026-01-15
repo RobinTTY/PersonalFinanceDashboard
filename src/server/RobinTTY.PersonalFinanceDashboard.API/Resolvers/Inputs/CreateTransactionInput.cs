@@ -13,6 +13,7 @@ public record CreateTransactionInput(
     string Category,
     string Notes)
 {
+    // TODO: Update this, accountId no longer part of Transaction
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>

@@ -45,7 +45,7 @@ public class AuthenticationRequestRepository
     public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(Guid authenticationId)
     {
         // TODO: Maybe let the API consumer choose whether to force the third party data sync
-        await _authenticationRequestSyncHandler.SynchronizeData(true);
+        await _authenticationRequestSyncHandler.SynchronizeData(authenticationId, true);
 
         return _dbContext.AuthenticationRequests.Where(authentication => authentication.Id == authenticationId);
     }

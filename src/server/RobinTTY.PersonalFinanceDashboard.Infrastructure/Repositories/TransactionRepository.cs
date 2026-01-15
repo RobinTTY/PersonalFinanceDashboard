@@ -46,9 +46,9 @@ public class TransactionRepository
     public async Task<IQueryable<Transaction>> GetTransactionsByAccountId(Guid accountId)
     {
         await _transactionSyncHandler.SynchronizeData(accountId);
-        
+
         return _dbContext.Transactions
-            .Where(transaction => transaction.AccountId == accountId);
+            .Where(transaction => transaction.BankAccount != null && transaction.BankAccount.ThirdPartyId == accountId);
     }
 
     /// <summary>

@@ -48,10 +48,7 @@ public static class GoCardlessTypeExtensions
             ownerName: account.OwnerName,
             transactions: [],
             associatedInstitution: new BankingInstitution
-                { Id = Guid.Empty, ThirdPartyId = bankAccount.InstitutionId },
-            associatedAuthenticationRequests: [])
-        {
-            Id = null
-        };
+                { ThirdPartyId = bankAccount.InstitutionId },
+            associatedAuthenticationRequests: []);
     }
 }

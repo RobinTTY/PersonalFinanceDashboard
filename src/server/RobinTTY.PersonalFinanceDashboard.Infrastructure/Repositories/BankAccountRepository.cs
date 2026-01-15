@@ -37,7 +37,7 @@ public class BankAccountRepository
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
     public async Task<IQueryable<BankAccount?>> GetBankAccount(Guid accountId)
     {
-        await _bankAccountSyncHandler.SynchronizeData(true);
+        await _bankAccountSyncHandler.SynchronizeData(accountId, true);
         
         return _dbContext.BankAccounts.Where(account => account.Id == accountId);
     }
