@@ -28,9 +28,9 @@ public class TransactionSyncHandler(
                     .Where(id => id.HasValue)
                     .Cast<Guid>();
                 
-                foreach (var accountId in accountIds)
+                foreach (var internAccountId in accountIds)
                 {
-                    var transactionForAccount = await GetTransactions(accountId);
+                    var transactionForAccount = await GetTransactions(internAccountId);
                     if (transactionForAccount != null)
                         transactions.AddRange(transactionForAccount);
                 }
@@ -44,7 +44,7 @@ public class TransactionSyncHandler(
                 return false;
             }
 
-            await AddNewTransactions(transactions);
+            await AddOrUpdateTransactions(transactions);
 
             // TODO: Maybe optimize to be able to save sync metadata for individual accounts
             // If we are updating only one account, do not reset the data expiry
@@ -57,26 +57,15 @@ public class TransactionSyncHandler(
         return true;
     }
 
-    private async Task<List<Transaction>?> GetTransactions(Guid accountId)
+    private async Task<List<Transaction>?> GetTransactions(Guid internalAccountId)
     {
         var thirdPartyAccountId =
-            dbContext.BankAccounts.SingleOrDefault(account => account.Id == accountId)?.ThirdPartyId;
+            dbContext.BankAccounts.SingleOrDefault(account => account.Id == internalAccountId)?.ThirdPartyId;
         if (thirdPartyAccountId == null)
             return null;
 
-        var response = await dataProvider.GetTransactions(accountId, thirdPartyAccountId.Value);
+        var response = await dataProvider.GetTransactions(thirdPartyAccountId.Value);
         return response.IsSuccessful ? response.Result.ToList() : null;
-    }
-
-    // TODO: Should transactions ever be updated after they are added? For now only add them
-    private async Task AddNewTransactions(List<Transaction> transactions)
-    {
-        var existingIds = dbContext.Transactions.Select(transaction => transaction.ThirdPartyId);
-        var newTransactions = transactions.Where(transaction => !existingIds.Contains(transaction.ThirdPartyId));
-
-        // TODO: set account association
-        dbContext.Transactions.AddRange(newTransactions);
-        await dbContext.SaveChangesAsync();
     }
 
     private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)

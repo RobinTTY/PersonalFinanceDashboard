@@ -28,8 +28,11 @@ public class BankAccountSyncHandler(
             }
 
             await AddOrUpdateBankAccounts(bankAccounts);
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankAccounts);
-
+            
+            // If we are updating only one account, do not reset the data expiry
+            if (!bankAccountId.HasValue)
+                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankAccounts);
+            
             logger.LogInformation("Synced {Count} bank accounts", bankAccounts.Count);
         }
 

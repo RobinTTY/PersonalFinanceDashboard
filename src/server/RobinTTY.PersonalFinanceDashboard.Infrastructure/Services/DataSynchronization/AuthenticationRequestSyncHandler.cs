@@ -83,12 +83,12 @@ public class AuthenticationRequestSyncHandler(
                 existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
             }
 
-            UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
+            await UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
             await dbContext.SaveChangesAsync();
         }
     }
     
-    private void UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
+    private async Task UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
         AuthenticationRequest existingRequest)
     {
         var associatedAccountIds = updatedAuthenticationRequest.AssociatedAccounts
@@ -102,7 +102,7 @@ public class AuthenticationRequestSyncHandler(
 
             if (trackedAccount == null)
             {
-                var entry = dbContext.BankAccounts.Add(account);
+                var entry = await dbContext.BankAccounts.AddAsync(account);
                 trackedAccount = entry.Entity;
                 trackedAccounts.Add(trackedAccount);
             }
