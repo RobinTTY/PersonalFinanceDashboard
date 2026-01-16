@@ -2,6 +2,7 @@
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
@@ -30,5 +31,15 @@ public class AuthenticationMutationResolvers
     public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, Guid authenticationId)
     {
         return await repository.DeleteAuthenticationRequest(authenticationId);
+    }
+
+    /// <summary>
+    /// Synchronizes authentication request data with third-party data providers.
+    /// </summary>
+    /// <param name="syncHandler">The handler responsible for managing the data synchronization process.</param>
+    /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
+    public async Task<bool> SynchronizeData(AuthenticationRequestSyncHandler syncHandler)
+    {
+        return await syncHandler.SynchronizeData(forceThirdPartySync: true);
     }
 }
