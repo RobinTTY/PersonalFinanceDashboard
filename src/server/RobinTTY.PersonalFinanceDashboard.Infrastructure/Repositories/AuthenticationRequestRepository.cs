@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -14,7 +14,7 @@ public class AuthenticationRequestRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly GoCardlessDataProviderService _dataProviderService;
-    private readonly AuthenticationRequestSyncHandler _authenticationRequestSyncHandler;
+    private readonly IAuthenticationRequestSyncHandler _authenticationRequestSyncHandler;
     private readonly ILogger<AuthenticationRequestRepository> _logger;
 
 
@@ -28,7 +28,7 @@ public class AuthenticationRequestRepository
     public AuthenticationRequestRepository(
         ApplicationDbContext dbContext,
         GoCardlessDataProviderService dataProviderService,
-        AuthenticationRequestSyncHandler authenticationRequestSyncHandler,
+        IAuthenticationRequestSyncHandler authenticationRequestSyncHandler,
         ILogger<AuthenticationRequestRepository> logger)
     {
         _dbContext = dbContext;
