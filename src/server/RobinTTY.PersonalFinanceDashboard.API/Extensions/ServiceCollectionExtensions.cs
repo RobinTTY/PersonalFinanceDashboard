@@ -86,9 +86,9 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddThirdPartyDataSynchronizationServices()
         {
             return services
-                .AddScoped<BankingInstitutionSyncHandler>()
-                .AddScoped<AuthenticationRequestSyncHandler>()
-                .AddScoped<BankAccountSyncHandler>()
+                .AddScoped<IBankingInstitutionSyncHandler, BankingInstitutionSyncHandler>()
+                .AddScoped<IAuthenticationRequestSyncHandler, AuthenticationRequestSyncHandler>()
+                .AddScoped<IBankAccountSyncHandler, BankAccountSyncHandler>()
                 .AddScoped<ITransactionSyncHandler, TransactionSyncHandler>()
                 .AddScoped<ThirdPartyDataRetrievalMetadataService>();
             

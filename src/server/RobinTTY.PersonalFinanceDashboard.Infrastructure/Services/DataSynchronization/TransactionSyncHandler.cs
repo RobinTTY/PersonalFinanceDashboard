@@ -10,7 +10,7 @@ public class TransactionSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
-    ILogger<BankingInstitutionSyncHandler> logger) : ITransactionSyncHandler
+    ILogger<TransactionSyncHandler> logger) : ITransactionSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {

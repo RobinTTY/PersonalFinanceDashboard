@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
@@ -8,7 +9,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 /// <see cref="BankAccount"/> related mutation resolvers.
 /// </summary>
 [MutationType]
-public class BankAccountMutations
+public class BankAccountMutationResolvers
 {
     /// <summary>
     /// Create a new banking account.
@@ -40,5 +41,15 @@ public class BankAccountMutations
         Guid bankAccountId)
     {
         return await repository.DeleteBankAccount(bankAccountId);
+    }
+    
+    /// <summary>
+    /// Synchronizes bank account data with third-party data providers.
+    /// </summary>
+    /// <param name="syncHandler">The handler responsible for managing the data synchronization process.</param>
+    /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
+    public async Task<bool> SynchronizeBankAccountData(IBankAccountSyncHandler syncHandler)
+    {
+        return await syncHandler.SynchronizeData(forceThirdPartySync: true);
     }
 }

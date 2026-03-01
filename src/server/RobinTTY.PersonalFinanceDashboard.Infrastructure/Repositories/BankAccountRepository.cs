@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -11,7 +11,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly BankAccountSyncHandler _bankAccountSyncHandler;
+    private readonly IBankAccountSyncHandler _bankAccountSyncHandler;
     private readonly ILogger<BankAccountRepository> _logger;
 
     /// <summary>
@@ -22,7 +22,7 @@ public class BankAccountRepository
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public BankAccountRepository(
         ApplicationDbContext dbContext,
-        BankAccountSyncHandler bankAccountSyncHandler,
+        IBankAccountSyncHandler bankAccountSyncHandler,
         ILogger<BankAccountRepository> logger)
     {
         _dbContext = dbContext;

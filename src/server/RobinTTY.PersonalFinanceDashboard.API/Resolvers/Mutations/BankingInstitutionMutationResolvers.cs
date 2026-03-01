@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
@@ -42,5 +43,15 @@ public class BankingInstitutionMutationResolvers
         Guid bankingInstitutionId)
     {
         return await repository.DeleteBankingInstitution(bankingInstitutionId);
+    }
+    
+    /// <summary>
+    /// Synchronizes banking institution data with third-party data providers.
+    /// </summary>
+    /// <param name="syncHandler">The handler responsible for managing the data synchronization process.</param>
+    /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
+    public async Task<bool> SynchronizeBankingInstitutionData(IBankingInstitutionSyncHandler syncHandler)
+    {
+        return await syncHandler.SynchronizeData(forceThirdPartySync: true);
     }
 }
