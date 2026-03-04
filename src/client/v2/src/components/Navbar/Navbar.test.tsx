@@ -1,11 +1,43 @@
+import {
+  IconAdjustments,
+  IconCalendarStats,
+  IconGauge,
+  IconNotes,
+  IconPresentationAnalytics,
+} from '@tabler/icons-react';
 import { axe, render } from '@test-utils';
-import attributes from './attributes.json';
 import { Navbar } from './Navbar';
 
+const mockLinks = [
+  { label: 'Dashboard', icon: IconGauge },
+  {
+    label: 'Accounts',
+    icon: IconNotes,
+    initiallyOpened: true,
+    links: [
+      { label: 'Overview', link: '/' },
+      { label: 'Forecasts', link: '/' },
+      { label: 'Outlook', link: '/' },
+      { label: 'Real time', link: '/' },
+    ],
+  },
+  {
+    label: 'Transactions',
+    icon: IconCalendarStats,
+    links: [
+      { label: 'Upcoming releases', link: '/' },
+      { label: 'Previous releases', link: '/' },
+      { label: 'Releases schedule', link: '/' },
+    ],
+  },
+  { label: 'Analytics', icon: IconPresentationAnalytics },
+  { label: 'Settings', icon: IconAdjustments },
+];
+
 describe('Navbar', () => {
-  axe([<Navbar key="1" {...(attributes as any)} />]);
+  axe([<Navbar key="1" links={mockLinks} />]);
 
   it('renders correctly', () => {
-    render(<Navbar {...(attributes as any)} />);
+    render(<Navbar links={mockLinks} />);
   });
 });

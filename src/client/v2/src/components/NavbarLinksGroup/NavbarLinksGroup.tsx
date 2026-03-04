@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { IconCalendarStats, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronRight } from '@tabler/icons-react';
 import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import classes from './NavbarLinksGroup.module.css';
 
-interface LinksGroupProps {
+export interface LinksGroupProps {
   icon: React.FC<any>;
   label: string;
   initiallyOpened?: boolean;
@@ -50,20 +50,10 @@ export function LinksGroup({ icon: Icon, label, initiallyOpened, links }: LinksG
   );
 }
 
-const mockdata = {
-  label: 'Releases',
-  icon: IconCalendarStats,
-  links: [
-    { label: 'Upcoming releases', link: '/' },
-    { label: 'Previous releases', link: '/' },
-    { label: 'Releases schedule', link: '/' },
-  ],
-};
-
-export function NavbarLinksGroup() {
+export function NavbarLinksGroup(props: LinksGroupProps) {
   return (
     <Box mih={220} p="md">
-      <LinksGroup {...mockdata} />
+      <LinksGroup {...props} />
     </Box>
   );
 }
