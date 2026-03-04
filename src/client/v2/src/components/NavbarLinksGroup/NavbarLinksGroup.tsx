@@ -1,33 +1,44 @@
 import { useState } from 'react';
 import { IconChevronRight } from '@tabler/icons-react';
 import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
+import { NavLink, useNavigate } from 'react-router-dom';
 import classes from './NavbarLinksGroup.module.css';
 
 export interface LinksGroupProps {
   icon: React.FC<any>;
   label: string;
+  link?: string;
   initiallyOpened?: boolean;
   links?: { label: string; link: string }[];
 }
 
-export function LinksGroup({ icon: Icon, label, initiallyOpened, links }: LinksGroupProps) {
+export function LinksGroup({ icon: Icon, label, link, initiallyOpened, links }: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
-  const items = (hasLinks ? links : []).map((link) => (
-    <Text<'a'>
-      component="a"
+  const navigate = useNavigate();
+
+  const items = (hasLinks ? links : []).map((item) => (
+    <Text<typeof NavLink>
+      component={NavLink}
       className={classes.link}
-      href={link.link}
-      key={link.label}
-      onClick={(event) => event.preventDefault()}
+      to={item.link}
+      key={item.label}
     >
-      {link.label}
+      {item.label}
     </Text>
   ));
 
+  const handleClick = () => {
+    if (hasLinks) {
+      setOpened((o) => !o);
+    } else if (link) {
+      navigate(link);
+    }
+  };
+
   return (
     <>
-      <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
+      <UnstyledButton onClick={handleClick} className={classes.control}>
         <Group justify="space-between" gap={0}>
           <Box style={{ display: 'flex', alignItems: 'center' }}>
             <ThemeIcon variant="light" size={34}>
