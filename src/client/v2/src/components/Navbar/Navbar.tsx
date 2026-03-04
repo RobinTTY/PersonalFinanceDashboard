@@ -1,9 +1,7 @@
 import {
   IconAdjustments,
   IconCalendarStats,
-  IconFileAnalytics,
   IconGauge,
-  IconLock,
   IconNotes,
   IconPresentationAnalytics,
 } from '@tabler/icons-react';
@@ -16,7 +14,7 @@ import classes from './Navbar.module.css';
 const mockData = [
   { label: 'Dashboard', icon: IconGauge },
   {
-    label: 'Market news',
+    label: 'Accounts',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
@@ -27,7 +25,7 @@ const mockData = [
     ],
   },
   {
-    label: 'Releases',
+    label: 'Transactions',
     icon: IconCalendarStats,
     links: [
       { label: 'Upcoming releases', link: '/' },
@@ -36,17 +34,7 @@ const mockData = [
     ],
   },
   { label: 'Analytics', icon: IconPresentationAnalytics },
-  { label: 'Contracts', icon: IconFileAnalytics },
   { label: 'Settings', icon: IconAdjustments },
-  {
-    label: 'Security',
-    icon: IconLock,
-    links: [
-      { label: 'Enable 2FA', link: '/' },
-      { label: 'Change password', link: '/' },
-      { label: 'Recovery codes', link: '/' },
-    ],
-  },
 ];
 
 export function Navbar() {
