@@ -25,7 +25,7 @@ describe('SettingsModal', () => {
     render(<SettingsModal opened onClose={noop} />);
     expect(screen.getByText('Account')).toBeInTheDocument();
     expect(screen.getByText('Application')).toBeInTheDocument();
-    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows all navigation items', () => {
@@ -46,7 +46,7 @@ describe('SettingsModal', () => {
   it('calls onClose when the close button is clicked', () => {
     const onClose = vi.fn();
     render(<SettingsModal opened onClose={onClose} />);
-    fireEvent.click(screen.getByRole('button', { name: /close/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

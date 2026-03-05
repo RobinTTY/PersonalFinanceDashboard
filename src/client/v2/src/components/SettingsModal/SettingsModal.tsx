@@ -90,7 +90,7 @@ export function SettingsModal({ opened, onClose }: SettingsModalProps) {
       <div className={classes.contentArea}>
         <div className={classes.contentHeader}>
           <Title order={3}>{activeLabel}</Title>
-          <CloseButton onClick={onClose} size="md" />
+          <CloseButton onClick={onClose} size="md" aria-label="Close" />
         </div>
         <ScrollArea className={classes.contentBody} h="100%">
           {/* Settings content */}

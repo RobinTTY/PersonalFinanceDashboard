@@ -5,6 +5,7 @@ import {
   IconNotes,
   IconPresentationAnalytics,
 } from '@tabler/icons-react';
+import { MemoryRouter } from 'react-router-dom';
 import { axe, render } from '@test-utils';
 import { Navbar } from './Navbar';
 
@@ -35,9 +36,9 @@ const mockLinks = [
 ];
 
 describe('Navbar', () => {
-  axe([<Navbar key="1" links={mockLinks} />]);
+  axe([<MemoryRouter key="1"><Navbar links={mockLinks} /></MemoryRouter>]);
 
   it('renders correctly', () => {
-    render(<Navbar links={mockLinks} />);
+    render(<MemoryRouter><Navbar links={mockLinks} /></MemoryRouter>);
   });
 });
