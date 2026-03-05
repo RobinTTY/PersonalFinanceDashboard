@@ -10,9 +10,10 @@ export interface LinksGroupProps {
   link?: string;
   initiallyOpened?: boolean;
   links?: { label: string; link: string }[];
+  onClick?: () => void;
 }
 
-export function LinksGroup({ icon: Icon, label, link, initiallyOpened, links }: LinksGroupProps) {
+export function LinksGroup({ icon: Icon, label, link, initiallyOpened, links, onClick }: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ export function LinksGroup({ icon: Icon, label, link, initiallyOpened, links }: 
   const handleClick = () => {
     if (hasLinks) {
       setOpened((o) => !o);
+    } else if (onClick) {
+      onClick();
     } else if (link) {
       navigate(link);
     }
