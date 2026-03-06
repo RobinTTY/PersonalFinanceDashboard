@@ -32,12 +32,20 @@ export function NetWorthLineChart({
     const chart = echarts.init(chartContainerRef.current);
 
     chart.setOption({
+      grid: {
+        left: 48,
+        right: 24,
+        top: 24,
+        bottom: 24,
+        containLabel: false,
+      },
       tooltip: {
         trigger: 'axis',
       },
       xAxis: {
         type: 'category',
         data: labels,
+        boundaryGap: false,
       },
       yAxis: {
         type: 'value',
@@ -46,6 +54,9 @@ export function NetWorthLineChart({
         max: yAxisMax,
         interval: yAxisInterval,
         splitNumber: 4,
+        axisLabel: {
+          margin: 16,
+        },
       },
       series: [
         {
