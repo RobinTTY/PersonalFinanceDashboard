@@ -9,7 +9,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { CloseButton, Modal, NavLink, ScrollArea, Text, Title } from '@mantine/core';
-import { PreferencesSection } from './sections/PreferencesSection';
+import { PreferencesSection } from './sections/PreferencesSection/PreferencesSection';
 import classes from './SettingsModal.module.css';
 
 interface SettingsItem {

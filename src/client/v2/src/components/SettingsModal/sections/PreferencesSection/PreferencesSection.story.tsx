@@ -1,4 +1,4 @@
-import { ComponentPreview } from '../../storybook/ComponentPreview';
+import { ComponentPreview } from '../../../storybook/ComponentPreview';
 import { PreferencesSection } from './PreferencesSection';
 
 export default { title: 'Settings/PreferencesSection' };
