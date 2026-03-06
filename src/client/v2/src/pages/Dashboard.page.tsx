@@ -11,6 +11,21 @@ export function DashboardPage() {
       return;
     }
 
+    // Lowest value in the plotted dataset
+    const minDataPoint = Math.min(...accountBalanceData);
+    // Highest value in the plotted dataset
+    const maxDataPoint = Math.max(...accountBalanceData);
+    // Extra room so the line does not touch chart bounds
+    const yAxisPadding = (maxDataPoint - minDataPoint) * 0.1;
+    // Rounded-down start of the y-axis to full 1,000s.
+    const yAxisMin = Math.floor((minDataPoint - yAxisPadding) / 1000) * 1000;
+    // Target size of each of the 4 y-axis segments (5 grid lines total).
+    const roughInterval = (maxDataPoint - yAxisMin) / 4;
+    // Rounded interval for cleaner axis labels and grid spacing.
+    const yAxisInterval = Math.ceil(roughInterval / 500) * 500;
+    // End of the y-axis based on 4 intervals above the computed minimum.
+    const yAxisMax = yAxisMin + yAxisInterval * 4;
+
     const chart = echarts.init(chartContainerRef.current);
 
     chart.setOption({
@@ -24,14 +39,10 @@ export function DashboardPage() {
       yAxis: {
         type: 'value',
         scale: true,
-        min: (value: { min: number; max: number }) => {
-          const padding = (value.max - value.min) * 0.1;
-          const paddedMin = value.min - padding;
-          return Math.floor(paddedMin / 1000) * 1000;
-        },
-        max: (value: { min: number; max: number }) => {
-          return Math.ceil(value.max / 1000) * 1000;
-        },
+        min: yAxisMin,
+        max: yAxisMax,
+        interval: yAxisInterval,
+        splitNumber: 4,
       },
       series: [
         {
