@@ -4,7 +4,7 @@ import { ComponentPreview } from '../storybook/ComponentPreview';
 import attributes from './attributes.json';
 import { SettingsModal } from './SettingsModal';
 
-export default { title: 'SettingsModal' };
+export default { title: 'Settings/SettingsModal' };
 
 export function Usage() {
   const [opened, setOpened] = useState(false);

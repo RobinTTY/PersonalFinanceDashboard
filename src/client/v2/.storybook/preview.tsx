@@ -7,8 +7,11 @@ export const parameters = {
   layout: 'fullscreen',
   options: {
     showPanel: false,
-    // @ts-expect-error – storybook throws build error for (a: any, b: any)
-    storySort: (a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }),
+    // Sort stories in the order they are defined in the file, then alphabetically
+    storySort: {
+      order: ['Settings', ['SettingsModal', 'PreferencesSection'], '*'],
+      method: 'alphabetical',
+    },
   },
   backgrounds: { disable: true },
 };
