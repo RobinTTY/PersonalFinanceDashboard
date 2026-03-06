@@ -9,6 +9,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { CloseButton, Modal, NavLink, ScrollArea, Text, Title } from '@mantine/core';
+import { PreferencesSection } from './sections/PreferencesSection';
 import classes from './SettingsModal.module.css';
 
 interface SettingsItem {
@@ -95,7 +96,7 @@ export function SettingsModal({ opened, onClose }: SettingsModalProps) {
               <CloseButton onClick={onClose} size="md" aria-label="Close" />
             </div>
             <ScrollArea className={classes.contentBody} h="100%">
-              {/* Settings content */}
+              {activeLabel === 'Preferences' && <PreferencesSection />}
             </ScrollArea>
           </div>
         </Modal.Body>
