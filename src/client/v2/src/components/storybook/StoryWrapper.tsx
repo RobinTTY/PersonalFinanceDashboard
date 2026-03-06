@@ -1,4 +1,4 @@
-import { CanvasAttributes } from './data';
+import { CanvasAttributes } from './CanvasAttributes';
 import { ComponentPreview } from './ComponentPreview';
 
 interface StoryWrapperProps {

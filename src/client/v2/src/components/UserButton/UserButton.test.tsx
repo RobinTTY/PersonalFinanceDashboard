@@ -1,11 +1,21 @@
 import { axe, render } from '@test-utils';
-import attributes from './attributes.json';
+import { ComponentPreview } from '../storybook/ComponentPreview';
 import { UserButton } from './UserButton';
 
+const attributes = { center: true, maxWidth: 320 };
+
 describe('UserButton', () => {
-  axe([<UserButton key="1" {...(attributes as any)} />]);
+  axe([
+    <ComponentPreview key="1" canvas={attributes} withSpacing>
+      <UserButton />
+    </ComponentPreview>,
+  ]);
 
   it('renders correctly', () => {
-    render(<UserButton {...(attributes as any)} />);
+    render(
+      <ComponentPreview canvas={attributes} withSpacing>
+        <UserButton />
+      </ComponentPreview>,
+    );
   });
 });

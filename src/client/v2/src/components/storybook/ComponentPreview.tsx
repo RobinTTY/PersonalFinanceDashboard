@@ -1,5 +1,5 @@
 import { Box } from '@mantine/core';
-import { CanvasAttributes } from './data';
+import { CanvasAttributes } from './CanvasAttributes';
 
 interface ComponentPreviewProps {
   children: React.ReactNode;
