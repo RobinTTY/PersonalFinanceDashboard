@@ -1,9 +1,12 @@
-import { StoryWrapper } from '../storybook/StoryWrapper';
-import attributes from './attributes.json';
+import { ComponentPreview } from '../storybook/ComponentPreview';
 import { UserButton } from './UserButton';
 
 export default { title: 'UserButton' };
 
 export function Usage() {
-  return <StoryWrapper attributes={attributes} component={UserButton} />;
+  return (
+    <ComponentPreview canvas={{ center: true, maxWidth: 320 }} withSpacing>
+      <UserButton />
+    </ComponentPreview>
+  );
 }

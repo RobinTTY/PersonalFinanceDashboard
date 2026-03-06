@@ -7,7 +7,6 @@ import {
 } from '@tabler/icons-react';
 import { MemoryRouter } from 'react-router-dom';
 import { ComponentPreview } from '../storybook/ComponentPreview';
-import attributes from './attributes.json';
 import { Navbar } from './Navbar';
 
 export default {
@@ -43,7 +42,7 @@ const mockLinks = [
 
 export function Usage() {
   return (
-    <ComponentPreview canvas={attributes.canvas} withSpacing>
+    <ComponentPreview canvas={{ center: false }} withSpacing>
       <Navbar links={mockLinks} />
     </ComponentPreview>
   );

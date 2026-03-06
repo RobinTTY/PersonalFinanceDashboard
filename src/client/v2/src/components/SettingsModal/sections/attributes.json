@@ -1,8 +1,0 @@
-{
-  "title": "Preferences Section",
-  "category": "settings",
-  "canvas": {
-    "center": true,
-    "maxWidth": 600
-  }
-}
