@@ -4,6 +4,7 @@ import * as echarts from 'echarts';
 
 export function DashboardPage() {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  const accountBalanceData = [12400, 12950, 13100, 13820, 14210, 14940];
 
   useEffect(() => {
     if (!chartContainerRef.current) {
@@ -22,13 +23,22 @@ export function DashboardPage() {
       },
       yAxis: {
         type: 'value',
+        scale: true,
+        min: (value: { min: number; max: number }) => {
+          const padding = (value.max - value.min) * 0.1;
+          const paddedMin = value.min - padding;
+          return Math.floor(paddedMin / 1000) * 1000;
+        },
+        max: (value: { min: number; max: number }) => {
+          return Math.ceil(value.max / 1000) * 1000;
+        },
       },
       series: [
         {
           name: 'Combined Accounts',
           type: 'line',
           smooth: true,
-          data: [12400, 12950, 13100, 13820, 14210, 14940],
+          data: accountBalanceData,
         },
       ],
     });
