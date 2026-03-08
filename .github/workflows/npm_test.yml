@@ -1,0 +1,39 @@
+name: npm test
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'src/client/v2/**'
+      - '.github/workflows/npm_test.yml'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/client/v2/**'
+      - '.github/workflows/npm_test.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  test_pull_request:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/client/v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: src/client/v2/.nvmrc
+          cache: npm
+          cache-dependency-path: src/client/v2/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run build
+        run: npm run build
+      - name: Run tests
+        run: npm test
