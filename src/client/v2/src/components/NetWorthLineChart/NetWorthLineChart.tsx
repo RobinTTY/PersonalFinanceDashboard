@@ -2,24 +2,27 @@ import { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 
 interface NetWorthLineChartProps {
-  data: number[];
-  labels: string[];
+  dataByLabel: Record<string, number>;
   seriesName?: string;
   height?: number;
 }
 
 export function NetWorthLineChart({
-  data,
-  labels,
+  dataByLabel,
   seriesName = 'Combined Accounts',
   height = 320,
 }: NetWorthLineChartProps) {
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!chartContainerRef.current || data.length === 0 || labels.length === 0) {
+    const entries = Object.entries(dataByLabel);
+
+    if (!chartContainerRef.current || entries.length === 0) {
       return;
     }
+
+    const labels = entries.map(([label]) => label);
+    const data = entries.map(([, value]) => value);
 
     const minDataPoint = Math.min(...data);
     const maxDataPoint = Math.max(...data);
@@ -78,7 +81,7 @@ export function NetWorthLineChart({
       window.removeEventListener('resize', handleResize);
       chart.dispose();
     };
-  }, [data, labels, seriesName]);
+  }, [dataByLabel, seriesName]);
 
   return <div ref={chartContainerRef} style={{ width: '100%', height }} />;
 }

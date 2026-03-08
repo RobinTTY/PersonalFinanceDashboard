@@ -7,8 +7,14 @@ export function Usage() {
   return (
     <ComponentPreview canvas={{ center: true, maxWidth: 720 }} withSpacing>
       <NetWorthLineChart
-        data={[12400, 12950, 13100, 13820, 14210, 14940]}
-        labels={['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar']}
+        dataByLabel={{
+          Oct: 12400,
+          Nov: 12950,
+          Dec: 13100,
+          Jan: 13820,
+          Feb: 14210,
+          Mar: 14940,
+        }}
       />
     </ComponentPreview>
   );

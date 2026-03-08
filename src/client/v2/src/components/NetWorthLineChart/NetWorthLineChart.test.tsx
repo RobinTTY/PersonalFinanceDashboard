@@ -20,8 +20,14 @@ describe('NetWorthLineChart', () => {
   it('initializes ECharts and applies axis/series options', () => {
     render(
       <NetWorthLineChart
-        data={[12400, 12950, 13100, 13820, 14210, 14940]}
-        labels={['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar']}
+        dataByLabel={{
+          Oct: 12400,
+          Nov: 12950,
+          Dec: 13100,
+          Jan: 13820,
+          Feb: 14210,
+          Mar: 14940,
+        }}
       />,
     );
 
@@ -49,7 +55,7 @@ describe('NetWorthLineChart', () => {
   });
 
   it('resizes chart on window resize and disposes on unmount', () => {
-    const { unmount } = render(<NetWorthLineChart data={[12000, 13000]} labels={['Jan', 'Feb']} />);
+    const { unmount } = render(<NetWorthLineChart dataByLabel={{ Jan: 12000, Feb: 13000 }} />);
 
     window.dispatchEvent(new Event('resize'));
     expect(chartMock.resize).toHaveBeenCalledTimes(1);
@@ -59,7 +65,7 @@ describe('NetWorthLineChart', () => {
   });
 
   it('does not initialize chart when data is empty', () => {
-    render(<NetWorthLineChart data={[]} labels={['Jan', 'Feb']} />);
+    render(<NetWorthLineChart dataByLabel={{}} />);
     expect(echarts.init).not.toHaveBeenCalled();
   });
 });

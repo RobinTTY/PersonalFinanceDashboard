@@ -2,7 +2,14 @@ import { Card, Stack, Text, Title } from '@mantine/core';
 import { NetWorthLineChart } from '@/components/NetWorthLineChart/NetWorthLineChart';
 
 export function DashboardPage() {
-  const accountBalanceData = [12400, 12950, 13100, 13820, 14210, 14940];
+  const accountBalanceByMonth = {
+    Oct: 12400,
+    Nov: 12950,
+    Dec: 13100,
+    Jan: 13820,
+    Feb: 14210,
+    Mar: 14940,
+  };
 
   return (
     <Stack>
@@ -14,10 +21,7 @@ export function DashboardPage() {
           <Text size="sm" c="dimmed">
             Total Accounts Balance Over Time
           </Text>
-          <NetWorthLineChart
-            data={accountBalanceData}
-            labels={['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar']}
-          />
+          <NetWorthLineChart dataByLabel={accountBalanceByMonth} />
         </Stack>
       </Card>
     </Stack>
