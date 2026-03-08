@@ -1,0 +1,48 @@
+.modalContent {
+  overflow: hidden;
+}
+
+.modalBody {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 40vh;
+  min-height: 300px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-xl);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+  border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  flex-shrink: 0;
+}
+
+.accountTypeCard {
+  flex: 1;
+  padding: var(--mantine-spacing-xl);
+  border-radius: var(--mantine-radius-md);
+  cursor: pointer;
+}
+
+.accountTypeCard[data-checked] {
+  background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
+  border-color: var(--mantine-color-blue-filled);
+}
