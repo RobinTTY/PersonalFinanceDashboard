@@ -9,7 +9,7 @@ export const parameters = {
     showPanel: false,
     // Sort stories in the order they are defined in the file, then alphabetically
     storySort: {
-      order: ['Settings', ['SettingsModal', 'PreferencesSection'], '*'],
+      order: ['Accounts', ['AddAccountModal'], 'Settings', ['SettingsModal', 'PreferencesSection'], '*'],
       method: 'alphabetical',
     },
   },
