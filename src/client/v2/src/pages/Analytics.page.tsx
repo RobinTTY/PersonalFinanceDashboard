@@ -1,5 +1,5 @@
 import { Title } from '@mantine/core';
 
 export function AnalyticsPage() {
-  return <Title>Analytics</Title>;
+  return <Title order={2}>Analytics</Title>;
 }
