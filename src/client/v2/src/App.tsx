@@ -9,6 +9,9 @@ import { theme } from './theme';
 const client = new ApolloClient({
   link: new HttpLink({ uri: "http://localhost:5115/graphql" }),
   cache: new InMemoryCache(),
+  devtools: {
+    enabled: true,
+  },
 });
 
 export default function App() {
