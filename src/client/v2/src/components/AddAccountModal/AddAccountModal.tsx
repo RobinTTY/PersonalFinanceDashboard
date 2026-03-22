@@ -1,42 +1,8 @@
 import { useState } from 'react';
-import { IconBuildingBank, IconChartLine } from '@tabler/icons-react';
-import {
-  Button,
-  CloseButton,
-  Group,
-  Modal,
-  Radio,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from '@mantine/core';
+import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
+import { AccountType, SelectAccountTypeStep } from './steps/SelectAccountTypeStep';
+import { SelectBankStep } from './steps/SelectBankStep';
 import classes from './AddAccountModal.module.css';
-
-type AccountType = 'savings' | 'investment';
-
-interface AccountTypeOption {
-  value: AccountType;
-  label: string;
-  description: string;
-  icon: React.FC<{ size?: number }>;
-}
-
-const accountTypeOptions: AccountTypeOption[] = [
-  {
-    value: 'savings',
-    label: 'Savings Account',
-    description: 'Track your cash, checking, and savings balances.',
-    icon: IconBuildingBank,
-  },
-  {
-    value: 'investment',
-    label: 'Investment Account',
-    description: 'Track stocks, ETFs, and other investment portfolios.',
-    icon: IconChartLine,
-  },
-];
 
 interface AddAccountModalProps {
   opened: boolean;
@@ -44,12 +10,28 @@ interface AddAccountModalProps {
 }
 
 export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
+  const [step, setStep] = useState<1 | 2>(1);
   const [selectedType, setSelectedType] = useState<AccountType | undefined>(undefined);
+  const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);
 
   const handleClose = () => {
+    setStep(1);
     setSelectedType(undefined);
+    setSelectedBank(undefined);
     onClose();
   };
+
+  const handleBack = () => {
+    setStep(1);
+    setSelectedBank(undefined);
+  };
+
+  const stepConfig = {
+    1: { title: 'Choose Account Type', subtitle: 'Select the type of account you want to add.' },
+    2: { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
+  };
+
+  const { title, subtitle } = stepConfig[step];
 
   return (
     <Modal.Root
@@ -60,7 +42,7 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
       centered
       classNames={{
         content: classes.modalContent,
-        body: classes.modalBody,
+        body: step === 2 ? `${classes.modalBody} ${classes.modalBodyLarge}` : classes.modalBody,
       }}
     >
       <Modal.Overlay />
@@ -68,48 +50,42 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
         <Modal.Body>
           <div className={classes.header}>
             <Stack gap={2}>
-              <Title order={3}>Choose Account Type</Title>
-              <Text size="sm" c="dimmed">Select the type of account you want to add.</Text>
+              <Title order={3}>{title}</Title>
+              <Text size="sm" c="dimmed">
+                {subtitle}
+              </Text>
             </Stack>
             <CloseButton onClick={handleClose} size="md" aria-label="Close" />
           </div>
 
           <div className={classes.content}>
-            <Stack gap="lg">
-              <Radio.Group
-                value={selectedType}
-                onChange={(value) => setSelectedType(value as AccountType)}
-              >
-                <SimpleGrid cols={2}>
-                  {accountTypeOptions.map((option) => (
-                    <Radio.Card
-                      key={option.value}
-                      value={option.value}
-                      className={classes.accountTypeCard}
-                    >
-                      <Group wrap="nowrap" align="center">
-                        <ThemeIcon size="xl" variant="light" radius="md" flex="0 0 auto">
-                          <option.icon size={20} />
-                        </ThemeIcon>
-                        <Stack gap={4}>
-                          <Text fw={600}>{option.label}</Text>
-                          <Text size="sm" c="dimmed">
-                            {option.description}
-                          </Text>
-                        </Stack>
-                      </Group>
-                    </Radio.Card>
-                  ))}
-                </SimpleGrid>
-              </Radio.Group>
-            </Stack>
+            {step === 1 && (
+              <SelectAccountTypeStep selectedType={selectedType} onChange={setSelectedType} />
+            )}
+
+            {step === 2 && (
+              <SelectBankStep selectedBank={selectedBank} onBankSelect={setSelectedBank} />
+            )}
           </div>
 
           <div className={classes.footer}>
-            <Button variant="default" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button disabled={!selectedType}>Next</Button>
+            {step === 1 ? (
+              <>
+                <Button variant="default" onClick={handleClose}>
+                  Cancel
+                </Button>
+                <Button disabled={!selectedType} onClick={() => setStep(2)}>
+                  Next
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="default" onClick={handleBack}>
+                  Back
+                </Button>
+                <Button disabled={!selectedBank}>Synchronize</Button>
+              </>
+            )}
           </div>
         </Modal.Body>
       </Modal.Content>
