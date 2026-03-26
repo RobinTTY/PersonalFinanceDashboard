@@ -70,3 +70,9 @@
   background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
   border-color: var(--mantine-color-blue-filled);
 }
+
+.bankList {
+  overflow-y: auto;
+  scrollbar-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-4)) transparent;
+  padding-right: var(--mantine-spacing-sm);
+}

@@ -23,16 +23,17 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
   );
 
   return (
-    <Stack gap="md" style={{ height: '100%' }}>
+    <Stack gap="md" style={{ height: '100%', overflow: 'hidden' }}>
       <TextInput
         placeholder="Filter banks..."
         leftSection={<IconSearch size={16} />}
         value={bankSearch}
         onChange={(e) => setBankSearch(e.currentTarget.value)}
+        style={{ flexShrink: 0 }}
       />
       {loading && <Loader mx="auto" />}
       {error && <Text c="red" size="sm">{error.message}</Text>}
-      <SimpleGrid cols={2} spacing="sm">
+      <SimpleGrid cols={2} spacing="sm" className={classes.bankList}>
         {filteredBanks.map((bank) => {
           const bankId = String(bank.id);
           const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
