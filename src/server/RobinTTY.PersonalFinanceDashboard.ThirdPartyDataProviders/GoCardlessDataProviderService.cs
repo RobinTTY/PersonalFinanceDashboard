@@ -69,6 +69,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         var requisition = response.Result!;
         var result = new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
             requisition.AuthenticationLink,
+            requisition.Created,
             requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
         return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
             response.Error);
@@ -88,7 +89,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         // TODO: handle request failure + use paged responses
         var requisitions = response.Result!.Results;
         var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
-            req.Status.ToAuthenticationStatus(), req.AuthenticationLink, req.Accounts.Select(accountId =>
+            req.Status.ToAuthenticationStatus(), req.AuthenticationLink, req.Created, req.Accounts.Select(accountId =>
                 new BankAccount(accountId)).ToList()));
         return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result,
             response.Error);
@@ -112,7 +113,7 @@ public class GoCardlessDataProviderService(NordigenClient client)
         {
             var requisition = response.Result;
             var authenticationRequest = new AuthenticationRequest(requisition.Id,
-                requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink,
+                requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink, requisition.Created,
                 requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
 
             return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess,
