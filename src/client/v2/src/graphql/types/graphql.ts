@@ -22,6 +22,7 @@ export type AuthenticationRequest = {
   __typename: 'AuthenticationRequest';
   associatedAccounts: Array<BankAccount>;
   authenticationLink: Scalars['URL']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Maybe<Scalars['UUID']['output']>;
   status: AuthenticationStatus;
   thirdPartyId: Scalars['UUID']['output'];
@@ -30,6 +31,7 @@ export type AuthenticationRequest = {
 export type AuthenticationRequestInput = {
   associatedAccounts: Array<BankAccountInput>;
   authenticationLink: Scalars['URL']['input'];
+  createdAt: Scalars['DateTime']['input'];
   id?: InputMaybe<Scalars['UUID']['input']>;
   status: AuthenticationStatus;
   thirdPartyId: Scalars['UUID']['input'];
@@ -575,3 +577,11 @@ export type UpdateTransactionPayload = {
   __typename: 'UpdateTransactionPayload';
   transaction: Maybe<Transaction>;
 };
+
+export type GetBankingInstitutionsQueryVariables = Exact<{
+  countryCode?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } }> | null } | null };

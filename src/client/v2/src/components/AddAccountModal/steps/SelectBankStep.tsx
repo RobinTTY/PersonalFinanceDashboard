@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { IconChevronRight, IconSearch } from '@tabler/icons-react';
 import { Avatar, Group, SimpleGrid, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { useQuery } from '@apollo/client/react';
+import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import classes from '../AddAccountModal.module.css';
 
 interface Bank {
@@ -32,6 +34,9 @@ interface SelectBankStepProps {
 
 export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepProps) {
   const [bankSearch, setBankSearch] = useState('');
+  const { loading, error, data } = useQuery(GetBankingInstitutions, {
+    variables: { first: 3000 },
+  });
 
   const filteredBanks = dummyBanks.filter((bank) =>
     bank.name.toLowerCase().includes(bankSearch.toLowerCase()),

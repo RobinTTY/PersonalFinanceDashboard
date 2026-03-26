@@ -11,12 +11,12 @@ interface AddAccountModalProps {
 
 export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
   const [step, setStep] = useState<1 | 2>(1);
-  const [selectedType, setSelectedType] = useState<AccountType | undefined>(undefined);
+  const [selectedType, setSelectedAccountType] = useState<AccountType | undefined>(undefined);
   const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);
 
   const handleClose = () => {
     setStep(1);
-    setSelectedType(undefined);
+    setSelectedAccountType(undefined);
     setSelectedBank(undefined);
     onClose();
   };
@@ -60,7 +60,7 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
 
           <div className={classes.content}>
             {step === 1 && (
-              <SelectAccountTypeStep selectedType={selectedType} onChange={setSelectedType} />
+              <SelectAccountTypeStep selectedType={selectedType} onChange={setSelectedAccountType} />
             )}
 
             {step === 2 && (
