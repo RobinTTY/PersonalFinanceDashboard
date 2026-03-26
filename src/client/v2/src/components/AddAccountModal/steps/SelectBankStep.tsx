@@ -1,31 +1,9 @@
 import { useState } from 'react';
 import { IconChevronRight, IconSearch } from '@tabler/icons-react';
-import { Avatar, Group, SimpleGrid, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { Avatar, Group, Loader, SimpleGrid, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import classes from '../AddAccountModal.module.css';
-
-interface Bank {
-  id: string;
-  name: string;
-  initials: string;
-  color: string;
-}
-
-const dummyBanks: Bank[] = [
-  { id: '1', name: 'Kreissparkasse Tübingen', initials: 'KT', color: 'red' },
-  { id: '2', name: 'Sparkasse Bad Neustadt', initials: 'SN', color: 'red' },
-  { id: '3', name: 'Kreissparkasse Rhein-Neckar', initials: 'KR', color: 'red' },
-  { id: '4', name: 'Bank für Kirche und Diakonie', initials: 'BK', color: 'teal' },
-  { id: '5', name: 'Hagnauer Volksbank', initials: 'HV', color: 'blue' },
-  { id: '6', name: 'Gabler-Saliter Bankhaus', initials: 'GS', color: 'yellow' },
-  { id: '7', name: 'Deutsche Bank', initials: 'DB', color: 'blue' },
-  { id: '8', name: 'Commerzbank', initials: 'CB', color: 'yellow' },
-  { id: '9', name: 'ING-DiBa', initials: 'IN', color: 'orange' },
-  { id: '10', name: 'DKB Deutsche Kreditbank', initials: 'DK', color: 'cyan' },
-  { id: '11', name: 'Comdirect', initials: 'CD', color: 'yellow' },
-  { id: '12', name: 'N26', initials: 'N2', color: 'dark' },
-];
 
 interface SelectBankStepProps {
   selectedBank: string | undefined;
@@ -38,7 +16,9 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
     variables: { first: 3000 },
   });
 
-  const filteredBanks = dummyBanks.filter((bank) =>
+  const banks = data?.bankingInstitutions?.edges?.map((edge) => edge.node) ?? [];
+
+  const filteredBanks = banks.filter((bank) =>
     bank.name.toLowerCase().includes(bankSearch.toLowerCase()),
   );
 
@@ -50,28 +30,49 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
         value={bankSearch}
         onChange={(e) => setBankSearch(e.currentTarget.value)}
       />
+      {loading && <Loader mx="auto" />}
+      {error && <Text c="red" size="sm">{error.message}</Text>}
       <SimpleGrid cols={2} spacing="sm">
-        {filteredBanks.map((bank) => (
-          <UnstyledButton
-            key={bank.id}
-            className={classes.bankCard}
-            data-selected={selectedBank === bank.id || undefined}
-            onClick={() => onBankSelect(bank.id)}
-          >
-            <Group justify="space-between" wrap="nowrap">
-              <Group wrap="nowrap" gap="sm" style={{ minWidth: 0 }}>
-                <Avatar color={bank.color} radius="sm" size="md" flex="0 0 auto">
-                  {bank.initials}
-                </Avatar>
-                <Text fw={500} size="sm" truncate>
-                  {bank.name}
-                </Text>
+        {filteredBanks.map((bank) => {
+          const bankId = String(bank.id);
+          const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
+
+          return (
+            <UnstyledButton
+              key={bankId}
+              className={classes.bankCard}
+              data-selected={selectedBank === bankId || undefined}
+              onClick={() => onBankSelect(bankId)}
+            >
+              <Group justify="space-between" wrap="nowrap">
+                <Group wrap="nowrap" gap="sm" style={{ minWidth: 0 }}>
+                  <Avatar src={logoUri} radius="sm" size="md" flex="0 0 auto">
+                    {getInitials(bank.name)}
+                  </Avatar>
+                  <Text fw={500} size="sm" truncate>
+                    {bank.name}
+                  </Text>
+                </Group>
+                <IconChevronRight size={16} style={{ flexShrink: 0 }} />
               </Group>
-              <IconChevronRight size={16} style={{ flexShrink: 0 }} />
-            </Group>
-          </UnstyledButton>
-        ))}
+            </UnstyledButton>
+          );
+        })}
       </SimpleGrid>
     </Stack>
   );
+}
+
+/**
+ * Generates initials from a bank name for use in the Avatar component when no logo is available.
+ * @param name The name of the bank
+ * @returns A string of initials (up to 2 characters) derived from the bank name
+ */
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase();
 }
