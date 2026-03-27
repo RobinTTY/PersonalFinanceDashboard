@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { IconChevronRight, IconSearch } from '@tabler/icons-react';
-import { Avatar, Group, Loader, SimpleGrid, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { Avatar, Group, Loader, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import classes from '../AddAccountModal.module.css';
+
+const COLUMNS = 2;
+// Row height: 1px top border + 12px padding + 38px avatar (md) + 12px padding + 1px bottom border = 64px
+// Gap between rows mirrors SimpleGrid spacing="sm" = 12px
+const ROW_HEIGHT = 64;
+const ROW_GAP = 12;
 
 interface SelectBankStepProps {
   selectedBank: string | undefined;
@@ -22,6 +29,16 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
     bank.name.toLowerCase().includes(bankSearch.toLowerCase()),
   );
 
+  const rowCount = Math.ceil(filteredBanks.length / COLUMNS);
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT + ROW_GAP,
+    overscan: 5,
+  });
+
   return (
     <Stack gap="md" style={{ height: '100%', overflow: 'hidden' }}>
       <TextInput
@@ -33,33 +50,58 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
       />
       {loading && <Loader mx="auto" />}
       {error && <Text c="red" size="sm">{error.message}</Text>}
-      <SimpleGrid cols={2} spacing="sm" className={classes.bankList}>
-        {filteredBanks.map((bank) => {
-          const bankId = String(bank.id);
-          const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
+      <div ref={parentRef} className={classes.bankList} style={{ flex: 1, overflowX: 'hidden' }}>
+        <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative' }}>
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const startIndex = virtualRow.index * COLUMNS;
+            const rowItems = filteredBanks.slice(startIndex, startIndex + COLUMNS);
 
-          return (
-            <UnstyledButton
-              key={bankId}
-              className={classes.bankCard}
-              data-selected={selectedBank === bankId || undefined}
-              onClick={() => onBankSelect(bankId)}
-            >
-              <Group justify="space-between" wrap="nowrap">
-                <Group wrap="nowrap" gap="sm" style={{ minWidth: 0 }}>
-                  <Avatar src={logoUri} radius="sm" size="md" flex="0 0 auto">
-                    {getInitials(bank.name)}
-                  </Avatar>
-                  <Text fw={500} size="sm" truncate>
-                    {bank.name}
-                  </Text>
-                </Group>
-                <IconChevronRight size={16} style={{ flexShrink: 0 }} />
-              </Group>
-            </UnstyledButton>
-          );
-        })}
-      </SimpleGrid>
+            return (
+              <div
+                key={virtualRow.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: ROW_HEIGHT,
+                  transform: `translateY(${virtualRow.start}px)`,
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 12,
+                }}
+              >
+                {rowItems.map((bank) => {
+                  const bankId = String(bank.id);
+                  const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
+
+                  return (
+                    <UnstyledButton
+                      key={bankId}
+                      className={classes.bankCard}
+                      data-selected={selectedBank === bankId || undefined}
+                      onClick={() => onBankSelect(bankId)}
+                      style={{ minWidth: 0 }}
+                    >
+                      <Group justify="space-between" wrap="nowrap">
+                        <Group wrap="nowrap" gap="sm" style={{ minWidth: 0 }}>
+                          <Avatar src={logoUri} radius="sm" size="md" flex="0 0 auto">
+                            {getInitials(bank.name)}
+                          </Avatar>
+                          <Text fw={500} size="sm" truncate>
+                            {bank.name}
+                          </Text>
+                        </Group>
+                        <IconChevronRight size={16} style={{ flexShrink: 0 }} />
+                      </Group>
+                    </UnstyledButton>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </Stack>
   );
 }
