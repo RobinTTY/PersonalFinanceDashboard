@@ -25,9 +25,9 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
 
   const banks = data?.bankingInstitutions?.edges?.map((edge) => edge.node) ?? [];
 
-  const filteredBanks = banks.filter((bank) =>
-    bank.name.toLowerCase().includes(bankSearch.toLowerCase()),
-  );
+  const filteredBanks = banks
+    .filter((bank) => bank.name.toLowerCase().includes(bankSearch.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const rowCount = Math.ceil(filteredBanks.length / COLUMNS);
   const parentRef = useRef<HTMLDivElement>(null);
