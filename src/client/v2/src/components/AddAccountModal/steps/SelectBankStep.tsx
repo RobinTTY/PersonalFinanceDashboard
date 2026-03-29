@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { IconChevronRight, IconSearch } from '@tabler/icons-react';
-import { Avatar, Group, Loader, Stack, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
+import { Loader, Stack, Text, TextInput } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import classes from '../AddAccountModal.module.css';
+import { SelectionCard } from './SelectionCard';
 
 const COLUMNS = 2;
 // Row height: 1px top border + 12px padding + 38px avatar (md) + 12px padding + 1px bottom border = 64px
@@ -76,25 +77,14 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                   const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
 
                   return (
-                    <UnstyledButton
+                    <SelectionCard
                       key={bankId}
-                      className={classes.bankCard}
-                      data-selected={selectedBank === bankId || undefined}
-                      onClick={() => onBankSelect(bankId)}
-                      style={{ minWidth: 0 }}
-                    >
-                      <Group justify="space-between" wrap="nowrap">
-                        <Group wrap="nowrap" gap="sm" style={{ minWidth: 0 }}>
-                          <Avatar src={logoUri} radius="sm" size="md" flex="0 0 auto">
-                            {getInitials(bank.name)}
-                          </Avatar>
-                          <Text fw={500} size="sm" truncate>
-                            {bank.name}
-                          </Text>
-                        </Group>
-                        <IconChevronRight size={16} style={{ flexShrink: 0 }} />
-                      </Group>
-                    </UnstyledButton>
+                      id={bankId}
+                      optionName={bank.name}
+                      logoUri={logoUri}
+                      isSelected={selectedBank === bankId}
+                      onSelect={onBankSelect}
+                    />
                   );
                 })}
               </div>
@@ -104,18 +94,4 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
       </div>
     </Stack>
   );
-}
-
-/**
- * Generates initials from a bank name for use in the Avatar component when no logo is available.
- * @param name The name of the bank
- * @returns A string of initials (up to 2 characters) derived from the bank name
- */
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase();
 }

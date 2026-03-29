@@ -1,0 +1,18 @@
+.selectionCard {
+  width: 100%;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease;
+}
+
+.selectionCard:hover {
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.selectionCard[data-selected] {
+  background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
+  border-color: var(--mantine-color-blue-filled);
+}
