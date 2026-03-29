@@ -35,25 +35,8 @@
   flex-shrink: 0;
 }
 
-.accountTypeCard {
-  flex: 1;
-  padding: var(--mantine-spacing-xl);
-  border-radius: var(--mantine-radius-md);
-  cursor: pointer;
-}
-
-.accountTypeCard[data-checked] {
-  background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-6));
-  border-color: var(--mantine-color-blue-filled);
-}
-
 .modalBodyLarge {
   height: 65vh;
   min-height: 500px;
 }
 
-.bankList {
-  overflow-y: auto;
-  scrollbar-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-4)) transparent;
-  padding-right: var(--mantine-spacing-sm);
-}

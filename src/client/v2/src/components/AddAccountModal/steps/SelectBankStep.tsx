@@ -5,7 +5,7 @@ import { Loader, Stack, Text, TextInput } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import { SelectionCard } from '../../SelectionCard/SelectionCard';
-import classes from '../AddAccountModal.module.css';
+import classes from './SelectBankStep.module.css';
 
 const COLUMNS = 2;
 // Row height: 1px top border + 12px padding + 38px avatar (md) + 12px padding + 1px bottom border = 64px

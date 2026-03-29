@@ -1,6 +1,6 @@
 import { IconBuildingBank, IconChartLine } from '@tabler/icons-react';
 import { Group, Radio, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
-import classes from '../AddAccountModal.module.css';
+import classes from './SelectAccountTypeStep.module.css';
 
 export type AccountType = 'savings' | 'investment';
 

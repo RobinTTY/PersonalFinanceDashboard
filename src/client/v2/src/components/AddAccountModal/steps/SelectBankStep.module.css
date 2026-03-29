@@ -1,0 +1,5 @@
+.bankList {
+  overflow-y: auto;
+  scrollbar-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-4)) transparent;
+  padding-right: var(--mantine-spacing-sm);
+}
