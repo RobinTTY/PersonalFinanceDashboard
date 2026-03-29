@@ -27,7 +27,7 @@ export function Usage() {
   const [opened, setOpened] = useState(false);
 
   return (
-    <MockedProvider mocks={[bankingInstitutionsMock]} addTypename={false}>
+    <MockedProvider mocks={[bankingInstitutionsMock]}>
       <ComponentPreview canvas={{ center: true }} withSpacing>
         <Button onClick={() => setOpened(true)}>Add Account</Button>
         <AddAccountModal opened={opened} onClose={() => setOpened(false)} />
@@ -40,7 +40,7 @@ export function OpenByDefault() {
   const [opened, setOpened] = useState(true);
 
   return (
-    <MockedProvider mocks={[bankingInstitutionsMock]} addTypename={false}>
+    <MockedProvider mocks={[bankingInstitutionsMock]}>
       <ComponentPreview canvas={{ center: true }} withSpacing>
         <Button onClick={() => setOpened(true)}>Add Account</Button>
         <AddAccountModal opened={opened} onClose={() => setOpened(false)} />
