@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
-import { AccountType, SelectAccountTypeStep } from './steps/SelectAccountTypeStep';
-import { SelectBankStep } from './steps/SelectBankStep';
+import { AccountType, SelectAccountTypeStep } from './steps/SelectAccountTypeStep/SelectAccountTypeStep';
+import { SelectBankStep } from './steps/SelectBankStep/SelectBankStep';
 import classes from './AddAccountModal.module.css';
 
 interface AddAccountModalProps {

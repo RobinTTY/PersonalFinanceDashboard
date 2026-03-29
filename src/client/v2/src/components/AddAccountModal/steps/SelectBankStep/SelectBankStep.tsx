@@ -4,7 +4,7 @@ import { IconSearch } from '@tabler/icons-react';
 import { Loader, Stack, Text, TextInput } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
-import { SelectionCard } from '../../SelectionCard/SelectionCard';
+import { SelectionCard } from '../../../SelectionCard/SelectionCard';
 import classes from './SelectBankStep.module.css';
 
 const COLUMNS = 2;
