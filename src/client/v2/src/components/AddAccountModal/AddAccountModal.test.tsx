@@ -1,5 +1,5 @@
 import { axe, render } from '@test-utils';
-import { screen, fireEvent } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { AddAccountModal } from './AddAccountModal';
 
 const noop = () => {};
@@ -25,8 +25,12 @@ describe('AddAccountModal', () => {
 
   it('shows the account type descriptions', () => {
     render(<AddAccountModal opened onClose={noop} />);
-    expect(screen.getByText('Track your cash, checking, and savings balances.')).toBeInTheDocument();
-    expect(screen.getByText('Track stocks, ETFs, and other investment portfolios.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Track your cash, checking, and savings balances.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Track stocks, ETFs, and other investment portfolios.')
+    ).toBeInTheDocument();
   });
 
   it('has Next button disabled when no account type is selected', () => {
@@ -67,12 +71,8 @@ describe('AddAccountModal', () => {
     expect(screen.getByRole('button', { name: 'Next' })).not.toBeDisabled();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    rerender(
-      <AddAccountModal opened={false} onClose={onClose} />
-    );
-    rerender(
-      <AddAccountModal opened onClose={onClose} />
-    );
+    rerender(<AddAccountModal opened={false} onClose={onClose} />);
+    rerender(<AddAccountModal opened onClose={onClose} />);
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
   });
 });

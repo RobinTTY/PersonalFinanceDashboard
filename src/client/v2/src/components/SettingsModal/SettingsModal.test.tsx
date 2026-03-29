@@ -1,5 +1,5 @@
 import { axe, render } from '@test-utils';
-import { screen, fireEvent } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { SettingsModal } from './SettingsModal';
 
 const noop = () => {};

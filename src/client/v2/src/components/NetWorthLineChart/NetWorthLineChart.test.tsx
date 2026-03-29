@@ -28,7 +28,7 @@ describe('NetWorthLineChart', () => {
           Feb: 14210,
           Mar: 14940,
         }}
-      />,
+      />
     );
 
     expect(echarts.init).toHaveBeenCalledTimes(1);
@@ -50,7 +50,7 @@ describe('NetWorthLineChart', () => {
             type: 'line',
           }),
         ],
-      }),
+      })
     );
   });
 

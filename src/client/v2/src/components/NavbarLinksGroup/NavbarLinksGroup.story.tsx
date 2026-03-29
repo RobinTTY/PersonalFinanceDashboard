@@ -5,7 +5,13 @@ import { NavbarLinksGroup } from './NavbarLinksGroup';
 
 export default {
   title: 'NavbarLinksGroup',
-  decorators: [(Story: any) => <MemoryRouter><Story /></MemoryRouter>],
+  decorators: [
+    (Story: any) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 };
 
 const mockdata = {

@@ -1,19 +1,25 @@
-import { fireEvent, screen } from '@testing-library/react';
 import { axe, render } from '@test-utils';
+import { fireEvent, screen } from '@testing-library/react';
 import { SelectionCard } from './SelectionCard';
 
 const noop = () => {};
 
 describe('SelectionCard', () => {
-  axe([<SelectionCard key="1" id="1" optionName="Test Option" isSelected={false} onSelect={noop} />]);
+  axe([
+    <SelectionCard key="1" id="1" optionName="Test Option" isSelected={false} onSelect={noop} />,
+  ]);
 
   it('renders the option name', () => {
-    render(<SelectionCard id="1" optionName="Savings Account" isSelected={false} onSelect={noop} />);
+    render(
+      <SelectionCard id="1" optionName="Savings Account" isSelected={false} onSelect={noop} />
+    );
     expect(screen.getByText('Savings Account')).toBeInTheDocument();
   });
 
   it('renders initials as fallback when no logoUri is provided', () => {
-    render(<SelectionCard id="1" optionName="Savings Account" isSelected={false} onSelect={noop} />);
+    render(
+      <SelectionCard id="1" optionName="Savings Account" isSelected={false} onSelect={noop} />
+    );
     expect(screen.getByText('SA')).toBeInTheDocument();
   });
 
@@ -36,7 +42,14 @@ describe('SelectionCard', () => {
 
   it('calls onSelect with the correct id when clicked', () => {
     const onSelect = vi.fn();
-    render(<SelectionCard id="bank-123" optionName="Test Option" isSelected={false} onSelect={onSelect} />);
+    render(
+      <SelectionCard
+        id="bank-123"
+        optionName="Test Option"
+        isSelected={false}
+        onSelect={onSelect}
+      />
+    );
     fireEvent.click(screen.getByRole('button'));
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith('bank-123');
@@ -44,7 +57,13 @@ describe('SelectionCard', () => {
 
   it('renders an avatar with the provided logoUri as image source', () => {
     render(
-      <SelectionCard id="1" optionName="Test Bank" isSelected={false} onSelect={noop} logoUri="https://example.com/logo.png" />
+      <SelectionCard
+        id="1"
+        optionName="Test Bank"
+        isSelected={false}
+        onSelect={noop}
+        logoUri="https://example.com/logo.png"
+      />
     );
     expect(screen.getByRole('img')).toHaveAttribute('src', 'https://example.com/logo.png');
   });

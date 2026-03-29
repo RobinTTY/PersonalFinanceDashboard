@@ -13,8 +13,18 @@ export function Usage() {
   return (
     <ComponentPreview canvas={{ center: true, maxWidth: 320 }} withSpacing>
       <Stack gap="xs">
-        <SelectionCard id="savings" optionName="Savings Account" isSelected={selectedId === 'savings'} onSelect={setSelectedId} />
-        <SelectionCard id="investment" optionName="Investment Account" isSelected={selectedId === 'investment'} onSelect={setSelectedId} />
+        <SelectionCard
+          id="savings"
+          optionName="Savings Account"
+          isSelected={selectedId === 'savings'}
+          onSelect={setSelectedId}
+        />
+        <SelectionCard
+          id="investment"
+          optionName="Investment Account"
+          isSelected={selectedId === 'investment'}
+          onSelect={setSelectedId}
+        />
       </Stack>
     </ComponentPreview>
   );
@@ -31,7 +41,12 @@ export function Selected() {
 export function Unselected() {
   return (
     <ComponentPreview canvas={{ center: true, maxWidth: 320 }} withSpacing>
-      <SelectionCard id="savings" optionName="Savings Account" isSelected={false} onSelect={() => {}} />
+      <SelectionCard
+        id="savings"
+        optionName="Savings Account"
+        isSelected={false}
+        onSelect={() => {}}
+      />
     </ComponentPreview>
   );
 }

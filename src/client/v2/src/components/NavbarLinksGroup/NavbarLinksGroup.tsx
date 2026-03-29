@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconChevronRight } from '@tabler/icons-react';
-import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import classes from './NavbarLinksGroup.module.css';
 
 export interface LinksGroupProps {
@@ -13,7 +13,14 @@ export interface LinksGroupProps {
   onClick?: () => void;
 }
 
-export function LinksGroup({ icon: Icon, label, link, initiallyOpened, links, onClick }: LinksGroupProps) {
+export function LinksGroup({
+  icon: Icon,
+  label,
+  link,
+  initiallyOpened,
+  links,
+  onClick,
+}: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const navigate = useNavigate();

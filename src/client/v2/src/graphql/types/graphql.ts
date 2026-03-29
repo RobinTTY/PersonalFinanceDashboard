@@ -3,19 +3,23 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = {
+  [_ in K]?: never;
+};
+export type Incremental<T> =
+  | T
+  | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: unknown; output: unknown; }
-  Decimal: { input: unknown; output: unknown; }
-  URL: { input: unknown; output: unknown; }
-  UUID: { input: unknown; output: unknown; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: unknown; output: unknown };
+  Decimal: { input: unknown; output: unknown };
+  URL: { input: unknown; output: unknown };
+  UUID: { input: unknown; output: unknown };
 };
 
 export type AuthenticationRequest = {
@@ -43,7 +47,7 @@ export enum AuthenticationStatus {
   Failed = 'FAILED',
   Pending = 'PENDING',
   RequiresUserAction = 'REQUIRES_USER_ACTION',
-  Unknown = 'UNKNOWN'
+  Unknown = 'UNKNOWN',
 }
 
 export type BankAccount = {
@@ -306,66 +310,55 @@ export type Mutation = {
   updateTransaction: UpdateTransactionPayload;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationCreateAuthenticationRequestArgs = {
   input: CreateAuthenticationRequestInput;
 };
-
 
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationCreateBankAccountArgs = {
   input: CreateBankAccountInput;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationCreateBankingInstitutionArgs = {
   input: CreateBankingInstitutionInput;
 };
-
 
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationCreateTransactionArgs = {
   input: CreateTransactionInput;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationDeleteAuthenticationRequestArgs = {
   input: DeleteAuthenticationRequestInput;
 };
-
 
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationDeleteBankAccountArgs = {
   input: DeleteBankAccountInput;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationDeleteBankingInstitutionArgs = {
   input: DeleteBankingInstitutionInput;
 };
-
 
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationDeleteTransactionArgs = {
   input: DeleteTransactionInput;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationUpdateBankAccountArgs = {
   input: UpdateBankAccountInput;
 };
 
-
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationUpdateBankingInstitutionArgs = {
   input: UpdateBankingInstitutionInput;
 };
-
 
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationUpdateTransactionArgs = {
@@ -406,18 +399,15 @@ export type Query = {
   transactionsByAccountId: Maybe<TransactionsByAccountIdConnection>;
 };
 
-
 /** AuthenticationRequest related query resolvers. */
 export type QueryAuthenticationRequestArgs = {
   authenticationId: Scalars['UUID']['input'];
 };
 
-
 /** AuthenticationRequest related query resolvers. */
 export type QueryBankAccountArgs = {
   accountId: Scalars['UUID']['input'];
 };
-
 
 /** AuthenticationRequest related query resolvers. */
 export type QueryBankAccountsArgs = {
@@ -427,12 +417,10 @@ export type QueryBankAccountsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
-
 /** AuthenticationRequest related query resolvers. */
 export type QueryBankingInstitutionArgs = {
   institutionId: Scalars['UUID']['input'];
 };
-
 
 /** AuthenticationRequest related query resolvers. */
 export type QueryBankingInstitutionsArgs = {
@@ -442,7 +430,6 @@ export type QueryBankingInstitutionsArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
 };
-
 
 /** AuthenticationRequest related query resolvers. */
 export type QueryTransactionsByAccountIdArgs = {
@@ -583,5 +570,25 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-
-export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } }> | null } | null };
+export type GetBankingInstitutionsQuery = {
+  bankingInstitutions: {
+    __typename: 'BankingInstitutionsConnection';
+    pageInfo: {
+      __typename: 'PageInfo';
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
+    edges: Array<{
+      __typename: 'BankingInstitutionsEdge';
+      node: {
+        __typename: 'BankingInstitution';
+        id: unknown | null;
+        name: string;
+        bic: string;
+        logoUri: unknown;
+      };
+    }> | null;
+  } | null;
+};

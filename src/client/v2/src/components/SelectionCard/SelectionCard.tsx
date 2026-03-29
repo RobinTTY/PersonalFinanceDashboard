@@ -10,7 +10,13 @@ interface SelectionCardProps {
   onSelect: (id: string) => void;
 }
 
-export function SelectionCard({ id, optionName: name, logoUri, isSelected, onSelect }: SelectionCardProps) {
+export function SelectionCard({
+  id,
+  optionName: name,
+  logoUri,
+  isSelected,
+  onSelect,
+}: SelectionCardProps) {
   return (
     <UnstyledButton
       className={classes.selectionCard}

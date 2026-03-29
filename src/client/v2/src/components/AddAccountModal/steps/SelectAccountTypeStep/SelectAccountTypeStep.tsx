@@ -36,11 +36,7 @@ export function SelectAccountTypeStep({ selectedType, onChange }: SelectAccountT
     <Radio.Group value={selectedType} onChange={(value) => onChange(value as AccountType)}>
       <SimpleGrid cols={2}>
         {accountTypeOptions.map((option) => (
-          <Radio.Card
-            key={option.value}
-            value={option.value}
-            className={classes.accountTypeCard}
-          >
+          <Radio.Card key={option.value} value={option.value} className={classes.accountTypeCard}>
             <Group wrap="nowrap" align="center">
               <ThemeIcon size="xl" variant="light" radius="md" flex="0 0 auto">
                 <option.icon size={20} />

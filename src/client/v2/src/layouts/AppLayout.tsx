@@ -5,8 +5,8 @@ import {
   IconNotes,
   IconPresentationAnalytics,
 } from '@tabler/icons-react';
-import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from 'react-router-dom';
+import { useDisclosure } from '@mantine/hooks';
 import { Navbar } from '@/components/Navbar/Navbar';
 import { LinksGroupProps } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
 import { SettingsModal } from '@/components/SettingsModal/SettingsModal';

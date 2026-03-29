@@ -11,7 +11,13 @@ import { Navbar } from './Navbar';
 
 export default {
   title: 'Navbar',
-  decorators: [(Story: any) => <MemoryRouter><Story /></MemoryRouter>],
+  decorators: [
+    (Story: any) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 };
 
 const mockLinks = [

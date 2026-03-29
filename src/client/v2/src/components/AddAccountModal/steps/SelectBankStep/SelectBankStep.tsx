@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { IconSearch } from '@tabler/icons-react';
-import { Loader, Stack, Text, TextInput } from '@mantine/core';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
+import { IconSearch } from '@tabler/icons-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Loader, Stack, Text, TextInput } from '@mantine/core';
 import { SelectionCard } from '../../../SelectionCard/SelectionCard';
 import classes from './SelectBankStep.module.css';
 
@@ -50,7 +50,11 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
         style={{ flexShrink: 0 }}
       />
       {loading && <Loader mx="auto" />}
-      {error && <Text c="red" size="sm">{error.message}</Text>}
+      {error && (
+        <Text c="red" size="sm">
+          {error.message}
+        </Text>
+      )}
       <div ref={parentRef} className={classes.bankList} style={{ flex: 1, overflowX: 'hidden' }}>
         <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative' }}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {

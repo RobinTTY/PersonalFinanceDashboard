@@ -15,7 +15,7 @@ describe('UserButton', () => {
     render(
       <ComponentPreview canvas={attributes} withSpacing>
         <UserButton />
-      </ComponentPreview>,
+      </ComponentPreview>
     );
   });
 });

@@ -1,6 +1,6 @@
 import { IconCalendarStats } from '@tabler/icons-react';
-import { MemoryRouter } from 'react-router-dom';
 import { axe, render } from '@test-utils';
+import { MemoryRouter } from 'react-router-dom';
 import { NavbarLinksGroup } from './NavbarLinksGroup';
 
 const mockdata = {
@@ -14,9 +14,17 @@ const mockdata = {
 };
 
 describe('NavbarLinksGroup', () => {
-  axe([<MemoryRouter key="1"><NavbarLinksGroup {...mockdata} /></MemoryRouter>]);
+  axe([
+    <MemoryRouter key="1">
+      <NavbarLinksGroup {...mockdata} />
+    </MemoryRouter>,
+  ]);
 
   it('renders correctly', () => {
-    render(<MemoryRouter><NavbarLinksGroup {...mockdata} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <NavbarLinksGroup {...mockdata} />
+      </MemoryRouter>
+    );
   });
 });

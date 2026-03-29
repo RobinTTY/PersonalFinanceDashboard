@@ -1,5 +1,5 @@
 import { axe, render } from '@test-utils';
-import { screen, fireEvent } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { PreferencesSection } from './PreferencesSection';
 
 describe('PreferencesSection', () => {

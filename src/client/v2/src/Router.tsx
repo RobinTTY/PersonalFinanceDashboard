@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
-import { DashboardPage } from './pages/Dashboard.page';
 import { AccountsPage } from './pages/Accounts.page';
-import { TransactionsPage } from './pages/Transactions.page';
 import { AnalyticsPage } from './pages/Analytics.page';
+import { DashboardPage } from './pages/Dashboard.page';
 import { SettingsPage } from './pages/Settings.page';
+import { TransactionsPage } from './pages/Transactions.page';
 
 const router = createBrowserRouter([
   {

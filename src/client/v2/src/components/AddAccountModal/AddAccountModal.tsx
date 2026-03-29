@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
-import { AccountType, SelectAccountTypeStep } from './steps/SelectAccountTypeStep/SelectAccountTypeStep';
+import {
+  AccountType,
+  SelectAccountTypeStep,
+} from './steps/SelectAccountTypeStep/SelectAccountTypeStep';
 import { SelectBankStep } from './steps/SelectBankStep/SelectBankStep';
 import classes from './AddAccountModal.module.css';
 
@@ -60,7 +63,10 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
 
           <div className={classes.content}>
             {step === 1 && (
-              <SelectAccountTypeStep selectedType={selectedType} onChange={setSelectedAccountType} />
+              <SelectAccountTypeStep
+                selectedType={selectedType}
+                onChange={setSelectedAccountType}
+              />
             )}
 
             {step === 2 && (
