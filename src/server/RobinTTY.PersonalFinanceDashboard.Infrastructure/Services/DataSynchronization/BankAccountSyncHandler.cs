@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -20,7 +21,7 @@ public class BankAccountSyncHandler(
             if (bankAccountId.HasValue)
                 bankAccountId = dbContext.BankAccounts
                     .SingleOrDefault(bankAccount => bankAccount.Id == bankAccountId)?.ThirdPartyId;
-            
+
             var bankAccounts = await GetBankAccounts(bankAccountId);
             if (bankAccounts == null || bankAccounts.Count == 0)
             {
@@ -28,11 +29,11 @@ public class BankAccountSyncHandler(
             }
 
             await AddOrUpdateBankAccounts(bankAccounts);
-            
+
             // If we are updating only one account, do not reset the data expiry
             if (!bankAccountId.HasValue)
                 await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankAccounts);
-            
+
             logger.LogInformation("Synced {Count} bank accounts", bankAccounts.Count);
         }
 
@@ -42,7 +43,7 @@ public class BankAccountSyncHandler(
     private async Task<List<BankAccount>?> GetBankAccounts(Guid? bankAccountId)
     {
         var accountsToFetch = new List<Guid>();
-        
+
         if (bankAccountId.HasValue)
         {
             accountsToFetch.Add(bankAccountId.Value);
@@ -54,7 +55,8 @@ public class BankAccountSyncHandler(
 
             foreach (var authenticationRequest in authRequests)
             {
-                if (authenticationRequest.Status == AuthenticationStatus.Active)
+                // TODO: EUA may have a different validity than 90 days
+                if (authenticationRequest.Status == AuthenticationStatus.Active && !DateUtility.IsOlderThan(authenticationRequest.CreatedAt, 90, TimeUnit.Days))
                 {
                     var ids = authenticationRequest.AssociatedAccounts.Select(acc => acc.ThirdPartyId);
                     accountsToFetch.AddRange(ids);
@@ -69,6 +71,12 @@ public class BankAccountSyncHandler(
             if (response.IsSuccessful)
             {
                 bankAccounts.Add(response.Result);
+            }
+            else
+            {
+                logger.LogWarning(
+                    "Encountered error while getting bank account. Summary: {errorSummary} Detail: {errorDetail}",
+                    response.Error.Summary, response.Error.Detail);
             }
         }
 
@@ -94,7 +102,7 @@ public class BankAccountSyncHandler(
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
             }
-            
+
             await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);
             await UpdateAssociatedInstitution(updatedBankAccount, existingBankAccount);
             await dbContext.SaveChangesAsync();
@@ -108,12 +116,12 @@ public class BankAccountSyncHandler(
             .Select(req => req.ThirdPartyId);
         var authRequests = dbContext.AuthenticationRequests
             .Where(request => associatedAuthenticationRequestIds.Contains(request.ThirdPartyId)).ToList();
-        
+
         foreach (var request in updatedBankAccount.AssociatedAuthenticationRequests)
         {
             var linkedRequest = authRequests.SingleOrDefault(existingRequest =>
                 existingRequest.ThirdPartyId == request.ThirdPartyId);
-           
+
             if (linkedRequest == null)
             {
                 var entry = await dbContext.AuthenticationRequests.AddAsync(request);
@@ -129,7 +137,7 @@ public class BankAccountSyncHandler(
             }
         }
     }
-    
+
     private async Task UpdateAssociatedInstitution(BankAccount updatedBankAccount,
         BankAccount existingBankAccount)
     {
@@ -139,13 +147,13 @@ public class BankAccountSyncHandler(
         {
             var trackedInstitution = dbContext.BankingInstitutions
                 .SingleOrDefault(institution => institution.ThirdPartyId == associatedInstitutionId);
-        
+
             if (trackedInstitution == null && updatedBankAccount.AssociatedInstitution != null)
             {
                 var entry = await dbContext.BankingInstitutions.AddAsync(updatedBankAccount.AssociatedInstitution);
                 trackedInstitution = entry.Entity;
             }
-            
+
             var associationDoesNotExistYet =
                 existingBankAccount.AssociatedInstitution?.ThirdPartyId != trackedInstitution?.ThirdPartyId;
             if (associationDoesNotExistYet)
