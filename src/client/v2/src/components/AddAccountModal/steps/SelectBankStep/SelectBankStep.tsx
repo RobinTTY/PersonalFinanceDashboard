@@ -77,7 +77,7 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                 }}
               >
                 {rowItems.map((bank) => {
-                  const bankId = String(bank.id);
+                  const bankId = String(bank.thirdPartyId);
                   const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
 
                   return (

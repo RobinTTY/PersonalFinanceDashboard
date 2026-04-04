@@ -599,4 +599,4 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
 }>;
 
 
-export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } }> | null } | null };
+export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, thirdPartyId: string, name: string, bic: string, logoUri: unknown } }> | null } | null };

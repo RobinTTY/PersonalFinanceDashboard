@@ -13,6 +13,7 @@ export const GetBankingInstitutions: TypedDocumentNode<GetBankingInstitutionsQue
       edges {
         node {
           id
+          thirdPartyId
           name
           bic
           logoUri

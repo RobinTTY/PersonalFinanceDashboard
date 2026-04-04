@@ -79,6 +79,7 @@ public class AuthenticationRequestRepository
             return request.Result;
         }
 
+        // TODO: Error can also be in the InstitutionIdError field here
         _logger.LogError(
             "Creation of new authentication request failed. The data provider returned the following error: " +
             "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
