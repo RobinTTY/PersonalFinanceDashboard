@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { CreateAuthenticationRequest } from '@/graphql/mutations/CreateAuthenticationRequest';
 import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
@@ -10,44 +10,78 @@ import { SelectBankStep } from './steps/SelectBankStep/SelectBankStep';
 import { AuthenticateBankStep } from './steps/AuthenticateBankStep/AuthenticateBankStep';
 import classes from './AddAccountModal.module.css';
 
+const STORAGE_KEY = 'pendingGoCardlessAuth';
+
+export interface PendingAuthState {
+  authenticationId: string;
+  authenticationLink: string;
+}
+
 interface AddAccountModalProps {
   opened: boolean;
   onClose: () => void;
+  pendingAuth?: PendingAuthState;
 }
 
-export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
+export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModalProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedType, setSelectedAccountType] = useState<AccountType | undefined>(undefined);
   const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);
   const [authenticationId, setAuthenticationId] = useState<string | undefined>(undefined);
+  const [authenticationLink, setAuthenticationLink] = useState<string | undefined>(undefined);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [autoCheck, setAutoCheck] = useState(false);
 
   const [createAuthenticationRequest, { loading: createAuthLoading, error: createAuthError }] =
     useMutation(CreateAuthenticationRequest);
 
+  useEffect(() => {
+    if (pendingAuth) {
+      setAuthenticationId(pendingAuth.authenticationId);
+      setAuthenticationLink(pendingAuth.authenticationLink);
+      setAutoCheck(true);
+      setStep(3);
+    }
+  }, [pendingAuth]);
+
   const handleSynchronize = async () => {
     if (!selectedBank) return;
-    console.log('Creating authentication request for bank:', selectedBank);
-    console.log('Redirect URI:', window.location.href);
     const result = await createAuthenticationRequest({
       variables: { institutionId: selectedBank, redirectUri: window.location.href },
     });
     const id = result.data?.createAuthenticationRequest?.authenticationRequest?.id;
-    const authenticationLink =
+    const link =
       result.data?.createAuthenticationRequest?.authenticationRequest?.authenticationLink;
     if (id) {
-      setAuthenticationId(String(id));
-      if (authenticationLink) {
-        window.open(String(authenticationLink), '_blank', 'noopener,noreferrer');
+      const authId = String(id);
+      const authLink = link ? String(link) : undefined;
+      setAuthenticationId(authId);
+      setAuthenticationLink(authLink);
+      setAutoCheck(false);
+      if (authLink) {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ authenticationId: authId, authenticationLink: authLink })
+        );
+        window.open(authLink, '_blank', 'noopener,noreferrer');
       }
       setStep(3);
     }
   };
 
+  const handleAuthenticated = () => {
+    setIsAuthenticated(true);
+  };
+
   const handleClose = () => {
+    localStorage.removeItem(STORAGE_KEY);
     setStep(1);
     setSelectedAccountType(undefined);
     setSelectedBank(undefined);
     setAuthenticationId(undefined);
+    setAuthenticationLink(undefined);
+    setIsAuthenticated(false);
+    setAutoCheck(false);
     onClose();
   };
 
@@ -59,10 +93,15 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
   const stepConfig = {
     1: { title: 'Choose Account Type', subtitle: 'Select the type of account you want to add.' },
     2: { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
-    3: {
-      title: 'Authenticate with GoCardless',
-      subtitle: 'Authenticate with your bank through GoCardless to complete the setup.',
-    },
+    3: isAuthenticated
+      ? {
+          title: 'Authenticated with GoCardless',
+          subtitle: 'Your bank account has been successfully linked.',
+        }
+      : {
+          title: 'Authenticate with GoCardless',
+          subtitle: 'Authenticate with your bank through GoCardless to complete the setup.',
+        },
   };
 
   const { title, subtitle } = stepConfig[step];
@@ -104,7 +143,15 @@ export function AddAccountModal({ opened, onClose }: AddAccountModalProps) {
               <SelectBankStep selectedBank={selectedBank} onBankSelect={setSelectedBank} />
             )}
 
-            {step === 3 && <AuthenticateBankStep authenticationId={authenticationId} />}
+            {step === 3 && (
+              <AuthenticateBankStep
+                authenticationId={authenticationId}
+                authenticationLink={authenticationLink}
+                autoCheck={autoCheck}
+                onAuthenticated={handleAuthenticated}
+                onClose={handleClose}
+              />
+            )}
           </div>
 
           <div className={classes.footer}>
