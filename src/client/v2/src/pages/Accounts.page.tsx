@@ -35,7 +35,11 @@ export function AccountsPage() {
         </Button>
       </Group>
 
-      <AddAccountModal opened={addAccountOpened} onClose={handleModalClose} pendingAuth={pendingAuth} />
+      <AddAccountModal
+        opened={addAccountOpened}
+        onClose={handleModalClose}
+        pendingAuth={pendingAuth}
+      />
     </Stack>
   );
 }

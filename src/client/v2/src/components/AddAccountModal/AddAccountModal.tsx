@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
-import { CreateAuthenticationRequest } from '@/graphql/mutations/CreateAuthenticationRequest';
 import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
+import { CreateAuthenticationRequest } from '@/graphql/mutations/CreateAuthenticationRequest';
+import { AuthenticateBankStep } from './steps/AuthenticateBankStep/AuthenticateBankStep';
 import {
   AccountType,
   SelectAccountTypeStep,
 } from './steps/SelectAccountTypeStep/SelectAccountTypeStep';
 import { SelectBankStep } from './steps/SelectBankStep/SelectBankStep';
-import { AuthenticateBankStep } from './steps/AuthenticateBankStep/AuthenticateBankStep';
 import classes from './AddAccountModal.module.css';
 
 const STORAGE_KEY = 'pendingGoCardlessAuth';

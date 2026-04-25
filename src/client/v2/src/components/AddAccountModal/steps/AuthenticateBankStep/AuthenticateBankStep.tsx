@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 import { GetAuthenticationRequest } from '@graphql-queries/GetAuthenticationRequest';
-import { AuthenticationStatus } from '@/graphql/types/graphql';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react';
 import { Anchor, Button, Loader, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { AuthenticationStatus } from '@/graphql/types/graphql';
 import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
