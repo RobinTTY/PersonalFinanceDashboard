@@ -1,5 +1,6 @@
 import { act, RenderResult, render as testingLibraryRender } from '@testing-library/react';
 import { MantineProvider, MantineProviderProps, MantineThemeOverride } from '@mantine/core';
+import { MockedProvider } from '@apollo/client/testing/react';
 
 export function render(
   ui: React.ReactNode,
@@ -8,9 +9,11 @@ export function render(
 ) {
   return testingLibraryRender(ui, {
     wrapper: ({ children }: { children: React.ReactNode }) => (
-      <MantineProvider theme={themeOverride} env="test" {...providerProps}>
-        {children}
-      </MantineProvider>
+      <MockedProvider>
+        <MantineProvider theme={themeOverride} env="test" {...providerProps}>
+          {children}
+        </MantineProvider>
+      </MockedProvider>
     ),
   });
 }
