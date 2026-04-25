@@ -44,7 +44,10 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     }
   }, [pendingAuth]);
 
-  const handleSynchronize = async () => {
+  /**
+   * Handles the synchronization process with the bank by creating an authentication request and opening the authentication link.
+   */
+  const handleSynchronizeWithBank = async () => {
     if (!selectedBank) return;
     const result = await createAuthenticationRequest({
       variables: { institutionId: selectedBank, redirectUri: window.location.href },
@@ -69,10 +72,18 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     }
   };
 
+  /**
+   * Handles the successful authentication by updating the state to reflect that the user is authenticated.
+   * This will trigger the UI to show the authenticated state and allow the user to complete the setup.
+   */
   const handleAuthenticated = () => {
     setIsAuthenticated(true);
   };
 
+  /**
+   * Handles the closing of the modal by resetting all relevant state and clearing any pending authentication data from localStorage.
+   * This ensures that when the user closes the modal, all progress is cleared and they can start fresh the next time they open it.
+   */
   const handleClose = () => {
     localStorage.removeItem(STORAGE_KEY);
     setStep(1);
@@ -85,6 +96,9 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     onClose();
   };
 
+  /**
+   * Handles going back to the previous step by resetting the selected bank and updating the step state.
+   */
   const handleBack = () => {
     setStep(1);
     setSelectedBank(undefined);
@@ -178,7 +192,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
                 <Button
                   disabled={!selectedBank}
                   loading={createAuthLoading}
-                  onClick={handleSynchronize}
+                  onClick={handleSynchronizeWithBank}
                 >
                   Synchronize
                 </Button>
