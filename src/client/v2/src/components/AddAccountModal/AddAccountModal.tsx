@@ -27,26 +27,37 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedType, setSelectedAccountType] = useState<AccountType | undefined>(undefined);
   const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);
-  const [authenticationId, setAuthenticationId] = useState<string | undefined>(undefined);
-  const [authenticationLink, setAuthenticationLink] = useState<string | undefined>(undefined);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [autoCheck, setAutoCheck] = useState(false);
+  const [authState, setAuthState] = useState<{
+    id: string | undefined;
+    link: string | undefined;
+    isAuthenticated: boolean;
+    autoCheck: boolean;
+  }>({
+    id: undefined,
+    link: undefined,
+    isAuthenticated: false,
+    autoCheck: false,
+  });
 
   const [createAuthenticationRequest, { loading: createAuthLoading, error: createAuthError }] =
     useMutation(CreateAuthenticationRequest);
 
+  /**
+   * If the user has completed the GoCardless authentication flow but hasn't returned to the app yet, we can detect that via localStorage and skip them directly to the final step of the flow.
+   * By storing the pending authentication state in localStorage, we can check for it when the modal opens and update the UI accordingly.
+   */
   useEffect(() => {
     if (pendingAuth) {
-      setAuthenticationId(pendingAuth.authenticationId);
-      setAuthenticationLink(pendingAuth.authenticationLink);
-      setAutoCheck(true);
+      setAuthState({
+        id: pendingAuth.authenticationId,
+        link: pendingAuth.authenticationLink,
+        isAuthenticated: false,
+        autoCheck: true,
+      });
       setStep(3);
     }
   }, [pendingAuth]);
 
-  /**
-   * Handles the synchronization process with the bank by creating an authentication request and opening the authentication link.
-   */
   const handleSynchronizeWithBank = async () => {
     if (!selectedBank) return;
     const result = await createAuthenticationRequest({
@@ -58,9 +69,12 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     if (id) {
       const authId = String(id);
       const authLink = link ? String(link) : undefined;
-      setAuthenticationId(authId);
-      setAuthenticationLink(authLink);
-      setAutoCheck(false);
+      setAuthState({
+        id: authId,
+        link: authLink,
+        isAuthenticated: false,
+        autoCheck: false,
+      });
       if (authLink) {
         localStorage.setItem(
           STORAGE_KEY,
@@ -72,33 +86,20 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     }
   };
 
-  /**
-   * Handles the successful authentication by updating the state to reflect that the user is authenticated.
-   * This will trigger the UI to show the authenticated state and allow the user to complete the setup.
-   */
-  const handleAuthenticated = () => {
-    setIsAuthenticated(true);
-  };
-
-  /**
-   * Handles the closing of the modal by resetting all relevant state and clearing any pending authentication data from localStorage.
-   * This ensures that when the user closes the modal, all progress is cleared and they can start fresh the next time they open it.
-   */
   const handleClose = () => {
     localStorage.removeItem(STORAGE_KEY);
     setStep(1);
     setSelectedAccountType(undefined);
     setSelectedBank(undefined);
-    setAuthenticationId(undefined);
-    setAuthenticationLink(undefined);
-    setIsAuthenticated(false);
-    setAutoCheck(false);
+    setAuthState({
+      id: undefined,
+      link: undefined,
+      isAuthenticated: false,
+      autoCheck: false,
+    });
     onClose();
   };
 
-  /**
-   * Handles going back to the previous step by resetting the selected bank and updating the step state.
-   */
   const handleBack = () => {
     setStep(1);
     setSelectedBank(undefined);
@@ -107,7 +108,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
   const stepConfig = {
     1: { title: 'Choose Account Type', subtitle: 'Select the type of account you want to add.' },
     2: { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
-    3: isAuthenticated
+    3: authState.isAuthenticated
       ? {
           title: 'Authenticated with GoCardless',
           subtitle: 'Your bank account has been successfully linked.',
@@ -159,10 +160,12 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
 
             {step === 3 && (
               <AuthenticateBankStep
-                authenticationId={authenticationId}
-                authenticationLink={authenticationLink}
-                autoCheck={autoCheck}
-                onAuthenticated={handleAuthenticated}
+                authenticationId={authState.id}
+                authenticationLink={authState.link}
+                autoCheck={authState.autoCheck}
+                onAuthenticated={() =>
+                  setAuthState((prev) => ({ ...prev, isAuthenticated: true }))
+                }
                 onClose={handleClose}
               />
             )}
