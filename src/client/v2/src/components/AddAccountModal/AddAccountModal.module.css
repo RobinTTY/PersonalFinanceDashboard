@@ -6,8 +6,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  height: 40vh;
-  min-height: 300px;
+  max-height: 85vh;
 }
 
 .header {
@@ -37,6 +36,5 @@
 
 .modalBodyLarge {
   height: 65vh;
-  min-height: 500px;
 }
 
