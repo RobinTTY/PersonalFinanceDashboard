@@ -27,11 +27,11 @@ public class AuthenticationRequestSyncHandler(
                 return false;
             }
 
-            await AddOrUpdateAuthenticationRequests(authenticationRequests);
-            await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
+            var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(authenticationRequests);
+            var numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
 
-            logger.LogInformation("Synced {Count} authentication requests", authenticationRequests.Count);
+            LogSynchronizationResults(authenticationRequests.Count, numOfAddedAuthRequests, numOfRemovedAuthRequests);
         }
 
         return true;
@@ -62,9 +62,10 @@ public class AuthenticationRequestSyncHandler(
     /// Adds new authentication requests to the database or updates existing ones based on their third-party IDs.
     /// </summary>
     /// <param name="authenticationRequests">A list of authentication requests to add or update in the database.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
+    /// <returns>The number of newly added authentication requests.</returns>
+    private async Task<int> AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
     {
+        var numOfAddedAuthRequests = 0;
         foreach (var updatedAuthenticationRequest in authenticationRequests)
         {
             var existingRequest = dbContext.AuthenticationRequests
@@ -76,6 +77,8 @@ public class AuthenticationRequestSyncHandler(
                 var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
                 var entry = await dbContext.AuthenticationRequests.AddAsync(insertEntity);
                 existingRequest = entry.Entity;
+                
+                numOfAddedAuthRequests++;
             }
             else
             {
@@ -86,6 +89,8 @@ public class AuthenticationRequestSyncHandler(
             await UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
             await dbContext.SaveChangesAsync();
         }
+        
+        return numOfAddedAuthRequests;
     }
     
     private async Task UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
@@ -123,12 +128,21 @@ public class AuthenticationRequestSyncHandler(
     /// </summary>
     /// <param name="authenticationRequests">The authentication requests to compare the ones stored in the
     /// database to.</param>
-    private async Task RemoveNotIncludedAuthenticationRequests(List<AuthenticationRequest> authenticationRequests)
+    /// <returns>The number of removed authentication requests.</returns>
+    private async Task<int> RemoveNotIncludedAuthenticationRequests(List<AuthenticationRequest> authenticationRequests)
     {
-        var thirdPartyIds = authenticationRequests.Select(req => req.ThirdPartyId);
-
-        await dbContext.AuthenticationRequests
+        var thirdPartyIds = authenticationRequests.Select(req => req.ThirdPartyId).ToList();
+        
+        return await dbContext.AuthenticationRequests
             .Where(req => !thirdPartyIds.Contains(req.ThirdPartyId))
             .ExecuteDeleteAsync();
+    }
+    
+    private void LogSynchronizationResults(int numOfSynchronizedRequests, int numOfAddedAuthRequests,
+        int numOfRemovedAuthRequests)
+    {
+        logger.LogInformation(
+            "Synchronized {numOfSynchronizedRequests} authentication requests. Added: {numOfAddedAuthRequests}, Removed: {numOfRemovedAuthRequests}",
+            numOfSynchronizedRequests, numOfAddedAuthRequests, numOfRemovedAuthRequests);
     }
 }
