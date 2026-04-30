@@ -134,17 +134,15 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     }
 
     /// <summary>
-    /// Gets bank accounts by their ids. This includes general account information, account details, and balances.
+    /// Gets bank accounts by their ids with per-account metadata inclusion control. This includes general account information, account details, and balances.
     /// </summary>
-    /// <param name="accountIds">The ids of the accounts to be retrieved.</param>
-    /// <param name="includeMetadata">Whether to include metadata in the response. This includes information about the account which is not expected to change often, e.g., account number, owner name, etc.
-    /// This can be used to optimize the number of requests to the data provider. If true, the returned object will contain null values for the affected properties.</param>
+    /// <param name="accountMetadataPreferences">A dictionary mapping account IDs to a boolean value indicating whether not to include account metadata during the fetch operation.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
-    /// <returns></returns>
+    /// <returns>API responses containing the fetched bank accounts or in the case of failure, the error.</returns>
     public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(
-        IEnumerable<Guid> accountIds, bool includeMetadata, CancellationToken cancellationToken = default)
+        IDictionary<Guid, bool> accountMetadataPreferences, CancellationToken cancellationToken = default)
     {
-        var tasks = accountIds.Select(accountId => GetBankAccount(accountId, includeMetadata, cancellationToken))
+        var tasks = accountMetadataPreferences.Select(kvp => GetBankAccount(kvp.Key, kvp.Value, cancellationToken))
             .ToList();
         await Task.WhenAll(tasks);
 

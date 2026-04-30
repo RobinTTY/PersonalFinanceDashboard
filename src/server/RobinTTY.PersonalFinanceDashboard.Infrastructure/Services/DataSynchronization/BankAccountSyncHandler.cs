@@ -16,6 +16,7 @@ public class BankAccountSyncHandler(
     public async Task<bool> SynchronizeData(Guid? bankAccountId = null, bool forceThirdPartySync = false)
     {
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts);
+
         if (dataIsStale || forceThirdPartySync)
         {
             if (bankAccountId.HasValue)
@@ -36,17 +37,32 @@ public class BankAccountSyncHandler(
 
             logger.LogInformation("Synced {Count} bank accounts", bankAccounts.Count);
         }
+        else
+        {
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.BankAccounts);
+        }
 
         return true;
     }
 
-    private async Task<List<BankAccount>?> FetchBankAccountsFromApi(Guid? bankAccountId)
+    /// <summary>
+    /// Fetches bank accounts from the third party API. If a specific bank account id is provided, only that account will be fetched. Otherwise, all bank accounts associated with active authentication requests that are not older than 90 days will be fetched.
+    /// </summary>
+    /// <param name="thirdPartyBankAccountId">The id of the bank account to fetch. If <see langword="null"/>, all bank accounts associated with active authentication requests that are not older than 90 days will be fetched.</param>
+    /// <returns></returns>
+    private async Task<List<BankAccount>?> FetchBankAccountsFromApi(Guid? thirdPartyBankAccountId)
     {
-        var accountsToFetch = new List<Guid>();
+        // Currency is the only mandatory field returned by the API when fetching metadata. If it is currently null, we need to fetch the metadata for this account.
+        var accountsToFetch = new Dictionary<Guid, bool>();
 
-        if (bankAccountId.HasValue)
+        if (thirdPartyBankAccountId.HasValue)
         {
-            accountsToFetch.Add(bankAccountId.Value);
+            var account =
+                dbContext.BankAccounts.FirstOrDefault(account => account.ThirdPartyId == thirdPartyBankAccountId.Value);
+            accountsToFetch = new Dictionary<Guid, bool>
+            {
+                { thirdPartyBankAccountId.Value, account?.Currency == null }
+            };
         }
         else
         {
@@ -59,16 +75,20 @@ public class BankAccountSyncHandler(
                 if (authenticationRequest.Status == AuthenticationStatus.Active &&
                     !DateUtility.IsOlderThan(authenticationRequest.CreatedAt, 90, TimeUnit.Days))
                 {
-                    var ids = authenticationRequest.AssociatedAccounts.Select(acc => acc.ThirdPartyId);
-                    accountsToFetch.AddRange(ids);
+                    var accountIdsIncludeMetadataPairs = authenticationRequest.AssociatedAccounts
+                        .Select(acc => (id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))
+                        .DistinctBy(pair => pair.id);
+
+                    foreach (var pair in accountIdsIncludeMetadataPairs)
+                    {
+                        accountsToFetch.Add(pair.id, pair.includeMetadata);
+                    }
                 }
             }
         }
 
-        accountsToFetch = accountsToFetch.Distinct().ToList();
-
         var bankAccounts = new List<BankAccount>();
-        var responses = await dataProvider.GetBankAccounts(accountsToFetch, true);
+        var responses = await dataProvider.GetBankAccounts(accountsToFetch);
         foreach (var response in responses)
         {
             if (response.IsSuccessful)
@@ -104,7 +124,8 @@ public class BankAccountSyncHandler(
             else
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
-                logger.LogInformation("Updated existing bank account {name} with id {bankAccountId}. New balance: {balance}.",
+                logger.LogInformation(
+                    "Updated existing bank account {name} with id {bankAccountId}. New balance: {balance}.",
                     existingBankAccount.Name, existingBankAccount.Id, updatedBankAccount.Balance);
             }
 

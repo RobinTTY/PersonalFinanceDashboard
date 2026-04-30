@@ -53,6 +53,10 @@ public class TransactionSyncHandler(
 
             logger.LogInformation("Synced {Count} transactions", transactions.Count);
         }
+        else
+        {
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.Transactions);
+        }
 
         return true;
     }

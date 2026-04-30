@@ -33,6 +33,10 @@ public class AuthenticationRequestSyncHandler(
 
             LogSynchronizationResults(authenticationRequests.Count, numOfAddedAuthRequests, numOfRemovedAuthRequests);
         }
+        else
+        {
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.AuthenticationRequests);
+        }
 
         return true;
     }
