@@ -49,8 +49,8 @@ public class BankAccountRepository
     public async Task<IQueryable<BankAccount>> GetBankAccounts()
     {
         await _bankAccountSyncHandler.SynchronizeData();
-        
-        return _dbContext.BankAccounts;
+
+        return _dbContext.BankAccounts.OrderBy(account => account.Name);
     }
 
     /// <summary>
