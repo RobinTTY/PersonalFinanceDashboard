@@ -1,4 +1,5 @@
-﻿using RobinTTY.NordigenApiClient;
+﻿using Microsoft.Extensions.Logging;
+using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models.Errors;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
@@ -12,7 +13,7 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 /// </summary>
 // TODO: Probably should already return a generic ThirdPartyError (type) here
 // TODO: These methods need to be reworked quite a bit
-public class GoCardlessDataProviderService(NordigenClient client)
+public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCardlessDataProviderService> logger)
 {
     public async Task<ThirdPartyResponse<BankingInstitution, BasicResponse>> GetBankingInstitution(string institutionId,
         CancellationToken cancellationToken = default)
@@ -132,43 +133,98 @@ public class GoCardlessDataProviderService(NordigenClient client)
             response.Error);
     }
 
+    /// <summary>
+    /// Gets bank accounts by their ids. This includes general account information, account details, and balances.
+    /// </summary>
+    /// <param name="accountIds">The ids of the accounts to be retrieved.</param>
+    /// <param name="includeMetadata">Whether to include metadata in the response. This includes information about the account which is not expected to change often, e.g., account number, owner name, etc.
+    /// This can be used to optimize the number of requests to the data provider. If true, the returned object will contain null values for the affected properties.</param>
+    /// <param name="cancellationToken">An optional token to signal cancellation.</param>
+    /// <returns></returns>
     public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(
-        IEnumerable<Guid> accountIds, CancellationToken cancellationToken = default)
+        IEnumerable<Guid> accountIds, bool includeMetadata, CancellationToken cancellationToken = default)
     {
-        var tasks = accountIds.Select(accountId => GetBankAccount(accountId, cancellationToken)).ToList();
+        var tasks = accountIds.Select(accountId => GetBankAccount(accountId, includeMetadata, cancellationToken))
+            .ToList();
         await Task.WhenAll(tasks);
+
         return tasks.Select(task => task.Result).ToList();
     }
 
-    // TODO #85: This could probably optimized to only execute requests based on what data has already been fetched once
-    // e.g. once the general details have been fetched they usually don't change often, so omit those requests after
     private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
-        CancellationToken cancellationToken = default)
+        bool includeMetadata, CancellationToken cancellationToken = default)
     {
-        var generalAccountInfoTask = client.AccountsEndpoint.GetAccount(accountId, cancellationToken);
-        var accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId, cancellationToken);
+        Task<NordigenApiResponse<NordigenApiClient.Models.Responses.BankAccount, BasicResponse>>?
+            generalAccountInfoTask = null;
+        Task<NordigenApiResponse<BankAccountDetails, AccountsError>>? accountDetailsTask = null;
         var balanceTask = client.AccountsEndpoint.GetBalances(accountId, cancellationToken);
 
-        var generalAccountInfoResponse = await generalAccountInfoTask;
-        var accountDetailsResponse = await accountDetailsTask;
+        if (includeMetadata)
+        {
+            generalAccountInfoTask = client.AccountsEndpoint.GetAccount(accountId, cancellationToken);
+            accountDetailsTask = client.AccountsEndpoint.GetAccountDetails(accountId, cancellationToken);
+        }
+
+        var generalAccountInfoResponse = generalAccountInfoTask != null ? await generalAccountInfoTask : null;
+        var accountDetailsResponse = accountDetailsTask != null ? await accountDetailsTask : null;
         var balanceResponse = await balanceTask;
 
-        if (!accountDetailsResponse.IsSuccess || !balanceResponse.IsSuccess || !generalAccountInfoResponse.IsSuccess)
-            return new ThirdPartyResponse<BankAccount, AccountsError>(
-                false, null, accountDetailsResponse.Error);
+        var errors = ExtractAndLogErrors(accountId, includeMetadata, balanceResponse, generalAccountInfoResponse, accountDetailsResponse);
+        if(errors.Count > 0)
+        {
+            return new ThirdPartyResponse<BankAccount, AccountsError>(false, null, new AccountsError
+            {
+                Summary = $"Failed to retrieve data for account {accountId}",
+                Detail = string.Join("; ", errors)
+            });
+        }
 
-        var generalAccountInfoResult = generalAccountInfoResponse.Result;
-        var accountDetailsResult = accountDetailsResponse.Result;
+        var generalAccountInfoResult = generalAccountInfoResponse?.Result;
+        var accountDetailsResult = accountDetailsResponse?.Result;
         var balanceResult = balanceResponse.Result;
         var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, generalAccountInfoResult,
-            accountDetailsResult, balanceResult);
-
+            accountDetailsResult, balanceResult!);
 
         return new ThirdPartyResponse<BankAccount, AccountsError>(
-            accountDetailsResponse.IsSuccess && balanceResponse.IsSuccess, bankAccount, null);
+            balanceResponse.IsSuccess, bankAccount, null);
     }
 
-    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(Guid goCardlessAccountId, CancellationToken cancellationToken = default)
+    private List<string> ExtractAndLogErrors(Guid accountId, bool includeMetadata, NordigenApiResponse<List<Balance>, AccountsError> balanceResponse,
+        NordigenApiResponse<NordigenApiClient.Models.Responses.BankAccount, BasicResponse>? generalAccountInfoResponse, NordigenApiResponse<BankAccountDetails, AccountsError>? accountDetailsResponse)
+    {
+        var errorMessages = new List<string>();
+        if (!balanceResponse.IsSuccess)
+        {
+            var error = $"Summary: {balanceResponse.Error.Summary}, Details: {balanceResponse.Error.Detail}";
+            
+            errorMessages.Add(error);
+            logger.LogWarning("Failed to retrieve balances for account {accountId}: {error}", accountId, error);
+        }
+
+        if (includeMetadata)
+        {
+            if (generalAccountInfoResponse is { IsSuccess: false })
+            {
+                var error = $"Summary: {generalAccountInfoResponse.Error.Summary}, Details: {generalAccountInfoResponse.Error.Detail}";
+                
+                errorMessages.Add(error);
+                logger.LogWarning("Failed to retrieve general account metadata for account {accountId}: {error}", accountId, error);
+            }
+
+            if (accountDetailsResponse is { IsSuccess: false })
+            {
+                var error = $"Summary: {accountDetailsResponse.Error.Summary}, Details: {accountDetailsResponse.Error.Detail}";
+                
+                errorMessages.Add(error);
+                logger.LogWarning("Failed to retrieve detailed account metadata for account {accountId}: {error}", accountId, error);
+            }
+        }
+        
+        return errorMessages;
+    }
+
+    public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
+        Guid goCardlessAccountId, CancellationToken cancellationToken = default)
     {
         var response =
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);

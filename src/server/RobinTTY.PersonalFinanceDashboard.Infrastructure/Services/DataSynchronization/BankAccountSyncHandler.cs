@@ -22,7 +22,7 @@ public class BankAccountSyncHandler(
                 bankAccountId = dbContext.BankAccounts
                     .SingleOrDefault(bankAccount => bankAccount.Id == bankAccountId)?.ThirdPartyId;
 
-            var bankAccounts = await GetBankAccounts(bankAccountId);
+            var bankAccounts = await FetchBankAccountsFromApi(bankAccountId);
             if (bankAccounts == null || bankAccounts.Count == 0)
             {
                 return false;
@@ -40,7 +40,7 @@ public class BankAccountSyncHandler(
         return true;
     }
 
-    private async Task<List<BankAccount>?> GetBankAccounts(Guid? bankAccountId)
+    private async Task<List<BankAccount>?> FetchBankAccountsFromApi(Guid? bankAccountId)
     {
         var accountsToFetch = new List<Guid>();
 
@@ -56,7 +56,8 @@ public class BankAccountSyncHandler(
             foreach (var authenticationRequest in authRequests)
             {
                 // TODO: EUA may have a different validity than 90 days
-                if (authenticationRequest.Status == AuthenticationStatus.Active && !DateUtility.IsOlderThan(authenticationRequest.CreatedAt, 90, TimeUnit.Days))
+                if (authenticationRequest.Status == AuthenticationStatus.Active &&
+                    !DateUtility.IsOlderThan(authenticationRequest.CreatedAt, 90, TimeUnit.Days))
                 {
                     var ids = authenticationRequest.AssociatedAccounts.Select(acc => acc.ThirdPartyId);
                     accountsToFetch.AddRange(ids);
@@ -64,8 +65,10 @@ public class BankAccountSyncHandler(
             }
         }
 
+        accountsToFetch = accountsToFetch.Distinct().ToList();
+
         var bankAccounts = new List<BankAccount>();
-        var responses = await dataProvider.GetBankAccounts(accountsToFetch);
+        var responses = await dataProvider.GetBankAccounts(accountsToFetch, true);
         foreach (var response in responses)
         {
             if (response.IsSuccessful)
@@ -101,6 +104,8 @@ public class BankAccountSyncHandler(
             else
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
+                logger.LogInformation("Updated existing bank account {name} with id {bankAccountId}. New balance: {balance}.",
+                    existingBankAccount.Name, existingBankAccount.Id, updatedBankAccount.Balance);
             }
 
             await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);
