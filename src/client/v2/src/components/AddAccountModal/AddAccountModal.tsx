@@ -60,13 +60,16 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
 
   const handleSynchronizeWithBank = async () => {
     if (!selectedBank) return;
+
     const result = await createAuthenticationRequest({
       variables: { institutionId: selectedBank, redirectUri: window.location.href },
     });
+
     const id = result.data?.createAuthenticationRequest?.authenticationRequest?.id;
     const link =
       result.data?.createAuthenticationRequest?.authenticationRequest?.authenticationLink;
-    if (id) {
+    
+      if (id) {
       const authId = String(id);
       const authLink = link ? String(link) : undefined;
       setAuthState({
@@ -75,6 +78,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
         isAuthenticated: false,
         autoCheck: false,
       });
+
       if (authLink) {
         localStorage.setItem(
           STORAGE_KEY,
@@ -82,6 +86,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
         );
         window.open(authLink, '_blank', 'noopener,noreferrer');
       }
+      
       setStep(3);
     }
   };
@@ -163,9 +168,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
                 authenticationId={authState.id}
                 authenticationLink={authState.link}
                 autoCheck={authState.autoCheck}
-                onAuthenticated={() =>
-                  setAuthState((prev) => ({ ...prev, isAuthenticated: true }))
-                }
+                onAuthenticated={() => setAuthState((prev) => ({ ...prev, isAuthenticated: true }))}
                 onClose={handleClose}
               />
             )}

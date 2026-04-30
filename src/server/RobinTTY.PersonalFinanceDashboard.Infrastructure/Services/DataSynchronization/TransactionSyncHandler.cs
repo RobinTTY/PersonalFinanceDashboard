@@ -88,6 +88,7 @@ public class TransactionSyncHandler(
             }
             else
             {
+                // TODO: Do we ever expect transactions to change after they have been retrieved?
                 existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
             }
             
