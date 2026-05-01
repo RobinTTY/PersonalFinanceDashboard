@@ -1,6 +1,5 @@
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
-import { Group, SegmentedControl, Stack, Text, useMantineColorScheme } from '@mantine/core';
-import type { MantineColorScheme } from '@mantine/core';
+import { Group, SegmentedControl, Stack, Text, useMantineColorScheme, MantineColorScheme } from '@mantine/core';
 
 const themeOptions: { value: MantineColorScheme; label: React.ReactNode }[] = [
   {

@@ -12,10 +12,8 @@ export function AccountsPage() {
     const stored = localStorage.getItem('pendingGoCardlessAuth');
     if (stored) {
       localStorage.removeItem('pendingGoCardlessAuth');
-      try {
-        setPendingAuth(JSON.parse(stored) as PendingAuthState);
-        openAddAccount();
-      } catch {}
+      setPendingAuth(JSON.parse(stored) as PendingAuthState);
+      openAddAccount();
     }
   }, [openAddAccount]);
 

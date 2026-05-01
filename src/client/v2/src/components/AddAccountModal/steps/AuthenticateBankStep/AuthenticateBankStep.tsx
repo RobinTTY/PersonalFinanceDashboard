@@ -39,40 +39,53 @@ export function AuthenticateBankStep({
   );
 
   const scheduleNextPoll = () => {
-    if (!pollingActive.current || !authenticationId) return;
+    if (!pollingActive.current || !authenticationId){
+       return;
+    }
+
     if (pollIndex.current >= POLL_DELAYS.length) {
       pollingActive.current = false;
       return;
     }
+
     const delay = POLL_DELAYS[pollIndex.current];
     pollIndex.current += 1;
+
     pollingTimeoutRef.current = setTimeout(() => {
       fetchAuthenticationRequest({ variables: { authenticationId } });
     }, delay);
   };
 
   useEffect(() => {
-    if (!authenticationId) return;
+    if (!authenticationId) {
+      return;
+    }
+
     pollingActive.current = true;
     if (autoCheck) {
       fetchAuthenticationRequest({ variables: { authenticationId } });
     } else {
       scheduleNextPoll();
     }
+
     return () => {
       pollingActive.current = false;
       clearTimeout(pollingTimeoutRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticationId]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data){
+      return;
+    }
+
     const status = data.authenticationRequest?.status;
     const latestLink = data.authenticationRequest?.authenticationLink;
+    
     if (latestLink) {
       setCurrentAuthLink(String(latestLink));
     }
+    
     if (status === AuthenticationStatus.Active) {
       pollingActive.current = false;
       clearTimeout(pollingTimeoutRef.current);
@@ -85,11 +98,13 @@ export function AuthenticateBankStep({
     } else {
       scheduleNextPoll();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const handleConfirm = () => {
-    if (!authenticationId) return;
+    if (!authenticationId){
+       return;
+    }
+    
     clearTimeout(pollingTimeoutRef.current);
     isManualCheck.current = true;
     pollingActive.current = false;

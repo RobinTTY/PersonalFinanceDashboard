@@ -59,7 +59,9 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
   }, [pendingAuth]);
 
   const handleSynchronizeWithBank = async () => {
-    if (!selectedBank) return;
+    if (!selectedBank) {
+      return;
+    }
 
     const result = await createAuthenticationRequest({
       variables: { institutionId: selectedBank, redirectUri: window.location.href },
@@ -68,8 +70,8 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     const id = result.data?.createAuthenticationRequest?.authenticationRequest?.id;
     const link =
       result.data?.createAuthenticationRequest?.authenticationRequest?.authenticationLink;
-    
-      if (id) {
+
+    if (id) {
       const authId = String(id);
       const authLink = link ? String(link) : undefined;
       setAuthState({
@@ -86,7 +88,7 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
         );
         window.open(authLink, '_blank', 'noopener,noreferrer');
       }
-      
+
       setStep(3);
     }
   };
