@@ -56,8 +56,8 @@ export function AuthenticateBankStep({
 
   /** Schedules the next authentication status poll after the delay defined by the current poll index, stopping polling once all delays are exhausted. */
   const scheduleNextPoll = () => {
-    if (!pollingActive.current || !authenticationId){
-       return;
+    if (!pollingActive.current || !authenticationId) {
+      return;
     }
 
     if (pollIndex.current >= POLL_DELAYS.length) {
@@ -94,17 +94,17 @@ export function AuthenticateBankStep({
 
   /** Reacts to a completed authentication query by transitioning to success, failed, or scheduling the next poll depending on the returned status. */
   useEffect(() => {
-    if (!data){
+    if (!data) {
       return;
     }
 
     const status = data.authenticationRequest?.status;
     const latestLink = data.authenticationRequest?.authenticationLink;
-    
+
     if (latestLink) {
       setCurrentAuthLink(String(latestLink));
     }
-    
+
     if (status === AuthenticationStatus.Active) {
       pollingActive.current = false;
       clearTimeout(pollingTimeoutRef.current);
@@ -121,10 +121,10 @@ export function AuthenticateBankStep({
 
   /** Handles the user clicking the confirm button by cancelling any pending poll and immediately querying the authentication status. */
   const handleAuthCompletedButtonPress = () => {
-    if (!authenticationId){
-       return;
+    if (!authenticationId) {
+      return;
     }
-    
+
     clearTimeout(pollingTimeoutRef.current);
     userInitiatedAuthFetch.current = true;
     pollingActive.current = false;
@@ -238,7 +238,12 @@ export function AuthenticateBankStep({
         </Text>
       )}
 
-      <Button mt="auto" loading={loading} disabled={!authenticationId} onClick={handleAuthCompletedButtonPress}>
+      <Button
+        mt="auto"
+        loading={loading}
+        disabled={!authenticationId}
+        onClick={handleAuthCompletedButtonPress}
+      >
         I&apos;ve completed the authentication
       </Button>
     </Stack>
