@@ -115,15 +115,10 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
   const stepConfig = {
     1: { title: 'Choose Account Type', subtitle: 'Select the type of account you want to add.' },
     2: { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
-    3: authState.isAuthenticated
-      ? {
-          title: 'Authenticated with GoCardless',
-          subtitle: 'Your bank account has been successfully linked.',
-        }
-      : {
-          title: 'Authenticate with GoCardless',
-          subtitle: 'Authenticate with your bank through GoCardless to complete the setup.',
-        },
+    3: {
+      title: 'Authenticate with GoCardless',
+      subtitle: 'Authenticate with your bank through GoCardless to complete the setup.',
+    },
   };
 
   const { title, subtitle } = stepConfig[step];
@@ -171,7 +166,6 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
                 authenticationLink={authState.link}
                 autoCheck={authState.autoCheck}
                 onAuthenticated={() => setAuthState((prev) => ({ ...prev, isAuthenticated: true }))}
-                onClose={handleClose}
               />
             )}
           </div>
@@ -205,6 +199,10 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
                   Synchronize
                 </Button>
               </>
+            ) : authState.isAuthenticated ? (
+              <Button mx="auto" onClick={handleClose}>
+                Done
+              </Button>
             ) : null}
           </div>
         </Modal.Body>

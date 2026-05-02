@@ -2,8 +2,21 @@ import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 import { GetAuthRequestWithAccounts } from '@graphql-queries/GetAuthRequestAndAccounts';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react';
-import { Anchor, Button, Loader, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import {
+  Anchor,
+  Avatar,
+  Badge,
+  Button,
+  Divider,
+  Group,
+  Loader,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+} from '@mantine/core';
 import { AuthenticationStatus } from '@/graphql/types/graphql';
+import { getInitials } from '@/utility/getInitials';
 import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
@@ -19,7 +32,6 @@ interface AuthenticateBankStepProps {
   authenticationLink?: string;
   autoCheck?: boolean;
   onAuthenticated?: () => void;
-  onClose?: () => void;
 }
 
 /**
@@ -39,7 +51,6 @@ export function AuthenticateBankStep({
   authenticationLink,
   autoCheck = false,
   onAuthenticated,
-  onClose,
 }: AuthenticateBankStepProps) {
   const [authState, setAuthState] = useState<AuthenticationState>(AuthenticationState.Waiting);
   const [currentAuthLink, setCurrentAuthLink] = useState<string | undefined>(authenticationLink);
@@ -141,22 +152,115 @@ export function AuthenticateBankStep({
   };
 
   if (authState === AuthenticationState.Success) {
+    const associatedAccounts = data?.authenticationRequest?.associatedAccounts ?? [];
+    const institution = associatedAccounts[0]?.associatedInstitution;
+    const accountCount = associatedAccounts.length;
+
     return (
-      <Stack className={classes.container} align="center" gap="xl">
-        <div className={classes.successSection}>
-          <ThemeIcon color="green" size={64} radius="xl">
-            <IconCircleCheck size={36} />
+      <Stack className={classes.container} align="center" gap="lg">
+        <Group gap="sm" align="center">
+          <ThemeIcon color="green" size={40} radius="xl">
+            <IconCircleCheck size={22} />
           </ThemeIcon>
-          <Stack gap={4} align="center">
+          <Stack gap={2}>
             <Title order={5}>Authentication Successful</Title>
-            <Text size="sm" c="dimmed" ta="center">
-              Your bank account has been successfully linked.
+            <Text size="sm" c="dimmed">
+              {accountCount === 1
+                ? 'Your bank account has been successfully linked.'
+                : accountCount > 1
+                  ? `${accountCount} bank accounts have been successfully linked.`
+                  : 'Your bank has been successfully linked.'}
             </Text>
           </Stack>
-        </div>
-        <Button mt="auto" onClick={onClose}>
-          Done
-        </Button>
+        </Group>
+
+        {institution && (
+          <Group className={classes.bankHeader} gap="md" wrap="nowrap">
+            <Avatar
+              src={institution.logoUri ? String(institution.logoUri) : undefined}
+              radius="sm"
+              size="lg"
+              flex="0 0 auto"
+            >
+              {getInitials(institution.name)}
+            </Avatar>
+            <Stack gap={2} style={{ minWidth: 0 }}>
+              <Text fw={600} size="md" truncate>
+                {institution.name}
+              </Text>
+              <Text size="sm" c="dimmed">
+                {institution.bic}
+              </Text>
+            </Stack>
+          </Group>
+        )}
+
+        {associatedAccounts.length > 0 && (
+          <Stack gap="sm" w="100%">
+            {associatedAccounts.map((account) => {
+              const hasNameOrDescription = account.name || account.description;
+              const balanceValue =
+                account.balance != null
+                  ? account.currency
+                    ? `${String(account.balance)} ${account.currency}`
+                    : String(account.balance)
+                  : null;
+
+              return (
+                <div key={String(account.id)} className={classes.accountCard}>
+                  {hasNameOrDescription && (
+                    <Stack gap={2} mb="md">
+                      {account.name && (
+                        <Text fw={600} size="md">
+                          {account.name}
+                        </Text>
+                      )}
+                      {account.description && account.description !== account.name && (
+                        <Text size="sm" c="dimmed">
+                          {account.description}
+                        </Text>
+                      )}
+                    </Stack>
+                  )}
+
+                  <Stack gap="xs">
+                    {account.accountType && (
+                      <Group justify="space-between" wrap="nowrap">
+                        <Text size="sm" c="dimmed">
+                          Type
+                        </Text>
+                        <Badge variant="light" size="sm">
+                          {account.accountType}
+                        </Badge>
+                      </Group>
+                    )}
+                    {hasNameOrDescription && account.accountType && <Divider />}
+                    {balanceValue && (
+                      <Group justify="space-between" wrap="nowrap">
+                        <Text size="sm" c="dimmed">
+                          Balance
+                        </Text>
+                        <Text size="sm" fw={600}>
+                          {balanceValue}
+                        </Text>
+                      </Group>
+                    )}
+                    {account.ownerName && (
+                      <Group justify="space-between" wrap="nowrap">
+                        <Text size="sm" c="dimmed">
+                          Owner
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          {account.ownerName}
+                        </Text>
+                      </Group>
+                    )}
+                  </Stack>
+                </div>
+              );
+            })}
+          </Stack>
+        )}
       </Stack>
     );
   }

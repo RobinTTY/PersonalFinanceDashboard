@@ -28,9 +28,13 @@ public class AuthenticationRequestSyncHandler(
             }
 
             var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(authenticationRequests);
-            var numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
+            var numOfRemovedAuthRequests = 0;
+            if (!authenticationRequestId.HasValue)
+            {
+                numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
+            }
+            
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
-
             LogSynchronizationResults(authenticationRequests.Count, numOfAddedAuthRequests, numOfRemovedAuthRequests);
         }
         else
