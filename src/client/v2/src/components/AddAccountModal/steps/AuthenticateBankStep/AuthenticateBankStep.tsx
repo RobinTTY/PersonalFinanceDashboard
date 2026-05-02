@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
-import { GetAuthenticationRequest } from '@graphql-queries/GetAuthenticationRequest';
+import { GetAuthRequestWithAccounts } from '@graphql-queries/GetAuthRequestAndAccounts';
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react';
 import { Anchor, Button, Loader, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { AuthenticationStatus } from '@/graphql/types/graphql';
@@ -50,7 +50,7 @@ export function AuthenticateBankStep({
   const userInitiatedAuthFetch = useRef(false);
 
   const [fetchAuthenticationRequest, { loading, data, error }] = useLazyQuery(
-    GetAuthenticationRequest,
+    GetAuthRequestWithAccounts,
     { fetchPolicy: 'network-only' }
   );
 

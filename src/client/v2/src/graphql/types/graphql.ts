@@ -586,6 +586,13 @@ export type CreateAuthenticationRequestMutationVariables = Exact<{
 
 export type CreateAuthenticationRequestMutation = { createAuthenticationRequest: { __typename: 'CreateAuthenticationRequestPayload', authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null } };
 
+export type GetAuthRequestWithAccountsQueryVariables = Exact<{
+  authenticationId: Scalars['UUID']['input'];
+}>;
+
+
+export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: unknown | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
+
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
 }>;
