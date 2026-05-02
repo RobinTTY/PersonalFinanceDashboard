@@ -54,6 +54,7 @@ export function AuthenticateBankStep({
     { fetchPolicy: 'network-only' }
   );
 
+  /** Schedules the next authentication status poll after the delay defined by the current poll index, stopping polling once all delays are exhausted. */
   const scheduleNextPoll = () => {
     if (!pollingActive.current || !authenticationId){
        return;
@@ -72,6 +73,7 @@ export function AuthenticateBankStep({
     }, delay);
   };
 
+  /** Starts polling when an authenticationId becomes available, performing an immediate check if autoCheck is set, and cleans up any pending poll on unmount. */
   useEffect(() => {
     if (!authenticationId) {
       return;
@@ -90,6 +92,7 @@ export function AuthenticateBankStep({
     };
   }, [authenticationId]);
 
+  /** Reacts to a completed authentication query by transitioning to success, failed, or scheduling the next poll depending on the returned status. */
   useEffect(() => {
     if (!data){
       return;
@@ -116,7 +119,8 @@ export function AuthenticateBankStep({
     }
   }, [data]);
 
-  const handleConfirm = () => {
+  /** Handles the user clicking the confirm button by cancelling any pending poll and immediately querying the authentication status. */
+  const handleAuthCompletedButtonPress = () => {
     if (!authenticationId){
        return;
     }
@@ -127,6 +131,7 @@ export function AuthenticateBankStep({
     fetchAuthenticationRequest({ variables: { authenticationId } });
   };
 
+  /** Resets the polling state back to the beginning and returns the component to the waiting view so the user can try again. */
   const handleRetry = () => {
     pollIndex.current = 0;
     userInitiatedAuthFetch.current = false;
@@ -233,7 +238,7 @@ export function AuthenticateBankStep({
         </Text>
       )}
 
-      <Button mt="auto" loading={loading} disabled={!authenticationId} onClick={handleConfirm}>
+      <Button mt="auto" loading={loading} disabled={!authenticationId} onClick={handleAuthCompletedButtonPress}>
         I&apos;ve completed the authentication
       </Button>
     </Stack>
