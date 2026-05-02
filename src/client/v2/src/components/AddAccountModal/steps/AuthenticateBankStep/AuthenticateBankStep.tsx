@@ -8,7 +8,11 @@ import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
 
-type ViewState = 'waiting' | 'success' | 'failed';
+enum AuthenticationState {
+  Waiting,
+  Success,
+  Failed,
+}
 
 interface AuthenticateBankStepProps {
   authenticationId: string | undefined;
@@ -18,6 +22,18 @@ interface AuthenticateBankStepProps {
   onClose?: () => void;
 }
 
+/**
+ * Step that guides the user through external bank authentication via GoCardless.
+ *
+ * Polls the authentication request at increasing intervals to detect completion.
+ * Renders one of three states: waiting, success, or failed.
+ *
+ * @param authenticationId - ID of the authentication request to poll.
+ * @param authenticationLink - Initial GoCardless authentication URL shown to the user.
+ * @param autoCheck - When true, performs an immediate check instead of waiting for the first poll interval.
+ * @param onAuthenticated - Called when the authentication request transitions to Active.
+ * @param onClose - Called when the user dismisses the success view.
+ */
 export function AuthenticateBankStep({
   authenticationId,
   authenticationLink,
@@ -25,13 +41,13 @@ export function AuthenticateBankStep({
   onAuthenticated,
   onClose,
 }: AuthenticateBankStepProps) {
-  const [viewState, setViewState] = useState<ViewState>('waiting');
+  const [authState, setAuthState] = useState<AuthenticationState>(AuthenticationState.Waiting);
   const [currentAuthLink, setCurrentAuthLink] = useState<string | undefined>(authenticationLink);
 
   const pollingActive = useRef(true);
   const pollIndex = useRef(0);
   const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const isManualCheck = useRef(false);
+  const userInitiatedAuthFetch = useRef(false);
 
   const [fetchAuthenticationRequest, { loading, data, error }] = useLazyQuery(
     GetAuthenticationRequest,
@@ -89,12 +105,12 @@ export function AuthenticateBankStep({
     if (status === AuthenticationStatus.Active) {
       pollingActive.current = false;
       clearTimeout(pollingTimeoutRef.current);
-      setViewState('success');
+      setAuthState(AuthenticationState.Success);
       onAuthenticated?.();
-    } else if (isManualCheck.current) {
-      isManualCheck.current = false;
+    } else if (userInitiatedAuthFetch.current) {
+      userInitiatedAuthFetch.current = false;
       pollingActive.current = false;
-      setViewState('failed');
+      setAuthState(AuthenticationState.Failed);
     } else {
       scheduleNextPoll();
     }
@@ -106,20 +122,20 @@ export function AuthenticateBankStep({
     }
     
     clearTimeout(pollingTimeoutRef.current);
-    isManualCheck.current = true;
+    userInitiatedAuthFetch.current = true;
     pollingActive.current = false;
     fetchAuthenticationRequest({ variables: { authenticationId } });
   };
 
   const handleRetry = () => {
     pollIndex.current = 0;
-    isManualCheck.current = false;
+    userInitiatedAuthFetch.current = false;
     pollingActive.current = true;
-    setViewState('waiting');
+    setAuthState(AuthenticationState.Waiting);
     scheduleNextPoll();
   };
 
-  if (viewState === 'success') {
+  if (authState === AuthenticationState.Success) {
     return (
       <Stack className={classes.container} align="center" gap="xl">
         <div className={classes.successSection}>
@@ -140,7 +156,7 @@ export function AuthenticateBankStep({
     );
   }
 
-  if (viewState === 'failed') {
+  if (authState === AuthenticationState.Failed) {
     return (
       <Stack className={classes.container} align="center" gap="xl">
         <div className={classes.failureSection}>
