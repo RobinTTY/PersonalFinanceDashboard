@@ -1,4 +1,5 @@
-import { useQuery } from '@apollo/client/react';
+import { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { IconAlertCircle, IconBuildingBank, IconTrash } from '@tabler/icons-react';
 import {
   Accordion,
@@ -6,14 +7,17 @@ import {
   Alert,
   Avatar,
   Badge,
+  Button,
   Center,
   Divider,
   Group,
   Loader,
+  Modal,
   Stack,
   Text,
   Tooltip,
 } from '@mantine/core';
+import { DeleteAuthenticationRequest } from '@/graphql/mutations/DeleteAuthenticationRequest';
 import { GetAuthRequestsWithAccounts } from '@/graphql/queries/GetAuthRequestsWithAccounts';
 import { AuthenticationStatus, GetAuthRequestsWithAccountsQuery } from '@/graphql/types/graphql';
 import { getInitials } from '@/utility/getInitials';
@@ -112,7 +116,13 @@ function AccountRow({ account }: { account: ConnectedAccount }) {
   );
 }
 
-function ConnectedBankCard({ bank }: { bank: ConnectedBank }) {
+interface ConnectedBankCardProps {
+  bank: ConnectedBank;
+  onRequestDelete: (bank: ConnectedBank) => void;
+  isDeleting: boolean;
+}
+
+function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: ConnectedBankCardProps) {
   const institution = bank.associatedAccounts[0]?.associatedInstitution;
   const status = bank.status;
   const accountCount = bank.associatedAccounts.length;
@@ -147,6 +157,8 @@ function ConnectedBankCard({ bank }: { bank: ConnectedBank }) {
             <ActionIcon
               variant="subtle"
               color="red"
+              loading={isDeleting}
+              onClick={() => onRequestDelete(bank)}
               aria-label={`Delete connection to ${institution?.name ?? 'bank'}`}
             >
               <IconTrash size={16} />
@@ -182,6 +194,36 @@ function ConnectedBankCard({ bank }: { bank: ConnectedBank }) {
 
 export function ConnectedBanksSection() {
   const { data, loading, error } = useQuery(GetAuthRequestsWithAccounts);
+  const [pendingDeletion, setPendingDeletion] = useState<ConnectedBank | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteAuthenticationRequest, { loading: deleting }] = useMutation(
+    DeleteAuthenticationRequest,
+    { refetchQueries: [GetAuthRequestsWithAccounts] }
+  );
+
+  const closeConfirmation = () => {
+    if (deleting) {
+      return;
+    }
+    setPendingDeletion(null);
+    setDeleteError(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeletion?.id) {
+      return;
+    }
+
+    try {
+      await deleteAuthenticationRequest({
+        variables: { authenticationId: pendingDeletion.id },
+      });
+      setPendingDeletion(null);
+      setDeleteError(null);
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete connection.');
+    }
+  };
 
   if (loading) {
     return (
@@ -200,6 +242,8 @@ export function ConnectedBanksSection() {
   }
 
   const banks = data?.authenticationRequests ?? [];
+  const pendingInstitutionName =
+    pendingDeletion?.associatedAccounts[0]?.associatedInstitution?.name ?? 'this bank';
 
   return (
     <Stack gap="lg">
@@ -222,10 +266,48 @@ export function ConnectedBanksSection() {
       ) : (
         <Stack gap="md">
           {banks.map((bank) => (
-            <ConnectedBankCard key={String(bank.id)} bank={bank} />
+            <ConnectedBankCard
+              key={String(bank.id)}
+              bank={bank}
+              isDeleting={deleting && pendingDeletion?.id === bank.id}
+              onRequestDelete={(target) => {
+                setDeleteError(null);
+                setPendingDeletion(target);
+              }}
+            />
           ))}
         </Stack>
       )}
+
+      <Modal
+        opened={pendingDeletion !== null}
+        onClose={closeConfirmation}
+        title="Remove bank connection"
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            Are you sure you want to remove the connection to{' '}
+            <Text component="span" fw={600}>
+              {pendingInstitutionName}
+            </Text>
+            ? This will stop syncing the associated accounts.
+          </Text>
+          {deleteError && (
+            <Alert color="red" icon={<IconAlertCircle size={16} />}>
+              {deleteError}
+            </Alert>
+          )}
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" onClick={closeConfirmation} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button color="red" onClick={confirmDelete} loading={deleting}>
+              Remove
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }
