@@ -1,4 +1,4 @@
-name: npm test
+name: Build and test client
 
 on:
   pull_request:
@@ -36,4 +36,4 @@ jobs:
       - name: Run build
         run: npm run build
       - name: Run tests
-        run: npm run vitest
+        run: npm run test
