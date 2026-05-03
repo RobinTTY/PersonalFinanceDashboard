@@ -53,6 +53,10 @@ public class TransactionSyncHandler(
 
             logger.LogInformation("Synced {Count} transactions", transactions.Count);
         }
+        else
+        {
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.Transactions);
+        }
 
         return true;
     }
@@ -84,6 +88,7 @@ public class TransactionSyncHandler(
             }
             else
             {
+                // TODO: Do we ever expect transactions to change after they have been retrieved?
                 existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
             }
             

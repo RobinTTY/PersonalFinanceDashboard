@@ -79,6 +79,7 @@ public class AuthenticationRequestRepository
             return request.Result;
         }
 
+        // TODO: Error can also be in the InstitutionIdError field here
         _logger.LogError(
             "Creation of new authentication request failed. The data provider returned the following error: " +
             "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
@@ -109,12 +110,16 @@ public class AuthenticationRequestRepository
         {
             _dbContext.AuthenticationRequests.Remove(authRequest);
             await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("Successfully deleted authentication request with id {id}", id);
+            
             return request.Result;
         }
 
         _logger.LogError(
             "Deletion of authentication request failed. The data provider returned the following error: " +
             "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+        
+        //TODO: return error
         throw new NotImplementedException();
     }
 }

@@ -40,6 +40,10 @@ public class BankingInstitutionSyncHandler(
 
             logger.LogInformation("Synced {Count} banking institutions", institutions.Count);
         }
+        else
+        {
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.BankingInstitutions);
+        }
 
         return true;
     }

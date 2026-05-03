@@ -50,9 +50,11 @@ public class BankingInstitutionRepository
     {
         await _bankingInstitutionSyncHandler.SynchronizeData();
 
-        return countryCode == null
+        var query = countryCode == null
             ? _dbContext.BankingInstitutions
             : _dbContext.BankingInstitutions.Where(institution => institution.Countries.Contains(countryCode));
+
+        return query.OrderBy(institution => institution.Name);
     }
 
     /// <summary>

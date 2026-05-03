@@ -1,0 +1,49 @@
+.modalContent {
+  overflow: hidden;
+}
+
+.modalBody {
+  padding: 0;
+  display: flex;
+  height: 80vh;
+  min-height: 500px;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
+  border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  padding: var(--mantine-spacing-sm);
+}
+
+.sectionLabel {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 700;
+  color: var(--mantine-color-dimmed);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-xs) var(--mantine-spacing-xs);
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.contentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  flex-shrink: 0;
+}
+
+.contentBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-xl);
+}

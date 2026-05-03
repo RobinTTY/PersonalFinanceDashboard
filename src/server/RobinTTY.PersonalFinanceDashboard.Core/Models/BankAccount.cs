@@ -133,20 +133,29 @@ public class BankAccount : Account
 
     /// <summary>
     /// Updates the (non-navigation) properties of the current <see cref="BankAccount"/> instance with the values
-    /// provided in the specified <paramref name="updatedAccount"/>.
+    /// provided in the specified <paramref name="updatedAccount"/>. Only properties that are not <see langword="null"/> in the <paramref name="updatedAccount"/> will be updated.
     /// </summary>
     /// <param name="updatedAccount">The <see cref="BankAccount"/> instance whose properties are used to update the current object.</param>
     /// <returns>The updated <see cref="BankAccount"/> instance.</returns>
     public void UpdateNonNavigationProperties(BankAccount updatedAccount)
     {
-        Name ??= updatedAccount.Name;
-        Iban ??= updatedAccount.Iban;
-        Bic ??= updatedAccount.Bic;
-        Bban ??= updatedAccount.Bban;
-        Balance ??= updatedAccount.Balance;
-        Currency ??= updatedAccount.Currency;
-        OwnerName ??= updatedAccount.OwnerName;
-        AccountType ??= updatedAccount.AccountType;
-        Description ??= updatedAccount.Description;
+        if (updatedAccount.Name != null)
+            Name = updatedAccount.Name;
+        if (updatedAccount.Iban != null)
+            Iban = updatedAccount.Iban;
+        if (updatedAccount.Bic != null)
+            Bic = updatedAccount.Bic;
+        if (updatedAccount.Bban != null)
+            Bban = updatedAccount.Bban;
+        if (updatedAccount.Balance != null)
+            Balance = updatedAccount.Balance;
+        if (updatedAccount.Currency != null)
+            Currency = updatedAccount.Currency;
+        if (updatedAccount.OwnerName != null)
+            OwnerName = updatedAccount.OwnerName;
+        if (updatedAccount.AccountType != null)
+            AccountType = updatedAccount.AccountType;
+        if (updatedAccount.Description != null)
+            Description = updatedAccount.Description;
     }
 }

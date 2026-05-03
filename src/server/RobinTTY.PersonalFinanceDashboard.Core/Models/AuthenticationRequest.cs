@@ -14,10 +14,15 @@ public class AuthenticationRequest : ThirdPartyEntity
     public Uri AuthenticationLink { get; set; }
 
     /// <summary>
+    /// The date when the authentication request was created. Usually authentication requests are valid for 90 days.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+    
+    /// <summary>
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
     public List<BankAccount> AssociatedAccounts { get; set; } = [];
-
+    
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// </summary>
@@ -26,8 +31,9 @@ public class AuthenticationRequest : ThirdPartyEntity
         ThirdPartyId = Guid.Empty;
         Status = AuthenticationStatus.Unknown;
         AuthenticationLink = new Uri("https://www.placeholder.example/");
+        CreatedAt = DateTime.Now;
     }
-    
+
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// Required constructor for Ef Core.
@@ -35,11 +41,13 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink)
+    /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink, DateTime createdAt)
     {
         ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
+        CreatedAt = createdAt;
     }
 
     /// <summary>
@@ -48,20 +56,22 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
+    /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink, DateTime createdAt,
         List<BankAccount> associatedAccounts)
     {
         ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
         AssociatedAccounts = associatedAccounts;
+        CreatedAt = createdAt;
     }
     
     public static AuthenticationRequest CreateWithoutNavigationProperties(AuthenticationRequest authenticationRequest)
     {
         return new AuthenticationRequest(authenticationRequest.ThirdPartyId, authenticationRequest.Status,
-            authenticationRequest.AuthenticationLink);
+            authenticationRequest.AuthenticationLink, authenticationRequest.CreatedAt);
     }
 }
 
