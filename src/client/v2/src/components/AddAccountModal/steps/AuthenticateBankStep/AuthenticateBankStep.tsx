@@ -1,22 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
 import { GetAuthRequestWithAccounts } from '@graphql-queries/GetAuthRequestAndAccounts';
-import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react';
-import {
-  Anchor,
-  Avatar,
-  Badge,
-  Button,
-  Divider,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from '@mantine/core';
+import { Stack } from '@mantine/core';
 import { AuthenticationStatus } from '@/graphql/types/graphql';
-import { getInitials } from '@/utility/getInitials';
+import { BankAuthenticationFailed } from './sub-components/BankAuthenticationFailed/BankAuthenticationFailed';
+import { BankAuthenticationPending } from './sub-components/BankAuthenticationPending/BankAuthenticationPending';
+import { BankAuthenticationSuccess } from './sub-components/BankAuthenticationSuccess/BankAuthenticationSuccess';
 import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
@@ -44,7 +33,6 @@ interface AuthenticateBankStepProps {
  * @param authenticationLink - Initial GoCardless authentication URL shown to the user.
  * @param autoCheck - When true, performs an immediate check instead of waiting for the first poll interval.
  * @param onAuthenticated - Called when the authentication request transitions to Active.
- * @param onClose - Called when the user dismisses the success view.
  */
 export function AuthenticateBankStep({
   authenticationId,
@@ -153,203 +141,27 @@ export function AuthenticateBankStep({
 
   if (authState === AuthenticationState.Success) {
     const associatedAccounts = data?.authenticationRequest?.associatedAccounts ?? [];
-    const institution = associatedAccounts[0]?.associatedInstitution;
-    const accountCount = associatedAccounts.length;
-
-    return (
-      <Stack className={classes.container} align="center" gap="lg">
-        <Group gap="sm" align="center">
-          <ThemeIcon color="green" size={40} radius="xl">
-            <IconCircleCheck size={22} />
-          </ThemeIcon>
-          <Stack gap={2}>
-            <Title order={5}>Authentication Successful</Title>
-            <Text size="sm" c="dimmed">
-              {accountCount === 1
-                ? 'Your bank account has been successfully linked.'
-                : accountCount > 1
-                  ? `${accountCount} bank accounts have been successfully linked.`
-                  : 'Your bank has been successfully linked.'}
-            </Text>
-          </Stack>
-        </Group>
-
-        {institution && (
-          <Group className={classes.bankHeader} gap="md" wrap="nowrap">
-            <Avatar
-              src={institution.logoUri ? String(institution.logoUri) : undefined}
-              radius="sm"
-              size="lg"
-              flex="0 0 auto"
-            >
-              {getInitials(institution.name)}
-            </Avatar>
-            <Stack gap={2} style={{ minWidth: 0 }}>
-              <Text fw={600} size="md" truncate>
-                {institution.name}
-              </Text>
-              <Text size="sm" c="dimmed">
-                {institution.bic}
-              </Text>
-            </Stack>
-          </Group>
-        )}
-
-        {associatedAccounts.length > 0 && (
-          <Stack gap="sm" w="100%">
-            {associatedAccounts.map((account) => {
-              const hasNameOrDescription = account.name || account.description;
-              const balanceValue =
-                account.balance != null
-                  ? account.currency
-                    ? `${String(account.balance)} ${account.currency}`
-                    : String(account.balance)
-                  : null;
-
-              return (
-                <div key={String(account.id)} className={classes.accountCard}>
-                  {hasNameOrDescription && (
-                    <Stack gap={2} mb="md">
-                      {account.name && (
-                        <Text fw={600} size="md">
-                          {account.name}
-                        </Text>
-                      )}
-                      {account.description && account.description !== account.name && (
-                        <Text size="sm" c="dimmed">
-                          {account.description}
-                        </Text>
-                      )}
-                    </Stack>
-                  )}
-
-                  <Stack gap="xs">
-                    {account.accountType && (
-                      <Group justify="space-between" wrap="nowrap">
-                        <Text size="sm" c="dimmed">
-                          Type
-                        </Text>
-                        <Badge variant="light" size="sm">
-                          {account.accountType}
-                        </Badge>
-                      </Group>
-                    )}
-                    {hasNameOrDescription && account.accountType && <Divider />}
-                    {balanceValue && (
-                      <Group justify="space-between" wrap="nowrap">
-                        <Text size="sm" c="dimmed">
-                          Balance
-                        </Text>
-                        <Text size="sm" fw={600}>
-                          {balanceValue}
-                        </Text>
-                      </Group>
-                    )}
-                    {account.ownerName && (
-                      <Group justify="space-between" wrap="nowrap">
-                        <Text size="sm" c="dimmed">
-                          Owner
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          {account.ownerName}
-                        </Text>
-                      </Group>
-                    )}
-                  </Stack>
-                </div>
-              );
-            })}
-          </Stack>
-        )}
-      </Stack>
-    );
+    return <BankAuthenticationSuccess accounts={associatedAccounts} />;
   }
 
   if (authState === AuthenticationState.Failed) {
     return (
-      <Stack className={classes.container} align="center" gap="xl">
-        <div className={classes.failureSection}>
-          <ThemeIcon color="orange" size={64} radius="xl">
-            <IconAlertCircle size={36} />
-          </ThemeIcon>
-          <Stack gap={4} align="center">
-            <Title order={5}>Authentication Not Completed</Title>
-            <Text size="sm" c="dimmed" ta="center">
-              Your authentication does not appear to be complete yet. If you haven&apos;t finished
-              the external authentication, please follow the link below.
-            </Text>
-          </Stack>
-        </div>
-        {currentAuthLink && (
-          <Anchor href={currentAuthLink} target="_blank" rel="noopener noreferrer" size="sm">
-            Open GoCardless authentication
-          </Anchor>
-        )}
-        <Button mt="auto" loading={loading} onClick={handleRetry}>
-          Check again
-        </Button>
-      </Stack>
+      <BankAuthenticationFailed
+        loading={loading}
+        authLink={currentAuthLink}
+        onRetry={handleRetry}
+      />
     );
   }
 
   return (
     <Stack className={classes.container} align="center" gap="xl">
-      <div className={classes.loaderSection}>
-        <Loader size="lg" />
-        <Stack gap={4} align="center">
-          <Title order={5}>Waiting for Authentication</Title>
-          <Text size="sm" c="dimmed" ta="center">
-            A GoCardless authentication page has been opened. Please authenticate with your bank
-            there and return here once you have completed the process.
-          </Text>
-        </Stack>
-      </div>
-
-      <div className={classes.instructionsSection}>
-        <Stack gap="sm">
-          <div className={classes.instructionItem}>
-            <ThemeIcon size="sm" variant="light" radius="xl">
-              <Text size="xs" fw={700}>
-                1
-              </Text>
-            </ThemeIcon>
-            <Text size="sm">
-              Open the GoCardless authentication link and log in with your bank credentials.
-            </Text>
-          </div>
-          <div className={classes.instructionItem}>
-            <ThemeIcon size="sm" variant="light" radius="xl">
-              <Text size="xs" fw={700}>
-                2
-              </Text>
-            </ThemeIcon>
-            <Text size="sm">Grant GoCardless permission to access your account data.</Text>
-          </div>
-          <div className={classes.instructionItem}>
-            <ThemeIcon size="sm" variant="light" radius="xl">
-              <Text size="xs" fw={700}>
-                3
-              </Text>
-            </ThemeIcon>
-            <Text size="sm">Return to this page and click the confirm button below.</Text>
-          </div>
-        </Stack>
-      </div>
-
-      {error && (
-        <Text c="red" size="sm" ta="center">
-          {error.message}
-        </Text>
-      )}
-
-      <Button
-        mt="auto"
+      <BankAuthenticationPending
         loading={loading}
         disabled={!authenticationId}
-        onClick={handleAuthCompletedButtonPress}
-      >
-        I&apos;ve completed the authentication
-      </Button>
+        error={error?.message}
+        onConfirm={handleAuthCompletedButtonPress}
+      />
     </Stack>
   );
 }
