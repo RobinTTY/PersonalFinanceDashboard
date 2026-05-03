@@ -5,11 +5,16 @@ interface ViteTypeOptions {
   strictImportMetaEnv: unknown
 }
 
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_APP_VERSION: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
+  
+  readonly VITE_PROJECT_REPOSITORY_URL: string
+  readonly VITE_DEVELOPER_GITHUB_URL: string
+  readonly VITE_PROJECT_LICENSE_URL: string
+  readonly VITE_PROJECT_ISSUES_URL: string
 }

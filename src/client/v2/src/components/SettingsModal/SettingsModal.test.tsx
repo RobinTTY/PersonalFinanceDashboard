@@ -32,7 +32,7 @@ describe('SettingsModal', () => {
     render(<SettingsModal opened onClose={noop} />);
     expect(screen.getByText('My Profile')).toBeInTheDocument();
     expect(screen.getByText('Notifications')).toBeInTheDocument();
-    expect(screen.getByText('Connections')).toBeInTheDocument();
+    expect(screen.getByText('Connected Banks')).toBeInTheDocument();
     expect(screen.getByText('General')).toBeInTheDocument();
     expect(screen.getByText('Import')).toBeInTheDocument();
   });

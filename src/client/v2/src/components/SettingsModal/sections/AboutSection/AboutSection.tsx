@@ -48,7 +48,7 @@ export function AboutSection() {
       <Stack gap="sm">
         <InfoRow icon={<IconBrandGithub size={iconSize} />} label="Repository">
           <Anchor
-            href="https://github.com/RobinTTY/PersonalFinanceDashboard"
+            href={import.meta.env.VITE_PROJECT_REPOSITORY_URL}
             target="_blank"
             rel="noopener noreferrer"
             size="sm"
@@ -59,7 +59,7 @@ export function AboutSection() {
 
         <InfoRow icon={<IconUser size={iconSize} />} label="Developer">
           <Anchor
-            href="https://github.com/RobinTTY"
+            href={import.meta.env.VITE_DEVELOPER_GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
             size="sm"
@@ -70,7 +70,7 @@ export function AboutSection() {
 
         <InfoRow icon={<IconFileText size={iconSize} />} label="License">
           <Anchor
-            href="https://github.com/RobinTTY/PersonalFinanceDashboard/blob/main/LICENSE.md"
+            href={import.meta.env.VITE_PROJECT_LICENSE_URL}
             target="_blank"
             rel="noopener noreferrer"
             size="sm"
@@ -81,7 +81,7 @@ export function AboutSection() {
 
         <InfoRow icon={<IconBug size={iconSize} />} label="Report a Bug">
           <Anchor
-            href="https://github.com/RobinTTY/PersonalFinanceDashboard/issues"
+            href={import.meta.env.VITE_PROJECT_ISSUES_URL}
             target="_blank"
             rel="noopener noreferrer"
             size="sm"
