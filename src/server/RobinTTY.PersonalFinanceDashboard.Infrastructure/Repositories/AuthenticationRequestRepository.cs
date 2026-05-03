@@ -93,7 +93,7 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="id">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
     /// <returns>The deleted <see cref="AuthenticationRequest"/>.</returns>
-    public async Task<BasicResponse> DeleteAuthenticationRequest(Guid id)
+    public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(Guid id)
     {
         var authRequest =
             await _dbContext.AuthenticationRequests.SingleOrDefaultAsync(authRequest => authRequest.Id == id);
@@ -102,7 +102,14 @@ public class AuthenticationRequestRepository
         {
             _logger.LogError(
                 "Deletion of authentication request failed. Authentication request with id {id} does not exist.", id);
-            throw new NotImplementedException();
+            
+            return new ThirdPartyResponse<BasicResponse, BasicResponse>(
+                false, null, new BasicResponse
+                {
+                    Summary = "Authentication request not found.",
+                    Detail = $"Authentication request with id {id} does not exist."
+                }
+            );
         }
 
         var request = await _dataProviderService.DeleteAuthenticationRequest(authRequest.ThirdPartyId);
@@ -111,15 +118,24 @@ public class AuthenticationRequestRepository
             _dbContext.AuthenticationRequests.Remove(authRequest);
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("Successfully deleted authentication request with id {id}", id);
-            
-            return request.Result;
+
+            return new ThirdPartyResponse<BasicResponse, BasicResponse>(
+                true, new BasicResponse
+                {
+                    Summary = "Authentication request deleted.",
+                    Detail = $"Authentication request with id {id} was successfully deleted."
+                }, null);
         }
 
         _logger.LogError(
             "Deletion of authentication request failed. The data provider returned the following error: " +
             "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
-        
-        //TODO: return error
-        throw new NotImplementedException();
+
+        return new ThirdPartyResponse<BasicResponse, BasicResponse>(
+            false, null, new BasicResponse
+            {
+                Summary = "Failed to delete authentication request.",
+                Detail = $"The data provider returned the following error: {request.Error.Summary} Error details: {request.Error.Detail}"
+            });
     }
 }

@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Types;
-using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
@@ -18,7 +18,8 @@ public class AuthenticationMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="institutionId">The id of the institution which the authentication request should be created for.</param>
     /// <param name="redirectUri">The URI to redirect to after the authentication is completed.</param>
-    public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository, string institutionId, string redirectUri)
+    public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository,
+        string institutionId, string redirectUri)
     {
         return await repository.AddAuthenticationRequest(institutionId, redirectUri);
     }
@@ -28,9 +29,27 @@ public class AuthenticationMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="authenticationId">The id of the authentication request to delete.</param>
-    public async Task<BasicResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository, Guid authenticationId)
+    public async Task<DeleteResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository,
+        Guid authenticationId)
     {
-        return await repository.DeleteAuthenticationRequest(authenticationId);
+        var deleteResult = await repository.DeleteAuthenticationRequest(authenticationId);
+
+        if (deleteResult.IsSuccessful)
+        {
+            return new DeleteResponse
+            {
+                DeletedId = authenticationId
+            };
+        }
+
+        throw new GraphQLException(
+            ErrorBuilder
+                .New()
+                .SetMessage(deleteResult.Error.Summary != null
+                    ? $"{deleteResult.Error.Summary} {deleteResult.Error.Detail}"
+                    : "Failed to delete authentication request.")
+                .SetCode("DELETE_AUTHENTICATION_REQUEST_FAILED")
+                .Build());
     }
 
     /// <summary>
