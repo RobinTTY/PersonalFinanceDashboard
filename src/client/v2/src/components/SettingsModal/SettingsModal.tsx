@@ -9,6 +9,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { CloseButton, Modal, NavLink, ScrollArea, Text, Title } from '@mantine/core';
+import { AboutSection } from './sections/AboutSection/AboutSection';
 import { PreferencesSection } from './sections/PreferencesSection/PreferencesSection';
 import classes from './SettingsModal.module.css';
 
@@ -29,7 +30,6 @@ const sections: SettingsSection[] = [
       { label: 'My Profile', icon: IconUser },
       { label: 'Preferences', icon: IconAdjustments },
       { label: 'Notifications', icon: IconBell },
-      { label: 'Connections', icon: IconLink },
     ],
   },
   {
@@ -37,10 +37,11 @@ const sections: SettingsSection[] = [
     items: [
       { label: 'General', icon: IconTable },
       { label: 'Import', icon: IconFileImport },
+      { label: 'Connected Banks', icon: IconLink },
     ],
   },
   {
-    label: 'About',
+    label: 'Other',
     items: [{ label: 'About', icon: IconInfoCircle }],
   },
 ];
@@ -97,6 +98,7 @@ export function SettingsModal({ opened, onClose }: SettingsModalProps) {
             </div>
             <ScrollArea className={classes.contentBody} h="100%">
               {activeLabel === 'Preferences' && <PreferencesSection />}
+              {activeLabel === 'About' && <AboutSection />}
             </ScrollArea>
           </div>
         </Modal.Body>
