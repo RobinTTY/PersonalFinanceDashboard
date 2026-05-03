@@ -588,6 +588,13 @@ export type CreateAuthenticationRequestMutationVariables = Exact<{
 
 export type CreateAuthenticationRequestMutation = { createAuthenticationRequest: { __typename: 'CreateAuthenticationRequestPayload', authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null } };
 
+export type DeleteAuthenticationRequestMutationVariables = Exact<{
+  authenticationId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteAuthenticationRequestMutation = { deleteAuthenticationRequest: { __typename: 'DeleteAuthenticationRequestPayload', deleteResponse: { __typename: 'DeleteResponse', deletedId: unknown } | null } };
+
 export type GetAuthRequestWithAccountsQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
 }>;
