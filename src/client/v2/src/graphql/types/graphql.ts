@@ -140,12 +140,6 @@ export type BankingInstitutionsEdge = {
   node: BankingInstitution;
 };
 
-export type BasicResponse = {
-  __typename: 'BasicResponse';
-  detail: Maybe<Scalars['String']['output']>;
-  summary: Maybe<Scalars['String']['output']>;
-};
-
 export type CreateAuthenticationRequestInput = {
   /** The id of the institution which the authentication request should be created for. */
   institutionId: Scalars['String']['input'];
@@ -210,7 +204,7 @@ export type DeleteAuthenticationRequestInput = {
 
 export type DeleteAuthenticationRequestPayload = {
   __typename: 'DeleteAuthenticationRequestPayload';
-  basicResponse: Maybe<BasicResponse>;
+  deleteResponse: Maybe<DeleteResponse>;
 };
 
 export type DeleteBankAccountInput = {
@@ -231,6 +225,12 @@ export type DeleteBankingInstitutionInput = {
 export type DeleteBankingInstitutionPayload = {
   __typename: 'DeleteBankingInstitutionPayload';
   boolean: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DeleteResponse = {
+  __typename: 'DeleteResponse';
+  /** The id of the deleted entity. */
+  deletedId: Scalars['UUID']['output'];
 };
 
 export type DeleteTransactionInput = {
@@ -578,6 +578,8 @@ export type UpdateTransactionPayload = {
   transaction: Maybe<Transaction>;
 };
 
+export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: unknown | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
+
 export type CreateAuthenticationRequestMutationVariables = Exact<{
   institutionId: Scalars['String']['input'];
   redirectUri: Scalars['String']['input'];
@@ -592,6 +594,11 @@ export type GetAuthRequestWithAccountsQueryVariables = Exact<{
 
 
 export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: unknown | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
+
+export type GetAuthRequestsWithAccountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: unknown | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> }> };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
