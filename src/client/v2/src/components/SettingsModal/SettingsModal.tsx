@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { CloseButton, Modal, NavLink, ScrollArea, Text, Title } from '@mantine/core';
 import { AboutSection } from './sections/AboutSection/AboutSection';
+import { ConnectedBanksSection } from './sections/ConnectedBanksSection/ConnectedBanksSection';
 import { PreferencesSection } from './sections/PreferencesSection/PreferencesSection';
 import classes from './SettingsModal.module.css';
 
@@ -98,6 +99,7 @@ export function SettingsModal({ opened, onClose }: SettingsModalProps) {
             </div>
             <ScrollArea className={classes.contentBody} h="100%">
               {activeLabel === 'Preferences' && <PreferencesSection />}
+              {activeLabel === 'Connected Banks' && <ConnectedBanksSection />}
               {activeLabel === 'About' && <AboutSection />}
             </ScrollArea>
           </div>
