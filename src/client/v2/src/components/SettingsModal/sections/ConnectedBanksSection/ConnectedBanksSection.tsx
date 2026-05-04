@@ -252,7 +252,7 @@ export function ConnectedBanksSection() {
           Manage the bank connections used to import your accounts and transactions.
         </Text>
         <Text size="xs" c="dimmed">
-          If you have multiple active connections to the same institution, removing one of them will not prevent you from syncing the associated accounts, as long as at least one active connection to that institution remains.
+          If an institution has multiple active connections, removing one will not affect account syncing as long as at least one connection remains.
         </Text>
       </Stack>
 
@@ -284,6 +284,7 @@ export function ConnectedBanksSection() {
         onClose={closeConfirmation}
         title="Remove bank connection"
         centered
+        styles={{ title: { fontWeight: 600 } }}
       >
         <Stack gap="md">
           <Text size="sm">
