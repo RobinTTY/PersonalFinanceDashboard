@@ -1,7 +1,7 @@
 import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
 import { ActionIcon, Avatar, Badge, Divider, Group, Stack, Text, Tooltip, Accordion } from '@mantine/core';
 import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
-import { formatCreatedAt, formatBalance, getInitials } from '@utility';
+import { formatBalance, getInitials } from '@utility';
 import classes from './ConnectedBanksSection.module.css';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
@@ -109,7 +109,7 @@ export function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: Connect
               {institution?.name ?? 'Unknown institution'}
             </Text>
             <Text size="xs" c="dimmed">
-              Connected on {formatCreatedAt(bank.createdAt)}
+              Connected on {bank.createdAt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
             </Text>
           </Stack>
         </Group>

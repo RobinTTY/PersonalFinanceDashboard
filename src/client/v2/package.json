@@ -37,6 +37,7 @@
     "@graphql-codegen/cli": "^6.2.1",
     "@graphql-codegen/typescript": "^5.0.9",
     "@graphql-codegen/typescript-operations": "^5.0.9",
+    "@homebound/graphql-typescript-scalar-type-policies": "^2.14.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@storybook/addon-themes": "^10.0.0",
     "@storybook/react": "^10.0.0",

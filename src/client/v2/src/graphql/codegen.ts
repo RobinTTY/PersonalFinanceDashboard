@@ -36,6 +36,24 @@ const config: CodegenConfig = {
          * don't generate a type for the `__typename` for root operation types.
          */
         skipTypeNameForRoot: true,
+        /**
+         * Map custom scalars to their TypeScript runtime equivalents
+         */
+        scalars: {
+          DateTime: 'Date',
+          Decimal: 'number',
+        },
+      },
+    },
+    'src/graphql/types/type-policies.ts': {
+      plugins: ['@homebound/graphql-typescript-scalar-type-policies'],
+      config: {
+        scalars: {
+          DateTime: 'Date',
+        },
+        scalarTypePolicies: {
+          DateTime: '../type-policies/DateTime.js#dateTimeTypePolicy',
+        },
       },
     },
   },
