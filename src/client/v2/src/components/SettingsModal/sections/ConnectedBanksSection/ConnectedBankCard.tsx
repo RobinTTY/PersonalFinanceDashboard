@@ -1,7 +1,7 @@
 import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
 import { ActionIcon, Avatar, Badge, Divider, Group, Stack, Text, Tooltip, Accordion } from '@mantine/core';
 import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
-import { getInitials } from '@utility/getInitials';
+import { formatCreatedAt, formatBalance, getInitials } from '@utility';
 import classes from './ConnectedBanksSection.module.css';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
@@ -24,26 +24,6 @@ const STATUS_LABELS: Record<AuthenticationStatus, string> = {
   [AuthenticationStatus.Failed]: 'Failed',
   [AuthenticationStatus.Unknown]: 'Unknown',
 };
-
-function formatCreatedAt(value: unknown): string {
-  if (!value) {
-    return '';
-  }
-  const date = new Date(String(value));
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function formatBalance(account: ConnectedBankAccount): string | null {
-  if (account.balance == null) {
-    return null;
-  }
-  return account.currency
-    ? `${String(account.balance)} ${account.currency}`
-    : String(account.balance);
-}
 
 /**
  * Sub-component to render individual linked accounts within a connected bank card.
