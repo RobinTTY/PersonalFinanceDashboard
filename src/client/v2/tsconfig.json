@@ -17,8 +17,11 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
+      "@utility/*": ["./src/utility/*"],
       "@test-utils": ["./test-utils"],
-      "@graphql-queries/*": ["./src/graphql/queries/*"]
+      "@graphql-queries/*": ["./src/graphql/queries/*"],
+      "@graphql-mutations/*": ["./src/graphql/mutations/*"],
+      "@graphql-types/*": ["./src/graphql/types/*"],
     }
   },
   "include": ["src", "test-utils", ".storybook/main.ts", ".storybook/preview.tsx"]

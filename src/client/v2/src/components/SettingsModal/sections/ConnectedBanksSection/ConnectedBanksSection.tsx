@@ -8,7 +8,6 @@ import {
   Avatar,
   Badge,
   Button,
-  Center,
   Divider,
   Group,
   Loader,
@@ -17,14 +16,14 @@ import {
   Text,
   Tooltip,
 } from '@mantine/core';
-import { DeleteAuthenticationRequest } from '@/graphql/mutations/DeleteAuthenticationRequest';
-import { GetAuthRequestsWithAccounts } from '@/graphql/queries/GetAuthRequestsWithAccounts';
-import { AuthenticationStatus, GetAuthRequestsWithAccountsQuery } from '@/graphql/types/graphql';
-import { getInitials } from '@/utility/getInitials';
+import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
+import { DeleteAuthenticationRequest } from '@graphql-mutations/DeleteAuthenticationRequest';
+import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
+import { getInitials } from '@utility/getInitials';
 import classes from './ConnectedBanksSection.module.css';
 
-type ConnectedBank = GetAuthRequestsWithAccountsQuery['authenticationRequests'][number];
-type ConnectedAccount = ConnectedBank['associatedAccounts'][number];
+type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
+type ConnectedBankAccount = AuthRequestWithAccounts['associatedAccounts'][number];
 
 const STATUS_COLORS: Record<AuthenticationStatus, string> = {
   [AuthenticationStatus.Active]: 'green',
@@ -55,7 +54,7 @@ function formatCreatedAt(value: unknown): string {
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function formatBalance(account: ConnectedAccount): string | null {
+function formatBalance(account: ConnectedBankAccount): string | null {
   if (account.balance == null) {
     return null;
   }
@@ -64,7 +63,7 @@ function formatBalance(account: ConnectedAccount): string | null {
     : String(account.balance);
 }
 
-function AccountRow({ account }: { account: ConnectedAccount }) {
+function AccountRow({ account }: { account: ConnectedBankAccount }) {
   const balance = formatBalance(account);
   const title = account.name || account.iban || 'Unnamed account';
 
@@ -117,8 +116,8 @@ function AccountRow({ account }: { account: ConnectedAccount }) {
 }
 
 interface ConnectedBankCardProps {
-  bank: ConnectedBank;
-  onRequestDelete: (bank: ConnectedBank) => void;
+  bank: AuthRequestWithAccounts;
+  onRequestDelete: (bank: AuthRequestWithAccounts) => void;
   isDeleting: boolean;
 }
 
@@ -194,7 +193,7 @@ function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: ConnectedBankC
 
 export function ConnectedBanksSection() {
   const { data, loading, error } = useQuery(GetAuthRequestsWithAccounts);
-  const [pendingDeletion, setPendingDeletion] = useState<ConnectedBank | null>(null);
+  const [pendingDeletion, setPendingDeletion] = useState<AuthRequestWithAccounts | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteAuthenticationRequest, { loading: deleting }] = useMutation(
     DeleteAuthenticationRequest,
@@ -225,22 +224,6 @@ export function ConnectedBanksSection() {
     }
   };
 
-  if (loading) {
-    return (
-      <Center py="xl">
-        <Loader size="sm" />
-      </Center>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert color="red" icon={<IconAlertCircle size={16} />} title="Failed to load connected banks">
-        {error.message}
-      </Alert>
-    );
-  }
-
   const banks = data?.authenticationRequests ?? [];
   const pendingInstitutionName =
     pendingDeletion?.associatedAccounts[0]?.associatedInstitution?.name ?? 'this bank';
@@ -249,14 +232,25 @@ export function ConnectedBanksSection() {
     <Stack gap="lg">
       <Stack gap={4}>
         <Text size="sm">
-          Manage the bank connections used to import your accounts and transactions.
+          Manage the bank connections used to sync your accounts and transactions.
         </Text>
         <Text size="xs" c="dimmed">
           If an institution has multiple active connections, removing one will not affect account syncing as long as at least one connection remains.
         </Text>
       </Stack>
 
-      {banks.length === 0 ? (
+      {loading ? (
+        <Stack gap="xs" align="center" py="xl">
+          <Loader size="sm" />
+          <Text size="sm" c="dimmed">
+            Fetching your connections…
+          </Text>
+        </Stack>
+      ) : error ? (
+        <Alert color="red" icon={<IconAlertCircle size={16} />} title="Failed to load connected banks">
+          {error.message}
+        </Alert>
+      ) : banks.length === 0 ? (
         <Stack gap="xs" align="center" py="xl">
           <IconBuildingBank size={32} color="var(--mantine-color-dimmed)" />
           <Text size="sm" c="dimmed">
@@ -270,9 +264,9 @@ export function ConnectedBanksSection() {
               key={String(bank.id)}
               bank={bank}
               isDeleting={deleting && pendingDeletion?.id === bank.id}
-              onRequestDelete={(target) => {
+              onRequestDelete={(authRequest) => {
                 setDeleteError(null);
-                setPendingDeletion(target);
+                setPendingDeletion(authRequest);
               }}
             />
           ))}
