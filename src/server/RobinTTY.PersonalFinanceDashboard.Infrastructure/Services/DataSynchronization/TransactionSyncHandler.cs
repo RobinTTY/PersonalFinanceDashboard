@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -24,10 +25,13 @@ public class TransactionSyncHandler(
             else
             {
                 var accountIds = dbContext.BankAccounts
+                    .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
+                        request.Status == AuthenticationStatus.Active &&
+                        request.CreatedAt > DateTime.UtcNow.AddDays(-90)))
                     .Select(account => account.Id)
                     .Where(id => id.HasValue)
                     .Cast<Guid>();
-                
+
                 foreach (var internAccountId in accountIds)
                 {
                     var transactionForAccount = await GetTransactions(internAccountId);
@@ -55,7 +59,8 @@ public class TransactionSyncHandler(
         }
         else
         {
-            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.Transactions);
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.",
+                ThirdPartyDataType.Transactions);
         }
 
         return true;
@@ -79,7 +84,7 @@ public class TransactionSyncHandler(
             var existingTransaction = dbContext.Transactions
                 .Include(t => t.BankAccount)
                 .SingleOrDefault(t => t.ThirdPartyId == updatedTransaction.ThirdPartyId);
-            
+
             if (existingTransaction == null)
             {
                 var insertEntity = Transaction.CreateWithoutNavigationProperties(updatedTransaction);
@@ -91,7 +96,7 @@ public class TransactionSyncHandler(
                 // TODO: Do we ever expect transactions to change after they have been retrieved?
                 existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
             }
-            
+
             await UpdateAssociatedBankAccount(updatedTransaction, existingTransaction);
             await dbContext.SaveChangesAsync();
         }

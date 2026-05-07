@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Core.Utility;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -71,9 +72,7 @@ public class BankAccountSyncHandler(
 
             foreach (var authenticationRequest in authRequests)
             {
-                // TODO: EUA may have a different validity than 90 days
-                if (authenticationRequest.Status == AuthenticationStatus.Active &&
-                    !DateUtility.IsOlderThan(authenticationRequest.CreatedAt, 90, TimeUnit.Days))
+                if (authenticationRequest.IsActive())
                 {
                     var accountIdsIncludeMetadataPairs = authenticationRequest.AssociatedAccounts
                         .Select(acc => (id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))

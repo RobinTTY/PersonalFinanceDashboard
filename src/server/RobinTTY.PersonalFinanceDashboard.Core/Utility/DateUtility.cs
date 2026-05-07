@@ -1,4 +1,4 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Utility;
+﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Utility;
 
 public enum TimeUnit
 {
