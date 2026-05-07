@@ -48,7 +48,7 @@ public class TransactionRepository
         await _transactionSyncHandler.SynchronizeData(accountId);
 
         return _dbContext.Transactions
-            .Where(transaction => transaction.BankAccount != null && transaction.BankAccount.ThirdPartyId == accountId)
+            .Where(transaction => transaction.BankAccount != null && transaction.BankAccount.Id == accountId)
             .OrderByDescending(transaction => transaction.ValueDate);
     }
 
