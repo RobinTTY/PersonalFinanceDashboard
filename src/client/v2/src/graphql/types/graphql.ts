@@ -580,6 +580,8 @@ export type UpdateTransactionPayload = {
 
 export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
 
+export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
+
 export type CreateAuthenticationRequestMutationVariables = Exact<{
   institutionId: Scalars['String']['input'];
   redirectUri: Scalars['String']['input'];
@@ -621,3 +623,14 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
 
 
 export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, thirdPartyId: string, name: string, bic: string, logoUri: unknown } }> | null } | null };
+
+export type GetTransactionsByAccountIdQueryVariables = Exact<{
+  accountId: Scalars['UUID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', cursor: string, node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string } }> | null } | null };
