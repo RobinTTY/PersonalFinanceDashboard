@@ -29,7 +29,6 @@ export const GetTransactionsByAccountId: TypedDocumentNode<
         endCursor
       }
       edges {
-        cursor
         node {
           ...Transaction
         }
