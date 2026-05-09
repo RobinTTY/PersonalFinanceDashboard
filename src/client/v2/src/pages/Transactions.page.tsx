@@ -5,27 +5,12 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Alert, Box, Group, Loader, Select, Stack, Text, Title } from '@mantine/core';
 import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
+import { formatDate, formatAmount } from '@utility';
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 52;
 const VIRTUAL_OVERSCAN = 8;
 const COLUMN_TEMPLATE = '140px minmax(0, 1fr) minmax(0, 1fr) 160px';
-
-function formatDate(date: Date | null | undefined): string {
-  if (!date) {
-    return '—';
-  }
-  return date.toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function formatAmount(amount: number, currency: string): string {
-  const sign = amount >= 0 ? '+' : '−';
-  return `${sign}${Math.abs(amount).toFixed(2)} ${currency}`;
-}
 
 export function TransactionsPage() {
   const { data: accountsData, loading: loadingAccounts } = useQuery(GetAuthRequestsWithAccounts);
