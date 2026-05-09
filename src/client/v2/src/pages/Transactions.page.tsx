@@ -10,7 +10,7 @@ import { formatDate, formatAmount } from '@utility';
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 52;
 const VIRTUAL_OVERSCAN = 8;
-const COLUMN_TEMPLATE = '140px minmax(0, 1fr) minmax(0, 1fr) 160px';
+const COLUMN_TEMPLATE = '140px minmax(0, 1fr) 160px';
 
 export function TransactionsPage() {
   const { data: accountsData, loading: loadingAccounts } = useQuery(GetAuthRequestsWithAccounts);
@@ -30,6 +30,8 @@ export function TransactionsPage() {
 
   const [accountId, setAccountId] = useState<string | null>(null);
 
+  // Auto-select the first account once the accounts query resolves, so the page
+  // shows transactions immediately instead of an empty selector.
   useEffect(() => {
     if (!accountId && accounts.length > 0) {
       setAccountId(accounts[0].value);
@@ -57,10 +59,17 @@ export function TransactionsPage() {
 
   const virtualItems = virtualizer.getVirtualItems();
 
+  // Reset scroll to the top when switching accounts. Each accountId has its own
+  // cached list (see field policy in App.tsx), so the previous scroll offset
+  // would otherwise be meaningless against a different list.
   useEffect(() => {
     parentRef.current?.scrollTo({ top: 0 });
   }, [accountId]);
 
+  // Infinite-scroll loader: when the virtualizer renders within VIRTUAL_OVERSCAN
+  // rows of the end and the server reports more pages, request the next page via
+  // the cursor. fetchingMoreRef guards against the effect firing repeatedly while
+  // a fetch is already in flight (each scroll tick re-runs this effect).
   useEffect(() => {
     const last = virtualItems[virtualItems.length - 1];
     if (!last || !pageInfo?.hasNextPage || fetchingMoreRef.current) {
@@ -123,10 +132,7 @@ export function TransactionsPage() {
           Date
         </Text>
         <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-          From
-        </Text>
-        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-          To
+          Description
         </Text>
         <Text size="xs" fw={600} c="dimmed" tt="uppercase" ta="right">
           Amount
@@ -189,10 +195,7 @@ export function TransactionsPage() {
                 >
                   <Text size="sm">{formatDate(transaction.valueDate)}</Text>
                   <Text size="sm" truncate>
-                    {transaction.payer ?? '—'}
-                  </Text>
-                  <Text size="sm" truncate>
-                    {transaction.payee ?? '—'}
+                    {transaction.amount < 0 ? transaction.payer ?? '—' : transaction.payee ?? '—'}
                   </Text>
                   <Text
                     size="sm"
