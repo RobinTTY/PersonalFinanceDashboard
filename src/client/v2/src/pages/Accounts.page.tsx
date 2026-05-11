@@ -138,7 +138,19 @@ export function AccountsPage() {
 
   return (
     <Stack style={{ height: '100%' }}>
-      <Group justify="space-between" align="center" wrap="nowrap">
+      <Box
+        style={{
+          background: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5))',
+          borderRadius: 'var(--mantine-radius-md)',
+          padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+      <Group
+        justify="space-between"
+        align="center"
+        wrap="nowrap"
+      >
         <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
           <Text size="xs" fw={600} c="dimmed" tt="uppercase">
             Current balance
@@ -186,6 +198,7 @@ export function AccountsPage() {
           </Button>
         </Group>
       </Group>
+      </Box>
 
       <AddAccountModal
         opened={addAccountOpened}
