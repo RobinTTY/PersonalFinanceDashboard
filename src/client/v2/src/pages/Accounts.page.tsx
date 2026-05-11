@@ -140,10 +140,12 @@ export function AccountsPage() {
     <Stack style={{ height: '100%' }}>
       <Box
         style={{
-          background: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5))',
+          background: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))',
           borderRadius: 'var(--mantine-radius-md)',
           padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+          border:
+            '.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
         }}
       >
       <Group
