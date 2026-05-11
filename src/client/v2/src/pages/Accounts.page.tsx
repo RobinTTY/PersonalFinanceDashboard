@@ -1,8 +1,34 @@
-import { useEffect, useState } from 'react';
-import { IconPlus } from '@tabler/icons-react';
-import { Button, Group, Stack, Title } from '@mantine/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@apollo/client/react';
+import {
+  IconAlertCircle,
+  IconBuildingBank,
+  IconChevronDown,
+  IconPlus,
+} from '@tabler/icons-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Group,
+  Loader,
+  Menu,
+  Stack,
+  Text,
+  UnstyledButton,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/AddAccountModal';
+import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
+import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
+import { formatAmount, formatBalance, formatDate, getInitials } from '@utility';
+
+const PAGE_SIZE = 50;
+const ROW_HEIGHT = 52;
+const VIRTUAL_OVERSCAN = 8;
+const COLUMN_TEMPLATE = '140px minmax(0, 1fr) 160px';
 
 export function AccountsPage() {
   const [addAccountOpened, { open: openAddAccount, close: closeAddAccount }] = useDisclosure(false);
@@ -22,15 +48,143 @@ export function AccountsPage() {
     closeAddAccount();
   };
 
+  const { data: accountsData, loading: loadingAccounts } = useQuery(GetAuthRequestsWithAccounts);
+
+  const accounts = useMemo(() => {
+    const all =
+      accountsData?.authenticationRequests.flatMap((req) =>
+        req.associatedAccounts.filter((acc) => acc.id != null)
+      ) ?? [];
+    return Array.from(new Map(all.map((a) => [String(a.id), a])).values());
+  }, [accountsData]);
+
+  const [accountId, setAccountId] = useState<string | null>(null);
+
+  // Auto-select the first account once the accounts query resolves, so the page
+  // shows transactions immediately instead of an empty selector.
+  useEffect(() => {
+    if (!accountId && accounts.length > 0) {
+      setAccountId(String(accounts[0].id));
+    }
+  }, [accounts, accountId]);
+
+  const currentAccount = useMemo(
+    () => accounts.find((a) => String(a.id) === accountId) ?? null,
+    [accounts, accountId]
+  );
+
+  const { data, loading, error, fetchMore } = useQuery(GetTransactionsByAccountId, {
+    variables: { accountId: accountId ?? '', first: PAGE_SIZE },
+    skip: !accountId,
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const edges = data?.transactionsByAccountId?.edges ?? [];
+  const pageInfo = data?.transactionsByAccountId?.pageInfo;
+
+  const parentRef = useRef<HTMLDivElement>(null);
+  const fetchingMoreRef = useRef(false);
+
+  const virtualizer = useVirtualizer({
+    count: edges.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: VIRTUAL_OVERSCAN,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+  // Reset scroll to the top when switching accounts. Each accountId has its own
+  // cached list (see field policy in App.tsx), so the previous scroll offset
+  // would otherwise be meaningless against a different list.
+  useEffect(() => {
+    parentRef.current?.scrollTo({ top: 0 });
+  }, [accountId]);
+
+  // Infinite-scroll loader: when the virtualizer renders within VIRTUAL_OVERSCAN
+  // rows of the end and the server reports more pages, request the next page via
+  // the cursor. fetchingMoreRef guards against the effect firing repeatedly while
+  // a fetch is already in flight (each scroll tick re-runs this effect).
+  useEffect(() => {
+    const last = virtualItems[virtualItems.length - 1];
+    if (!last || !pageInfo?.hasNextPage || fetchingMoreRef.current) {
+      return;
+    }
+    if (last.index < edges.length - VIRTUAL_OVERSCAN) {
+      return;
+    }
+
+    fetchingMoreRef.current = true;
+    fetchMore({
+      variables: {
+        accountId,
+        first: PAGE_SIZE,
+        after: pageInfo.endCursor,
+      },
+    }).finally(() => {
+      fetchingMoreRef.current = false;
+    });
+  }, [virtualItems, edges.length, pageInfo, fetchMore, accountId]);
+
+  const showInitialLoader = !!accountId && loading && edges.length === 0;
+  const showEmptyState = !!accountId && !loading && edges.length === 0;
+  const showNoAccounts = !loadingAccounts && accounts.length === 0;
+
+  const institution = currentAccount?.associatedInstitution;
+  const accountLabel =
+    currentAccount?.name ?? currentAccount?.iban ?? (loadingAccounts ? 'Loading…' : 'No account');
+  const balanceLabel = currentAccount ? formatBalance(currentAccount) : null;
+  const canSwitchAccount = accounts.length > 1;
+
   return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={2} m={0}>
-          Accounts
-        </Title>
-        <Button leftSection={<IconPlus size={16} />} onClick={openAddAccount}>
-          Add Account
-        </Button>
+    <Stack style={{ height: '100%' }}>
+      <Group justify="space-between" align="center" wrap="nowrap">
+        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+            Current balance
+          </Text>
+          <Text size="xl" fw={700}>
+            {balanceLabel ?? '—'}
+          </Text>
+        </Stack>
+
+        <Menu position="bottom" withinPortal disabled={!canSwitchAccount}>
+          <Menu.Target>
+            <UnstyledButton disabled={!canSwitchAccount} style={{ cursor: canSwitchAccount ? 'pointer' : 'default' }}>
+              <Stack align="center" gap={6}>
+                <Avatar
+                  src={institution?.logoUri ? String(institution.logoUri) : undefined}
+                  radius="xl"
+                  size="lg"
+                >
+                  {institution ? getInitials(institution.name) : <IconBuildingBank size={20} />}
+                </Avatar>
+                <Group gap={4} wrap="nowrap" align="center">
+                  <Text fw={600} size="sm">
+                    {accountLabel}
+                  </Text>
+                  {canSwitchAccount && <IconChevronDown size={14} />}
+                </Group>
+              </Stack>
+            </UnstyledButton>
+          </Menu.Target>
+          <Menu.Dropdown>
+            {accounts.map((account) => (
+              <Menu.Item
+                key={String(account.id)}
+                onClick={() => setAccountId(String(account.id))}
+              >
+                {account.name ?? account.iban ?? 'Unnamed account'}
+              </Menu.Item>
+            ))}
+          </Menu.Dropdown>
+        </Menu>
+
+        <Group justify="flex-end" style={{ flex: 1 }}>
+          <Button leftSection={<IconPlus size={16} />} onClick={openAddAccount}>
+            Add Account
+          </Button>
+        </Group>
       </Group>
 
       <AddAccountModal
@@ -38,6 +192,106 @@ export function AccountsPage() {
         onClose={handleModalClose}
         pendingAuth={pendingAuth}
       />
+
+      {error ? (
+        <Alert color="red" icon={<IconAlertCircle size={16} />} title="Failed to load transactions">
+          {error.message}
+        </Alert>
+      ) : null}
+
+      <Box
+        style={{
+          display: 'grid',
+          gridTemplateColumns: COLUMN_TEMPLATE,
+          gap: 'var(--mantine-spacing-md)',
+          padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
+          borderBottom:
+            '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
+        }}
+      >
+        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          Date
+        </Text>
+        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+          Description
+        </Text>
+        <Text size="xs" fw={600} c="dimmed" tt="uppercase" ta="right">
+          Amount
+        </Text>
+      </Box>
+
+      {showNoAccounts ? (
+        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+          <Text size="sm" c="dimmed">
+            Connect a bank account to view transactions.
+          </Text>
+        </Stack>
+      ) : showInitialLoader ? (
+        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+          <Loader size="sm" />
+        </Stack>
+      ) : showEmptyState ? (
+        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+          <Text size="sm" c="dimmed">
+            No transactions for this account.
+          </Text>
+        </Stack>
+      ) : (
+        <Box
+          ref={parentRef}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflow: 'auto',
+            contain: 'strict',
+          }}
+        >
+          <div
+            style={{
+              height: virtualizer.getTotalSize(),
+              position: 'relative',
+              width: '100%',
+            }}
+          >
+            {virtualItems.map((virtualRow) => {
+              const transaction = edges[virtualRow.index].node;
+              return (
+                <div
+                  key={virtualRow.key}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                    height: ROW_HEIGHT,
+                    display: 'grid',
+                    gridTemplateColumns: COLUMN_TEMPLATE,
+                    gap: 'var(--mantine-spacing-md)',
+                    alignItems: 'center',
+                    padding: '0 var(--mantine-spacing-md)',
+                    borderBottom:
+                      '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5))',
+                  }}
+                >
+                  <Text size="sm">{formatDate(transaction.valueDate)}</Text>
+                  <Text size="sm" truncate>
+                    {transaction.amount < 0 ? transaction.payer ?? '—' : transaction.payee ?? '—'}
+                  </Text>
+                  <Text
+                    size="sm"
+                    fw={600}
+                    ta="right"
+                    c={transaction.amount >= 0 ? 'green' : 'red'}
+                  >
+                    {formatAmount(transaction.amount, transaction.currency)}
+                  </Text>
+                </div>
+              );
+            })}
+          </div>
+        </Box>
+      )}
     </Stack>
   );
 }

@@ -1,6 +1,5 @@
 import {
   IconAdjustments,
-  IconCalendarStats,
   IconGauge,
   IconNotes,
   IconPresentationAnalytics,
@@ -17,7 +16,6 @@ export function AppLayout() {
   const navLinks: LinksGroupProps[] = [
     { label: 'Dashboard', icon: IconGauge, link: '/dashboard' },
     { label: 'Accounts', icon: IconNotes, link: '/accounts' },
-    { label: 'Transactions', icon: IconCalendarStats, link: '/transactions' },
     { label: 'Analytics', icon: IconPresentationAnalytics, link: '/analytics' },
     { label: 'Settings', icon: IconAdjustments, onClick: openSettings },
   ];
