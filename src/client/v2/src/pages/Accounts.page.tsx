@@ -1,29 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
-import {
-  IconAlertCircle,
-  IconBuildingBank,
-  IconChevronDown,
-  IconPlus,
-} from '@tabler/icons-react';
+import { IconAlertCircle } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   Alert,
-  Avatar,
   Box,
-  Button,
-  Group,
   Loader,
-  Menu,
   Stack,
   Text,
-  UnstyledButton,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { AccountsHeader } from '@/components/AccountsHeader/AccountsHeader';
 import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/AddAccountModal';
 import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
-import { formatAmount, formatBalance, formatDate, getInitials } from '@utility';
+import { formatAmount, formatDate } from '@utility';
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 52;
@@ -130,77 +121,15 @@ export function AccountsPage() {
   const showEmptyState = !!accountId && !loading && edges.length === 0;
   const showNoAccounts = !loadingAccounts && accounts.length === 0;
 
-  const institution = currentAccount?.associatedInstitution;
-  const accountLabel =
-    currentAccount?.name ?? currentAccount?.iban ?? (loadingAccounts ? 'Loading…' : 'No account');
-  const balanceLabel = currentAccount ? formatBalance(currentAccount) : null;
-  const canSwitchAccount = accounts.length > 1;
-
   return (
     <Stack style={{ height: '100%' }}>
-      <Box
-        style={{
-          background: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))',
-          borderRadius: 'var(--mantine-radius-md)',
-          padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-          border:
-            '.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
-        }}
-      >
-      <Group
-        justify="space-between"
-        align="center"
-        wrap="nowrap"
-      >
-        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-            Current balance
-          </Text>
-          <Text size="xl" fw={700}>
-            {balanceLabel ?? '—'}
-          </Text>
-        </Stack>
-
-        <Menu position="bottom" withinPortal disabled={!canSwitchAccount}>
-          <Menu.Target>
-            <UnstyledButton disabled={!canSwitchAccount} style={{ cursor: canSwitchAccount ? 'pointer' : 'default' }}>
-              <Stack align="center" gap={6}>
-                <Avatar
-                  src={institution?.logoUri ? String(institution.logoUri) : undefined}
-                  radius="xl"
-                  size="lg"
-                >
-                  {institution ? getInitials(institution.name) : <IconBuildingBank size={20} />}
-                </Avatar>
-                <Group gap={4} wrap="nowrap" align="center">
-                  <Text fw={600} size="sm">
-                    {accountLabel}
-                  </Text>
-                  {canSwitchAccount && <IconChevronDown size={14} />}
-                </Group>
-              </Stack>
-            </UnstyledButton>
-          </Menu.Target>
-          <Menu.Dropdown>
-            {accounts.map((account) => (
-              <Menu.Item
-                key={String(account.id)}
-                onClick={() => setAccountId(String(account.id))}
-              >
-                {account.name ?? account.iban ?? 'Unnamed account'}
-              </Menu.Item>
-            ))}
-          </Menu.Dropdown>
-        </Menu>
-
-        <Group justify="flex-end" style={{ flex: 1 }}>
-          <Button leftSection={<IconPlus size={16} />} onClick={openAddAccount}>
-            Add Account
-          </Button>
-        </Group>
-      </Group>
-      </Box>
+      <AccountsHeader
+        currentAccount={currentAccount}
+        accounts={accounts}
+        loadingAccounts={loadingAccounts}
+        onAccountChange={setAccountId}
+        onAddAccount={openAddAccount}
+      />
 
       <AddAccountModal
         opened={addAccountOpened}
