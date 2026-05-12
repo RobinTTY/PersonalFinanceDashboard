@@ -15,6 +15,8 @@ public class TransactionSyncHandler(
 {
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {
+        // TODO: Save metadata on a per-account basis, so that we do not have to sync all accounts if only one account has stale data
+        return true;
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions);
 
         if (dataIsStale || forceThirdPartySync)
