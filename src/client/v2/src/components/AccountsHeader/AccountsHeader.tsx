@@ -1,5 +1,5 @@
 import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
-import { Avatar, Box, Button, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
+import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { formatBalance, getInitials } from '@utility';
 import classes from './AccountsHeader.module.css';
@@ -30,19 +30,12 @@ export function AccountsHeader({
   return (
     <Box className={classes.header}>
       <Group justify="space-between" align="center" wrap="nowrap">
-        <Stack gap={2} className={classes.balanceStack}>
-          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-            Current balance
-          </Text>
-          <Text size="xl" fw={700}>
-            {balanceLabel ?? '—'}
-          </Text>
-        </Stack>
+        <Box style={{ flex: 1 }} />
 
-        <Menu position="bottom" withinPortal disabled={!canSwitchAccount}>
+        <Menu position="bottom" withinPortal>
           <Menu.Target>
             <UnstyledButton
-              disabled={!canSwitchAccount}
+              disabled={!canSwitchAccount && accounts.length > 0}
               className={canSwitchAccount ? classes.accountButton : classes.accountButtonDisabled}
             >
               <Stack align="center" gap={6}>
@@ -57,7 +50,7 @@ export function AccountsHeader({
                   <Text fw={600} size="sm">
                     {accountLabel}
                   </Text>
-                  {canSwitchAccount && <IconChevronDown size={14} />}
+                  <IconChevronDown size={14} />
                 </Group>
               </Stack>
             </UnstyledButton>
@@ -71,14 +64,21 @@ export function AccountsHeader({
                 {account.name ?? account.iban ?? 'Unnamed account'}
               </Menu.Item>
             ))}
+            <Menu.Divider />
+            <Menu.Item color="blue" leftSection={<IconPlus size={14} />} onClick={onAddAccount}>
+              Add account
+            </Menu.Item>
           </Menu.Dropdown>
         </Menu>
 
-        <Group justify="flex-end" className={classes.actionsGroup}>
-          <Button leftSection={<IconPlus size={16} />} onClick={onAddAccount}>
-            Add Account
-          </Button>
-        </Group>
+        <Stack gap={2} align="flex-end" style={{ flex: 1 }}>
+          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+            Current balance
+          </Text>
+          <Text size="xl" fw={700}>
+            {balanceLabel ?? '—'}
+          </Text>
+        </Stack>
       </Group>
     </Box>
   );

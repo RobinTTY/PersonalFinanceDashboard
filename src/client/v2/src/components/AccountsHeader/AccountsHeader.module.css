@@ -6,15 +6,6 @@
   border: 0.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
-.balanceStack {
-  flex: 1;
-  min-width: 0;
-}
-
-.actionsGroup {
-  flex: 1;
-}
-
 .accountButton {
   cursor: pointer;
 }
