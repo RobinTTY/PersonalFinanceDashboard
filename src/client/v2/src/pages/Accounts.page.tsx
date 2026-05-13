@@ -15,11 +15,11 @@ import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/
 import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
 import { formatAmount, formatDate } from '@utility';
+import classes from './Accounts.page.module.css';
 
 const PAGE_SIZE = 50;
 const ROW_HEIGHT = 52;
 const VIRTUAL_OVERSCAN = 8;
-const COLUMN_TEMPLATE = '140px minmax(0, 1fr) 160px';
 
 export function AccountsPage() {
   const [addAccountOpened, { open: openAddAccount, close: closeAddAccount }] = useDisclosure(false);
@@ -122,7 +122,7 @@ export function AccountsPage() {
   const showNoAccounts = !loadingAccounts && accounts.length === 0;
 
   return (
-    <Stack style={{ height: '100%' }}>
+    <Stack className={classes.pageStack}>
       <AccountsHeader
         currentAccount={currentAccount}
         accounts={accounts}
@@ -143,16 +143,7 @@ export function AccountsPage() {
         </Alert>
       ) : null}
 
-      <Box
-        style={{
-          display: 'grid',
-          gridTemplateColumns: COLUMN_TEMPLATE,
-          gap: 'var(--mantine-spacing-md)',
-          padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
-          borderBottom:
-            '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
-        }}
-      >
+      <Box className={classes.columnHeader}>
         <Text size="xs" fw={600} c="dimmed" tt="uppercase">
           Date
         </Text>
@@ -165,58 +156,31 @@ export function AccountsPage() {
       </Box>
 
       {showNoAccounts ? (
-        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+        <Stack align="center" justify="center" className={classes.centeredFlex}>
           <Text size="sm" c="dimmed">
             Connect a bank account to view transactions.
           </Text>
         </Stack>
       ) : showInitialLoader ? (
-        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+        <Stack align="center" justify="center" className={classes.centeredFlex}>
           <Loader size="sm" />
         </Stack>
       ) : showEmptyState ? (
-        <Stack align="center" justify="center" style={{ flex: 1, minHeight: 0 }}>
+        <Stack align="center" justify="center" className={classes.centeredFlex}>
           <Text size="sm" c="dimmed">
             No transactions for this account.
           </Text>
         </Stack>
       ) : (
-        <Box
-          ref={parentRef}
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflow: 'auto',
-            contain: 'strict',
-          }}
-        >
-          <div
-            style={{
-              height: virtualizer.getTotalSize(),
-              position: 'relative',
-              width: '100%',
-            }}
-          >
+        <Box ref={parentRef} className={classes.scrollContainer}>
+          <div className={classes.virtualList} style={{ height: virtualizer.getTotalSize() }}>
             {virtualItems.map((virtualRow) => {
               const transaction = edges[virtualRow.index].node;
               return (
                 <div
                   key={virtualRow.key}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                    height: ROW_HEIGHT,
-                    display: 'grid',
-                    gridTemplateColumns: COLUMN_TEMPLATE,
-                    gap: 'var(--mantine-spacing-md)',
-                    alignItems: 'center',
-                    padding: '0 var(--mantine-spacing-md)',
-                    borderBottom:
-                      '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5))',
-                  }}
+                  className={classes.virtualRow}
+                  style={{ transform: `translateY(${virtualRow.start}px)` }}
                 >
                   <Text size="sm">{formatDate(transaction.valueDate)}</Text>
                   <Text size="sm" truncate>

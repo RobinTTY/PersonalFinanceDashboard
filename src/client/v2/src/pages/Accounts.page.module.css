@@ -1,0 +1,42 @@
+.pageStack {
+  height: 100%;
+}
+
+.columnHeader {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 160px;
+  gap: var(--mantine-spacing-md);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.centeredFlex {
+  flex: 1;
+  min-height: 0;
+}
+
+.scrollContainer {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  contain: strict;
+}
+
+.virtualList {
+  position: relative;
+  width: 100%;
+}
+
+.virtualRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 160px;
+  gap: var(--mantine-spacing-md);
+  align-items: center;
+  padding: 0 var(--mantine-spacing-md);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+}
