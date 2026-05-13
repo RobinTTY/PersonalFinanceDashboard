@@ -1,0 +1,24 @@
+.header {
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 0.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.balanceStack {
+  flex: 1;
+  min-width: 0;
+}
+
+.actionsGroup {
+  flex: 1;
+}
+
+.accountButton {
+  cursor: pointer;
+}
+
+.accountButtonDisabled {
+  cursor: default;
+}

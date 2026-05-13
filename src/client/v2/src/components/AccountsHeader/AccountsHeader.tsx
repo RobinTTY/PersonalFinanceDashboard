@@ -2,6 +2,7 @@ import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react
 import { Avatar, Box, Button, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { formatBalance, getInitials } from '@utility';
+import classes from './AccountsHeader.module.css';
 
 type Account = AuthRequestWithAccountsFragment['associatedAccounts'][number];
 
@@ -27,17 +28,9 @@ export function AccountsHeader({
   const canSwitchAccount = accounts.length > 1;
 
   return (
-    <Box
-      style={{
-        background: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))',
-        borderRadius: 'var(--mantine-radius-md)',
-        padding: 'var(--mantine-spacing-sm) var(--mantine-spacing-md)',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-        border: '.5px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
-      }}
-    >
+    <Box className={classes.header}>
       <Group justify="space-between" align="center" wrap="nowrap">
-        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+        <Stack gap={2} className={classes.balanceStack}>
           <Text size="xs" fw={600} c="dimmed" tt="uppercase">
             Current balance
           </Text>
@@ -50,7 +43,7 @@ export function AccountsHeader({
           <Menu.Target>
             <UnstyledButton
               disabled={!canSwitchAccount}
-              style={{ cursor: canSwitchAccount ? 'pointer' : 'default' }}
+              className={canSwitchAccount ? classes.accountButton : classes.accountButtonDisabled}
             >
               <Stack align="center" gap={6}>
                 <Avatar
@@ -81,7 +74,7 @@ export function AccountsHeader({
           </Menu.Dropdown>
         </Menu>
 
-        <Group justify="flex-end" style={{ flex: 1 }}>
+        <Group justify="flex-end" className={classes.actionsGroup}>
           <Button leftSection={<IconPlus size={16} />} onClick={onAddAccount}>
             Add Account
           </Button>
