@@ -9,7 +9,3 @@
 .accountButton {
   cursor: pointer;
 }
-
-.accountButtonDisabled {
-  cursor: default;
-}

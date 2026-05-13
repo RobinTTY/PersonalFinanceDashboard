@@ -25,7 +25,6 @@ export function AccountsHeader({
   const accountLabel =
     currentAccount?.name ?? currentAccount?.iban ?? (loadingAccounts ? 'Loading…' : 'No account');
   const balanceLabel = currentAccount ? formatBalance(currentAccount) : null;
-  const canSwitchAccount = accounts.length > 1;
 
   return (
     <Box className={classes.header}>
@@ -34,10 +33,7 @@ export function AccountsHeader({
 
         <Menu position="bottom" withinPortal>
           <Menu.Target>
-            <UnstyledButton
-              disabled={!canSwitchAccount && accounts.length > 0}
-              className={canSwitchAccount ? classes.accountButton : classes.accountButtonDisabled}
-            >
+            <UnstyledButton className={classes.accountButton}>
               <Stack align="center" gap={6}>
                 <Avatar
                   src={institution?.logoUri ? String(institution.logoUri) : undefined}

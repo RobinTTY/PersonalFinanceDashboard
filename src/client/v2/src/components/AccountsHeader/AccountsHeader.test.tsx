@@ -96,7 +96,7 @@ describe('AccountsHeader', () => {
     expect(screen.getByText('CB')).toBeInTheDocument();
   });
 
-  it('renders the Add Account button', () => {
+  it('shows Add account option in the dropdown', () => {
     render(
       <AccountsHeader
         currentAccount={c24Account}
@@ -106,10 +106,11 @@ describe('AccountsHeader', () => {
         onAddAccount={noop}
       />
     );
-    expect(screen.getByRole('button', { name: /add account/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByText('C24 Gemeinschaftskonto'));
+    expect(screen.getByRole('menuitem', { name: /add account/i })).toBeInTheDocument();
   });
 
-  it('calls onAddAccount when Add Account is clicked', () => {
+  it('calls onAddAccount when Add account is clicked', () => {
     const onAddAccount = vi.fn();
     render(
       <AccountsHeader
@@ -120,7 +121,8 @@ describe('AccountsHeader', () => {
         onAddAccount={onAddAccount}
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: /add account/i }));
+    fireEvent.click(screen.getByText('C24 Gemeinschaftskonto'));
+    fireEvent.click(screen.getByRole('menuitem', { name: /add account/i }));
     expect(onAddAccount).toHaveBeenCalledTimes(1);
   });
 
@@ -161,7 +163,7 @@ describe('AccountsHeader', () => {
       />
     );
     fireEvent.click(screen.getByText('C24 Gemeinschaftskonto'));
-    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Sparkasse Girokonto' })).not.toBeInTheDocument();
   });
 
   it('opens account switcher and calls onAccountChange when a menu item is clicked', () => {
