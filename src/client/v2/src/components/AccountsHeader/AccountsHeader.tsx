@@ -60,7 +60,7 @@ export function AccountsHeader({
                 {account.name ?? account.iban ?? 'Unnamed account'}
               </Menu.Item>
             ))}
-            <Menu.Divider />
+            {accounts.length > 0 && <Menu.Divider />}
             <Menu.Item color="blue" leftSection={<IconPlus size={14} />} onClick={onAddAccount}>
               Add account
             </Menu.Item>

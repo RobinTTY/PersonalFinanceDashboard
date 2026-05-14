@@ -5,6 +5,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   Alert,
   Box,
+  Button,
   Loader,
   Stack,
   Text,
@@ -143,23 +144,26 @@ export function AccountsPage() {
         </Alert>
       ) : null}
 
-      <Box className={classes.columnHeader}>
-        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-          Date
-        </Text>
-        <Text size="xs" fw={600} c="dimmed" tt="uppercase">
-          Description
-        </Text>
-        <Text size="xs" fw={600} c="dimmed" tt="uppercase" ta="right">
-          Amount
-        </Text>
-      </Box>
+      {!showNoAccounts && (
+        <Box className={classes.columnHeader}>
+          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+            Date
+          </Text>
+          <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+            Description
+          </Text>
+          <Text size="xs" fw={600} c="dimmed" tt="uppercase" ta="right">
+            Amount
+          </Text>
+        </Box>
+      )}
 
       {showNoAccounts ? (
         <Stack align="center" justify="center" className={classes.centeredFlex}>
           <Text size="sm" c="dimmed">
             Connect a bank account to view transactions.
           </Text>
+          <Button onClick={openAddAccount}>Add account</Button>
         </Stack>
       ) : showInitialLoader ? (
         <Stack align="center" justify="center" className={classes.centeredFlex}>
