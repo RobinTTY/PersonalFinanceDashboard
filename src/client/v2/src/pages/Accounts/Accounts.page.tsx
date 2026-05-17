@@ -40,7 +40,7 @@ export function AccountsPage() {
     closeAddAccount();
   };
 
-  const { data: accountsData, loading: loadingAccounts } = useQuery(GetAuthRequestsWithAccounts);
+  const { data: accountsData, loading: isFetchingAuthRequest } = useQuery(GetAuthRequestsWithAccounts);
 
   const accounts = useMemo(() => {
     const all =
@@ -65,7 +65,7 @@ export function AccountsPage() {
     [accounts, accountId]
   );
 
-  const { data, loading, error, fetchMore } = useQuery(GetTransactionsByAccountId, {
+  const { data, loading: isFetchingTransactions, error, fetchMore } = useQuery(GetTransactionsByAccountId, {
     variables: { accountId: accountId ?? '', first: PAGE_SIZE },
     skip: !accountId,
     notifyOnNetworkStatusChange: true,
@@ -118,16 +118,21 @@ export function AccountsPage() {
     });
   }, [virtualItems, edges.length, pageInfo, fetchMore, accountId]);
 
-  const showInitialLoader = !!accountId && loading && edges.length === 0;
-  const showEmptyState = !!accountId && !loading && edges.length === 0;
-  const showNoAccounts = !loadingAccounts && accounts.length === 0;
+  // Waiting on auth request query; account list not yet available
+  const showAccountsLoader = isFetchingAuthRequest;
+  // Account selected, first page of transactions still loading (no rows yet)
+  const showInitialLoader = !isFetchingAuthRequest && !!accountId && isFetchingTransactions && edges.length === 0;
+  // Account selected, load complete, but no transactions exist
+  const showEmptyState = !isFetchingAuthRequest && !!accountId && !isFetchingTransactions && edges.length === 0;
+  // Auth done but user has no linked accounts
+  const showNoAccounts = !isFetchingAuthRequest && accounts.length === 0;
 
   return (
     <Stack className={classes.pageStack}>
       <AccountsHeader
         currentAccount={currentAccount}
         accounts={accounts}
-        loadingAccounts={loadingAccounts}
+        loadingAccounts={isFetchingAuthRequest}
         onAccountChange={setAccountId}
         onAddAccount={openAddAccount}
       />
@@ -144,7 +149,7 @@ export function AccountsPage() {
         </Alert>
       ) : null}
 
-      {!showNoAccounts && (
+      {!showNoAccounts && !showAccountsLoader && (
         <Box className={classes.columnHeader}>
           <Text size="xs" fw={600} c="dimmed" tt="uppercase">
             Date
@@ -158,7 +163,14 @@ export function AccountsPage() {
         </Box>
       )}
 
-      {showNoAccounts ? (
+      {showAccountsLoader ? (
+        <Stack align="center" justify="center" className={classes.centeredFlex}>
+          <Loader size="sm" />
+          <Text size="sm" c="dimmed">
+            Loading accounts…
+          </Text>
+        </Stack>
+      ) : showNoAccounts ? (
         <Stack align="center" justify="center" className={classes.centeredFlex}>
           <Text size="sm" c="dimmed">
             Connect a bank account to view transactions.
