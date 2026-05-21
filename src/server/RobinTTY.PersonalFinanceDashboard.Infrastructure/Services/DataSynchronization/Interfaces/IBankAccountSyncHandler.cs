@@ -2,5 +2,5 @@
 
 public interface IBankAccountSyncHandler
 {
-    Task<bool> SynchronizeData(Guid? bankAccountId = null, bool forceThirdPartySync = false);
+    Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false);
 }

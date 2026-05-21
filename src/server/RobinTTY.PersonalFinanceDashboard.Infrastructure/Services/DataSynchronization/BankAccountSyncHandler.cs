@@ -16,20 +16,21 @@ public class BankAccountSyncHandler(
     /// <summary>
     /// Synchronizes stale bank account data by fetching it from a third-party API and updating the local database. If a specific bank account ID is provided, synchronization is limited to that account; otherwise, all accounts are synchronized.
     /// </summary>
-    /// <param name="bankAccountId">The internal ID of a specific bank account to synchronize. If <see langword="null"/>, all bank accounts will be synchronized.</param>
+    /// <param name="internalBankAccountId">The internal ID of a specific bank account to synchronize. If <see langword="null"/>, all bank accounts will be synchronized.</param>
     /// <param name="forceThirdPartySync">Indicates whether to force synchronization with the third-party API.</param>
     /// <returns>A boolean value indicating whether the synchronization process was successful.</returns>
-    public async Task<bool> SynchronizeData(Guid? bankAccountId = null, bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false)
     {
         Guid? thirdPartyBankAccountId = null;
 
         // If a specific bank account id is provided, we only want to fetch and update that account. In this case, we need to get the corresponding third party id to fetch the data from the API.
-        if (bankAccountId.HasValue)
+        if (internalBankAccountId.HasValue)
             thirdPartyBankAccountId = dbContext.BankAccounts
-                .SingleOrDefault(bankAccount => bankAccount.Id == bankAccountId)?.ThirdPartyId;
+                .SingleOrDefault(bankAccount => bankAccount.Id == internalBankAccountId)?.ThirdPartyId;
 
         // Fetch bank accounts from third party
-        var bankAccounts = await FetchBankAccountsFromApi(bankAccountId, thirdPartyBankAccountId, forceThirdPartySync);
+        var bankAccounts =
+            await FetchBankAccountsFromApi(internalBankAccountId, thirdPartyBankAccountId, forceThirdPartySync);
         if (bankAccounts == null)
         {
             logger.LogWarning("Failed to fetch bank accounts from third party API.");

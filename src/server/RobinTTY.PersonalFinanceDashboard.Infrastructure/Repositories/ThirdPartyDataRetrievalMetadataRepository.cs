@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
