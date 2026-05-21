@@ -16,7 +16,8 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
         ThirdPartyDataType dataType, Guid? synchronizationEntityId)
     {
         return await dbContext.ThirdPartyDataRetrievalMetadata
-            .SingleOrDefaultAsync(metadata => metadata.DataType == dataType && metadata.SynchronizationEntityId == synchronizationEntityId);
+            .SingleOrDefaultAsync(metadata =>
+                metadata.DataType == dataType && metadata.SynchronizationEntityId == synchronizationEntityId);
     }
 
     /// <summary>
@@ -40,7 +41,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     public async Task ResetLastRetrievalTime(ThirdPartyDataType dataType, Guid? synchronizationEntityId)
     {
         var existingMetadata = await GetThirdPartyDataRetrievalMetadata(dataType, synchronizationEntityId);
-        
+
         if (existingMetadata is null)
         {
             var newMetadata = new ThirdPartyDataRetrievalMetadata
@@ -51,7 +52,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
                 LastRetrievalTime = DateTime.Now,
                 RetrievalInterval = GetRetrievalInterval(dataType)
             };
-            
+
             await AddThirdPartyDataRetrievalMetadata(newMetadata);
         }
         else
@@ -60,14 +61,13 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
             await dbContext.SaveChangesAsync();
         }
     }
-    
+
     private static TimeSpan GetRetrievalInterval(ThirdPartyDataType dataType)
     {
         return dataType switch
         {
-            ThirdPartyDataType.BankingInstitutions or ThirdPartyDataType.AuthenticationRequests
-                or ThirdPartyDataType.BankAccounts => TimeSpan.FromDays(7),
-            ThirdPartyDataType.Transactions => TimeSpan.FromDays(1),
+            ThirdPartyDataType.BankingInstitutions or ThirdPartyDataType.AuthenticationRequests => TimeSpan.FromDays(7),
+            ThirdPartyDataType.Transactions or ThirdPartyDataType.BankAccounts => TimeSpan.FromDays(1),
             _ => throw new ArgumentException("Data type cannot be undefined.", nameof(dataType))
         };
     }
