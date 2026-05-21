@@ -1,30 +1,51 @@
-﻿namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
 
-public class ThirdPartyDataRetrievalMetadata(
-    Guid id,
-    ThirdPartyDataType dataType,
-    ThirdPartyDataSource dataSource,
-    DateTime lastRetrievalTime,
-    TimeSpan retrievalInterval)
+namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
+
+public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
 {
-    /// <summary>
-    /// Distinct id identifying this entity.
-    /// </summary>
-    public Guid Id { get; init; } = id;
     /// <summary>
     /// The type of data being retrieved. 
     /// </summary>
-    public ThirdPartyDataType DataType { get; set; } = dataType;
+    public required ThirdPartyDataType DataType { get; set; }
+
     /// <summary>
     /// The source of the data.
     /// </summary>
-    public ThirdPartyDataSource DataSource { get; set; } = dataSource;
+    public required ThirdPartyDataSource DataSource { get; set; }
+
     /// <summary>
     /// The <see cref="DateTime"/> at which the data was retrieved last.
     /// </summary>
-    public DateTime LastRetrievalTime { get; set; } = lastRetrievalTime;
+    public required DateTime LastRetrievalTime { get; set; }
+
+    // TODO: This may be removed 
     /// <summary>
     /// The interval at which the data should be retrieved again from the data source.
     /// </summary>
-    public TimeSpan RetrievalInterval { get; set; } = retrievalInterval;
+    public required TimeSpan RetrievalInterval { get; set; }
+
+    /// <summary>
+    /// Depending on the data type, we track individual synchronization entities. For example, for accounts,
+    /// we track the account id for which the data retrieval metadata applies. This allows us to have different
+    /// retrieval times and intervals for different accounts.
+    /// </summary>
+    public Guid? SynchronizationEntityId { get; set; }
+    
+    public ThirdPartyDataRetrievalMetadata() 
+    {
+    }
+
+    public ThirdPartyDataRetrievalMetadata(Guid id,
+        ThirdPartyDataType dataType,
+        ThirdPartyDataSource dataSource,
+        DateTime lastRetrievalTime,
+        TimeSpan retrievalInterval)
+    {
+        Id = id;
+        DataType = dataType;
+        DataSource = dataSource;
+        LastRetrievalTime = lastRetrievalTime;
+        RetrievalInterval = retrievalInterval;
+    }
 }

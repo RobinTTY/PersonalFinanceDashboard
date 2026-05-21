@@ -20,14 +20,20 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// database, has gone stale.
     /// </summary>
     /// <param name="thirdPartyDataType">The data type for which to check.</param>
+    /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to check.</param>
     /// <returns><see langword="true"/> if the data stored in the db is stale,
     /// <see langword="false"/> otherwise.</returns>
-    public async Task<bool> DataIsStale(ThirdPartyDataType thirdPartyDataType)
+    public async Task<bool> DataIsStale(ThirdPartyDataType thirdPartyDataType, Guid? synchronizationEntityId = null)
     {
         var retrievalMetadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetThirdPartyDataRetrievalMetadata(thirdPartyDataType);
-        var nextRetrievalTime = retrievalMetadata.LastRetrievalTime + retrievalMetadata.RetrievalInterval;
+            .GetThirdPartyDataRetrievalMetadata(thirdPartyDataType, synchronizationEntityId);
 
+        if (retrievalMetadata is null)
+        {
+            return true;
+        }
+            
+        var nextRetrievalTime = retrievalMetadata.LastRetrievalTime + retrievalMetadata.RetrievalInterval;
         return nextRetrievalTime <= DateTime.Now;
     }
 
@@ -35,14 +41,10 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// Sets the last retrieval time for the given <see cref="ThirdPartyDataType"/> to the
     /// current moment.
     /// </summary>
+    /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to reset the data expiry.</param>
     /// <param name="thirdPartyDataType">The data type for which to reset the data expiry.</param>
-    public async Task ResetDataExpiry(ThirdPartyDataType thirdPartyDataType)
+    public async Task ResetDataExpiry(ThirdPartyDataType thirdPartyDataType, Guid? synchronizationEntityId = null)
     {
-        var resetWasSuccessful =
-            await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(thirdPartyDataType);
-
-        if (!resetWasSuccessful)
-            logger.LogError("Could not reset the data expiry time for ThirdPartyDataType {dataType}",
-                thirdPartyDataType);
+        await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(thirdPartyDataType, synchronizationEntityId);
     }
 }

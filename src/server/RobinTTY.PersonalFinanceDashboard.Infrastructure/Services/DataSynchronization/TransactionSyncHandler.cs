@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
@@ -15,24 +14,27 @@ public class TransactionSyncHandler(
 {
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {
-        // TODO: Save metadata on a per-account basis, so that we do not have to sync all accounts if only one account has stale data
-        return true;
-        var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions);
+        List<Guid> accountIds = [];
+        var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, internalAccountId);
 
         if (dataIsStale || forceThirdPartySync)
         {
             var transactions = new List<Transaction>();
             if (internalAccountId.HasValue)
+            {
+                accountIds = [internalAccountId.Value];
                 transactions = await GetTransactions(internalAccountId.Value);
+            }
             else
             {
-                var accountIds = dbContext.BankAccounts
+                accountIds = dbContext.BankAccounts
                     .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
                         request.Status == AuthenticationStatus.Active &&
                         request.CreatedAt > DateTime.UtcNow.AddDays(-90)))
                     .Select(account => account.Id)
                     .Where(id => id.HasValue)
-                    .Cast<Guid>();
+                    .Cast<Guid>()
+                    .ToList();
 
                 foreach (var internAccountId in accountIds)
                 {
@@ -42,7 +44,6 @@ public class TransactionSyncHandler(
                 }
             }
 
-
             if (transactions == null || transactions.Count == 0)
             {
                 logger.LogWarning("Could not retrieve transactions from {dataProvider}",
@@ -51,11 +52,10 @@ public class TransactionSyncHandler(
             }
 
             await AddOrUpdateTransactions(transactions);
-
-            // TODO: Maybe optimize to be able to save sync metadata for individual accounts
-            // If we are updating only one account, do not reset the data expiry
-            if (!internalAccountId.HasValue)
-                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.Transactions);
+            foreach (var accountId in accountIds)
+            {
+                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.Transactions, accountId);
+            }
 
             logger.LogInformation("Synced {Count} transactions", transactions.Count);
         }
