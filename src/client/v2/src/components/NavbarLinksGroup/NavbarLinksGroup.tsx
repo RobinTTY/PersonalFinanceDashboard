@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconChevronRight } from '@tabler/icons-react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import classes from './NavbarLinksGroup.module.css';
 
@@ -24,6 +24,10 @@ export function LinksGroup({
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const active = link
+    ? location.pathname === link || location.pathname.startsWith(`${link}/`)
+    : false;
 
   const items = (hasLinks ? links : []).map((item) => (
     <Text<typeof NavLink>
@@ -48,11 +52,20 @@ export function LinksGroup({
 
   return (
     <>
-      <UnstyledButton onClick={handleClick} className={classes.control}>
+      <UnstyledButton
+        onClick={handleClick}
+        className={classes.control}
+        data-active={active || undefined}
+      >
         <Group justify="space-between" gap={0}>
           <Box style={{ display: 'flex', alignItems: 'center' }}>
-            <ThemeIcon variant="light" size={34}>
-              <Icon size={22} />
+            <ThemeIcon
+              variant={active ? 'gradient' : 'light'}
+              gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
+              size={40}
+              radius="md"
+            >
+              <Icon size={24} stroke={1.7} />
             </ThemeIcon>
             <Box ml="md">{label}</Box>
           </Box>
