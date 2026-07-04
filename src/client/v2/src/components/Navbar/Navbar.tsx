@@ -6,9 +6,10 @@ import classes from './Navbar.module.css';
 
 interface NavbarProps {
   links: LinksGroupProps[];
+  onUserProfileClick?: () => void;
 }
 
-export function Navbar({ links }: NavbarProps) {
+export function Navbar({ links, onUserProfileClick }: NavbarProps) {
   const linkItems = links.map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
@@ -25,7 +26,7 @@ export function Navbar({ links }: NavbarProps) {
       </ScrollArea>
 
       <div className={classes.footer}>
-        <UserButton />
+        <UserButton onClick={onUserProfileClick} />
       </div>
     </nav>
   );

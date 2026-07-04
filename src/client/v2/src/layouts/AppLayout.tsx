@@ -1,9 +1,4 @@
-import {
-  IconAdjustments,
-  IconGauge,
-  IconNotes,
-  IconPresentationAnalytics,
-} from '@tabler/icons-react';
+import { IconGauge, IconNotes, IconPresentationAnalytics } from '@tabler/icons-react';
 import { Outlet } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { Navbar } from '@/components/Navbar/Navbar';
@@ -17,12 +12,11 @@ export function AppLayout() {
     { label: 'Dashboard', icon: IconGauge, link: '/dashboard' },
     { label: 'Accounts', icon: IconNotes, link: '/accounts' },
     { label: 'Analytics', icon: IconPresentationAnalytics, link: '/analytics' },
-    { label: 'Settings', icon: IconAdjustments, onClick: openSettings },
   ];
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <Navbar links={navLinks} />
+      <Navbar links={navLinks} onUserProfileClick={openSettings} />
       <main style={{ flex: 1, overflow: 'auto', padding: 'var(--mantine-spacing-md)' }}>
         <Outlet />
       </main>
