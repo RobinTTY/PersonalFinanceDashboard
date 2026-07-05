@@ -32,6 +32,12 @@ public class BankAccount : Account
     public string? AccountType { get; set; }
 
     /// <summary>
+    /// Whether this account is included in analytics such as graphs and account views.
+    /// This is user-controlled and is not affected by third party data synchronization.
+    /// </summary>
+    public bool IncludeInAnalytics { get; set; } = true;
+
+    /// <summary>
     /// The banking institution this account belongs to.
     /// </summary>
     public BankingInstitution? AssociatedInstitution { get; set; }
@@ -52,6 +58,7 @@ public class BankAccount : Account
         Bban = null;
         OwnerName = null;
         AccountType = null;
+        IncludeInAnalytics = true;
         AssociatedInstitution = null;
     }
 

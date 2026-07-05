@@ -31,7 +31,20 @@ public class BankAccountMutationResolvers
     {
         return await repository.UpdateBankAccount(bankAccount);
     }
-    
+
+    /// <summary>
+    /// Sets whether a bank account is included in analytics such as graphs and account views.
+    /// </summary>
+    /// <param name="repository">The injected repository to use for data retrieval.</param>
+    /// <param name="bankAccountId">The id of the bank account to update.</param>
+    /// <param name="includeInAnalytics">Whether the account should be included in analytics.</param>
+    /// <returns>The updated bank account if one is matched, otherwise <see langword="null"/>.</returns>
+    public async Task<BankAccount?> SetBankAccountIncludeInAnalytics(BankAccountRepository repository,
+        Guid bankAccountId, bool includeInAnalytics)
+    {
+        return await repository.SetIncludeInAnalytics(bankAccountId, includeInAnalytics);
+    }
+
     /// <summary>
     /// Delete an existing bank account.
     /// </summary>
@@ -42,7 +55,7 @@ public class BankAccountMutationResolvers
     {
         return await repository.DeleteBankAccount(bankAccountId);
     }
-    
+
     /// <summary>
     /// Synchronizes bank account data with third-party data providers.
     /// </summary>

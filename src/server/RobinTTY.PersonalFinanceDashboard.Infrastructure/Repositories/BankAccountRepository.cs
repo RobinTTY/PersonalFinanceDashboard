@@ -38,7 +38,7 @@ public class BankAccountRepository
     public async Task<IQueryable<BankAccount?>> GetBankAccount(Guid accountId)
     {
         await _bankAccountSyncHandler.SynchronizeData(accountId, true);
-        
+
         return _dbContext.BankAccounts.Where(account => account.Id == accountId);
     }
 
@@ -76,6 +76,24 @@ public class BankAccountRepository
         await _dbContext.SaveChangesAsync();
 
         return entityEntry.Entity;
+    }
+
+    /// <summary>
+    /// Sets whether a <see cref="BankAccount"/> is included in analytics such as graphs and account views.
+    /// </summary>
+    /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to update.</param>
+    /// <param name="includeInAnalytics">Whether the account should be included in analytics.</param>
+    /// <returns>The updated <see cref="BankAccount"/> if one is matched, otherwise <see langword="null"/>.</returns>
+    public async Task<BankAccount?> SetIncludeInAnalytics(Guid bankAccountId, bool includeInAnalytics)
+    {
+        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId);
+        if (bankAccount == null)
+            return null;
+
+        bankAccount.IncludeInAnalytics = includeInAnalytics;
+        await _dbContext.SaveChangesAsync();
+
+        return bankAccount;
     }
 
     /// <summary>
