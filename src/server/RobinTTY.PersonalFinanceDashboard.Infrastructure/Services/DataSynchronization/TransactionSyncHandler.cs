@@ -17,59 +17,37 @@ public class TransactionSyncHandler(
         var transactions = new List<Transaction>();
         var syncedAccountIds = new List<Guid>();
 
-        if (internalAccountId.HasValue)
+        var accountIds = internalAccountId.HasValue
+            ? [internalAccountId.Value]
+            : GetActiveAccountIds();
+
+        foreach (var accountId in accountIds)
         {
             var dataIsStale =
-                await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, internalAccountId);
+                await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, accountId);
             if (!dataIsStale && !forceThirdPartySync)
             {
                 logger.LogDebug(
                     "Transaction data for account with id {accountId} is not stale. Skipping synchronization with third party.",
-                    internalAccountId);
+                    accountId);
+                continue;
             }
-            else
+
+            var transactionsForAccount = await FetchTransactionsForAccount(accountId);
+            if (transactionsForAccount == null)
             {
-                var transactionsForAccount = await FetchTransactionsForAccount(internalAccountId.Value);
-                if (transactionsForAccount == null)
+                // Only the explicitly-requested single account aborts the whole sync on failure.
+                if (internalAccountId.HasValue)
                 {
                     logger.LogWarning("Failed to fetch transactions from third party API.");
                     return false;
                 }
 
-                transactions.AddRange(transactionsForAccount);
-                syncedAccountIds.Add(internalAccountId.Value);
+                continue;
             }
-        }
-        else
-        {
-            var accountIds = dbContext.BankAccounts
-                .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
-                    request.Status == AuthenticationStatus.Active &&
-                    request.CreatedAt > DateTime.UtcNow.AddDays(-90)))
-                .Select(account => account.Id)
-                .Where(id => id.HasValue)
-                .Cast<Guid>()
-                .ToList();
 
-            foreach (var accountId in accountIds)
-            {
-                var dataIsStale =
-                    await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, accountId);
-                if (!dataIsStale && !forceThirdPartySync)
-                {
-                    logger.LogDebug(
-                        "Transaction data for account with id {accountId} is not stale. Skipping synchronization with third party.",
-                        accountId);
-                    continue;
-                }
-
-                var transactionsForAccount = await FetchTransactionsForAccount(accountId);
-                if (transactionsForAccount != null)
-                {
-                    transactions.AddRange(transactionsForAccount);
-                    syncedAccountIds.Add(accountId);
-                }
-            }
+            transactions.AddRange(transactionsForAccount);
+            syncedAccountIds.Add(accountId);
         }
 
         if (syncedAccountIds.Count == 0)
@@ -86,6 +64,16 @@ public class TransactionSyncHandler(
 
         return true;
     }
+
+    private List<Guid> GetActiveAccountIds() =>
+        dbContext.BankAccounts
+            .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
+                request.Status == AuthenticationStatus.Active &&
+                request.CreatedAt > DateTime.UtcNow.AddDays(-90)))
+            .Select(account => account.Id)
+            .Where(id => id.HasValue)
+            .Cast<Guid>()
+            .ToList();
 
     private async Task<List<Transaction>?> FetchTransactionsForAccount(Guid internalAccountId)
     {
