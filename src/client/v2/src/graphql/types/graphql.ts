@@ -634,3 +634,8 @@ export type GetTransactionsByAccountIdQueryVariables = Exact<{
 
 
 export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string } }> | null } | null };
+
+export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNetWorthHistoryQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, balance: number | null, currency: string | null, transactions: Array<{ __typename: 'Transaction', valueDate: Date | null, amount: number }> }> | null } | null };
