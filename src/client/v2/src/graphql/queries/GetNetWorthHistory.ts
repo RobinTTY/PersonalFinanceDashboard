@@ -3,7 +3,7 @@ import { GetNetWorthHistoryQuery } from '../types/graphql';
 
 export const GetNetWorthHistory: TypedDocumentNode<GetNetWorthHistoryQuery> = gql`
   query GetNetWorthHistory {
-    bankAccounts(first: 50) {
+    bankAccounts(first: 50, where: { includeInAnalytics: { eq: true } }) {
       nodes {
         id
         balance
