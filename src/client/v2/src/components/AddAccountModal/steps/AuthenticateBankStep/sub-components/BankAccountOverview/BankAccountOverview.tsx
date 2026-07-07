@@ -1,4 +1,5 @@
 import { Avatar, Badge, Divider, Group, Stack, Text } from '@mantine/core';
+import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
 import { GetAuthRequestWithAccountsQuery } from '@/graphql/types/graphql';
 import { getInitials } from '@/utility/getInitials';
 import classes from './BankAccountOverview.module.css';
@@ -98,6 +99,16 @@ export function BankAccountOverview({ accounts }: BankAccountOverviewProps) {
                 </Group>
               )}
             </Stack>
+
+            {account.id != null && (
+              <>
+                <Divider my="sm" />
+                <IncludeInAnalyticsSwitch
+                  accountId={String(account.id)}
+                  includeInAnalytics={account.includeInAnalytics}
+                />
+              </>
+            )}
           </div>
         );
       })}

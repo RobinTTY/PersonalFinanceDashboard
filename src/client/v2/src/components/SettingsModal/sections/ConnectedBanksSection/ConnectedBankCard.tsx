@@ -2,6 +2,7 @@ import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
 import { ActionIcon, Avatar, Badge, Divider, Group, Stack, Text, Tooltip, Accordion } from '@mantine/core';
 import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { formatBalance, getInitials } from '@utility';
+import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
 import classes from './ConnectedBanksSection.module.css';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
@@ -75,6 +76,16 @@ function AccountRow({ account }: { account: ConnectedBankAccount }) {
               {account.ownerName}
             </Text>
           </Group>
+        )}
+        {account.id != null && (
+          <>
+            <Divider my={4} />
+            <IncludeInAnalyticsSwitch
+              accountId={String(account.id)}
+              includeInAnalytics={account.includeInAnalytics}
+              size="xs"
+            />
+          </>
         )}
       </Stack>
     </div>

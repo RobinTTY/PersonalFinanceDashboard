@@ -18,6 +18,7 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
       balance
       currency
       ownerName
+      includeInAnalytics
       associatedInstitution {
         name
         bic

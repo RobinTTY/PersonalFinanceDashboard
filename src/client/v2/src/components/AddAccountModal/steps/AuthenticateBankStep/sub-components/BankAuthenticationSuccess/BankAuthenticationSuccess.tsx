@@ -29,7 +29,15 @@ export function BankAuthenticationSuccess({ accounts }: BankAuthenticationSucces
           </Text>
         </Stack>
       </Group>
-      {accounts.length > 0 && <BankAccountOverview accounts={accounts} />}
+      {accounts.length > 0 && (
+        <>
+          <Text size="sm" c="dimmed" ta="center">
+            Choose which accounts to include in your analytics. You can change this later in the
+            connected banks settings.
+          </Text>
+          <BankAccountOverview accounts={accounts} />
+        </>
+      )}
     </Stack>
   );
 }

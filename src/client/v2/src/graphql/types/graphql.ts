@@ -606,7 +606,7 @@ export type UpdateTransactionPayload = {
   transaction: Maybe<Transaction>;
 };
 
-export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
+export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
 
 export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null };
 
@@ -627,17 +627,25 @@ export type DeleteAuthenticationRequestMutationVariables = Exact<{
 
 export type DeleteAuthenticationRequestMutation = { deleteAuthenticationRequest: { __typename: 'DeleteAuthenticationRequestPayload', deleteResponse: { __typename: 'DeleteResponse', deletedId: unknown } | null } };
 
+export type SetBankAccountIncludeInAnalyticsMutationVariables = Exact<{
+  bankAccountId: Scalars['UUID']['input'];
+  includeInAnalytics: Scalars['Boolean']['input'];
+}>;
+
+
+export type SetBankAccountIncludeInAnalyticsMutation = { setBankAccountIncludeInAnalytics: { __typename: 'SetBankAccountIncludeInAnalyticsPayload', bankAccount: { __typename: 'BankAccount', id: unknown | null, includeInAnalytics: boolean } | null } };
+
 export type GetAuthRequestWithAccountsQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
 }>;
 
 
-export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
+export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
 
 export type GetAuthRequestsWithAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> }> };
+export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> }> };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
