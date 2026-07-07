@@ -18,6 +18,7 @@ const c24Account: Account = {
   balance: 468.15,
   currency: 'EUR',
   ownerName: 'Robin Mueller',
+  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'C24 Bank',
@@ -37,6 +38,7 @@ const sparkasseAccount: Account = {
   balance: 1234.56,
   currency: 'EUR',
   ownerName: 'Robin Mueller',
+  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'Sparkasse',
