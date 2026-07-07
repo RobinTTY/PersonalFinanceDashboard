@@ -50,9 +50,15 @@ export function AccountsPage() {
   const [accountId, setAccountId] = useState<string | null>(null);
 
   // Auto-select the first account once the accounts query resolves, so the page
-  // shows transactions immediately instead of an empty selector.
+  // shows transactions immediately instead of an empty selector. Also recovers the
+  // selection if the currently selected account leaves the list (e.g. the user
+  // excludes it from analytics in the connected banks settings).
   useEffect(() => {
-    if (!accountId && accounts.length > 0) {
+    if (accounts.length === 0) {
+      return;
+    }
+    const selectionExists = accountId != null && accounts.some((a) => String(a.id) === accountId);
+    if (!selectionExists) {
       setAccountId(String(accounts[0].id));
     }
   }, [accounts, accountId]);

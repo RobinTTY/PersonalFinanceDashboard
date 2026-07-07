@@ -9,6 +9,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { CloseButton, Modal, NavLink, ScrollArea, Text, Title } from '@mantine/core';
+import { useFlushAnalyticsRefetchOnClose } from '@/components/IncludeInAnalyticsSwitch/DeferredAnalyticsRefetch';
 import { AboutSection } from './sections/AboutSection/AboutSection';
 import { ConnectedBanksSection } from './sections/ConnectedBanksSection/ConnectedBanksSection';
 import { PreferencesSection } from './sections/PreferencesSection/PreferencesSection';
@@ -54,6 +55,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ opened, onClose }: SettingsModalProps) {
   const [activeLabel, setActiveLabel] = useState('Preferences');
+  useFlushAnalyticsRefetchOnClose(opened);
 
   return (
     <Modal.Root
