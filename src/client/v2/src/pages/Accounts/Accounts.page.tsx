@@ -13,7 +13,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { AccountsHeader } from '@/components/AccountsHeader/AccountsHeader';
 import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/AddAccountModal';
-import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
+import { GetBankAccounts } from '@graphql-queries/GetBankAccounts';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
 import { formatAmount, formatDate } from '@utility';
 import classes from './Accounts.page.module.css';
@@ -40,15 +40,12 @@ export function AccountsPage() {
     closeAddAccount();
   };
 
-  const { data: accountsData, loading: isFetchingAuthRequest } = useQuery(GetAuthRequestsWithAccounts);
+  const { data: accountsData, loading: isFetchingAccounts } = useQuery(GetBankAccounts);
 
-  const accounts = useMemo(() => {
-    const all =
-      accountsData?.authenticationRequests.flatMap((req) =>
-        req.associatedAccounts.filter((acc) => acc.id != null)
-      ) ?? [];
-    return Array.from(new Map(all.map((a) => [String(a.id), a])).values());
-  }, [accountsData]);
+  const accounts = useMemo(
+    () => accountsData?.bankAccounts?.nodes?.filter((acc) => acc.id != null) ?? [],
+    [accountsData]
+  );
 
   const [accountId, setAccountId] = useState<string | null>(null);
 
@@ -118,21 +115,21 @@ export function AccountsPage() {
     });
   }, [virtualItems, edges.length, pageInfo, fetchMore, accountId]);
 
-  // Waiting on auth request query; account list not yet available
-  const showAccountsLoader = isFetchingAuthRequest;
+  // Waiting on bank accounts query; account list not yet available
+  const showAccountsLoader = isFetchingAccounts;
   // Account selected, first page of transactions still loading (no rows yet)
-  const showInitialLoader = !isFetchingAuthRequest && !!accountId && isFetchingTransactions && edges.length === 0;
+  const showInitialLoader = !isFetchingAccounts && !!accountId && isFetchingTransactions && edges.length === 0;
   // Account selected, load complete, but no transactions exist
-  const showEmptyState = !isFetchingAuthRequest && !!accountId && !isFetchingTransactions && edges.length === 0;
-  // Auth done but user has no linked accounts
-  const showNoAccounts = !isFetchingAuthRequest && accounts.length === 0;
+  const showEmptyState = !isFetchingAccounts && !!accountId && !isFetchingTransactions && edges.length === 0;
+  // Query done but user has no linked accounts
+  const showNoAccounts = !isFetchingAccounts && accounts.length === 0;
 
   return (
     <Stack className={classes.pageStack}>
       <AccountsHeader
         currentAccount={currentAccount}
         accounts={accounts}
-        loadingAccounts={isFetchingAuthRequest}
+        loadingAccounts={isFetchingAccounts}
         onAccountChange={setAccountId}
         onAddAccount={openAddAccount}
       />

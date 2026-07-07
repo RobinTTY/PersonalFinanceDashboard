@@ -1,10 +1,10 @@
 import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
 import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
-import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
+import { BankAccountSummaryFragment } from '@graphql-types/graphql';
 import { formatBalance, getInitials } from '@utility';
 import classes from './AccountsHeader.module.css';
 
-type Account = AuthRequestWithAccountsFragment['associatedAccounts'][number];
+type Account = BankAccountSummaryFragment;
 
 interface AccountsHeaderProps {
   currentAccount: Account | null;

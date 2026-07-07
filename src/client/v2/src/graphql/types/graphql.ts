@@ -58,6 +58,7 @@ export type BankAccount = {
   description: Maybe<Scalars['String']['output']>;
   iban: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
+  includeInAnalytics: Scalars['Boolean']['output'];
   name: Maybe<Scalars['String']['output']>;
   ownerName: Maybe<Scalars['String']['output']>;
   thirdPartyId: Scalars['UUID']['output'];
@@ -75,6 +76,7 @@ export type BankAccountInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   iban?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+  includeInAnalytics: Scalars['Boolean']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   ownerName?: InputMaybe<Scalars['String']['input']>;
   thirdPartyId: Scalars['UUID']['input'];
@@ -267,6 +269,14 @@ export type Mutation = {
   /** Delete an existing transaction. */
   deleteTransaction: DeleteTransactionPayload;
   /**
+   * Sets whether a bank account is included in analytics such as graphs and account views.
+   *
+   *
+   * **Returns:**
+   * The updated bank account if one is matched, otherwise null.
+   */
+  setBankAccountIncludeInAnalytics: SetBankAccountIncludeInAnalyticsPayload;
+  /**
    * Synchronizes authentication request data with third-party data providers.
    *
    *
@@ -352,6 +362,12 @@ export type MutationDeleteBankingInstitutionArgs = {
 /** AuthenticationRequest related mutation resolvers. */
 export type MutationDeleteTransactionArgs = {
   input: DeleteTransactionInput;
+};
+
+
+/** AuthenticationRequest related mutation resolvers. */
+export type MutationSetBankAccountIncludeInAnalyticsArgs = {
+  input: SetBankAccountIncludeInAnalyticsInput;
 };
 
 
@@ -458,6 +474,18 @@ export type Response = {
   __typename: 'Response';
   /** TODO */
   id: Scalars['UUID']['output'];
+};
+
+export type SetBankAccountIncludeInAnalyticsInput = {
+  /** The id of the bank account to update. */
+  bankAccountId: Scalars['UUID']['input'];
+  /** Whether the account should be included in analytics. */
+  includeInAnalytics: Scalars['Boolean']['input'];
+};
+
+export type SetBankAccountIncludeInAnalyticsPayload = {
+  __typename: 'SetBankAccountIncludeInAnalyticsPayload';
+  bankAccount: Maybe<BankAccount>;
 };
 
 export type SynchronizeAuthenticationRequestDataPayload = {
@@ -580,6 +608,8 @@ export type UpdateTransactionPayload = {
 
 export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
 
+export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null };
+
 export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
 
 export type CreateAuthenticationRequestMutationVariables = Exact<{
@@ -616,6 +646,11 @@ export type GetAuthenticationRequestQueryVariables = Exact<{
 
 export type GetAuthenticationRequestQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null };
 
+export type GetBankAccountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBankAccountsQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null }> | null } | null };
+
 export type GetBankingInstitutionsQueryVariables = Exact<{
   countryCode?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -623,6 +658,11 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
 
 
 export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, thirdPartyId: string, name: string, bic: string, logoUri: unknown } }> | null } | null };
+
+export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNetWorthHistoryQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, balance: number | null, currency: string | null, transactions: Array<{ __typename: 'Transaction', valueDate: Date | null, amount: number }> }> | null } | null };
 
 export type GetTransactionsByAccountIdQueryVariables = Exact<{
   accountId: Scalars['UUID']['input'];
@@ -634,8 +674,3 @@ export type GetTransactionsByAccountIdQueryVariables = Exact<{
 
 
 export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string } }> | null } | null };
-
-export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetNetWorthHistoryQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, balance: number | null, currency: string | null, transactions: Array<{ __typename: 'Transaction', valueDate: Date | null, amount: number }> }> | null } | null };
