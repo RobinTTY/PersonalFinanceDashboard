@@ -29,6 +29,7 @@ public sealed class BankAccountQueryResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     [UsePaging]
     [UseProjection]
+    [UseFiltering]
     public async Task<IQueryable<BankAccount>> GetBankAccounts(BankAccountRepository repository)
     {
         return await repository.GetBankAccounts();

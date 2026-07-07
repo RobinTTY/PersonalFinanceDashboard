@@ -55,15 +55,11 @@ public static class ServiceCollectionExtensions
                 .AddMutationConventions()
                 // Enables efficient querying of the underlying db via projections
                 .AddProjections()
-                .ModifyOptions(options =>
-                {
-                    options.StripLeadingIFromInterface = true;
-                })
+                // Enables filtering of query results (e.g. filtering based on a certain property)
+                .AddFiltering()
+                .ModifyOptions(options => { options.StripLeadingIFromInterface = true; })
                 // TODO: Configure cost analyzer at some point (enforces maximum query costs)
-                .ModifyCostOptions(options =>
-                {
-                    options.EnforceCostLimits = false;
-                });
+                .ModifyCostOptions(options => { options.EnforceCostLimits = false; });
 
             return requestExecutorBuilder.Services;
         }
@@ -91,7 +87,6 @@ public static class ServiceCollectionExtensions
                 .AddScoped<IBankAccountSyncHandler, BankAccountSyncHandler>()
                 .AddScoped<ITransactionSyncHandler, TransactionSyncHandler>()
                 .AddScoped<ThirdPartyDataRetrievalMetadataService>();
-            
         }
 
         /// <summary>
@@ -129,8 +124,8 @@ public static class ServiceCollectionExtensions
             return services.AddDbContextPool<ApplicationDbContext>(options =>
             {
                 options.UseSqlite(AppConfig.DatabaseConfiguration.ConnectionString);
-            
-                if(environment.IsDevelopment())
+
+                if (environment.IsDevelopment())
                     options.EnableDetailedErrors();
             });
         }
