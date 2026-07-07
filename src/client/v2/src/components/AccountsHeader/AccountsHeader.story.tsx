@@ -96,7 +96,7 @@ export function Loading() {
       <AccountsHeader
         currentAccount={null}
         accounts={[]}
-        loadingAccounts={true}
+        loadingAccounts
         onAccountChange={noop}
         onAddAccount={noop}
       />
