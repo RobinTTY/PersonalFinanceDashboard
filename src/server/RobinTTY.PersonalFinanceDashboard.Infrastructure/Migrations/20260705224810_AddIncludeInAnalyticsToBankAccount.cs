@@ -15,7 +15,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                 table: "BankAccounts",
                 type: "INTEGER",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
         }
 
         /// <inheritdoc />
