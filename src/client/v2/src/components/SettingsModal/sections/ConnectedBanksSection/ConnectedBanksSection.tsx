@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client/react';
+import { DeleteAuthenticationRequest } from '@graphql-mutations/DeleteAuthenticationRequest';
+import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
+import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { IconAlertCircle, IconBuildingBank } from '@tabler/icons-react';
 import { Alert, Button, Group, Loader, Modal, Stack, Text } from '@mantine/core';
-import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWithAccounts';
-import { DeleteAuthenticationRequest } from '@graphql-mutations/DeleteAuthenticationRequest';
-import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { ConnectedBankCard } from './ConnectedBankCard';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
@@ -53,7 +53,8 @@ export function ConnectedBanksSection() {
           Manage the bank connections used to sync your accounts and transactions.
         </Text>
         <Text size="xs" c="dimmed">
-          If an institution has multiple active connections, removing one will not affect account syncing as long as at least one connection remains.
+          If an institution has multiple active connections, removing one will not affect account
+          syncing as long as at least one connection remains.
         </Text>
       </Stack>
 
@@ -65,7 +66,11 @@ export function ConnectedBanksSection() {
           </Text>
         </Stack>
       ) : error ? (
-        <Alert color="red" icon={<IconAlertCircle size={16} />} title="Failed to load connected banks">
+        <Alert
+          color="red"
+          icon={<IconAlertCircle size={16} />}
+          title="Failed to load connected banks"
+        >
           {error.message}
         </Alert>
       ) : banks.length === 0 ? (

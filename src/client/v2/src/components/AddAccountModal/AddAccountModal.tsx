@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { Button, CloseButton, Modal, Stack, Text, Title } from '@mantine/core';
+import { useFlushAnalyticsRefetchOnClose } from '@/components/IncludeInAnalyticsSwitch/DeferredAnalyticsRefetch';
 import { CreateAuthenticationRequest } from '@/graphql/mutations/CreateAuthenticationRequest';
 import { AuthenticateBankStep } from './steps/AuthenticateBankStep/AuthenticateBankStep';
 import {
@@ -24,6 +25,7 @@ interface AddAccountModalProps {
 }
 
 export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModalProps) {
+  useFlushAnalyticsRefetchOnClose(opened);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedType, setSelectedAccountType] = useState<AccountType | undefined>(undefined);
   const [selectedBank, setSelectedBank] = useState<string | undefined>(undefined);

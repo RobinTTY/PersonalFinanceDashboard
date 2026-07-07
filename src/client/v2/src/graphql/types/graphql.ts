@@ -28,6 +28,17 @@ export type AuthenticationRequest = {
   thirdPartyId: Scalars['UUID']['output'];
 };
 
+export type AuthenticationRequestFilterInput = {
+  and?: InputMaybe<Array<AuthenticationRequestFilterInput>>;
+  associatedAccounts?: InputMaybe<ListFilterInputTypeOfBankAccountFilterInput>;
+  authenticationLink?: InputMaybe<UrlOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<AuthenticationRequestFilterInput>>;
+  status?: InputMaybe<AuthenticationStatusOperationFilterInput>;
+  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
+};
+
 export type AuthenticationRequestInput = {
   associatedAccounts: Array<BankAccountInput>;
   authenticationLink: Scalars['URL']['input'];
@@ -46,6 +57,13 @@ export enum AuthenticationStatus {
   Unknown = 'UNKNOWN'
 }
 
+export type AuthenticationStatusOperationFilterInput = {
+  eq?: InputMaybe<AuthenticationStatus>;
+  in?: InputMaybe<Array<AuthenticationStatus>>;
+  neq?: InputMaybe<AuthenticationStatus>;
+  nin?: InputMaybe<Array<AuthenticationStatus>>;
+};
+
 export type BankAccount = {
   __typename: 'BankAccount';
   accountType: Maybe<Scalars['String']['output']>;
@@ -63,6 +81,26 @@ export type BankAccount = {
   ownerName: Maybe<Scalars['String']['output']>;
   thirdPartyId: Scalars['UUID']['output'];
   transactions: Array<Transaction>;
+};
+
+export type BankAccountFilterInput = {
+  accountType?: InputMaybe<StringOperationFilterInput>;
+  and?: InputMaybe<Array<BankAccountFilterInput>>;
+  associatedAuthenticationRequests?: InputMaybe<ListFilterInputTypeOfAuthenticationRequestFilterInput>;
+  associatedInstitution?: InputMaybe<BankingInstitutionFilterInput>;
+  balance?: InputMaybe<DecimalOperationFilterInput>;
+  bban?: InputMaybe<StringOperationFilterInput>;
+  bic?: InputMaybe<StringOperationFilterInput>;
+  currency?: InputMaybe<StringOperationFilterInput>;
+  description?: InputMaybe<StringOperationFilterInput>;
+  iban?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  includeInAnalytics?: InputMaybe<BooleanOperationFilterInput>;
+  name?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<BankAccountFilterInput>>;
+  ownerName?: InputMaybe<StringOperationFilterInput>;
+  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
+  transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
 };
 
 export type BankAccountInput = {
@@ -113,6 +151,17 @@ export type BankingInstitution = {
   thirdPartyId: Scalars['String']['output'];
 };
 
+export type BankingInstitutionFilterInput = {
+  and?: InputMaybe<Array<BankingInstitutionFilterInput>>;
+  bic?: InputMaybe<StringOperationFilterInput>;
+  countries?: InputMaybe<ListStringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  logoUri?: InputMaybe<UrlOperationFilterInput>;
+  name?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<BankingInstitutionFilterInput>>;
+  thirdPartyId?: InputMaybe<StringOperationFilterInput>;
+};
+
 export type BankingInstitutionInput = {
   bic: Scalars['String']['input'];
   countries: Array<Scalars['String']['input']>;
@@ -140,6 +189,11 @@ export type BankingInstitutionsEdge = {
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: BankingInstitution;
+};
+
+export type BooleanOperationFilterInput = {
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  neq?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type CreateAuthenticationRequestInput = {
@@ -199,6 +253,36 @@ export type CreateTransactionPayload = {
   transaction: Maybe<Transaction>;
 };
 
+export type DateTimeOperationFilterInput = {
+  eq?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
+  neq?: InputMaybe<Scalars['DateTime']['input']>;
+  ngt?: InputMaybe<Scalars['DateTime']['input']>;
+  ngte?: InputMaybe<Scalars['DateTime']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  nlt?: InputMaybe<Scalars['DateTime']['input']>;
+  nlte?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DecimalOperationFilterInput = {
+  eq?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Decimal']['input']>>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
+  neq?: InputMaybe<Scalars['Decimal']['input']>;
+  ngt?: InputMaybe<Scalars['Decimal']['input']>;
+  ngte?: InputMaybe<Scalars['Decimal']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['Decimal']['input']>>>;
+  nlt?: InputMaybe<Scalars['Decimal']['input']>;
+  nlte?: InputMaybe<Scalars['Decimal']['input']>;
+};
+
 export type DeleteAuthenticationRequestInput = {
   /** The id of the authentication request to delete. */
   authenticationId: Scalars['UUID']['input'];
@@ -247,6 +331,41 @@ export type DeleteTransactionPayload = {
 
 export type Error = {
   message: Scalars['String']['output'];
+};
+
+export type ListFilterInputTypeOfAuthenticationRequestFilterInput = {
+  all?: InputMaybe<AuthenticationRequestFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<AuthenticationRequestFilterInput>;
+  some?: InputMaybe<AuthenticationRequestFilterInput>;
+};
+
+export type ListFilterInputTypeOfBankAccountFilterInput = {
+  all?: InputMaybe<BankAccountFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<BankAccountFilterInput>;
+  some?: InputMaybe<BankAccountFilterInput>;
+};
+
+export type ListFilterInputTypeOfTagFilterInput = {
+  all?: InputMaybe<TagFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<TagFilterInput>;
+  some?: InputMaybe<TagFilterInput>;
+};
+
+export type ListFilterInputTypeOfTransactionFilterInput = {
+  all?: InputMaybe<TransactionFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<TransactionFilterInput>;
+  some?: InputMaybe<TransactionFilterInput>;
+};
+
+export type ListStringOperationFilterInput = {
+  all?: InputMaybe<StringOperationFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<StringOperationFilterInput>;
+  some?: InputMaybe<StringOperationFilterInput>;
 };
 
 /** AuthenticationRequest related mutation resolvers. */
@@ -441,6 +560,7 @@ export type QueryBankAccountsArgs = {
   before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<BankAccountFilterInput>;
 };
 
 
@@ -488,6 +608,21 @@ export type SetBankAccountIncludeInAnalyticsPayload = {
   bankAccount: Maybe<BankAccount>;
 };
 
+export type StringOperationFilterInput = {
+  and?: InputMaybe<Array<StringOperationFilterInput>>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  ncontains?: InputMaybe<Scalars['String']['input']>;
+  nendsWith?: InputMaybe<Scalars['String']['input']>;
+  neq?: InputMaybe<Scalars['String']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  nstartsWith?: InputMaybe<Scalars['String']['input']>;
+  or?: InputMaybe<Array<StringOperationFilterInput>>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type SynchronizeAuthenticationRequestDataPayload = {
   __typename: 'SynchronizeAuthenticationRequestDataPayload';
   boolean: Maybe<Scalars['Boolean']['output']>;
@@ -517,6 +652,16 @@ export type Tag = {
   transactions: Array<Transaction>;
 };
 
+export type TagFilterInput = {
+  and?: InputMaybe<Array<TagFilterInput>>;
+  color?: InputMaybe<StringOperationFilterInput>;
+  description?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  name?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<TagFilterInput>>;
+  transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
+};
+
 export type TagInput = {
   color: Scalars['String']['input'];
   description: Scalars['String']['input'];
@@ -539,6 +684,23 @@ export type Transaction = {
   tags: Array<Tag>;
   thirdPartyId: Scalars['UUID']['output'];
   valueDate: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type TransactionFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<TransactionFilterInput>>;
+  bankAccount?: InputMaybe<BankAccountFilterInput>;
+  bankTransactionId?: InputMaybe<StringOperationFilterInput>;
+  category?: InputMaybe<StringOperationFilterInput>;
+  currency?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  notes?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<TransactionFilterInput>>;
+  payee?: InputMaybe<StringOperationFilterInput>;
+  payer?: InputMaybe<StringOperationFilterInput>;
+  tags?: InputMaybe<ListFilterInputTypeOfTagFilterInput>;
+  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
+  valueDate?: InputMaybe<DateTimeOperationFilterInput>;
 };
 
 export type TransactionInput = {
@@ -604,6 +766,36 @@ export type UpdateTransactionInput = {
 export type UpdateTransactionPayload = {
   __typename: 'UpdateTransactionPayload';
   transaction: Maybe<Transaction>;
+};
+
+export type UrlOperationFilterInput = {
+  eq?: InputMaybe<Scalars['URL']['input']>;
+  gt?: InputMaybe<Scalars['URL']['input']>;
+  gte?: InputMaybe<Scalars['URL']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['URL']['input']>>>;
+  lt?: InputMaybe<Scalars['URL']['input']>;
+  lte?: InputMaybe<Scalars['URL']['input']>;
+  neq?: InputMaybe<Scalars['URL']['input']>;
+  ngt?: InputMaybe<Scalars['URL']['input']>;
+  ngte?: InputMaybe<Scalars['URL']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['URL']['input']>>>;
+  nlt?: InputMaybe<Scalars['URL']['input']>;
+  nlte?: InputMaybe<Scalars['URL']['input']>;
+};
+
+export type UuidOperationFilterInput = {
+  eq?: InputMaybe<Scalars['UUID']['input']>;
+  gt?: InputMaybe<Scalars['UUID']['input']>;
+  gte?: InputMaybe<Scalars['UUID']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
+  lt?: InputMaybe<Scalars['UUID']['input']>;
+  lte?: InputMaybe<Scalars['UUID']['input']>;
+  neq?: InputMaybe<Scalars['UUID']['input']>;
+  ngt?: InputMaybe<Scalars['UUID']['input']>;
+  ngte?: InputMaybe<Scalars['UUID']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
+  nlt?: InputMaybe<Scalars['UUID']['input']>;
+  nlte?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };

@@ -1,6 +1,7 @@
 import { IconGauge, IconNotes, IconPresentationAnalytics } from '@tabler/icons-react';
 import { Outlet } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
+import { DeferredAnalyticsRefetchProvider } from '@/components/IncludeInAnalyticsSwitch/DeferredAnalyticsRefetch';
 import { Navbar } from '@/components/Navbar/Navbar';
 import { LinksGroupProps } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
 import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
@@ -15,12 +16,14 @@ export function AppLayout() {
   ];
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <Navbar links={navLinks} onUserProfileClick={openSettings} />
-      <main style={{ flex: 1, overflow: 'auto', padding: 'var(--mantine-spacing-md)' }}>
-        <Outlet />
-      </main>
-      <SettingsModal opened={settingsOpened} onClose={closeSettings} />
-    </div>
+    <DeferredAnalyticsRefetchProvider>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <Navbar links={navLinks} onUserProfileClick={openSettings} />
+        <main style={{ flex: 1, overflow: 'auto', padding: 'var(--mantine-spacing-md)' }}>
+          <Outlet />
+        </main>
+        <SettingsModal opened={settingsOpened} onClose={closeSettings} />
+      </div>
+    </DeferredAnalyticsRefetchProvider>
   );
 }
