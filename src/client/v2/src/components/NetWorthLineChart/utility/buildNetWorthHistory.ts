@@ -1,9 +1,10 @@
 /**
- * The most months the net worth history will span. Keeping this at 12 keeps the
- * x-axis readable and guarantees the short month labels (e.g. "Oct") stay unique
- * within a single window.
+ * The most days the net worth history will span. One year of daily points keeps the
+ * series bounded while the full-date labels (e.g. "Oct 3, 2025") stay unique within a
+ * single window. ECharts thins out overlapping x-axis labels automatically, so every
+ * day is plotted even though only a subset of labels are drawn.
  */
-const MAX_MONTHS = 12;
+const MAX_DAYS = 365;
 
 interface NetWorthTransaction {
   valueDate?: Date | string | null;
@@ -17,14 +18,14 @@ export interface NetWorthAccount {
 }
 
 export interface NetWorthHistory {
-  /** Reconstructed end-of-month balance keyed by short month label. */
+  /** Reconstructed end-of-day balance keyed by full date label (e.g. "Oct 3, 2025"). */
   dataByLabel: Record<string, number>;
   /** The currency shared by most accounts, used for display. */
   currency: string | null;
 }
 
 /**
- * Reconstructs the combined available balance across all accounts for each month.
+ * Reconstructs the combined available balance across all accounts for each day.
  *
  * The backend only stores the *current* balance per account, so historical values
  * are derived by walking the transaction history backwards: the balance at a past
@@ -34,7 +35,7 @@ export interface NetWorthHistory {
  *
  * @param accounts The accounts to combine, each with its current balance and transactions.
  * @param now Reference point for "today"; injectable to keep the output deterministic in tests.
- * @returns The month-keyed balance series and the dominant currency.
+ * @returns The day-keyed balance series and the dominant currency.
  */
 export function buildNetWorthHistory(
   accounts: NetWorthAccount[],
@@ -51,12 +52,12 @@ export function buildNetWorthHistory(
 
   const currency = pickDominantCurrency(accounts);
 
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const capMonthStart = new Date(now.getFullYear(), now.getMonth() - (MAX_MONTHS - 1), 1);
+  const todayStart = startOfDay(now);
+  const capDayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (MAX_DAYS - 1));
 
-  // Start at the month of the earliest transaction so we don't fabricate a flat
-  // pre-history, but never reach further back than MAX_MONTHS.
-  let startMonthStart = currentMonthStart;
+  // Start at the day of the earliest transaction so we don't fabricate a flat
+  // pre-history, but never reach further back than MAX_DAYS.
+  let startDayStart = todayStart;
 
   if (transactions.length > 0) {
     const earliest = transactions.reduce(
@@ -64,32 +65,39 @@ export function buildNetWorthHistory(
       transactions[0].date
     );
 
-    const earliestMonthStart = new Date(earliest.getFullYear(), earliest.getMonth(), 1);
-    startMonthStart = earliestMonthStart < capMonthStart ? capMonthStart : earliestMonthStart;
+    const earliestDayStart = startOfDay(earliest);
+    startDayStart = earliestDayStart < capDayStart ? capDayStart : earliestDayStart;
   }
 
   const dataByLabel: Record<string, number> = {};
   for (
-    let cursor = startMonthStart;
-    cursor <= currentMonthStart;
-    cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1)
+    let cursor = startDayStart;
+    cursor <= todayStart;
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 1)
   ) {
-    const isCurrentMonth =
-      cursor.getFullYear() === now.getFullYear() && cursor.getMonth() === now.getMonth();
-    // For past months use the last instant of the month; for the current month use
-    // `now` so the final point matches the true current balance exactly.
-    const boundary = isCurrentMonth
+    const isToday = cursor.getTime() === todayStart.getTime();
+    // For past days use the last instant of the day; for today use `now` so the
+    // final point matches the true current balance exactly.
+    const boundary = isToday
       ? now
-      : new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
+      : new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate(), 23, 59, 59, 999);
     const netAfterBoundary = transactions.reduce(
       (sum, transaction) => (transaction.date > boundary ? sum + transaction.amount : sum),
       0
     );
-    const label = cursor.toLocaleDateString('en-US', { month: 'short' });
+    const label = cursor.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
     dataByLabel[label] = round2(totalNow - netAfterBoundary);
   }
 
   return { dataByLabel, currency };
+}
+
+function startOfDay(value: Date): Date {
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate());
 }
 
 function toDate(value: Date | string | null | undefined): Date | null {
