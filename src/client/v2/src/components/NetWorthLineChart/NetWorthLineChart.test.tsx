@@ -10,6 +10,13 @@ const chartMock = vi.hoisted(() => ({
 
 vi.mock('echarts', () => ({
   init: vi.fn(() => chartMock),
+  graphic: {
+    LinearGradient: class {
+      constructor(...args: unknown[]) {
+        Object.assign(this, { args });
+      }
+    },
+  },
 }));
 
 describe('NetWorthLineChart', () => {
