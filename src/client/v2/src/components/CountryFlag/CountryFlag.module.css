@@ -1,0 +1,9 @@
+.flag {
+  display: block;
+  height: 14px;
+  width: 21px; /* 3x2 aspect ratio */
+  border-radius: 2px;
+  /* Subtle outline so predominantly white flags stay visible on the card background. */
+  box-shadow: 0 0 0 1px light-dark(rgb(0 0 0 / 12%), rgb(255 255 255 / 15%));
+  flex: 0 0 auto;
+}

@@ -17,6 +17,7 @@ export const GetBankingInstitutions: TypedDocumentNode<GetBankingInstitutionsQue
           name
           bic
           logoUri
+          countries
         }
       }
     }

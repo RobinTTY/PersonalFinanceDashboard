@@ -23,7 +23,7 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
-    /// <param name="authenticationRequestSyncHandler"></param>
+    /// <param name="authenticationRequestSyncHandler">Handles the synchronization of authentication request data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public AuthenticationRequestRepository(
         ApplicationDbContext dbContext,
@@ -46,7 +46,6 @@ public class AuthenticationRequestRepository
     {
         // TODO: Maybe let the API consumer choose whether to force the third party data sync
         await _authenticationRequestSyncHandler.SynchronizeData(authenticationId, true);
-
         return _dbContext.AuthenticationRequests.Where(authentication => authentication.Id == authenticationId);
     }
 

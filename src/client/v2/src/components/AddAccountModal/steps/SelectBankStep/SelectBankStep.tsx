@@ -3,15 +3,19 @@ import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
 import { IconSearch } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Loader, Stack, Text, TextInput } from '@mantine/core';
+import { Group, Loader, Stack, Text, TextInput } from '@mantine/core';
+import { CountryFlag } from '../../../CountryFlag/CountryFlag';
 import { SelectionCard } from '../../../SelectionCard/SelectionCard';
 import classes from './SelectBankStep.module.css';
 
 const COLUMNS = 2;
-// Row height: 1px top border + 12px padding + 38px avatar (md) + 12px padding + 1px bottom border = 64px
+// Row height: 1px top border + 12px padding + ~46px content (two lines: name + metadata) +
+// 12px padding + 1px bottom border = 72px
 // Gap between rows mirrors SimpleGrid spacing="sm" = 12px
-const ROW_HEIGHT = 64;
+const ROW_HEIGHT = 72;
 const ROW_GAP = 12;
+// Number of country flags to show before collapsing the remainder into a "+N" indicator.
+const MAX_VISIBLE_COUNTRIES = 3;
 
 interface SelectBankStepProps {
   selectedBank: string | undefined;
@@ -79,6 +83,9 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                 {rowItems.map((bank) => {
                   const bankId = String(bank.thirdPartyId);
                   const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
+                  const countries = bank.countries ?? [];
+                  const visibleCountries = countries.slice(0, MAX_VISIBLE_COUNTRIES);
+                  const hiddenCountryCount = countries.length - visibleCountries.length;
 
                   return (
                     <SelectionCard
@@ -88,6 +95,23 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                       logoUri={logoUri}
                       isSelected={selectedBank === bankId}
                       onSelect={onBankSelect}
+                      subtitle={
+                        <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+                          {visibleCountries.map((country) => (
+                            <CountryFlag key={country} code={country} />
+                          ))}
+                          {hiddenCountryCount > 0 && (
+                            <Text size="xs" c="dimmed">
+                              +{hiddenCountryCount}
+                            </Text>
+                          )}
+                          {bank.bic && (
+                            <Text size="xs" c="dimmed" ff="monospace" truncate>
+                              {bank.bic}
+                            </Text>
+                          )}
+                        </Group>
+                      }
                     />
                   );
                 })}
