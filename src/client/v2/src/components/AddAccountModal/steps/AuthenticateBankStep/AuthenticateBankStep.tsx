@@ -140,8 +140,11 @@ export function AuthenticateBankStep({
   };
 
   if (authState === AuthenticationState.Success) {
-    const associatedAccounts = data?.authenticationRequest?.associatedAccounts ?? [];
-    return <BankAuthenticationSuccess accounts={associatedAccounts} />;
+    const associatedAccountIds = (data?.authenticationRequest?.associatedAccounts ?? [])
+      .map((account) => account.id)
+      .filter((id): id is NonNullable<typeof id> => id != null)
+      .map(String);
+    return <BankAuthenticationSuccess accountIds={associatedAccountIds} />;
   }
 
   if (authState === AuthenticationState.Failed) {

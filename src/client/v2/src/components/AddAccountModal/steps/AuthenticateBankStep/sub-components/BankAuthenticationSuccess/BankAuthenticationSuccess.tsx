@@ -1,16 +1,14 @@
 import { Group, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconCircleCheck } from '@tabler/icons-react';
-import {
-  AssociatedAccount,
-  BankAccountOverview,
-} from '../BankAccountOverview/BankAccountOverview';
+import { BankAccountOverview } from '../BankAccountOverview/BankAccountOverview';
 
 interface BankAuthenticationSuccessProps {
-  accounts: AssociatedAccount[];
+  /** Internal ids of the accounts linked by the completed authentication request. */
+  accountIds: string[];
 }
 
-export function BankAuthenticationSuccess({ accounts }: BankAuthenticationSuccessProps) {
-  const accountCount = accounts.length;
+export function BankAuthenticationSuccess({ accountIds }: BankAuthenticationSuccessProps) {
+  const accountCount = accountIds.length;
 
   return (
     <Stack h="100%" align="center" gap="lg">
@@ -29,13 +27,13 @@ export function BankAuthenticationSuccess({ accounts }: BankAuthenticationSucces
           </Text>
         </Stack>
       </Group>
-      {accounts.length > 0 && (
+      {accountCount > 0 && (
         <>
           <Text size="sm" c="dimmed" ta="center">
             Choose which accounts to include in your analytics. You can change this later in the
             connected banks settings.
           </Text>
-          <BankAccountOverview accounts={accounts} />
+          <BankAccountOverview accountIds={accountIds} />
         </>
       )}
     </Stack>
