@@ -1,21 +1,27 @@
-import { Avatar, Badge, Divider, Group, Stack, Text } from '@mantine/core';
-import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
-import { GetAuthRequestWithAccountsQuery } from '@/graphql/types/graphql';
+import { useCallback, useState } from 'react';
+import { Avatar, Group, Stack, Text } from '@mantine/core';
 import { getInitials } from '@/utility/getInitials';
+import { BankAccountCard, BankAccountInstitution } from './BankAccountCard';
 import classes from './BankAccountOverview.module.css';
 
-export type AssociatedAccount = NonNullable<
-  NonNullable<
-    GetAuthRequestWithAccountsQuery['authenticationRequest']
-  >['associatedAccounts'][number]
->;
-
 interface BankAccountOverviewProps {
-  accounts: AssociatedAccount[];
+  /** Internal ids of the accounts associated with the completed authentication request. */
+  accountIds: string[];
 }
 
-export function BankAccountOverview({ accounts }: BankAccountOverviewProps) {
-  const institution = accounts[0]?.associatedInstitution;
+/**
+ * Renders the accounts linked by a completed authentication request.
+ *
+ * Each account is loaded individually by id (see {@link BankAccountCard}) so its details are synced
+ * on demand. The institution header is shared across accounts, so it's populated from the first
+ * account that finishes loading.
+ */
+export function BankAccountOverview({ accountIds }: BankAccountOverviewProps) {
+  const [institution, setInstitution] = useState<BankAccountInstitution | undefined>(undefined);
+
+  const handleInstitutionLoaded = useCallback((loaded: BankAccountInstitution) => {
+    setInstitution((current) => current ?? loaded);
+  }, []);
 
   return (
     <Stack gap="sm" w="100%">
@@ -40,78 +46,13 @@ export function BankAccountOverview({ accounts }: BankAccountOverviewProps) {
         </Group>
       )}
 
-      {accounts.map((account) => {
-        const hasNameOrDescription = account.name || account.description;
-        const balanceValue =
-          account.balance != null
-            ? account.currency
-              ? `${String(account.balance)} ${account.currency}`
-              : String(account.balance)
-            : null;
-
-        return (
-          <div key={String(account.id)} className={classes.accountCard}>
-            {hasNameOrDescription && (
-              <Stack gap={2} mb="md">
-                {account.name && (
-                  <Text fw={600} size="md">
-                    {account.name}
-                  </Text>
-                )}
-                {account.description && account.description !== account.name && (
-                  <Text size="sm" c="dimmed">
-                    {account.description}
-                  </Text>
-                )}
-              </Stack>
-            )}
-
-            <Stack gap="xs">
-              {account.accountType && (
-                <Group justify="space-between" wrap="nowrap">
-                  <Text size="sm" c="dimmed">
-                    Type
-                  </Text>
-                  <Badge variant="light" size="sm">
-                    {account.accountType}
-                  </Badge>
-                </Group>
-              )}
-              {hasNameOrDescription && account.accountType && <Divider />}
-              {balanceValue && (
-                <Group justify="space-between" wrap="nowrap">
-                  <Text size="sm" c="dimmed">
-                    Balance
-                  </Text>
-                  <Text size="sm" fw={600}>
-                    {balanceValue}
-                  </Text>
-                </Group>
-              )}
-              {account.ownerName && (
-                <Group justify="space-between" wrap="nowrap">
-                  <Text size="sm" c="dimmed">
-                    Owner
-                  </Text>
-                  <Text size="sm" fw={500}>
-                    {account.ownerName}
-                  </Text>
-                </Group>
-              )}
-            </Stack>
-
-            {account.id != null && (
-              <>
-                <Divider my="sm" />
-                <IncludeInAnalyticsSwitch
-                  accountId={String(account.id)}
-                  includeInAnalytics={account.includeInAnalytics}
-                />
-              </>
-            )}
-          </div>
-        );
-      })}
+      {accountIds.map((accountId) => (
+        <BankAccountCard
+          key={accountId}
+          accountId={accountId}
+          onInstitutionLoaded={handleInstitutionLoaded}
+        />
+      ))}
     </Stack>
   );
 }
