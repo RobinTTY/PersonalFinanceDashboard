@@ -17,4 +17,7 @@ interface ImportMetaEnv {
   readonly VITE_DEVELOPER_GITHUB_URL: string
   readonly VITE_PROJECT_LICENSE_URL: string
   readonly VITE_PROJECT_ISSUES_URL: string
+
+  /** When "true", starts the MSW worker at bootstrap so the GraphQL API is mocked. */
+  readonly VITE_ENABLE_API_MOCKING: string
 }
