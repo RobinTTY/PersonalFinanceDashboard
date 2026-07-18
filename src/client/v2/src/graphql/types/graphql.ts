@@ -800,6 +800,8 @@ export type UuidOperationFilterInput = {
 
 export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
 
+export type BankAccountDetailsFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null };
+
 export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null };
 
 export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
@@ -845,6 +847,13 @@ export type GetAuthenticationRequestQueryVariables = Exact<{
 
 
 export type GetAuthenticationRequestQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null };
+
+export type GetBankAccountQueryVariables = Exact<{
+  accountId: Scalars['UUID']['input'];
+}>;
+
+
+export type GetBankAccountQuery = { bankAccount: { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null } | null };
 
 export type GetBankAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
