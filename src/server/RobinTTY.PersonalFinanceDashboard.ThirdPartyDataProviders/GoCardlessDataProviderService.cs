@@ -141,8 +141,7 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, generalAccountInfoResult,
             accountDetailsResult, balanceResult!);
 
-        return new ThirdPartyResponse<BankAccount, AccountsError>(
-            balanceResponse.IsSuccess, bankAccount, null);
+        return new ThirdPartyResponse<BankAccount, AccountsError>(true, bankAccount, null);
     }
 
     private List<string> ExtractAndLogErrors(Guid accountId, bool includeMetadata,

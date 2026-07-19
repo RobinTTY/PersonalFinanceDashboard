@@ -46,43 +46,40 @@ public static class GoCardlessTypeExtensions
     {
         return status switch
         {
-            RequisitionStatus.Created => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.GivingConsent => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.UndergoingAuthentication => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.SelectingAccounts => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.Undefined => AuthenticationStatus.Failed,
-            RequisitionStatus.Suspended => AuthenticationStatus.Failed,
-            RequisitionStatus.Rejected => AuthenticationStatus.Failed,
+            RequisitionStatus.Created or RequisitionStatus.GivingConsent
+                or RequisitionStatus.UndergoingAuthentication or RequisitionStatus.SelectingAccounts
+                or RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.Undefined or RequisitionStatus.Suspended
+                or RequisitionStatus.Rejected => AuthenticationStatus.Failed,
             RequisitionStatus.Linked => AuthenticationStatus.Active,
             RequisitionStatus.Expired => AuthenticationStatus.Expired,
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
     }
 
-    public static BankAccount CreateBankAccount(Guid accountId, NordigenBankAccount? bankAccount,
-        BankAccountDetails? account, List<Balance> balances)
+    public static BankAccount CreateBankAccount(Guid accountId, NordigenBankAccount? generalAccountInfo,
+        BankAccountDetails? accountDetails, List<Balance> balances)
     {
         return new BankAccount
         (
             thirdPartyId: accountId,
-            accountType: account?.CashAccountType.HasValue ?? false
-                ? Enum.GetName(typeof(CashAccountType), account.CashAccountType)
+            accountType: accountDetails?.CashAccountType is { } cashAccountType
+                ? Enum.GetName(cashAccountType)
                 : null,
-            name: account?.Product,
-            description: account?.Details,
+            name: accountDetails?.Product,
+            description: accountDetails?.Details,
             // TODO: The balance type could be something different (which one should be grabbed?)
             balance: balances.FirstOrDefault(bal =>
                     bal.BalanceType is BalanceType.ClosingBooked or BalanceType.InterimAvailable)
                 ?.BalanceAmount.Amount,
-            currency: account?.Currency,
-            iban: account?.Iban,
-            bic: account?.Bic,
-            bban: account?.Bban,
-            ownerName: account?.OwnerName,
+            currency: accountDetails?.Currency,
+            iban: accountDetails?.Iban,
+            bic: accountDetails?.Bic,
+            bban: accountDetails?.Bban,
+            ownerName: accountDetails?.OwnerName,
             transactions: [],
-            associatedInstitution: bankAccount != null
-                ? new BankingInstitution { ThirdPartyId = bankAccount.InstitutionId }
+            associatedInstitution: generalAccountInfo != null
+                ? new BankingInstitution { ThirdPartyId = generalAccountInfo.InstitutionId }
                 : null,
             associatedAuthenticationRequests: []);
     }
