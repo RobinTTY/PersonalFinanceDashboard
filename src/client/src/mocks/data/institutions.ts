@@ -148,4 +148,4 @@ export const bankingInstitutionsData = {
       },
     ],
   },
-} as unknown as GetBankingInstitutionsQuery;
+} satisfies GetBankingInstitutionsQuery;

@@ -116,4 +116,4 @@ export const bankAccountDetailsById: Record<string, BankAccountDetail> = {
       logoUri: 'https://cdn-logos.gocardless.com/ais/SANTANDER_PL_CORP_WBKPPLPP.png',
     },
   },
-} as unknown as Record<string, BankAccountDetail>;
+} satisfies Record<string, BankAccountDetail>;

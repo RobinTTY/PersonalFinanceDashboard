@@ -63,4 +63,4 @@ export const bankAccountsData = {
       },
     ],
   },
-} as unknown as GetBankAccountsQuery;
+} satisfies GetBankAccountsQuery;
