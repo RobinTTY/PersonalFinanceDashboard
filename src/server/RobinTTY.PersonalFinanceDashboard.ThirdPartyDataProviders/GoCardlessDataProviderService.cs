@@ -19,17 +19,7 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         CancellationToken cancellationToken = default)
     {
         var response = await client.InstitutionsEndpoint.GetInstitution(institutionId, cancellationToken);
-
-        if (response.IsSuccess)
-        {
-            var inst = response.Result;
-            var institution = new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries);
-
-            return new ThirdPartyResponse<BankingInstitution, BasicResponse>(true,
-                institution, null);
-        }
-
-        return new ThirdPartyResponse<BankingInstitution, BasicResponse>(false, null, response.Error);
+        return response.ToThirdPartyResponse(institution => institution.ToBankingInstitution());
     }
 
     /// <summary>
@@ -42,18 +32,8 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         string? country = null, CancellationToken cancellationToken = default)
     {
         var response = await client.InstitutionsEndpoint.GetInstitutions(country, cancellationToken: cancellationToken);
-
-        if (response.IsSuccess)
-        {
-            // TODO: Maybe don't transform the data here but when it's added to db, so we don't need to add the GUID
-            var institutions =
-                response.Result.Select(inst =>
-                    new BankingInstitution(inst.Id, inst.Bic, inst.Name, inst.Logo, inst.Countries));
-            return new ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>(true,
-                institutions, null);
-        }
-
-        return new ThirdPartyResponse<IEnumerable<BankingInstitution>, BasicResponse>(false, null, response.Error);
+        return response.ToThirdPartyResponse(institutions =>
+            institutions.Select(institution => institution.ToBankingInstitution()));
     }
 
     /// <summary>
@@ -66,14 +46,7 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         Guid requisitionId, CancellationToken cancellationToken = default)
     {
         var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId, cancellationToken);
-        // TODO: handle request failure
-        var requisition = response.Result!;
-        var result = new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
-            requisition.AuthenticationLink,
-            requisition.Created,
-            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
-        return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(response.IsSuccess, result,
-            response.Error);
+        return response.ToThirdPartyResponse(requisition => requisition.ToAuthenticationRequest())!;
     }
 
     // TODO: Cancellation token support
@@ -87,13 +60,9 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         int requisitionLimit, CancellationToken cancellationToken = default)
     {
         var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0, cancellationToken);
-        // TODO: handle request failure + use paged responses
-        var requisitions = response.Result!.Results;
-        var result = requisitions.Select(req => new AuthenticationRequest(req.Id,
-            req.Status.ToAuthenticationStatus(), req.AuthenticationLink, req.Created, req.Accounts.Select(accountId =>
-                new BankAccount(accountId)).ToList()));
-        return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(response.IsSuccess, result,
-            response.Error);
+        // TODO: use paged responses
+        return response.ToThirdPartyResponse(paged =>
+            paged.Results.Select(requisition => requisition.ToAuthenticationRequest()))!;
     }
 
     /// <summary>
@@ -110,19 +79,7 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
             await client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri,
                 reference: Guid.NewGuid().ToString(), cancellationToken: cancellationToken);
 
-        if (response.IsSuccess)
-        {
-            var requisition = response.Result;
-            var authenticationRequest = new AuthenticationRequest(requisition.Id,
-                requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink, requisition.Created,
-                requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
-
-            return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess,
-                authenticationRequest, null);
-        }
-
-        return new ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>(response.IsSuccess, null,
-            response.Error);
+        return response.ToThirdPartyResponse(requisition => requisition.ToAuthenticationRequest());
     }
 
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
@@ -167,8 +124,9 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         var accountDetailsResponse = accountDetailsTask != null ? await accountDetailsTask : null;
         var balanceResponse = await balanceTask;
 
-        var errors = ExtractAndLogErrors(accountId, includeMetadata, balanceResponse, generalAccountInfoResponse, accountDetailsResponse);
-        if(errors.Count > 0)
+        var errors = ExtractAndLogErrors(accountId, includeMetadata, balanceResponse, generalAccountInfoResponse,
+            accountDetailsResponse);
+        if (errors.Count > 0)
         {
             return new ThirdPartyResponse<BankAccount, AccountsError>(false, null, new AccountsError
             {
@@ -187,14 +145,16 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
             balanceResponse.IsSuccess, bankAccount, null);
     }
 
-    private List<string> ExtractAndLogErrors(Guid accountId, bool includeMetadata, NordigenApiResponse<List<Balance>, AccountsError> balanceResponse,
-        NordigenApiResponse<NordigenApiClient.Models.Responses.BankAccount, BasicResponse>? generalAccountInfoResponse, NordigenApiResponse<BankAccountDetails, AccountsError>? accountDetailsResponse)
+    private List<string> ExtractAndLogErrors(Guid accountId, bool includeMetadata,
+        NordigenApiResponse<List<Balance>, AccountsError> balanceResponse,
+        NordigenApiResponse<NordigenApiClient.Models.Responses.BankAccount, BasicResponse>? generalAccountInfoResponse,
+        NordigenApiResponse<BankAccountDetails, AccountsError>? accountDetailsResponse)
     {
         var errorMessages = new List<string>();
         if (!balanceResponse.IsSuccess)
         {
             var error = $"Summary: {balanceResponse.Error.Summary}, Details: {balanceResponse.Error.Detail}";
-            
+
             errorMessages.Add(error);
             logger.LogWarning("Failed to retrieve balances for account {accountId}: {error}", accountId, error);
         }
@@ -203,21 +163,25 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         {
             if (generalAccountInfoResponse is { IsSuccess: false })
             {
-                var error = $"Summary: {generalAccountInfoResponse.Error.Summary}, Details: {generalAccountInfoResponse.Error.Detail}";
-                
+                var error =
+                    $"Summary: {generalAccountInfoResponse.Error.Summary}, Details: {generalAccountInfoResponse.Error.Detail}";
+
                 errorMessages.Add(error);
-                logger.LogWarning("Failed to retrieve general account metadata for account {accountId}: {error}", accountId, error);
+                logger.LogWarning("Failed to retrieve general account metadata for account {accountId}: {error}",
+                    accountId, error);
             }
 
             if (accountDetailsResponse is { IsSuccess: false })
             {
-                var error = $"Summary: {accountDetailsResponse.Error.Summary}, Details: {accountDetailsResponse.Error.Detail}";
-                
+                var error =
+                    $"Summary: {accountDetailsResponse.Error.Summary}, Details: {accountDetailsResponse.Error.Detail}";
+
                 errorMessages.Add(error);
-                logger.LogWarning("Failed to retrieve detailed account metadata for account {accountId}: {error}", accountId, error);
+                logger.LogWarning("Failed to retrieve detailed account metadata for account {accountId}: {error}",
+                    accountId, error);
             }
         }
-        
+
         return errorMessages;
     }
 
@@ -228,21 +192,17 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
 
         // TODO: Also return pending transactions
-        var transactions = response.Result!.BookedTransactions.Select(transaction =>
+        return response.ToThirdPartyResponse(result => result.BookedTransactions.Select(transaction =>
         {
-            var thirdPartyId = transaction.InternalTransactionId != null
-                ? Guid.Parse(transaction.InternalTransactionId)
+            var thirdPartyId = Guid.TryParse(transaction.InternalTransactionId, out var parsedId)
+                ? parsedId
                 : Guid.Empty;
-            var transactionId = transaction.TransactionId ?? null;
             var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
 
-            return new Transaction(thirdPartyId, transactionId, valueDate, transaction.CreditorName,
+            return new Transaction(thirdPartyId, transaction.TransactionId, valueDate, transaction.CreditorName,
                 transaction.DebtorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
                 new BankAccount { ThirdPartyId = goCardlessAccountId });
-        });
-
-        return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(response.IsSuccess, transactions,
-            response.Error);
+        }));
     }
 }
