@@ -253,7 +253,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BankAccountId");
+                    b.HasIndex("BankAccountId", "ThirdPartyId")
+                        .IsUnique();
 
                     b.ToTable("Transactions");
                 });

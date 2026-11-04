@@ -191,17 +191,7 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
 
         // TODO: Also return pending transactions
-        return response.ToThirdPartyResponse(result => result.BookedTransactions.Select(transaction =>
-        {
-            var thirdPartyId = Guid.TryParse(transaction.InternalTransactionId, out var parsedId)
-                ? parsedId
-                : Guid.Empty;
-            var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
-
-            return new Transaction(thirdPartyId, transaction.TransactionId, valueDate,
-                payer: transaction.DebtorName, payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
-                transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
-                new BankAccount { ThirdPartyId = goCardlessAccountId });
-        }));
+        return response.ToThirdPartyResponse(result =>
+            result.BookedTransactions.ToTransactions(goCardlessAccountId).AsEnumerable());
     }
 }
