@@ -42,21 +42,14 @@ public static class GoCardlessTypeExtensions
             requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
     }
 
-    public static AuthenticationStatus ToAuthenticationStatus(this RequisitionStatus status)
-    {
-        return status switch
-        {
-            RequisitionStatus.Created or RequisitionStatus.GivingConsent
-                or RequisitionStatus.UndergoingAuthentication or RequisitionStatus.SelectingAccounts
-                or RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.Undefined or RequisitionStatus.Suspended
-                or RequisitionStatus.Rejected => AuthenticationStatus.Failed,
-            RequisitionStatus.Linked => AuthenticationStatus.Active,
-            RequisitionStatus.Expired => AuthenticationStatus.Expired,
-            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
-        };
-    }
-
+    /// <summary>
+    /// Maps a <see cref="NordigenBankAccount"/> to a <see cref="BankAccount"/>.
+    /// </summary>
+    /// <param name="accountId">The id of the account to map.</param>
+    /// <param name="generalAccountInfo"></param>
+    /// <param name="accountDetails"></param>
+    /// <param name="balances"></param>
+    /// <returns></returns>
     public static BankAccount CreateBankAccount(Guid accountId, NordigenBankAccount? generalAccountInfo,
         BankAccountDetails? accountDetails, List<Balance> balances)
     {
@@ -82,5 +75,26 @@ public static class GoCardlessTypeExtensions
                 ? new BankingInstitution { ThirdPartyId = generalAccountInfo.InstitutionId }
                 : null,
             associatedAuthenticationRequests: []);
+    }
+
+    /// <summary>
+    /// Maps a <see cref="RequisitionStatus"/> to an <see cref="AuthenticationStatus"/>.
+    /// </summary>
+    /// <param name="status">The requisition status to map.</param>
+    /// <returns>The mapped authentication status.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="status"/> is not a valid <see cref="RequisitionStatus"/>.</exception>
+    private static AuthenticationStatus ToAuthenticationStatus(this RequisitionStatus status)
+    {
+        return status switch
+        {
+            RequisitionStatus.Created or RequisitionStatus.GivingConsent
+                or RequisitionStatus.UndergoingAuthentication or RequisitionStatus.SelectingAccounts
+                or RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
+            RequisitionStatus.Undefined or RequisitionStatus.Suspended
+                or RequisitionStatus.Rejected => AuthenticationStatus.Failed,
+            RequisitionStatus.Linked => AuthenticationStatus.Active,
+            RequisitionStatus.Expired => AuthenticationStatus.Expired,
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
     }
 }
