@@ -119,10 +119,10 @@ public class Transaction : ThirdPartyEntity
 
     /// <summary>
     /// Updates the (non-navigation) properties of the current <see cref="Transaction"/> instance with the values
-    /// provided in the specified <paramref name="transaction"/>.
+    /// provided in the specified <paramref name="transaction"/>. User-entered properties (<see cref="Category"/> and
+    /// <see cref="Notes"/>) are not updated, since third party data doesn't contain them.
     /// </summary>
     /// <param name="transaction">The <see cref="Transaction"/> instance whose properties are used to update the current object.</param>
-    /// <returns>The updated <see cref="Transaction"/> instance.</returns>
     public void UpdateNonNavigationProperties(Transaction transaction)
     {
         BankTransactionId = transaction.BankTransactionId;
@@ -131,7 +131,5 @@ public class Transaction : ThirdPartyEntity
         Payee = transaction.Payee;
         Amount = transaction.Amount;
         Currency = transaction.Currency;
-        Category = transaction.Category;
-        Notes = transaction.Notes;
     }
 }
