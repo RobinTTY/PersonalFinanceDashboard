@@ -127,29 +127,26 @@ public class BankAccountSyncHandler(
             var authRequests = dbContext.AuthenticationRequests
                 .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToList();
 
-            foreach (var authenticationRequest in authRequests)
+            // An account can be linked to multiple active authentication requests
+            var accountIdsIncludeMetadataPairs = authRequests
+                .Where(authenticationRequest => authenticationRequest.IsActive())
+                .SelectMany(authenticationRequest => authenticationRequest.AssociatedAccounts)
+                .Select(acc => (internalId: acc.Id, id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))
+                .DistinctBy(pair => pair.id);
+
+            foreach (var pair in accountIdsIncludeMetadataPairs)
             {
-                if (!authenticationRequest.IsActive()) continue;
-
-                var accountIdsIncludeMetadataPairs = authenticationRequest.AssociatedAccounts
-                    .Select(acc => (internalId: acc.Id, id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))
-                    .DistinctBy(pair => pair.id);
-
-                foreach (var pair in accountIdsIncludeMetadataPairs)
+                var dataIsStale =
+                    await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts, pair.internalId);
+                if (dataIsStale || forceSync)
                 {
-                    var dataIsStale =
-                        await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts,
-                            pair.internalId);
-                    if (dataIsStale || forceSync)
-                    {
-                        accountsToFetch.Add(pair.id, pair.includeMetadata);
-                    }
-                    else
-                    {
-                        logger.LogDebug(
-                            "Bank account data for account with id {bankAccountId} is not stale. Skipping synchronization with third party.",
-                            pair.internalId);
-                    }
+                    accountsToFetch.Add(pair.id, pair.includeMetadata);
+                }
+                else
+                {
+                    logger.LogDebug(
+                        "Bank account data for account with id {bankAccountId} is not stale. Skipping synchronization with third party.",
+                        pair.internalId);
                 }
             }
         }
