@@ -19,8 +19,8 @@ const client = new ApolloClient({
           // fetchMore grows the list instead of replacing it.
           transactionsByAccountId: {
             keyArgs: ['accountId'],
-            merge(existing, incoming) {
-              if (!existing) {
+            merge(existing, incoming, { args }) {
+              if (!existing || !args?.after) {
                 return incoming;
               }
               return {
