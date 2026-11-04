@@ -198,8 +198,8 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
                 : Guid.Empty;
             var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
 
-            return new Transaction(thirdPartyId, transaction.TransactionId, valueDate, transaction.CreditorName,
-                transaction.DebtorName, transaction.TransactionAmount.Amount,
+            return new Transaction(thirdPartyId, transaction.TransactionId, valueDate,
+                payer: transaction.DebtorName, payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
                 new BankAccount { ThirdPartyId = goCardlessAccountId });
         }));

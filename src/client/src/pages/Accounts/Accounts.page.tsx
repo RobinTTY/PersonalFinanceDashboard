@@ -203,7 +203,8 @@ export function AccountsPage() {
                 >
                   <Text size="sm">{formatDate(transaction.valueDate)}</Text>
                   <Text size="sm" truncate>
-                    {transaction.amount < 0 ? transaction.payer ?? '—' : transaction.payee ?? '—'}
+                    {/* Show the counterparty: who was paid for outgoing, who paid for incoming */}
+                    {transaction.amount < 0 ? transaction.payee ?? '—' : transaction.payer ?? '—'}
                   </Text>
                   <Text
                     size="sm"
