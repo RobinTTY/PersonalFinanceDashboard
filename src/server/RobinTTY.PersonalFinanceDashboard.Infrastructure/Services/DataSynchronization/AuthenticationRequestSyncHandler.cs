@@ -40,9 +40,9 @@ public class AuthenticationRequestSyncHandler(
             if (!thirdPartyId.HasValue)
             {
                 numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
+                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
             }
 
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
             LogSynchronizationResults(authenticationRequests.Count, numOfAddedAuthRequests, numOfRemovedAuthRequests);
         }
         else

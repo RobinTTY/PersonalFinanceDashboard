@@ -19,8 +19,15 @@ public class BankingInstitutionSyncHandler(
         {
             string? thirdPartyBankingInstitutionId = null;
             if (bankingInstitutionId.HasValue)
+            {
                 thirdPartyBankingInstitutionId = dbContext.BankingInstitutions
                     .SingleOrDefault(bankingInstitution => bankingInstitution.Id == bankingInstitutionId)?.ThirdPartyId;
+                if (thirdPartyBankingInstitutionId == null)
+                {
+                    logger.LogWarning("Banking institution with id {id} does not exist.", bankingInstitutionId);
+                    return false;
+                }
+            }
 
             var institutions = await GetBankingInstitutions(thirdPartyBankingInstitutionId);
             if (institutions == null)
@@ -31,18 +38,23 @@ public class BankingInstitutionSyncHandler(
             }
 
             if (bankingInstitutionId.HasValue)
+            {
                 await AddOrUpdateBankingInstitutions(institutions);
+                await dbContext.SaveChangesAsync();
+            }
             else
+            {
                 await AddUpdateOrDeleteBankingInstitutions(institutions);
-
-            await dbContext.SaveChangesAsync();
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
+                await dbContext.SaveChangesAsync();
+                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
+            }
 
             logger.LogInformation("Synced {Count} banking institutions", institutions.Count);
         }
         else
         {
-            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.BankingInstitutions);
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.",
+                ThirdPartyDataType.BankingInstitutions);
         }
 
         return true;
@@ -62,7 +74,7 @@ public class BankingInstitutionSyncHandler(
         {
             var response = await dataProvider.GetBankingInstitutions();
             if (response.IsSuccessful)
-                bankingInstitutions = [..response.Result];
+                bankingInstitutions = [.. response.Result];
         }
 
         return bankingInstitutions;
