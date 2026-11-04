@@ -17,11 +17,19 @@ public class AuthenticationRequestSyncHandler(
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
         if (dataIsStale || forceThirdPartySync)
         {
-            if (authenticationRequestId != null)
-                authenticationRequestId = dbContext.AuthenticationRequests
+            Guid? thirdPartyId = null;
+            if (authenticationRequestId.HasValue)
+            {
+                thirdPartyId = dbContext.AuthenticationRequests
                     .SingleOrDefault(authRequest => authRequest.Id == authenticationRequestId)?.ThirdPartyId;
-            
-            var authenticationRequests = await GetAuthenticationRequests(authenticationRequestId);
+                if (thirdPartyId == null)
+                {
+                    logger.LogWarning("Authentication request with id {id} does not exist.", authenticationRequestId);
+                    return false;
+                }
+            }
+
+            var authenticationRequests = await GetAuthenticationRequests(thirdPartyId);
             if (authenticationRequests == null)
             {
                 return false;
@@ -29,17 +37,18 @@ public class AuthenticationRequestSyncHandler(
 
             var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(authenticationRequests);
             var numOfRemovedAuthRequests = 0;
-            if (!authenticationRequestId.HasValue)
+            if (!thirdPartyId.HasValue)
             {
                 numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
             }
-            
+
             await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
             LogSynchronizationResults(authenticationRequests.Count, numOfAddedAuthRequests, numOfRemovedAuthRequests);
         }
         else
         {
-            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.", ThirdPartyDataType.AuthenticationRequests);
+            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.",
+                ThirdPartyDataType.AuthenticationRequests);
         }
 
         return true;
@@ -57,15 +66,14 @@ public class AuthenticationRequestSyncHandler(
         }
         else
         {
-            // TODO: Limit should be different
-            var response = await dataProvider.GetAuthenticationRequests(100);
+            var response = await dataProvider.GetAuthenticationRequests();
             if (response.IsSuccessful)
-                authRequests = [..response.Result];
+                authRequests = [.. response.Result];
         }
 
         return authRequests;
     }
-    
+
     /// <summary>
     /// Adds new authentication requests to the database or updates existing ones based on their third-party IDs.
     /// </summary>
@@ -82,10 +90,11 @@ public class AuthenticationRequestSyncHandler(
 
             if (existingRequest == null)
             {
-                var insertEntity = AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
+                var insertEntity =
+                    AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
                 var entry = await dbContext.AuthenticationRequests.AddAsync(insertEntity);
                 existingRequest = entry.Entity;
-                
+
                 numOfAddedAuthRequests++;
             }
             else
@@ -97,10 +106,10 @@ public class AuthenticationRequestSyncHandler(
             await UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
             await dbContext.SaveChangesAsync();
         }
-        
+
         return numOfAddedAuthRequests;
     }
-    
+
     private async Task UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
         AuthenticationRequest existingRequest)
     {
@@ -129,7 +138,7 @@ public class AuthenticationRequestSyncHandler(
             }
         }
     }
-    
+
     /// <summary>
     /// Removes all authentication requests from the database that are not included in the provided collection
     /// of authentication requests.
@@ -140,12 +149,12 @@ public class AuthenticationRequestSyncHandler(
     private async Task<int> RemoveNotIncludedAuthenticationRequests(List<AuthenticationRequest> authenticationRequests)
     {
         var thirdPartyIds = authenticationRequests.Select(req => req.ThirdPartyId).ToList();
-        
+
         return await dbContext.AuthenticationRequests
             .Where(req => !thirdPartyIds.Contains(req.ThirdPartyId))
             .ExecuteDeleteAsync();
     }
-    
+
     private void LogSynchronizationResults(int numOfSynchronizedRequests, int numOfAddedAuthRequests,
         int numOfRemovedAuthRequests)
     {

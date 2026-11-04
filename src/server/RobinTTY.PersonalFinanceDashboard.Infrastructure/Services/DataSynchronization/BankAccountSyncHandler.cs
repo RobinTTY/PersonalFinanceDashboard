@@ -25,8 +25,15 @@ public class BankAccountSyncHandler(
 
         // If a specific bank account id is provided, we only want to fetch and update that account. In this case, we need to get the corresponding third party id to fetch the data from the API.
         if (internalBankAccountId.HasValue)
+        {
             thirdPartyBankAccountId = dbContext.BankAccounts
                 .SingleOrDefault(bankAccount => bankAccount.Id == internalBankAccountId)?.ThirdPartyId;
+            if (thirdPartyBankAccountId == null)
+            {
+                logger.LogWarning("Bank account with id {bankAccountId} does not exist.", internalBankAccountId);
+                return false;
+            }
+        }
 
         // Fetch bank accounts from third party
         var bankAccounts =

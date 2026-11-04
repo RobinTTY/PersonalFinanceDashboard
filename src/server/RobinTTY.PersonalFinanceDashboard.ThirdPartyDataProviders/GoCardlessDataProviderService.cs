@@ -51,18 +51,32 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
 
     // TODO: Cancellation token support
     /// <summary>
-    /// Gets existing authentication requests (requisitions) for all banking institutions.
+    /// Gets all existing authentication requests (requisitions) for all banking institutions.
     /// </summary>
-    /// <param name="requisitionLimit">The maximum number of requisitions to get.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>All existing <see cref="Requisition"/>s.</returns>
     public async Task<ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>> GetAuthenticationRequests(
-        int requisitionLimit, CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.GetRequisitions(requisitionLimit, 0, cancellationToken);
-        // TODO: use paged responses
-        return response.ToThirdPartyResponse(paged =>
-            paged.Results.Select(requisition => requisition.ToAuthenticationRequest()))!;
+        const int pageSize = 100;
+        var requisitions = new List<Requisition>();
+
+        while (true)
+        {
+            var response =
+                await client.RequisitionsEndpoint.GetRequisitions(pageSize, requisitions.Count, cancellationToken);
+            if (!response.IsSuccess)
+                return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(false, null,
+                    response.Error);
+
+            var page = response.Result!;
+            requisitions.AddRange(page.Results);
+            if (page.Next == null || page.Results.Count == 0)
+                break;
+        }
+
+        return new ThirdPartyResponse<IEnumerable<AuthenticationRequest>, BasicResponse?>(true,
+            requisitions.Select(requisition => requisition.ToAuthenticationRequest()), null);
     }
 
     /// <summary>
