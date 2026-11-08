@@ -66,10 +66,7 @@ public static class GoCardlessTypeExtensions
                 : null,
             name: accountDetails?.Product,
             description: accountDetails?.Details,
-            // TODO: The balance type could be something different (which one should be grabbed?)
-            balance: balances.FirstOrDefault(bal =>
-                    bal.BalanceType is BalanceType.ClosingBooked or BalanceType.InterimAvailable)
-                ?.BalanceAmount.Amount,
+            balance: SelectBalance(balances),
             currency: accountDetails?.Currency,
             iban: accountDetails?.Iban,
             bic: accountDetails?.Bic,
@@ -81,6 +78,20 @@ public static class GoCardlessTypeExtensions
                 : null,
             associatedAuthenticationRequests: []);
     }
+
+    // Booked balances come first, since the net worth history subtracts booked transactions from the balance.
+    // Available balances can include a credit line, so they're only used if a bank reports nothing else.
+    private static readonly BalanceType[] BalancePreference =
+    [
+        BalanceType.InterimBooked, BalanceType.ClosingBooked, BalanceType.Expected,
+        BalanceType.InterimAvailable, BalanceType.ClosingAvailable
+    ];
+
+    private static decimal? SelectBalance(List<Balance> balances) =>
+        BalancePreference
+            .Select(type => balances.FirstOrDefault(balance => balance.BalanceType == type))
+            .FirstOrDefault(balance => balance != null)
+            ?.BalanceAmount.Amount;
 
     /// <summary>
     /// Maps the booked transactions of a GoCardless account to <see cref="Transaction"/>s, giving each one a
