@@ -8,6 +8,9 @@ public class BankAccountTypeConfiguration : IEntityTypeConfiguration<BankAccount
 {
     public void Configure(EntityTypeBuilder<BankAccount> builder)
     {
-        builder.HasIndex(entity => entity.ThirdPartyId).IsUnique();
+        // Manually created accounts have an empty third party id and are excluded
+        builder.HasIndex(entity => entity.ThirdPartyId)
+            .IsUnique()
+            .HasFilter($"\"{nameof(BankAccount.ThirdPartyId)}\" <> '{Guid.Empty}'");
     }
 }

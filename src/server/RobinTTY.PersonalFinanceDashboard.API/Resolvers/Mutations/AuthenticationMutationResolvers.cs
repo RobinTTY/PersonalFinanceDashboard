@@ -48,7 +48,7 @@ public class AuthenticationMutationResolvers
                 .SetMessage(deleteResult.Error.Summary != null
                     ? $"{deleteResult.Error.Summary} {deleteResult.Error.Detail}"
                     : "Failed to delete authentication request.")
-                .SetCode("DELETE_AUTHENTICATION_REQUEST_FAILED")
+                .SetCode(ErrorCodes.DeleteAuthenticationRequestFailed)
                 .Build());
     }
 

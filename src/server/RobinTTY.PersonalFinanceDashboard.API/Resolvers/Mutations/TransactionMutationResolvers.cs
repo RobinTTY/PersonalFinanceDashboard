@@ -33,23 +33,18 @@ public class TransactionMutationResolvers
             Id = null
         };
         return await repository.AddTransaction(transaction, input.AccountId)
-               ?? throw new GraphQLException(
-                   ErrorBuilder
-                       .New()
-                       .SetMessage($"Bank account with id {input.AccountId} does not exist.")
-                       .SetCode("BANK_ACCOUNT_NOT_FOUND")
-                       .Build());
+               ?? throw MutationErrors.NotFound<BankAccount>(input.AccountId, ErrorCodes.BankAccountNotFound);
     }
 
     /// <summary>
-    /// Update an existing transaction.
+    /// Update the category and notes of an existing transaction.
     /// </summary>
-    /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="transaction">The transaction to update.</param>
-    public async Task<Transaction> UpdateTransaction(TransactionRepository repository,
-        Transaction transaction)
+    /// <param name="repository">The injected repository to use for data mutation.</param>
+    /// <param name="input">The transaction values to update.</param>
+    public async Task<Transaction> UpdateTransaction(TransactionRepository repository, UpdateTransactionInput input)
     {
-        return await repository.UpdateTransaction(transaction);
+        return await repository.UpdateTransaction(input.Id, input.Category, input.Notes)
+               ?? throw MutationErrors.NotFound<Transaction>(input.Id, ErrorCodes.TransactionNotFound);
     }
 
     /// <summary>
@@ -63,12 +58,7 @@ public class TransactionMutationResolvers
         if (deleted)
             return new DeleteResponse { DeletedId = transactionId };
 
-        throw new GraphQLException(
-            ErrorBuilder
-                .New()
-                .SetMessage($"Transaction with id {transactionId} does not exist.")
-                .SetCode("TRANSACTION_NOT_FOUND")
-                .Build());
+        throw MutationErrors.NotFound<Transaction>(transactionId, ErrorCodes.TransactionNotFound);
     }
 
     /// <summary>

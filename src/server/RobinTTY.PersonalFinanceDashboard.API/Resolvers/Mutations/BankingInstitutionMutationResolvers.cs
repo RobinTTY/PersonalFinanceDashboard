@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
@@ -15,10 +16,13 @@ public class BankingInstitutionMutationResolvers
     /// Create a new banking institution.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="bankingInstitution">The banking institution to create.</param>
+    /// <param name="input">The banking institution to create.</param>
     public async Task<BankingInstitution> CreateBankingInstitution(BankingInstitutionRepository repository,
-        BankingInstitution bankingInstitution)
+        CreateBankingInstitutionInput input)
     {
+        // Manually created institutions have no third party id
+        var bankingInstitution =
+            new BankingInstitution(string.Empty, input.Bic, input.Name, input.LogoUri, input.Countries);
         return await repository.AddBankingInstitution(bankingInstitution);
     }
 
@@ -26,11 +30,13 @@ public class BankingInstitutionMutationResolvers
     /// Update an existing banking institution.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="bankingInstitution">The banking institution to update.</param>
+    /// <param name="input">The banking institution values to update.</param>
     public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitutionRepository repository,
-        BankingInstitution bankingInstitution)
+        UpdateBankingInstitutionInput input)
     {
-        return await repository.UpdateBankingInstitution(bankingInstitution);
+        return await repository.UpdateBankingInstitution(input.Id, input.Name, input.Bic, input.LogoUri,
+                   input.Countries)
+               ?? throw MutationErrors.NotFound<BankingInstitution>(input.Id, ErrorCodes.BankingInstitutionNotFound);
     }
 
     // TODO: Return something more than bool? Generalized response across all resolvers?
@@ -44,7 +50,7 @@ public class BankingInstitutionMutationResolvers
     {
         return await repository.DeleteBankingInstitution(bankingInstitutionId);
     }
-    
+
     /// <summary>
     /// Synchronizes banking institution data with third-party data providers.
     /// </summary>

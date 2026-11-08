@@ -84,14 +84,27 @@ public class BankingInstitutionRepository
     /// <summary>
     /// Updates an existing <see cref="BankingInstitution"/>.
     /// </summary>
-    /// <param name="bankingInstitution">The banking institution to update.</param>
-    /// <returns>The updated <see cref="BankingInstitution"/>.</returns>
-    public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitution bankingInstitution)
+    /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to update.</param>
+    /// <param name="name">The name of the institution.</param>
+    /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
+    /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution.</param>
+    /// <param name="countries">The countries the institution operates in.</param>
+    /// <returns>The updated <see cref="BankingInstitution"/>, or <see langword="null"/> if it doesn't exist.</returns>
+    public async Task<BankingInstitution?> UpdateBankingInstitution(Guid institutionId, string name, string bic,
+        Uri logoUri, List<string> countries)
     {
-        var updatedEntity = _dbContext.BankingInstitutions.Update(bankingInstitution);
+        var institution = await _dbContext.BankingInstitutions
+            .SingleOrDefaultAsync(institution => institution.Id == institutionId);
+        if (institution == null)
+            return null;
+
+        institution.Name = name;
+        institution.Bic = bic;
+        institution.LogoUri = logoUri;
+        institution.Countries = countries;
         await _dbContext.SaveChangesAsync();
 
-        return updatedEntity.Entity;
+        return institution;
     }
 
     /// <summary>

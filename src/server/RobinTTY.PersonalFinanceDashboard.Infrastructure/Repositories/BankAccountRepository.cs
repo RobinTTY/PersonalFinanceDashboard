@@ -66,16 +66,23 @@ public class BankAccountRepository
     }
 
     /// <summary>
-    /// Updates an existing <see cref="BankAccount"/>.
+    /// Updates the name and description of an existing <see cref="BankAccount"/>.
     /// </summary>
-    /// <param name="bankAccount">The bank account to update.</param>
-    /// <returns>The updated <see cref="BankAccount"/>.</returns>
-    public async Task<BankAccount> UpdateBankAccount(BankAccount bankAccount)
+    /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to update.</param>
+    /// <param name="name">The name of the account.</param>
+    /// <param name="description">A description of this account.</param>
+    /// <returns>The updated <see cref="BankAccount"/>, or <see langword="null"/> if it doesn't exist.</returns>
+    public async Task<BankAccount?> UpdateBankAccount(Guid bankAccountId, string name, string? description)
     {
-        var entityEntry = _dbContext.BankAccounts.Update(bankAccount);
+        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId);
+        if (bankAccount == null)
+            return null;
+
+        bankAccount.Name = name;
+        bankAccount.Description = description;
         await _dbContext.SaveChangesAsync();
 
-        return entityEntry.Entity;
+        return bankAccount;
     }
 
     /// <summary>

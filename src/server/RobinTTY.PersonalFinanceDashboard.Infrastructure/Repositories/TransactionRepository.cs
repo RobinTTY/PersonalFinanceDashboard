@@ -72,16 +72,23 @@ public class TransactionRepository
     }
 
     /// <summary>
-    /// Updates an existing <see cref="Transaction"/>.
+    /// Updates the user-entered properties of an existing <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="transaction">The <see cref="Transaction"/> to update.</param>
-    /// <returns>The updated <see cref="Transaction"/>.</returns>
-    public async Task<Transaction> UpdateTransaction(Transaction transaction)
+    /// <param name="transactionId">The id of the <see cref="Transaction"/> to update.</param>
+    /// <param name="category">The category this transaction belongs to.</param>
+    /// <param name="notes">User created notes for this transaction.</param>
+    /// <returns>The updated <see cref="Transaction"/>, or <see langword="null"/> if it doesn't exist.</returns>
+    public async Task<Transaction?> UpdateTransaction(Guid transactionId, string category, string notes)
     {
-        var updateEntry = _dbContext.Transactions.Update(transaction);
+        var transaction = await _dbContext.Transactions.SingleOrDefaultAsync(t => t.Id == transactionId);
+        if (transaction == null)
+            return null;
+
+        transaction.Category = category;
+        transaction.Notes = notes;
         await _dbContext.SaveChangesAsync();
 
-        return updateEntry.Entity;
+        return transaction;
     }
 
     /// <summary>

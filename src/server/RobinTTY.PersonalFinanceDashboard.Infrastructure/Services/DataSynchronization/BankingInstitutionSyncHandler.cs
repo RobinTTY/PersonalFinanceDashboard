@@ -88,7 +88,9 @@ public class BankingInstitutionSyncHandler(
     /// <returns>A task representing the asynchronous operation.</returns>
     private async Task AddUpdateOrDeleteBankingInstitutions(List<BankingInstitution> bankingInstitutions)
     {
-        var allInstitutionsInDb = await dbContext.BankingInstitutions.ToListAsync();
+        // Manually created institutions aren't managed by the sync
+        var allInstitutionsInDb = await dbContext.BankingInstitutions
+            .Where(institution => institution.ThirdPartyId != string.Empty).ToListAsync();
         // Optimization for initial seeding (empty db)
         if (allInstitutionsInDb.Count == 0)
         {

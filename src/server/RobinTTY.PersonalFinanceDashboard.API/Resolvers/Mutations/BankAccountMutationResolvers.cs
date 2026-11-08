@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
@@ -15,21 +16,24 @@ public class BankAccountMutationResolvers
     /// Create a new banking account.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="bankAccount">The banking account to create.</param>
-    public async Task<BankAccount> CreateBankAccount(BankAccountRepository repository, BankAccount bankAccount)
+    /// <param name="input">The banking account to create.</param>
+    public async Task<BankAccount> CreateBankAccount(BankAccountRepository repository, CreateBankAccountInput input)
     {
+        // Manually created accounts have no third party id
+        var bankAccount = new BankAccount(Guid.Empty, input.Name, input.Description, input.Balance, input.Currency,
+            input.Iban, input.Bic, input.Bban, input.OwnerName, input.AccountType);
         return await repository.AddBankAccount(bankAccount);
     }
 
     /// <summary>
-    /// Update an existing banking account.
+    /// Update the name and description of an existing banking account.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
-    /// <param name="bankAccount">The banking account to update.</param>
-    /// <returns></returns>
-    public async Task<BankAccount> UpdateBankAccount(BankAccountRepository repository, BankAccount bankAccount)
+    /// <param name="input">The banking account values to update.</param>
+    public async Task<BankAccount> UpdateBankAccount(BankAccountRepository repository, UpdateBankAccountInput input)
     {
-        return await repository.UpdateBankAccount(bankAccount);
+        return await repository.UpdateBankAccount(input.Id, input.Name, input.Description)
+               ?? throw MutationErrors.NotFound<BankAccount>(input.Id, ErrorCodes.BankAccountNotFound);
     }
 
     /// <summary>

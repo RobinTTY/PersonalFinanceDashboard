@@ -15,7 +15,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
             modelBuilder.Entity("AuthenticationRequestBankAccount", b =>
                 {
@@ -106,7 +106,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.HasIndex("AssociatedInstitutionId");
 
                     b.HasIndex("ThirdPartyId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"ThirdPartyId\" <> '00000000-0000-0000-0000-000000000000'");
 
                     b.ToTable("BankAccounts");
                 });
@@ -140,7 +141,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ThirdPartyId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"ThirdPartyId\" <> ''");
 
                     b.ToTable("BankingInstitutions");
                 });
