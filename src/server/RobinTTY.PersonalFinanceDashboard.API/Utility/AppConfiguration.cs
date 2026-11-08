@@ -16,10 +16,18 @@ public class AppConfiguration
     public required DatabaseConfiguration DatabaseConfiguration { get; set; }
 
     /// <summary>
+    /// The origins allowed to call the API from a browser, e.g. "http://localhost:5173".
+    /// If not set, only the Vite dev server is allowed.
+    /// </summary>
+    public string[]? AllowedCorsOrigins { get; set; }
+
+    /// <summary>
     /// Creates a new instance of <see cref="AppConfiguration"/>.
     /// Necessary for 
     /// </summary>
-    public AppConfiguration() { }
+    public AppConfiguration()
+    {
+    }
 }
 
 /// <summary>
@@ -31,6 +39,7 @@ public class NordigenApiClientConfiguration
     /// The secret id to access the Nordigen API.
     /// </summary>
     public string SecretId { get; set; }
+
     /// <summary>
     /// The secret key to access the Nordigen API.
     /// </summary>

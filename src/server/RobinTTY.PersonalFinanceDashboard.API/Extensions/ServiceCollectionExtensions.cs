@@ -109,8 +109,11 @@ public static class ServiceCollectionExtensions
                 .AddHttpClient()
                 .AddCors(options =>
                 {
-                    // TODO: update to sensible policy
-                    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                    var allowedOrigins = AppConfig.AllowedCorsOrigins is { Length: > 0 } origins
+                        ? origins
+                        : ["http://localhost:5173"];
+                    options.AddDefaultPolicy(policy =>
+                        policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod());
                 });
         }
 
