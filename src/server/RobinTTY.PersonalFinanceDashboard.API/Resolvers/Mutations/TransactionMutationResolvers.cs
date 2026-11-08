@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -56,11 +57,18 @@ public class TransactionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>
     /// <param name="transactionId">The id of the transaction to delete.</param>
-    public async Task<Response> DeleteTransaction(TransactionRepository repository, Guid transactionId)
+    public async Task<DeleteResponse> DeleteTransaction(TransactionRepository repository, Guid transactionId)
     {
-        var result = await repository.DeleteTransaction(transactionId);
-        // TODO: error if result false
-        return new Response { Id = Guid.NewGuid() };
+        var deleted = await repository.DeleteTransaction(transactionId);
+        if (deleted)
+            return new DeleteResponse { DeletedId = transactionId };
+
+        throw new GraphQLException(
+            ErrorBuilder
+                .New()
+                .SetMessage($"Transaction with id {transactionId} does not exist.")
+                .SetCode("TRANSACTION_NOT_FOUND")
+                .Build());
     }
 
     /// <summary>
@@ -72,15 +80,4 @@ public class TransactionMutationResolvers
     {
         return await syncHandler.SynchronizeData(forceThirdPartySync: true);
     }
-}
-
-/// <summary>
-/// TODO
-/// </summary>
-public class Response
-{
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public required Guid Id { get; set; }
 }
