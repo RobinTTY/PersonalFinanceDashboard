@@ -21,7 +21,16 @@ public class AuthenticationMutationResolvers
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository,
         string institutionId, string redirectUri)
     {
-        return await repository.AddAuthenticationRequest(institutionId, redirectUri);
+        if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var uri))
+            throw MutationErrors.Create($"Redirect URI \"{redirectUri}\" is not a valid absolute URI.",
+                ErrorCodes.InvalidRedirectUri);
+
+        var result = await repository.AddAuthenticationRequest(institutionId, uri);
+        if (result.IsSuccessful)
+            return result.Result;
+
+        throw MutationErrors.ThirdPartyRequestFailed(result.Error, "Failed to create authentication request.",
+            ErrorCodes.CreateAuthenticationRequestFailed);
     }
 
     /// <summary>
@@ -42,14 +51,8 @@ public class AuthenticationMutationResolvers
             };
         }
 
-        throw new GraphQLException(
-            ErrorBuilder
-                .New()
-                .SetMessage(deleteResult.Error.Summary != null
-                    ? $"{deleteResult.Error.Summary} {deleteResult.Error.Detail}"
-                    : "Failed to delete authentication request.")
-                .SetCode(ErrorCodes.DeleteAuthenticationRequestFailed)
-                .Build());
+        throw MutationErrors.ThirdPartyRequestFailed(deleteResult.Error, "Failed to delete authentication request.",
+            ErrorCodes.DeleteAuthenticationRequestFailed);
     }
 
     /// <summary>

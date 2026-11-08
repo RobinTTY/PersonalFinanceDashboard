@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using RobinTTY.NordigenApiClient.Models.Responses;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
@@ -19,10 +20,30 @@ internal static class MutationErrors
         var entityName = Regex.Replace(typeof(TEntity).Name, "(?<=[a-z])[A-Z]",
             match => " " + char.ToLowerInvariant(match.Value[0]));
 
-        return new GraphQLException(ErrorBuilder
+        return Create($"{entityName} with id {id} does not exist.", code);
+    }
+
+    /// <summary>
+    /// Creates an error for a failed request to a third party.
+    /// </summary>
+    /// <param name="error">The error returned by the third party.</param>
+    /// <param name="fallbackMessage">The message to use if the third party didn't describe the error.</param>
+    /// <param name="code">The error code from <see cref="ErrorCodes"/>.</param>
+    public static GraphQLException ThirdPartyRequestFailed(BasicResponse error, string fallbackMessage, string code)
+    {
+        var message = error.Summary != null ? $"{error.Summary} {error.Detail}" : fallbackMessage;
+        return Create(message, code);
+    }
+
+    /// <summary>
+    /// Creates an error with the given message.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="code">The error code from <see cref="ErrorCodes"/>.</param>
+    public static GraphQLException Create(string message, string code) =>
+        new(ErrorBuilder
             .New()
-            .SetMessage($"{entityName} with id {id} does not exist.")
+            .SetMessage(message)
             .SetCode(code)
             .Build());
-    }
 }

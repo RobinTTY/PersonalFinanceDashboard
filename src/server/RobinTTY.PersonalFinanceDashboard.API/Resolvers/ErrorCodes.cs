@@ -21,6 +21,16 @@ public static class ErrorCodes
     public const string TransactionNotFound = "TRANSACTION_NOT_FOUND";
 
     /// <summary>
+    /// The provided redirect URI isn't a valid absolute URI.
+    /// </summary>
+    public const string InvalidRedirectUri = "INVALID_REDIRECT_URI";
+
+    /// <summary>
+    /// The authentication request couldn't be created at the third party.
+    /// </summary>
+    public const string CreateAuthenticationRequestFailed = "CREATE_AUTHENTICATION_REQUEST_FAILED";
+
+    /// <summary>
     /// The authentication request couldn't be deleted at the third party.
     /// </summary>
     public const string DeleteAuthenticationRequestFailed = "DELETE_AUTHENTICATION_REQUEST_FAILED";

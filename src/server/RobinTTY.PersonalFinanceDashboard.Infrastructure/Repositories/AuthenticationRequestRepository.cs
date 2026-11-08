@@ -65,26 +65,25 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="institutionId">The id of the institution to create a <see cref="AuthenticationRequest"/> for.</param>
     /// <param name="redirectUri">The URI of the page to redirect to after successful authentication.</param>
-    /// <returns>The added <see cref="AuthenticationRequest"/>.</returns>
-    public async Task<AuthenticationRequest> AddAuthenticationRequest(string institutionId, string redirectUri)
+    /// <returns>The data provider's response containing the added <see cref="AuthenticationRequest"/>, or the error.</returns>
+    public async Task<ThirdPartyResponse<AuthenticationRequest, BasicResponse>> AddAuthenticationRequest(
+        string institutionId, Uri redirectUri)
     {
-        // TODO: URI validation (here or in resolver?)
-        var request = await _dataProviderService.CreateAuthenticationRequest(institutionId, new Uri(redirectUri));
+        var request = await _dataProviderService.CreateAuthenticationRequest(institutionId, redirectUri);
 
         if (request.IsSuccessful)
         {
             await _dbContext.AuthenticationRequests.AddAsync(request.Result);
             await _dbContext.SaveChangesAsync();
-            return request.Result;
+        }
+        else
+        {
+            _logger.LogError(
+                "Creation of new authentication request failed. The data provider returned the following error: " +
+                "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
         }
 
-        // TODO: Error can also be in the InstitutionIdError field here
-        _logger.LogError(
-            "Creation of new authentication request failed. The data provider returned the following error: " +
-            "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
-
-        //TODO: return error
-        throw new NotImplementedException();
+        return request;
     }
 
     /// <summary>
@@ -101,7 +100,7 @@ public class AuthenticationRequestRepository
         {
             _logger.LogError(
                 "Deletion of authentication request failed. Authentication request with id {id} does not exist.", id);
-            
+
             return new ThirdPartyResponse<BasicResponse, BasicResponse>(
                 false, null, new BasicResponse
                 {
@@ -134,7 +133,8 @@ public class AuthenticationRequestRepository
             false, null, new BasicResponse
             {
                 Summary = "Failed to delete authentication request.",
-                Detail = $"The data provider returned the following error: {request.Error.Summary} Error details: {request.Error.Detail}"
+                Detail =
+                    $"The data provider returned the following error: {request.Error.Summary} Error details: {request.Error.Detail}"
             });
     }
 }

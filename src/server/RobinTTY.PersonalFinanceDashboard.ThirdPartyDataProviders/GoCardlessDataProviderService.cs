@@ -86,14 +86,27 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     /// <param name="redirectUri"><see cref="Uri"/> which will be redirected too when the user completes authentication for the given requisition.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The created <see cref="Requisition"/>.</returns>
-    public async Task<ThirdPartyResponse<AuthenticationRequest, CreateRequisitionError>> CreateAuthenticationRequest(
+    public async Task<ThirdPartyResponse<AuthenticationRequest, BasicResponse>> CreateAuthenticationRequest(
         string institutionId, Uri redirectUri, CancellationToken cancellationToken = default)
     {
         var response =
             await client.RequisitionsEndpoint.CreateRequisition(institutionId, redirectUri,
                 reference: Guid.NewGuid().ToString(), cancellationToken: cancellationToken);
 
-        return response.ToThirdPartyResponse(requisition => requisition.ToAuthenticationRequest());
+        if (response.IsSuccess)
+            return new ThirdPartyResponse<AuthenticationRequest, BasicResponse>(true,
+                response.Result!.ToAuthenticationRequest(), null);
+
+        // Errors for single request fields (e.g. an unknown institution id) aren't part of the summary
+        var error = response.Error!;
+        BasicResponse?[] fieldErrors =
+        [
+            error.InstitutionIdError, error.RedirectError, error.AgreementError, error.ReferenceError,
+            error.UserLanguageError, error.SocialSecurityNumberError, error.AccountSelectionError
+        ];
+        var basicError = error.Summary != null ? error : fieldErrors.FirstOrDefault(e => e != null) ?? error;
+
+        return new ThirdPartyResponse<AuthenticationRequest, BasicResponse>(false, null, basicError);
     }
 
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
