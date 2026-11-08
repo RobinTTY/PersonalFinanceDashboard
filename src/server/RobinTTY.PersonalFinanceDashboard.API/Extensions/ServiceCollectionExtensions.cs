@@ -1,12 +1,13 @@
 ﻿using System.Net.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
-using RobinTTY.PersonalFinanceDashboard.API.Utility;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
@@ -21,8 +22,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    private static readonly AppConfiguration AppConfig = AppConfigurationManager.AppConfiguration;
-
     /// <param name="services">The service collection to which to add the services.</param>
     extension(IServiceCollection services)
     {
@@ -91,26 +90,43 @@ public static class ServiceCollectionExtensions
         }
 
         /// <summary>
-        /// Adds all necessary configuration data for this application.
+        /// Adds all necessary configuration data for this application. Missing required settings stop the
+        /// application on startup.
         /// </summary>
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
         public IServiceCollection AddApplicationConfiguration()
         {
-            return services.AddSingleton(new NordigenClientCredentials(AppConfig.NordigenApiConfiguration.SecretId,
-                AppConfig.NordigenApiConfiguration.SecretKey));
+            services.AddOptions<NordigenApiClientConfiguration>()
+                .BindConfiguration(NordigenApiClientConfiguration.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddOptions<DatabaseConfiguration>()
+                .BindConfiguration(DatabaseConfiguration.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            return services.AddSingleton(provider =>
+            {
+                var config = provider.GetRequiredService<IOptions<NordigenApiClientConfiguration>>().Value;
+                return new NordigenClientCredentials(config.SecretId, config.SecretKey);
+            });
         }
 
         /// <summary>
-        /// Adds a configured <see cref="IHttpClientFactory"/> to the service collection. 
+        /// Adds a configured <see cref="IHttpClientFactory"/> to the service collection.
         /// </summary>
+        /// <param name="configuration">The configuration of the application.</param>
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-        public IServiceCollection AddConfiguredHttpClient()
+        public IServiceCollection AddConfiguredHttpClient(IConfiguration configuration)
         {
+            var appConfig = configuration.GetSection(AppConfiguration.SectionName).Get<AppConfiguration>();
+
             return services
                 .AddHttpClient()
                 .AddCors(options =>
                 {
-                    var allowedOrigins = AppConfig.AllowedCorsOrigins is { Length: > 0 } origins
+                    var allowedOrigins = appConfig?.AllowedCorsOrigins is { Length: > 0 } origins
                         ? origins
                         : ["http://localhost:5173"];
                     options.AddDefaultPolicy(policy =>
@@ -125,9 +141,10 @@ public static class ServiceCollectionExtensions
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
         public IServiceCollection AddDatabase(IWebHostEnvironment environment)
         {
-            return services.AddDbContextPool<ApplicationDbContext>(options =>
+            return services.AddDbContextPool<ApplicationDbContext>((provider, options) =>
             {
-                options.UseSqlite(AppConfig.DatabaseConfiguration.ConnectionString);
+                var config = provider.GetRequiredService<IOptions<DatabaseConfiguration>>().Value;
+                options.UseSqlite(config.ConnectionString);
 
                 if (environment.IsDevelopment())
                     options.EnableDetailedErrors();

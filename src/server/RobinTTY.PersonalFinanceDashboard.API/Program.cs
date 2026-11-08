@@ -8,7 +8,7 @@ builder.ConfigureSerilog();
 
 builder.Services
     .AddDatabase(environment)
-    .AddConfiguredHttpClient()
+    .AddConfiguredHttpClient(builder.Configuration)
     .AddApplicationConfiguration()
     .AddApplicationServices()
     .AddRepositories()
