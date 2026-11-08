@@ -3,7 +3,7 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext)
+public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext, TimeProvider timeProvider)
 {
     /// <summary>
     /// Retrieves a single third-party data retrieval metadata record based on the specified data type.
@@ -40,6 +40,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     public async Task ResetLastRetrievalTime(ThirdPartyDataType dataType, Guid? synchronizationEntityId)
     {
         var existingMetadata = await GetThirdPartyDataRetrievalMetadata(dataType, synchronizationEntityId);
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
         if (existingMetadata is null)
         {
@@ -48,7 +49,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
                 DataType = dataType,
                 DataSource = ThirdPartyDataSource.GoCardless,
                 SynchronizationEntityId = synchronizationEntityId,
-                LastRetrievalTime = DateTime.UtcNow,
+                LastRetrievalTime = utcNow,
                 RetrievalInterval = GetRetrievalInterval(dataType)
             };
 
@@ -56,7 +57,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
         }
         else
         {
-            existingMetadata.LastRetrievalTime = DateTime.UtcNow;
+            existingMetadata.LastRetrievalTime = utcNow;
             await dbContext.SaveChangesAsync();
         }
     }

@@ -11,6 +11,7 @@ public class BankAccountSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
+    TimeProvider timeProvider,
     ILogger<BankAccountSyncHandler> logger) : IBankAccountSyncHandler
 {
     /// <summary>
@@ -129,7 +130,7 @@ public class BankAccountSyncHandler(
 
             // An account can be linked to multiple active authentication requests
             var accountIdsIncludeMetadataPairs = authRequests
-                .Where(authenticationRequest => authenticationRequest.IsActive())
+                .Where(authenticationRequest => authenticationRequest.IsActive(timeProvider.GetUtcNow().UtcDateTime))
                 .SelectMany(authenticationRequest => authenticationRequest.AssociatedAccounts)
                 .Select(acc => (internalId: acc.Id, id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))
                 .DistinctBy(pair => pair.id);

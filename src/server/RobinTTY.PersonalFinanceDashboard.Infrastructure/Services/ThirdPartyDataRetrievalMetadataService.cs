@@ -11,9 +11,11 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 /// </summary>
 /// <param name="thirdPartyDataRetrievalMetadataRepository">The repository which holds the
 /// <see cref="ThirdPartyDataRetrievalMetadata"/> used to determine when data is stale.</param>
+/// <param name="timeProvider">Provides the current time.</param>
 public class ThirdPartyDataRetrievalMetadataService(
     ILogger<ThirdPartyDataRetrievalMetadataService> logger,
-    ThirdPartyDataRetrievalMetadataRepository thirdPartyDataRetrievalMetadataRepository)
+    ThirdPartyDataRetrievalMetadataRepository thirdPartyDataRetrievalMetadataRepository,
+    TimeProvider timeProvider)
 {
     /// <summary>
     /// Checks whether the data for the given <see cref="ThirdPartyDataType"/>, stored in the
@@ -34,7 +36,7 @@ public class ThirdPartyDataRetrievalMetadataService(
         }
 
         var nextRetrievalTime = retrievalMetadata.LastRetrievalTime + retrievalMetadata.RetrievalInterval;
-        return nextRetrievalTime <= DateTime.UtcNow;
+        return nextRetrievalTime <= timeProvider.GetUtcNow().UtcDateTime;
     }
 
     /// <summary>

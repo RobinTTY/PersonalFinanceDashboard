@@ -10,6 +10,7 @@ public class TransactionSyncHandler(
     ApplicationDbContext dbContext,
     GoCardlessDataProviderService dataProvider,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
+    TimeProvider timeProvider,
     ILogger<TransactionSyncHandler> logger) : ITransactionSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
@@ -65,15 +66,19 @@ public class TransactionSyncHandler(
         return true;
     }
 
-    private List<Guid> GetActiveAccountIds() =>
-        dbContext.BankAccounts
+    private List<Guid> GetActiveAccountIds()
+    {
+        var validSince = timeProvider.GetUtcNow().UtcDateTime.AddDays(-90);
+
+        return dbContext.BankAccounts
             .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
                 request.Status == AuthenticationStatus.Active &&
-                request.CreatedAt > DateTime.UtcNow.AddDays(-90)))
+                request.CreatedAt > validSince))
             .Select(account => account.Id)
             .Where(id => id.HasValue)
             .Cast<Guid>()
             .ToList();
+    }
 
     private async Task<List<Transaction>?> FetchTransactionsForAccount(Guid internalAccountId)
     {

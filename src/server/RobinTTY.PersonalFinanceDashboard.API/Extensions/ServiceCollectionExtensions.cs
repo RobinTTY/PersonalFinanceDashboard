@@ -71,6 +71,7 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddApplicationServices()
         {
             return services
+                .AddSingleton(TimeProvider.System)
                 .AddSingleton<NordigenClient>()
                 .AddSingleton<GoCardlessDataProviderService>();
         }
