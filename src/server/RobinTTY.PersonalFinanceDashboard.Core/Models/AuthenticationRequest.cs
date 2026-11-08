@@ -8,6 +8,7 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// The status of this authentication request.
     /// </summary>
     public AuthenticationStatus Status { get; set; }
+
     /// <summary>
     /// A <see cref="Uri"/> which can be used to start the authentication via the third party provider.
     /// </summary>
@@ -17,12 +18,12 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// The date when the authentication request was created. Usually authentication requests are valid for 90 days.
     /// </summary>
     public DateTime CreatedAt { get; set; }
-    
+
     /// <summary>
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
     public List<BankAccount> AssociatedAccounts { get; set; } = [];
-    
+
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// </summary>
@@ -31,7 +32,7 @@ public class AuthenticationRequest : ThirdPartyEntity
         ThirdPartyId = Guid.Empty;
         Status = AuthenticationStatus.Unknown;
         AuthenticationLink = new Uri("https://www.placeholder.example/");
-        CreatedAt = DateTime.Now;
+        CreatedAt = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -42,7 +43,8 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink, DateTime createdAt)
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
+        DateTime createdAt)
     {
         ThirdPartyId = thirdPartyId;
         Status = status;
@@ -58,7 +60,8 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink, DateTime createdAt,
+    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
+        DateTime createdAt,
         List<BankAccount> associatedAccounts)
     {
         ThirdPartyId = thirdPartyId;
@@ -67,7 +70,7 @@ public class AuthenticationRequest : ThirdPartyEntity
         AssociatedAccounts = associatedAccounts;
         CreatedAt = createdAt;
     }
-    
+
     public static AuthenticationRequest CreateWithoutNavigationProperties(AuthenticationRequest authenticationRequest)
     {
         return new AuthenticationRequest(authenticationRequest.ThirdPartyId, authenticationRequest.Status,
@@ -84,7 +87,7 @@ public enum AuthenticationStatus
     /// Assigned if the status of the authentication request couldn't be determined.
     /// </summary>
     Unknown,
-    
+
     /// <summary>
     /// A user action is required for the authentication to proceed.
     /// </summary>

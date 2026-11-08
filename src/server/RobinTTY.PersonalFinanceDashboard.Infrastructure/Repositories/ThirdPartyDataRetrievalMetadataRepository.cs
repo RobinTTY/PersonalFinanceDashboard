@@ -48,7 +48,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
                 DataType = dataType,
                 DataSource = ThirdPartyDataSource.GoCardless,
                 SynchronizationEntityId = synchronizationEntityId,
-                LastRetrievalTime = DateTime.Now,
+                LastRetrievalTime = DateTime.UtcNow,
                 RetrievalInterval = GetRetrievalInterval(dataType)
             };
 
@@ -56,7 +56,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
         }
         else
         {
-            existingMetadata.LastRetrievalTime = DateTime.Now;
+            existingMetadata.LastRetrievalTime = DateTime.UtcNow;
             await dbContext.SaveChangesAsync();
         }
     }

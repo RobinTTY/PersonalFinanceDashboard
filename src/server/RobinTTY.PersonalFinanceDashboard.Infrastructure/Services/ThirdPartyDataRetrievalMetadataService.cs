@@ -32,9 +32,9 @@ public class ThirdPartyDataRetrievalMetadataService(
         {
             return true;
         }
-            
+
         var nextRetrievalTime = retrievalMetadata.LastRetrievalTime + retrievalMetadata.RetrievalInterval;
-        return nextRetrievalTime <= DateTime.Now;
+        return nextRetrievalTime <= DateTime.UtcNow;
     }
 
     /// <summary>
@@ -45,6 +45,7 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="thirdPartyDataType">The data type for which to reset the data expiry.</param>
     public async Task ResetDataExpiry(ThirdPartyDataType thirdPartyDataType, Guid? synchronizationEntityId = null)
     {
-        await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(thirdPartyDataType, synchronizationEntityId);
+        await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(thirdPartyDataType,
+            synchronizationEntityId);
     }
 }

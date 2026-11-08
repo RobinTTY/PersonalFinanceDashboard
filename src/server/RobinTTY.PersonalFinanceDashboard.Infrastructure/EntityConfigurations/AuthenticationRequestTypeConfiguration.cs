@@ -9,5 +9,6 @@ public class AuthenticationRequestTypeConfiguration : IEntityTypeConfiguration<A
     public void Configure(EntityTypeBuilder<AuthenticationRequest> builder)
     {
         builder.HasIndex(entity => entity.ThirdPartyId).IsUnique();
+        builder.Property(entity => entity.CreatedAt).HasConversion<UtcDateTimeConverter>();
     }
 }
