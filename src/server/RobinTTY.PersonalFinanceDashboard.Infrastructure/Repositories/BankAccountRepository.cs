@@ -12,21 +12,25 @@ public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IBankAccountSyncHandler _bankAccountSyncHandler;
+    private readonly ITransactionSyncHandler _transactionSyncHandler;
     private readonly ILogger<BankAccountRepository> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccountRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="bankAccountSyncHandler">Handles the synchronization of third party data.</param>
+    /// <param name="bankAccountSyncHandler">Handles the synchronization of third party bank account data.</param>
+    /// <param name="transactionSyncHandler">Handles the synchronization of third party transaction data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public BankAccountRepository(
         ApplicationDbContext dbContext,
         IBankAccountSyncHandler bankAccountSyncHandler,
+        ITransactionSyncHandler transactionSyncHandler,
         ILogger<BankAccountRepository> logger)
     {
         _dbContext = dbContext;
         _bankAccountSyncHandler = bankAccountSyncHandler;
+        _transactionSyncHandler = transactionSyncHandler;
         _logger = logger;
     }
 
@@ -49,6 +53,8 @@ public class BankAccountRepository
     public async Task<IQueryable<BankAccount>> GetBankAccounts()
     {
         await _bankAccountSyncHandler.SynchronizeData();
+        // Keeps nested transactions in line with the balances, which the net worth history is calculated from
+        await _transactionSyncHandler.SynchronizeData();
 
         return _dbContext.BankAccounts.OrderBy(account => account.Name);
     }
