@@ -53,13 +53,18 @@ public class TransactionRepository
     }
 
     /// <summary>
-    /// Adds a new <see cref="Transaction"/>.
+    /// Adds a new <see cref="Transaction"/> to the specified <see cref="BankAccount"/>.
     /// </summary>
     /// <param name="transaction">The <see cref="Transaction"/> to add.</param>
-    /// <returns>The <see cref="Transaction"/> to add.</returns>
-    // TODO: This should use a TransactionRequest class not Transaction itself
-    public async Task<Transaction> AddTransaction(Transaction transaction)
+    /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> the transaction belongs to.</param>
+    /// <returns>The added <see cref="Transaction"/>, or <see langword="null"/> if the bank account doesn't exist.</returns>
+    public async Task<Transaction?> AddTransaction(Transaction transaction, Guid bankAccountId)
     {
+        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId);
+        if (bankAccount == null)
+            return null;
+
+        transaction.BankAccount = bankAccount;
         await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
 

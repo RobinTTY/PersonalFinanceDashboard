@@ -8,8 +8,10 @@ public class TransactionTypeConfiguration : IEntityTypeConfiguration<Transaction
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
-        // Scoped to the bank account so manually created transactions (no account, empty third party id) don't
-        // conflict, since SQLite treats NULL values as distinct
-        builder.HasIndex("BankAccountId", nameof(Transaction.ThirdPartyId)).IsUnique();
+        // Scoped to the bank account, since third party ids are only unique per account. Manually created
+        // transactions have an empty third party id and are excluded.
+        builder.HasIndex("BankAccountId", nameof(Transaction.ThirdPartyId))
+            .IsUnique()
+            .HasFilter($"\"{nameof(Transaction.ThirdPartyId)}\" <> '{Guid.Empty}'");
     }
 }

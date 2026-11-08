@@ -31,8 +31,13 @@ public class TransactionMutationResolvers
             ValueDate = input.ValueDate,
             Id = null
         };
-        await repository.AddTransaction(transaction);
-        return transaction;
+        return await repository.AddTransaction(transaction, input.AccountId)
+               ?? throw new GraphQLException(
+                   ErrorBuilder
+                       .New()
+                       .SetMessage($"Bank account with id {input.AccountId} does not exist.")
+                       .SetCode("BANK_ACCOUNT_NOT_FOUND")
+                       .Build());
     }
 
     /// <summary>
@@ -55,9 +60,9 @@ public class TransactionMutationResolvers
     {
         var result = await repository.DeleteTransaction(transactionId);
         // TODO: error if result false
-        return new Response {Id = Guid.NewGuid()};
+        return new Response { Id = Guid.NewGuid() };
     }
-    
+
     /// <summary>
     /// Synchronizes transaction data with third-party data providers.
     /// </summary>
