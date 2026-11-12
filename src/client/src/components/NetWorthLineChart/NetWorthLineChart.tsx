@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useComputedColorScheme } from '@mantine/core';
 import * as echarts from 'echarts';
+import { useComputedColorScheme } from '@mantine/core';
 
 interface NetWorthLineChartProps {
   dataByLabel: Record<string, number>;

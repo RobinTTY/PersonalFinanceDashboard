@@ -1,6 +1,6 @@
+import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { axe, render } from '@test-utils';
 import { fireEvent, screen } from '@testing-library/react';
-import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { AccountsHeader } from './AccountsHeader';
 
 type Account = AuthRequestWithAccountsFragment['associatedAccounts'][number];

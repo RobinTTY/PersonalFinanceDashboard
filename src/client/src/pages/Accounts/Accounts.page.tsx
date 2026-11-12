@@ -1,21 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
+import { GetBankAccounts } from '@graphql-queries/GetBankAccounts';
+import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import {
-  Alert,
-  Box,
-  Button,
-  Loader,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { formatAmount, formatDate } from '@utility';
+import { Alert, Box, Button, Loader, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AccountsHeader } from '@/components/AccountsHeader/AccountsHeader';
 import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/AddAccountModal';
-import { GetBankAccounts } from '@graphql-queries/GetBankAccounts';
-import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
-import { formatAmount, formatDate } from '@utility';
 import classes from './Accounts.page.module.css';
 
 const PAGE_SIZE = 50;
@@ -68,7 +61,12 @@ export function AccountsPage() {
     [accounts, accountId]
   );
 
-  const { data, loading: isFetchingTransactions, error, fetchMore } = useQuery(GetTransactionsByAccountId, {
+  const {
+    data,
+    loading: isFetchingTransactions,
+    error,
+    fetchMore,
+  } = useQuery(GetTransactionsByAccountId, {
     variables: { accountId: accountId ?? '', first: PAGE_SIZE },
     skip: !accountId,
     notifyOnNetworkStatusChange: true,
@@ -124,9 +122,11 @@ export function AccountsPage() {
   // Waiting on bank accounts query; account list not yet available
   const showAccountsLoader = isFetchingAccounts;
   // Account selected, first page of transactions still loading (no rows yet)
-  const showInitialLoader = !isFetchingAccounts && !!accountId && isFetchingTransactions && edges.length === 0;
+  const showInitialLoader =
+    !isFetchingAccounts && !!accountId && isFetchingTransactions && edges.length === 0;
   // Account selected, load complete, but no transactions exist
-  const showEmptyState = !isFetchingAccounts && !!accountId && !isFetchingTransactions && edges.length === 0;
+  const showEmptyState =
+    !isFetchingAccounts && !!accountId && !isFetchingTransactions && edges.length === 0;
   // Query done but user has no linked accounts
   const showNoAccounts = !isFetchingAccounts && accounts.length === 0;
 
@@ -204,14 +204,11 @@ export function AccountsPage() {
                   <Text size="sm">{formatDate(transaction.valueDate)}</Text>
                   <Text size="sm" truncate>
                     {/* Show the counterparty: who was paid for outgoing, who paid for incoming */}
-                    {transaction.amount < 0 ? transaction.payee ?? '—' : transaction.payer ?? '—'}
+                    {transaction.amount < 0
+                      ? (transaction.payee ?? '—')
+                      : (transaction.payer ?? '—')}
                   </Text>
-                  <Text
-                    size="sm"
-                    fw={600}
-                    ta="right"
-                    c={transaction.amount >= 0 ? 'green' : 'red'}
-                  >
+                  <Text size="sm" fw={600} ta="right" c={transaction.amount >= 0 ? 'green' : 'red'}>
                     {formatAmount(transaction.amount, transaction.currency)}
                   </Text>
                 </div>

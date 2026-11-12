@@ -1,5 +1,5 @@
-import { Group, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconCircleCheck } from '@tabler/icons-react';
+import { Group, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { BankAccountOverview } from '../BankAccountOverview/BankAccountOverview';
 
 interface BankAuthenticationSuccessProps {

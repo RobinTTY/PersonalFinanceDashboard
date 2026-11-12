@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { GetNetWorthHistory } from '@graphql-queries/GetNetWorthHistory';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { Alert, Card, Center, Loader, Stack, Text, Title } from '@mantine/core';
-import { NetWorthLabel, NetWorthPanel } from '@/components/NetWorthPanel/NetWorthPanel';
+import { Alert, Card, Center, Loader, Stack, Text } from '@mantine/core';
 import {
   buildNetWorthHistory,
   NetWorthAccount,
 } from '@/components/NetWorthLineChart/utility/buildNetWorthHistory';
+import { NetWorthLabel, NetWorthPanel } from '@/components/NetWorthPanel/NetWorthPanel';
 
 const CHART_HEIGHT = 320;
 

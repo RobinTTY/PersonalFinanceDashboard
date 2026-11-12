@@ -1,5 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react';
 import { render } from '@test-utils';
+import { fireEvent, screen } from '@testing-library/react';
 import { NetWorthPanel } from './NetWorthPanel';
 import { computeChange, formatCurrency, RangeKey, sliceRange } from './utility/netWorthRange';
 
@@ -17,9 +17,7 @@ vi.mock('echarts', () => ({
 }));
 
 // 120 daily points valued 0..119 so different ranges start from different points.
-const data = Object.fromEntries(
-  Array.from({ length: 120 }, (_, index) => [`day-${index}`, index])
-);
+const data = Object.fromEntries(Array.from({ length: 120 }, (_, index) => [`day-${index}`, index]));
 
 // Mirrors the component's percentage formatting; kept locale-agnostic by reusing Intl.
 function expectedPct(range: RangeKey): string {

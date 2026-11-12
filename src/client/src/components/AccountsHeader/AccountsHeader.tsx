@@ -1,7 +1,7 @@
-import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
-import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { BankAccountSummaryFragment } from '@graphql-types/graphql';
+import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
 import { formatBalance, getInitials } from '@utility';
+import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import classes from './AccountsHeader.module.css';
 
 type Account = BankAccountSummaryFragment;

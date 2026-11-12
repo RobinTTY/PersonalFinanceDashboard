@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { GetBankAccount } from '@/graphql/queries/GetBankAccount';
-import { BankAccountDetailsFragment } from '@/graphql/types/graphql';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { Badge, Divider, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
+import { GetBankAccount } from '@/graphql/queries/GetBankAccount';
+import { BankAccountDetailsFragment } from '@/graphql/types/graphql';
 import classes from './BankAccountOverview.module.css';
 
 export type BankAccountInstitution = NonNullable<

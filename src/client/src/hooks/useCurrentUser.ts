@@ -16,7 +16,6 @@ export function useCurrentUser(): CurrentUser {
   return {
     name: 'Robin Müller',
     email: 'muellerobin95@gmail.com',
-    avatarUrl:
-      'https://avatars.githubusercontent.com/u/27669180',
+    avatarUrl: 'https://avatars.githubusercontent.com/u/27669180',
   };
 }

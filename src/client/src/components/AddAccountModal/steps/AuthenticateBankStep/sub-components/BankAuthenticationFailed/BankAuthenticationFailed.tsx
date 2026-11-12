@@ -1,5 +1,5 @@
-import { Anchor, Button, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
+import { Anchor, Button, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import classes from './BankAuthenticationFailed.module.css';
 
 interface BankAuthenticationFailedProps {
@@ -22,8 +22,8 @@ export function BankAuthenticationFailed({
         <Stack gap={4} align="center">
           <Title order={5}>Authentication Not Completed</Title>
           <Text size="sm" c="dimmed" ta="center">
-            Your authentication does not appear to be complete yet. If you haven&apos;t finished
-            the external authentication, please follow the link below.
+            Your authentication does not appear to be complete yet. If you haven&apos;t finished the
+            external authentication, please follow the link below.
           </Text>
         </Stack>
       </div>

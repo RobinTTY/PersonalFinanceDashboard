@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client/react';
-import { GetAuthRequestWithAccounts } from '@/graphql/queries/GetAuthRequestWithAccounts';
 import { Stack } from '@mantine/core';
+import { GetAuthRequestWithAccounts } from '@/graphql/queries/GetAuthRequestWithAccounts';
 import { AuthenticationStatus } from '@/graphql/types/graphql';
 import { BankAuthenticationFailed } from './sub-components/BankAuthenticationFailed/BankAuthenticationFailed';
 import { BankAuthenticationPending } from './sub-components/BankAuthenticationPending/BankAuthenticationPending';

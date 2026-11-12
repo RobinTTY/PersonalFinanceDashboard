@@ -1,7 +1,17 @@
-import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
-import { ActionIcon, Avatar, Badge, Divider, Group, Stack, Text, Tooltip, Accordion } from '@mantine/core';
 import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
+import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
 import { formatBalance, getInitials } from '@utility';
+import {
+  Accordion,
+  ActionIcon,
+  Avatar,
+  Badge,
+  Divider,
+  Group,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core';
 import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
 import classes from './ConnectedBanksSection.module.css';
 
@@ -120,7 +130,12 @@ export function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: Connect
               {institution?.name ?? 'Unknown institution'}
             </Text>
             <Text size="xs" c="dimmed">
-              Connected on {bank.createdAt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+              Connected on{' '}
+              {bank.createdAt.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
             </Text>
           </Stack>
         </Group>
@@ -146,7 +161,11 @@ export function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: Connect
       {accountCount > 0 && (
         <>
           <Divider my="sm" />
-          <Accordion variant="filled" chevronPosition="right" classNames={{ item: classes.accordionItem }}>
+          <Accordion
+            variant="filled"
+            chevronPosition="right"
+            classNames={{ item: classes.accordionItem }}
+          >
             <Accordion.Item value="accounts">
               <Accordion.Control>
                 <Text size="sm" fw={500}>
