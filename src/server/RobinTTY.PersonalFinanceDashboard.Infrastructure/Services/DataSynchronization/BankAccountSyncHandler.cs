@@ -165,35 +165,54 @@ public class BankAccountSyncHandler(
     /// that were added or updated in the database.</returns>
     private async Task<List<BankAccount>> AddOrUpdateBankAccounts(List<BankAccount> bankAccounts)
     {
-        var updatedBankAccounts = new List<BankAccount>();
+        var accountIds = bankAccounts.Select(account => account.ThirdPartyId).Distinct().ToList();
+        var existingAccounts = await dbContext.BankAccounts
+            .Include(account => account.AssociatedAuthenticationRequests)
+            .Include(account => account.AssociatedInstitution)
+            .Where(account => accountIds.Contains(account.ThirdPartyId))
+            .ToDictionaryAsync(account => account.ThirdPartyId);
 
+        var requestIds = bankAccounts
+            .SelectMany(account => account.AssociatedAuthenticationRequests)
+            .Select(request => request.ThirdPartyId)
+            .Distinct()
+            .ToList();
+        var trackedRequests = await dbContext.AuthenticationRequests
+            .Where(request => requestIds.Contains(request.ThirdPartyId))
+            .ToDictionaryAsync(request => request.ThirdPartyId);
+
+        var institutionIds = bankAccounts
+            .Select(account => account.AssociatedInstitution?.ThirdPartyId)
+            .OfType<string>()
+            .Distinct()
+            .ToList();
+        var trackedInstitutions = await dbContext.BankingInstitutions
+            .Where(institution => institutionIds.Contains(institution.ThirdPartyId))
+            .ToDictionaryAsync(institution => institution.ThirdPartyId);
+
+        var updatedBankAccounts = new List<BankAccount>();
         foreach (var updatedBankAccount in bankAccounts)
         {
-            var existingBankAccount = dbContext.BankAccounts
-                .Include(account => account.AssociatedAuthenticationRequests)
-                .Include(account => account.AssociatedInstitution)
-                .SingleOrDefault(account => account.ThirdPartyId == updatedBankAccount.ThirdPartyId);
-
-            if (existingBankAccount == null)
-            {
-                var insertEntity = BankAccount.CreateWithoutNavigationProperties(updatedBankAccount);
-                var entry = await dbContext.BankAccounts.AddAsync(insertEntity);
-                existingBankAccount = entry.Entity;
-            }
-            else
+            if (existingAccounts.TryGetValue(updatedBankAccount.ThirdPartyId, out var existingBankAccount))
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
                 logger.LogInformation(
                     "Updated existing bank account {name} with id {bankAccountId}. New balance: {balance}.",
                     existingBankAccount.Name, existingBankAccount.Id, updatedBankAccount.Balance);
             }
+            else
+            {
+                existingBankAccount = BankAccount.CreateWithoutNavigationProperties(updatedBankAccount);
+                dbContext.BankAccounts.Add(existingBankAccount);
+                existingAccounts[existingBankAccount.ThirdPartyId] = existingBankAccount;
+            }
 
-            await UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount);
-            await UpdateAssociatedInstitution(updatedBankAccount, existingBankAccount);
+            UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount, trackedRequests);
+            UpdateAssociatedInstitution(updatedBankAccount, existingBankAccount, trackedInstitutions);
             updatedBankAccounts.Add(existingBankAccount);
-
-            await dbContext.SaveChangesAsync();
         }
+
+        await dbContext.SaveChangesAsync();
 
         return updatedBankAccounts;
     }
@@ -203,31 +222,25 @@ public class BankAccountSyncHandler(
     /// </summary>
     /// <param name="updatedBankAccount">The bank account containing the updated authentication requests.</param>
     /// <param name="existingBankAccount">The existing bank account to which the updated authentication requests will be linked.</param>
-    private async Task UpdateAssociatedAuthenticationRequests(BankAccount updatedBankAccount,
-        BankAccount existingBankAccount)
+    /// <param name="trackedRequests">The authentication requests already in the database, keyed by their third party id.
+    /// Newly added requests are added to it.</param>
+    private void UpdateAssociatedAuthenticationRequests(BankAccount updatedBankAccount,
+        BankAccount existingBankAccount, Dictionary<Guid, AuthenticationRequest> trackedRequests)
     {
-        var associatedAuthenticationRequestIds = updatedBankAccount.AssociatedAuthenticationRequests
-            .Select(req => req.ThirdPartyId);
-        var authRequests = dbContext.AuthenticationRequests
-            .Where(request => associatedAuthenticationRequestIds.Contains(request.ThirdPartyId)).ToList();
-
         foreach (var request in updatedBankAccount.AssociatedAuthenticationRequests)
         {
-            var linkedRequest = authRequests.SingleOrDefault(existingRequest =>
-                existingRequest.ThirdPartyId == request.ThirdPartyId);
-
-            if (linkedRequest == null)
+            if (!trackedRequests.TryGetValue(request.ThirdPartyId, out var trackedRequest))
             {
-                var entry = await dbContext.AuthenticationRequests.AddAsync(request);
-                linkedRequest = entry.Entity;
-                existingBankAccount.AssociatedAuthenticationRequests.Add(request);
+                trackedRequest = request;
+                dbContext.AuthenticationRequests.Add(trackedRequest);
+                trackedRequests[trackedRequest.ThirdPartyId] = trackedRequest;
             }
 
-            var associationAlreadyExists = existingBankAccount.AssociatedAuthenticationRequests
-                .All(req => req.ThirdPartyId != linkedRequest.ThirdPartyId);
-            if (associationAlreadyExists)
+            var associationDoesNotExistYet = existingBankAccount.AssociatedAuthenticationRequests
+                .All(existingRequest => existingRequest.ThirdPartyId != trackedRequest.ThirdPartyId);
+            if (associationDoesNotExistYet)
             {
-                existingBankAccount.AssociatedAuthenticationRequests.Add(linkedRequest);
+                existingBankAccount.AssociatedAuthenticationRequests.Add(trackedRequest);
             }
         }
     }
@@ -237,28 +250,22 @@ public class BankAccountSyncHandler(
     /// </summary>
     /// <param name="updatedBankAccount">The bank account with the updated data.</param>
     /// <param name="existingBankAccount">The existing bank account in the database.</param>
-    private async Task UpdateAssociatedInstitution(BankAccount updatedBankAccount,
-        BankAccount existingBankAccount)
+    /// <param name="trackedInstitutions">The institutions already in the database, keyed by their third party id.
+    /// Newly added institutions are added to it.</param>
+    private void UpdateAssociatedInstitution(BankAccount updatedBankAccount, BankAccount existingBankAccount,
+        Dictionary<string, BankingInstitution> trackedInstitutions)
     {
-        var associatedInstitutionId = updatedBankAccount.AssociatedInstitution?.ThirdPartyId;
+        var institution = updatedBankAccount.AssociatedInstitution;
+        if (institution == null)
+            return;
 
-        if (associatedInstitutionId != null)
+        if (!trackedInstitutions.TryGetValue(institution.ThirdPartyId, out var trackedInstitution))
         {
-            var trackedInstitution = dbContext.BankingInstitutions
-                .SingleOrDefault(institution => institution.ThirdPartyId == associatedInstitutionId);
-
-            if (trackedInstitution == null && updatedBankAccount.AssociatedInstitution != null)
-            {
-                var entry = await dbContext.BankingInstitutions.AddAsync(updatedBankAccount.AssociatedInstitution);
-                trackedInstitution = entry.Entity;
-            }
-
-            var associationDoesNotExistYet =
-                existingBankAccount.AssociatedInstitution?.ThirdPartyId != trackedInstitution?.ThirdPartyId;
-            if (associationDoesNotExistYet)
-            {
-                existingBankAccount.AssociatedInstitution = trackedInstitution;
-            }
+            trackedInstitution = institution;
+            dbContext.BankingInstitutions.Add(trackedInstitution);
+            trackedInstitutions[trackedInstitution.ThirdPartyId] = trackedInstitution;
         }
+
+        existingBankAccount.AssociatedInstitution = trackedInstitution;
     }
 }

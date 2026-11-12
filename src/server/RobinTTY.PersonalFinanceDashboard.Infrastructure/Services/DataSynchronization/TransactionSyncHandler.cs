@@ -101,50 +101,49 @@ public class TransactionSyncHandler(
 
     private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)
     {
+        var accountIds = updatedTransactions
+            .Select(transaction => transaction.BankAccount?.ThirdPartyId)
+            .OfType<Guid>()
+            .Distinct()
+            .ToList();
+        var accounts = await dbContext.BankAccounts
+            .Where(account => accountIds.Contains(account.ThirdPartyId))
+            .ToDictionaryAsync(account => account.ThirdPartyId);
+
+        // Keyed like the unique index, since third party ids are only unique per account
+        var transactionIds = updatedTransactions.Select(transaction => transaction.ThirdPartyId).Distinct().ToList();
+        var existingTransactions = await dbContext.Transactions
+            .Include(transaction => transaction.BankAccount)
+            .Where(transaction => transactionIds.Contains(transaction.ThirdPartyId) &&
+                                  transaction.BankAccount != null &&
+                                  accountIds.Contains(transaction.BankAccount.ThirdPartyId))
+            .ToDictionaryAsync(transaction => (transaction.BankAccount!.ThirdPartyId, transaction.ThirdPartyId));
+
         foreach (var updatedTransaction in updatedTransactions)
         {
-            var existingTransaction = dbContext.Transactions
-                .Include(t => t.BankAccount)
-                .SingleOrDefault(t => t.ThirdPartyId == updatedTransaction.ThirdPartyId);
-
-            if (existingTransaction == null)
+            if (updatedTransaction.BankAccount == null ||
+                !accounts.TryGetValue(updatedTransaction.BankAccount.ThirdPartyId, out var account))
             {
-                var insertEntity = Transaction.CreateWithoutNavigationProperties(updatedTransaction);
-                var entry = await dbContext.Transactions.AddAsync(insertEntity);
-                existingTransaction = entry.Entity;
+                logger.LogWarning("Skipping transaction {transactionId} without a known bank account.",
+                    updatedTransaction.ThirdPartyId);
+                continue;
             }
-            else
+
+            var key = (account.ThirdPartyId, updatedTransaction.ThirdPartyId);
+            if (existingTransactions.TryGetValue(key, out var existingTransaction))
             {
                 // TODO: Do we ever expect transactions to change after they have been retrieved?
                 existingTransaction.UpdateNonNavigationProperties(updatedTransaction);
             }
-
-            await UpdateAssociatedBankAccount(updatedTransaction, existingTransaction);
-            await dbContext.SaveChangesAsync();
-        }
-    }
-
-    private async Task UpdateAssociatedBankAccount(Transaction updatedTransaction, Transaction existingTransaction)
-    {
-        var associatedBankAccountId = updatedTransaction.BankAccount?.ThirdPartyId;
-
-        if (associatedBankAccountId != null)
-        {
-            var trackedBankAccount = dbContext.BankAccounts
-                .SingleOrDefault(bankAccount => bankAccount.ThirdPartyId == associatedBankAccountId);
-
-            if (trackedBankAccount == null && updatedTransaction.BankAccount != null)
+            else
             {
-                var entry = await dbContext.BankAccounts.AddAsync(updatedTransaction.BankAccount);
-                trackedBankAccount = entry.Entity;
-            }
-
-            var associationDoesNotExistYet =
-                existingTransaction.BankAccount?.ThirdPartyId != trackedBankAccount?.ThirdPartyId;
-            if (associationDoesNotExistYet)
-            {
-                existingTransaction.BankAccount = trackedBankAccount;
+                var insertEntity = Transaction.CreateWithoutNavigationProperties(updatedTransaction);
+                insertEntity.BankAccount = account;
+                dbContext.Transactions.Add(insertEntity);
+                existingTransactions[key] = insertEntity;
             }
         }
+
+        await dbContext.SaveChangesAsync();
     }
 }

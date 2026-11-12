@@ -81,52 +81,58 @@ public class AuthenticationRequestSyncHandler(
     /// <returns>The number of newly added authentication requests.</returns>
     private async Task<int> AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
     {
+        var requestIds = authenticationRequests.Select(request => request.ThirdPartyId).Distinct().ToList();
+        var existingRequests = await dbContext.AuthenticationRequests
+            .Include(request => request.AssociatedAccounts)
+            .Where(request => requestIds.Contains(request.ThirdPartyId))
+            .ToDictionaryAsync(request => request.ThirdPartyId);
+
+        // An account can belong to multiple requests (e.g. after renewing consent), so it's only looked up once
+        var accountIds = authenticationRequests
+            .SelectMany(request => request.AssociatedAccounts)
+            .Select(account => account.ThirdPartyId)
+            .Distinct()
+            .ToList();
+        var trackedAccounts = await dbContext.BankAccounts
+            .Where(account => accountIds.Contains(account.ThirdPartyId))
+            .ToDictionaryAsync(account => account.ThirdPartyId);
+
         var numOfAddedAuthRequests = 0;
         foreach (var updatedAuthenticationRequest in authenticationRequests)
         {
-            var existingRequest = dbContext.AuthenticationRequests
-                .Include(req => req.AssociatedAccounts)
-                .SingleOrDefault(req => req.ThirdPartyId == updatedAuthenticationRequest.ThirdPartyId);
-
-            if (existingRequest == null)
-            {
-                var insertEntity =
-                    AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
-                var entry = await dbContext.AuthenticationRequests.AddAsync(insertEntity);
-                existingRequest = entry.Entity;
-
-                numOfAddedAuthRequests++;
-            }
-            else
+            if (existingRequests.TryGetValue(updatedAuthenticationRequest.ThirdPartyId, out var existingRequest))
             {
                 existingRequest.Status = updatedAuthenticationRequest.Status;
                 existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
             }
+            else
+            {
+                existingRequest =
+                    AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
+                dbContext.AuthenticationRequests.Add(existingRequest);
+                existingRequests[existingRequest.ThirdPartyId] = existingRequest;
 
-            await UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest);
-            await dbContext.SaveChangesAsync();
+                numOfAddedAuthRequests++;
+            }
+
+            UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest, trackedAccounts);
         }
+
+        await dbContext.SaveChangesAsync();
 
         return numOfAddedAuthRequests;
     }
 
-    private async Task UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
-        AuthenticationRequest existingRequest)
+    private void UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
+        AuthenticationRequest existingRequest, Dictionary<Guid, BankAccount> trackedAccounts)
     {
-        var associatedAccountIds = updatedAuthenticationRequest.AssociatedAccounts
-            .Select(acc => acc.ThirdPartyId).Distinct().ToList();
-        var trackedAccounts = dbContext.BankAccounts
-            .Where(account => associatedAccountIds.Contains(account.ThirdPartyId)).ToList();
-
         foreach (var account in updatedAuthenticationRequest.AssociatedAccounts)
         {
-            var trackedAccount = trackedAccounts.SingleOrDefault(a => a.ThirdPartyId == account.ThirdPartyId);
-
-            if (trackedAccount == null)
+            if (!trackedAccounts.TryGetValue(account.ThirdPartyId, out var trackedAccount))
             {
-                var entry = await dbContext.BankAccounts.AddAsync(account);
-                trackedAccount = entry.Entity;
-                trackedAccounts.Add(trackedAccount);
+                trackedAccount = account;
+                dbContext.BankAccounts.Add(trackedAccount);
+                trackedAccounts[trackedAccount.ThirdPartyId] = trackedAccount;
             }
 
             // If the account is already tracked, check first if the existing authentication request already contains the association
