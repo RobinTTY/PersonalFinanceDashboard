@@ -300,7 +300,7 @@ export type DeleteBankAccountInput = {
 
 export type DeleteBankAccountPayload = {
   __typename: 'DeleteBankAccountPayload';
-  boolean: Maybe<Scalars['Boolean']['output']>;
+  deleteResponse: Maybe<DeleteResponse>;
 };
 
 export type DeleteBankingInstitutionInput = {
@@ -310,7 +310,7 @@ export type DeleteBankingInstitutionInput = {
 
 export type DeleteBankingInstitutionPayload = {
   __typename: 'DeleteBankingInstitutionPayload';
-  boolean: Maybe<Scalars['Boolean']['output']>;
+  deleteResponse: Maybe<DeleteResponse>;
 };
 
 export type DeleteResponse = {

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
@@ -13,7 +12,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 /// <see cref="ThirdPartyDataRetrievalMetadata"/> used to determine when data is stale.</param>
 /// <param name="timeProvider">Provides the current time.</param>
 public class ThirdPartyDataRetrievalMetadataService(
-    ILogger<ThirdPartyDataRetrievalMetadataService> logger,
     ThirdPartyDataRetrievalMetadataRepository thirdPartyDataRetrievalMetadataRepository,
     TimeProvider timeProvider)
 {

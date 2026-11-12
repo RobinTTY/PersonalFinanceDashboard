@@ -32,10 +32,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
         },
-        blog: {
-          showReadingTime: true,
-          onUntruncatedBlogPosts: "ignore",
-        },
+        blog: false,
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
@@ -70,7 +67,6 @@ const config = {
             position: "left",
             label: "Docs",
           },
-          { to: "/blog", position: "left", label: "Blog" },
           {
             to: "/dev/purpose",
             position: "left",
@@ -107,10 +103,6 @@ const config = {
           {
             title: "More",
             items: [
-              {
-                label: "Blog",
-                to: "/blog",
-              },
               {
                 label: "GitHub",
                 href: "https://github.com/RobinTTY/PersonalFinanceDashboard",
