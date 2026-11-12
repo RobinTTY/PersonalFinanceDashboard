@@ -20,4 +20,7 @@ interface ImportMetaEnv {
 
   /** When "true", starts the MSW worker at bootstrap so the GraphQL API is mocked. */
   readonly VITE_ENABLE_API_MOCKING: string;
+
+  /** The GraphQL endpoint of the server, e.g. "http://localhost:5115/graphql". */
+  readonly VITE_API_URL: string;
 }

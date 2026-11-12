@@ -39,15 +39,6 @@ export type AuthenticationRequestFilterInput = {
   thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
 };
 
-export type AuthenticationRequestInput = {
-  associatedAccounts: Array<BankAccountInput>;
-  authenticationLink: Scalars['URL']['input'];
-  createdAt: Scalars['DateTime']['input'];
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  status: AuthenticationStatus;
-  thirdPartyId: Scalars['UUID']['input'];
-};
-
 export enum AuthenticationStatus {
   Active = 'ACTIVE',
   Expired = 'EXPIRED',
@@ -103,24 +94,6 @@ export type BankAccountFilterInput = {
   transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
 };
 
-export type BankAccountInput = {
-  accountType?: InputMaybe<Scalars['String']['input']>;
-  associatedAuthenticationRequests: Array<AuthenticationRequestInput>;
-  associatedInstitution?: InputMaybe<BankingInstitutionInput>;
-  balance?: InputMaybe<Scalars['Decimal']['input']>;
-  bban?: InputMaybe<Scalars['String']['input']>;
-  bic?: InputMaybe<Scalars['String']['input']>;
-  currency?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  iban?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  includeInAnalytics: Scalars['Boolean']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  ownerName?: InputMaybe<Scalars['String']['input']>;
-  thirdPartyId: Scalars['UUID']['input'];
-  transactions: Array<TransactionInput>;
-};
-
 /** A connection to a list of items. */
 export type BankAccountsConnection = {
   __typename: 'BankAccountsConnection';
@@ -162,15 +135,6 @@ export type BankingInstitutionFilterInput = {
   thirdPartyId?: InputMaybe<StringOperationFilterInput>;
 };
 
-export type BankingInstitutionInput = {
-  bic: Scalars['String']['input'];
-  countries: Array<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  logoUri: Scalars['URL']['input'];
-  name: Scalars['String']['input'];
-  thirdPartyId: Scalars['String']['input'];
-};
-
 /** A connection to a list of items. */
 export type BankingInstitutionsConnection = {
   __typename: 'BankingInstitutionsConnection';
@@ -208,9 +172,29 @@ export type CreateAuthenticationRequestPayload = {
   authenticationRequest: Maybe<AuthenticationRequest>;
 };
 
+/** Payload required to create a bank account through the API. */
 export type CreateBankAccountInput = {
-  /** The banking account to create. */
-  bankAccount: BankAccountInput;
+  /** Specifies the nature, or use, of the account. */
+  accountType?: InputMaybe<Scalars['String']['input']>;
+  /** The current balance of the account. */
+  balance?: InputMaybe<Scalars['Decimal']['input']>;
+  /**
+   * Basic Bank Account Number represents a country-specific bank account number.
+   * This data element is used for payment accounts which have no IBAN.
+   */
+  bban?: InputMaybe<Scalars['String']['input']>;
+  /** The BIC (Business Identifier Code) associated with the account. */
+  bic?: InputMaybe<Scalars['String']['input']>;
+  /** The currency this account is denominated in. */
+  currency?: InputMaybe<Scalars['String']['input']>;
+  /** A description of this account. */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** The IBAN of the bank account. */
+  iban?: InputMaybe<Scalars['String']['input']>;
+  /** The name of the account. */
+  name: Scalars['String']['input'];
+  /** Name of the legal account owner. If there is more than one owner, then two names might be noted here. */
+  ownerName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateBankAccountPayload = {
@@ -218,9 +202,16 @@ export type CreateBankAccountPayload = {
   bankAccount: Maybe<BankAccount>;
 };
 
+/** Payload required to create a banking institution through the API. */
 export type CreateBankingInstitutionInput = {
-  /** The banking institution to create. */
-  bankingInstitution: BankingInstitutionInput;
+  /** The Business Identifier Code (BIC) of the institution. */
+  bic: Scalars['String']['input'];
+  /** The countries the institution operates in. */
+  countries: Array<Scalars['String']['input']>;
+  /** A Uri for the logo of the institution. */
+  logoUri: Scalars['URL']['input'];
+  /** The name of the institution. */
+  name: Scalars['String']['input'];
 };
 
 export type CreateBankingInstitutionPayload = {
@@ -313,6 +304,7 @@ export type DeleteBankingInstitutionPayload = {
   deleteResponse: Maybe<DeleteResponse>;
 };
 
+/** The result of a successful delete mutation. */
 export type DeleteResponse = {
   __typename: 'DeleteResponse';
   /** The id of the deleted entity. */
@@ -326,7 +318,7 @@ export type DeleteTransactionInput = {
 
 export type DeleteTransactionPayload = {
   __typename: 'DeleteTransactionPayload';
-  response: Maybe<Response>;
+  deleteResponse: Maybe<DeleteResponse>;
 };
 
 export type Error = {
@@ -427,11 +419,11 @@ export type Mutation = {
    * A boolean value indicating whether the synchronization was successful.
    */
   synchronizeTransactionData: SynchronizeTransactionDataPayload;
-  /** Update an existing banking account. */
+  /** Update the name and description of an existing banking account. */
   updateBankAccount: UpdateBankAccountPayload;
   /** Update an existing banking institution. */
   updateBankingInstitution: UpdateBankingInstitutionPayload;
-  /** Update an existing transaction. */
+  /** Update the category and notes of an existing transaction. */
   updateTransaction: UpdateTransactionPayload;
 };
 
@@ -589,13 +581,6 @@ export type QueryTransactionsByAccountIdArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/** TODO */
-export type Response = {
-  __typename: 'Response';
-  /** TODO */
-  id: Scalars['UUID']['output'];
-};
-
 export type SetBankAccountIncludeInAnalyticsInput = {
   /** The id of the bank account to update. */
   bankAccountId: Scalars['UUID']['input'];
@@ -662,14 +647,6 @@ export type TagFilterInput = {
   transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
 };
 
-export type TagInput = {
-  color: Scalars['String']['input'];
-  description: Scalars['String']['input'];
-  id: Scalars['UUID']['input'];
-  name: Scalars['String']['input'];
-  transactions: Array<TransactionInput>;
-};
-
 export type Transaction = {
   __typename: 'Transaction';
   amount: Scalars['Decimal']['output'];
@@ -703,21 +680,6 @@ export type TransactionFilterInput = {
   valueDate?: InputMaybe<DateTimeOperationFilterInput>;
 };
 
-export type TransactionInput = {
-  amount: Scalars['Decimal']['input'];
-  bankAccount?: InputMaybe<BankAccountInput>;
-  bankTransactionId?: InputMaybe<Scalars['String']['input']>;
-  category: Scalars['String']['input'];
-  currency: Scalars['String']['input'];
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  notes: Scalars['String']['input'];
-  payee?: InputMaybe<Scalars['String']['input']>;
-  payer?: InputMaybe<Scalars['String']['input']>;
-  tags: Array<TagInput>;
-  thirdPartyId: Scalars['UUID']['input'];
-  valueDate?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
 /** A connection to a list of items. */
 export type TransactionsByAccountIdConnection = {
   __typename: 'TransactionsByAccountIdConnection';
@@ -738,9 +700,14 @@ export type TransactionsByAccountIdEdge = {
   node: Transaction;
 };
 
+/** Payload required to update a bank account through the API. */
 export type UpdateBankAccountInput = {
-  /** The banking account to update. */
-  bankAccount: BankAccountInput;
+  /** A description of this account. */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** The id of the bank account to update. */
+  id: Scalars['UUID']['input'];
+  /** The name of the account. */
+  name: Scalars['String']['input'];
 };
 
 export type UpdateBankAccountPayload = {
@@ -748,9 +715,18 @@ export type UpdateBankAccountPayload = {
   bankAccount: Maybe<BankAccount>;
 };
 
+/** Payload required to update a banking institution through the API. */
 export type UpdateBankingInstitutionInput = {
-  /** The banking institution to update. */
-  bankingInstitution: BankingInstitutionInput;
+  /** The Business Identifier Code (BIC) of the institution. */
+  bic: Scalars['String']['input'];
+  /** The countries the institution operates in. */
+  countries: Array<Scalars['String']['input']>;
+  /** The id of the banking institution to update. */
+  id: Scalars['UUID']['input'];
+  /** A Uri for the logo of the institution. */
+  logoUri: Scalars['URL']['input'];
+  /** The name of the institution. */
+  name: Scalars['String']['input'];
 };
 
 export type UpdateBankingInstitutionPayload = {
@@ -758,9 +734,14 @@ export type UpdateBankingInstitutionPayload = {
   bankingInstitution: Maybe<BankingInstitution>;
 };
 
+/** Payload required to update a transaction through the API. */
 export type UpdateTransactionInput = {
-  /** The transaction to update. */
-  transaction: TransactionInput;
+  /** The category this transaction belongs to. */
+  category: Scalars['String']['input'];
+  /** The id of the transaction to update. */
+  id: Scalars['UUID']['input'];
+  /** User created notes for this transaction. */
+  notes: Scalars['String']['input'];
 };
 
 export type UpdateTransactionPayload = {

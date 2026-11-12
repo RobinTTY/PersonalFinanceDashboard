@@ -8,7 +8,7 @@ import { Router } from './Router';
 import { theme } from './theme';
 
 const client = new ApolloClient({
-  link: new HttpLink({ uri: 'http://localhost:5115/graphql' }),
+  link: new HttpLink({ uri: import.meta.env.VITE_API_URL }),
   cache: new InMemoryCache({
     typePolicies: {
       ...scalarTypePolicies,
