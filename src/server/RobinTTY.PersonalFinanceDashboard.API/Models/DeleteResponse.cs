@@ -1,5 +1,8 @@
 ﻿namespace RobinTTY.PersonalFinanceDashboard.Api.Models;
 
+/// <summary>
+/// The result of a successful delete mutation.
+/// </summary>
 public class DeleteResponse
 {
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -54,10 +55,14 @@ public class BankAccountMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankAccountId">The id of the bank account to delete.</param>
-    public async Task<bool> DeleteBankAccount(BankAccountRepository repository,
+    public async Task<DeleteResponse> DeleteBankAccount(BankAccountRepository repository,
         Guid bankAccountId)
     {
-        return await repository.DeleteBankAccount(bankAccountId);
+        var deleted = await repository.DeleteBankAccount(bankAccountId);
+        if (deleted)
+            return new DeleteResponse { DeletedId = bankAccountId };
+
+        throw MutationErrors.NotFound<BankAccount>(bankAccountId, ErrorCodes.BankAccountNotFound);
     }
 
     /// <summary>

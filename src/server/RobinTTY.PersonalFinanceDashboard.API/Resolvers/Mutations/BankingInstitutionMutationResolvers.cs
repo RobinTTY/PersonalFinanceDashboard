@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Types;
+using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -39,16 +40,20 @@ public class BankingInstitutionMutationResolvers
                ?? throw MutationErrors.NotFound<BankingInstitution>(input.Id, ErrorCodes.BankingInstitutionNotFound);
     }
 
-    // TODO: Return something more than bool? Generalized response across all resolvers?
     /// <summary>
     /// Delete an existing banking institution.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
-    public async Task<bool> DeleteBankingInstitution(BankingInstitutionRepository repository,
+    public async Task<DeleteResponse> DeleteBankingInstitution(BankingInstitutionRepository repository,
         Guid bankingInstitutionId)
     {
-        return await repository.DeleteBankingInstitution(bankingInstitutionId);
+        var deleted = await repository.DeleteBankingInstitution(bankingInstitutionId);
+        if (deleted)
+            return new DeleteResponse { DeletedId = bankingInstitutionId };
+
+        throw MutationErrors.NotFound<BankingInstitution>(bankingInstitutionId,
+            ErrorCodes.BankingInstitutionNotFound);
     }
 
     /// <summary>
