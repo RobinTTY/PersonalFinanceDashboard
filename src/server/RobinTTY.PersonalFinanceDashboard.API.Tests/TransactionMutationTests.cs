@@ -78,16 +78,26 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
     private async Task<string> CreateTransactionForNewAccount()
     {
         var accountId = await BankAccountMutationTests.CreateBankAccount(_client);
-        var response = await CreateTransaction(accountId);
+        return await CreateTransaction(_client, accountId);
+    }
+
+    /// <summary>
+    /// Creates a transaction for the given account and returns its id.
+    /// </summary>
+    internal static async Task<string> CreateTransaction(HttpClient client, string accountId)
+    {
+        var response = await PostCreateTransaction(client, accountId);
         return response.Data("createTransaction", "transaction", "id").GetString()!;
     }
 
-    private Task<JsonElement> CreateTransaction(string accountId) =>
-        _client.PostGraphQl("""
-                            mutation($input: CreateTransactionInput!) {
-                              createTransaction(input: $input) { transaction { id amount bankAccount { id } } }
-                            }
-                            """, new
+    private Task<JsonElement> CreateTransaction(string accountId) => PostCreateTransaction(_client, accountId);
+
+    private static Task<JsonElement> PostCreateTransaction(HttpClient client, string accountId) =>
+        client.PostGraphQl("""
+                           mutation($input: CreateTransactionInput!) {
+                             createTransaction(input: $input) { transaction { id amount bankAccount { id } } }
+                           }
+                           """, new
         {
             input = new
             {

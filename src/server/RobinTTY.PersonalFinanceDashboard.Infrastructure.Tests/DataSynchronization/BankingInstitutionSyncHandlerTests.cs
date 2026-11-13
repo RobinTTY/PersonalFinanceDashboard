@@ -46,6 +46,22 @@ public class BankingInstitutionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task RemovedInstitution_IsUnlinkedFromItsAccounts()
+    {
+        var account = TestData.Account(Guid.NewGuid());
+        account.AssociatedInstitution = TestData.Institution("BANK_OLD");
+        await _env.Seed(TestData.Institution("BANK_A"), account);
+        _env.GoCardless.Respond(InstitutionsPath, Institutions(("BANK_A", "Bank A")));
+
+        Assert.True(await _env.SyncBankingInstitutions());
+
+        await using var dbContext = _env.CreateDbContext();
+        var storedAccount = await dbContext.BankAccounts.Include(a => a.AssociatedInstitution).SingleAsync();
+        Assert.Null(storedAccount.AssociatedInstitution);
+        Assert.DoesNotContain(await GetInstitutions(), institution => institution.ThirdPartyId == "BANK_OLD");
+    }
+
+    [Fact]
     public async Task FreshInstitutions_AreOnlyFetchedAgainAfterSevenDays()
     {
         _env.GoCardless.Respond(InstitutionsPath, Institutions(("BANK_A", "Bank A")));

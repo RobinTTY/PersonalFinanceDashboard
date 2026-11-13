@@ -296,7 +296,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                 {
                     b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", "AssociatedInstitution")
                         .WithMany()
-                        .HasForeignKey("AssociatedInstitutionId");
+                        .HasForeignKey("AssociatedInstitutionId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("AssociatedInstitution");
                 });
@@ -305,7 +306,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                 {
                     b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", "BankAccount")
                         .WithMany("Transactions")
-                        .HasForeignKey("BankAccountId");
+                        .HasForeignKey("BankAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("BankAccount");
                 });

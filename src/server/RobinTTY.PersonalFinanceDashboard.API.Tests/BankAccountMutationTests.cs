@@ -53,6 +53,27 @@ public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFac
         Assert.Equal("BANK_ACCOUNT_NOT_FOUND", deletedAgain.ErrorCode());
     }
 
+    [Fact]
+    public async Task DeleteBankAccount_AlsoDeletesItsTransactions()
+    {
+        var accountId = await CreateBankAccount(_client);
+        var transactionId = await TransactionMutationTests.CreateTransaction(_client, accountId);
+
+        var deleted = await _client.PostGraphQl("""
+                                                mutation($id: UUID!) {
+                                                  deleteBankAccount(input: { bankAccountId: $id }) { deleteResponse { deletedId } }
+                                                }
+                                                """, new { id = accountId });
+        var deletedTransaction = await _client.PostGraphQl("""
+                                                           mutation($id: UUID!) {
+                                                             deleteTransaction(input: { transactionId: $id }) { deleteResponse { deletedId } }
+                                                           }
+                                                           """, new { id = transactionId });
+
+        Assert.Equal(accountId, deleted.Data("deleteBankAccount", "deleteResponse", "deletedId").GetString());
+        Assert.Equal("TRANSACTION_NOT_FOUND", deletedTransaction.ErrorCode());
+    }
+
     /// <summary>
     /// Creates a manual bank account and returns its id.
     /// </summary>
