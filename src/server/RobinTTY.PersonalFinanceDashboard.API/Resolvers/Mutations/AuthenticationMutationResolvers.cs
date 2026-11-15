@@ -39,8 +39,7 @@ public class AuthenticationMutationResolvers
                 $"{institution.Name} can't be connected to a bank data provider.",
                 ErrorCodes.InstitutionNotConnectable),
             CreateAuthenticationRequestResult.ProviderFailed failed => throw MutationErrors.ThirdPartyRequestFailed(
-                failed.Error, "Failed to create authentication request.",
-                ErrorCodes.CreateAuthenticationRequestFailed),
+                failed.Error, ErrorCodes.CreateAuthenticationRequestFailed),
 
             var result => throw new UnreachableException($"Unhandled result {result}.")
         };
@@ -54,18 +53,11 @@ public class AuthenticationMutationResolvers
     public async Task<DeleteResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository,
         Guid authenticationId)
     {
-        var deleteResult = await repository.DeleteAuthenticationRequest(authenticationId);
+        var error = await repository.DeleteAuthenticationRequest(authenticationId);
+        if (error is null)
+            return new DeleteResponse { DeletedId = authenticationId };
 
-        if (deleteResult.IsSuccessful)
-        {
-            return new DeleteResponse
-            {
-                DeletedId = authenticationId
-            };
-        }
-
-        throw MutationErrors.ThirdPartyRequestFailed(deleteResult.Error, "Failed to delete authentication request.",
-            ErrorCodes.DeleteAuthenticationRequestFailed);
+        throw MutationErrors.ThirdPartyRequestFailed(error, ErrorCodes.DeleteAuthenticationRequestFailed);
     }
 
     /// <summary>

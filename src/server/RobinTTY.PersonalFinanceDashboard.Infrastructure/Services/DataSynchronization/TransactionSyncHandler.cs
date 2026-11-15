@@ -1,21 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
+/// <summary>
+/// Synchronizes the transactions of bank accounts with the data providers the accounts originate from.
+/// </summary>
 public class TransactionSyncHandler(
     ApplicationDbContext dbContext,
-    GoCardlessDataProviderService dataProvider,
+    BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     TimeProvider timeProvider,
     ILogger<TransactionSyncHandler> logger) : ITransactionSyncHandler
 {
+    private sealed record SyncedAccount(Guid Id, DataSource Source, string ExternalId);
+
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {
-        List<(Guid Id, string ExternalId)> accounts;
         if (internalAccountId.HasValue)
         {
             var account = await dbContext.BankAccounts.SingleOrDefaultAsync(a => a.Id == internalAccountId);
@@ -25,94 +29,92 @@ public class TransactionSyncHandler(
                 return false;
             }
 
-            if (account.Source != DataSource.GoCardless)
+            // Accounts without a provider (e.g. manually created ones) aren't synchronized
+            if (!providers.TryGet(account.Source, out var provider))
                 return true;
 
-            accounts = [(internalAccountId.Value, account.ExternalId!)];
-        }
-        else
-        {
-            accounts = await GetActiveAccounts();
+            // Only the explicitly requested single account fails the whole sync on failure
+            return await SynchronizeAccounts(provider,
+                [new SyncedAccount(internalAccountId.Value, account.Source, account.ExternalId!)],
+                forceThirdPartySync, abortOnFailure: true);
         }
 
+        foreach (var accounts in (await GetActiveAccounts()).GroupBy(account => account.Source))
+        {
+            if (providers.TryGet(accounts.Key, out var provider))
+                await SynchronizeAccounts(provider, accounts.ToList(), forceThirdPartySync, abortOnFailure: false);
+        }
+
+        return true;
+    }
+
+    private async Task<bool> SynchronizeAccounts(IBankDataProvider provider, List<SyncedAccount> accounts,
+        bool forceThirdPartySync, bool abortOnFailure)
+    {
         var transactions = new List<Transaction>();
         var syncedAccountIds = new List<Guid>();
 
-        foreach (var (accountId, externalAccountId) in accounts)
+        foreach (var account in accounts)
         {
-            var dataIsStale =
-                await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, accountId);
+            var dataIsStale = await dataRetrievalMetadataService.DataIsStale(provider.Source,
+                ThirdPartyDataType.Transactions, account.Id);
             if (!dataIsStale && !forceThirdPartySync)
             {
                 logger.LogDebug(
                     "Transaction data for account with id {accountId} is not stale. Skipping synchronization with third party.",
-                    accountId);
+                    account.Id);
                 continue;
             }
 
-            var transactionsForAccount = await FetchTransactionsForAccount(accountId, externalAccountId);
-            if (transactionsForAccount == null)
+            var response = await provider.GetTransactions(account.ExternalId);
+            if (!response.IsSuccessful)
             {
-                // Only the explicitly-requested single account aborts the whole sync on failure.
-                if (internalAccountId.HasValue)
-                {
-                    logger.LogWarning("Failed to fetch transactions from third party API.");
+                logger.LogWarning(
+                    "Encountered error while getting transactions for account with id {accountId} from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
+                    account.Id, provider.Source, response.Error.Summary, response.Error.Detail);
+                if (abortOnFailure)
                     return false;
-                }
 
                 continue;
             }
 
-            transactions.AddRange(transactionsForAccount);
-            syncedAccountIds.Add(accountId);
+            transactions.AddRange(response.Result);
+            syncedAccountIds.Add(account.Id);
         }
 
         if (syncedAccountIds.Count == 0)
             return true;
 
-        await AddOrUpdateTransactions(transactions);
+        await AddOrUpdateTransactions(provider.Source, transactions);
         foreach (var accountId in syncedAccountIds)
         {
             logger.LogDebug("Resetting data expiry for transactions for account with id {accountId}", accountId);
-            await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.Transactions, accountId);
+            await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.Transactions,
+                accountId);
         }
 
-        logger.LogInformation("Synced {Count} transactions", transactions.Count);
+        logger.LogInformation("Synced {Count} transactions from {dataSource}", transactions.Count, provider.Source);
 
         return true;
     }
 
-    private async Task<List<(Guid Id, string ExternalId)>> GetActiveAccounts()
+    private async Task<List<SyncedAccount>> GetActiveAccounts()
     {
         var validSince = timeProvider.GetUtcNow().UtcDateTime.AddDays(-90);
 
         var accounts = await dbContext.BankAccounts
-            .Where(account => account.Source == DataSource.GoCardless &&
+            .Where(account => account.ExternalId != null &&
                               account.AssociatedAuthenticationRequests.Any(request =>
                                   request.Status == AuthenticationStatus.Active &&
                                   request.CreatedAt > validSince))
-            .Select(account => new { account.Id, account.ExternalId })
+            .Select(account => new { account.Id, account.Source, account.ExternalId })
             .ToListAsync();
 
-        return accounts.Select(account => (account.Id!.Value, account.ExternalId!)).ToList();
+        return accounts.Select(account => new SyncedAccount(account.Id!.Value, account.Source, account.ExternalId!))
+            .ToList();
     }
 
-    private async Task<List<Transaction>?> FetchTransactionsForAccount(Guid internalAccountId,
-        string externalAccountId)
-    {
-        var response = await dataProvider.GetTransactions(externalAccountId);
-        if (!response.IsSuccessful)
-        {
-            logger.LogWarning(
-                "Encountered error while getting transactions for account with id {accountId}. Summary: {errorSummary} Detail: {errorDetail}",
-                internalAccountId, response.Error.Summary, response.Error.Detail);
-            return null;
-        }
-
-        return response.Result.ToList();
-    }
-
-    private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)
+    private async Task AddOrUpdateTransactions(DataSource source, List<Transaction> updatedTransactions)
     {
         var accountIds = updatedTransactions
             .Select(transaction => transaction.BankAccount?.ExternalId)
@@ -120,17 +122,17 @@ public class TransactionSyncHandler(
             .Distinct()
             .ToList();
         var accounts = await dbContext.BankAccounts
-            .Where(account => account.Source == DataSource.GoCardless && accountIds.Contains(account.ExternalId!))
+            .Where(account => account.Source == source && accountIds.Contains(account.ExternalId!))
             .ToDictionaryAsync(account => account.ExternalId!);
 
-        // Keyed like the unique index, since third party ids are only unique per account
+        // Keyed like the unique index, since external transaction ids are only unique per account
         var transactionIds = updatedTransactions.Select(transaction => transaction.ExternalId!).Distinct().ToList();
         var existingTransactions = await dbContext.Transactions
             .Include(transaction => transaction.BankAccount)
-            .Where(transaction => transaction.Source == DataSource.GoCardless &&
+            .Where(transaction => transaction.Source == source &&
                                   transactionIds.Contains(transaction.ExternalId!) &&
                                   transaction.BankAccount != null &&
-                                  transaction.BankAccount.Source == DataSource.GoCardless &&
+                                  transaction.BankAccount.Source == source &&
                                   accountIds.Contains(transaction.BankAccount.ExternalId!))
             .ToDictionaryAsync(transaction => (transaction.BankAccount!.ExternalId!, transaction.ExternalId!));
 

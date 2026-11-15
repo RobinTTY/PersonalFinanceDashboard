@@ -41,14 +41,14 @@ public class GoCardlessCreateAuthenticationRequestTests
         Assert.Equal("Authentication failed", response.Error!.Summary);
     }
 
-    private static GoCardlessDataProviderService CreateService(HttpStatusCode statusCode, string body)
+    private static GoCardlessBankDataProvider CreateService(HttpStatusCode statusCode, string body)
     {
         // A valid token pair keeps the client from requesting a new token
         var token = CreateUnsignedToken(DateTimeOffset.UtcNow.AddDays(1));
         var client = new NordigenClient(new HttpClient(new StubHandler(statusCode, body)),
             new NordigenClientCredentials("secret-id", "secret-key"), new JsonWebTokenPair(token, token));
 
-        return new GoCardlessDataProviderService(client, NullLogger<GoCardlessDataProviderService>.Instance);
+        return new GoCardlessBankDataProvider(client, NullLogger<GoCardlessBankDataProvider>.Instance);
     }
 
     private static string CreateUnsignedToken(DateTimeOffset expires)

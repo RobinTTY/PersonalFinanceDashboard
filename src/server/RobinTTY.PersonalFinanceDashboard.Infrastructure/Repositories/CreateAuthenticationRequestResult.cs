@@ -1,4 +1,4 @@
-using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -23,5 +23,5 @@ public abstract record CreateAuthenticationRequestResult
     /// The data provider couldn't create the authentication request.
     /// </summary>
     /// <param name="Error">The error returned by the data provider.</param>
-    public sealed record ProviderFailed(BasicResponse Error) : CreateAuthenticationRequestResult;
+    public sealed record ProviderFailed(ThirdPartyError Error) : CreateAuthenticationRequestResult;
 }

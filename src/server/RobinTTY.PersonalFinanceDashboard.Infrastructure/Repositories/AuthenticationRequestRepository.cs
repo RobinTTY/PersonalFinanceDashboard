@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -13,26 +12,25 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class AuthenticationRequestRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly GoCardlessDataProviderService _dataProviderService;
+    private readonly BankDataProviderRegistry _providers;
     private readonly IAuthenticationRequestSyncHandler _authenticationRequestSyncHandler;
     private readonly ILogger<AuthenticationRequestRepository> _logger;
-
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequestRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="dataProviderService">The data provider to use for data retrieval.</param>
+    /// <param name="providers">The data providers authentication requests are made at.</param>
     /// <param name="authenticationRequestSyncHandler">Handles the synchronization of authentication request data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public AuthenticationRequestRepository(
         ApplicationDbContext dbContext,
-        GoCardlessDataProviderService dataProviderService,
+        BankDataProviderRegistry providers,
         IAuthenticationRequestSyncHandler authenticationRequestSyncHandler,
         ILogger<AuthenticationRequestRepository> logger)
     {
         _dbContext = dbContext;
-        _dataProviderService = dataProviderService;
+        _providers = providers;
         _authenticationRequestSyncHandler = authenticationRequestSyncHandler;
         _logger = logger;
     }
@@ -69,16 +67,11 @@ public class AuthenticationRequestRepository
     public async Task<CreateAuthenticationRequestResult> AddAuthenticationRequest(BankingInstitution institution,
         Uri redirectUri)
     {
-        // The data sources supporting authentication requests; every other source can't be connected
-        ThirdPartyResponse<AuthenticationRequest, BasicResponse> request;
-        switch (institution.Source)
-        {
-            case DataSource.GoCardless:
-                request = await _dataProviderService.CreateAuthenticationRequest(institution.ExternalId!, redirectUri);
-                break;
-            default:
-                return new CreateAuthenticationRequestResult.NotConnectable();
-        }
+        // Institutions without a provider (e.g. manually created ones) can't be connected
+        if (!_providers.TryGet(institution.Source, out var provider))
+            return new CreateAuthenticationRequestResult.NotConnectable();
+
+        var request = await provider.CreateAuthenticationRequest(institution.ExternalId!, redirectUri);
 
         if (!request.IsSuccessful)
         {
@@ -98,8 +91,8 @@ public class AuthenticationRequestRepository
     /// Deletes an existing <see cref="AuthenticationRequest"/>.
     /// </summary>
     /// <param name="id">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
-    /// <returns>The deleted <see cref="AuthenticationRequest"/>.</returns>
-    public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(Guid id)
+    /// <returns>The error if the deletion failed, otherwise <see langword="null"/>.</returns>
+    public async Task<ThirdPartyError?> DeleteAuthenticationRequest(Guid id)
     {
         var authRequest =
             await _dbContext.AuthenticationRequests.SingleOrDefaultAsync(authRequest => authRequest.Id == id);
@@ -109,40 +102,31 @@ public class AuthenticationRequestRepository
             _logger.LogError(
                 "Deletion of authentication request failed. Authentication request with id {id} does not exist.", id);
 
-            return new ThirdPartyResponse<BasicResponse, BasicResponse>(
-                false, null, new BasicResponse
-                {
-                    Summary = "Authentication request not found.",
-                    Detail = $"Authentication request with id {id} does not exist."
-                }
-            );
+            return new ThirdPartyError("Authentication request not found.",
+                $"Authentication request with id {id} does not exist.");
         }
 
-        var request = await _dataProviderService.DeleteAuthenticationRequest(authRequest.ExternalId!);
-        if (request.IsSuccessful)
+        if (!_providers.TryGet(authRequest.Source, out var provider))
+        {
+            return new ThirdPartyError("Failed to delete authentication request.",
+                $"No data provider is registered for {authRequest.Source}.");
+        }
+
+        var error = await provider.DeleteAuthenticationRequest(authRequest.ExternalId!);
+        if (error is null)
         {
             _dbContext.AuthenticationRequests.Remove(authRequest);
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("Successfully deleted authentication request with id {id}", id);
 
-            return new ThirdPartyResponse<BasicResponse, BasicResponse>(
-                true, new BasicResponse
-                {
-                    Summary = "Authentication request deleted.",
-                    Detail = $"Authentication request with id {id} was successfully deleted."
-                }, null);
+            return null;
         }
 
         _logger.LogError(
             "Deletion of authentication request failed. The data provider returned the following error: " +
-            "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+            "\"{error}\" error details: \"{errorDetails}\"", error.Summary, error.Detail);
 
-        return new ThirdPartyResponse<BasicResponse, BasicResponse>(
-            false, null, new BasicResponse
-            {
-                Summary = "Failed to delete authentication request.",
-                Detail =
-                    $"The data provider returned the following error: {request.Error.Summary} Error details: {request.Error.Detail}"
-            });
+        return new ThirdPartyError("Failed to delete authentication request.",
+            $"The data provider returned the following error: {error.Message}");
     }
 }

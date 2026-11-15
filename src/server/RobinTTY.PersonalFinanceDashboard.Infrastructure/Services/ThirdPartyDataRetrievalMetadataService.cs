@@ -16,17 +16,19 @@ public class ThirdPartyDataRetrievalMetadataService(
     TimeProvider timeProvider)
 {
     /// <summary>
-    /// Checks whether the data for the given <see cref="ThirdPartyDataType"/>, stored in the
+    /// Checks whether the data of the given <see cref="ThirdPartyDataType"/> and data source, stored in the
     /// database, has gone stale.
     /// </summary>
+    /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="thirdPartyDataType">The data type for which to check.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to check.</param>
     /// <returns><see langword="true"/> if the data stored in the db is stale,
     /// <see langword="false"/> otherwise.</returns>
-    public async Task<bool> DataIsStale(ThirdPartyDataType thirdPartyDataType, Guid? synchronizationEntityId = null)
+    public async Task<bool> DataIsStale(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
+        Guid? synchronizationEntityId = null)
     {
         var retrievalMetadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetThirdPartyDataRetrievalMetadata(thirdPartyDataType, synchronizationEntityId);
+            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
 
         if (retrievalMetadata is null)
         {
@@ -38,14 +40,16 @@ public class ThirdPartyDataRetrievalMetadataService(
     }
 
     /// <summary>
-    /// Sets the last retrieval time for the given <see cref="ThirdPartyDataType"/> to the
+    /// Sets the last retrieval time for the given <see cref="ThirdPartyDataType"/> and data source to the
     /// current moment.
     /// </summary>
-    /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to reset the data expiry.</param>
+    /// <param name="dataSource">The data source the data was retrieved from.</param>
     /// <param name="thirdPartyDataType">The data type for which to reset the data expiry.</param>
-    public async Task ResetDataExpiry(ThirdPartyDataType thirdPartyDataType, Guid? synchronizationEntityId = null)
+    /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to reset the data expiry.</param>
+    public async Task ResetDataExpiry(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
+        Guid? synchronizationEntityId = null)
     {
-        await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(thirdPartyDataType,
+        await thirdPartyDataRetrievalMetadataRepository.ResetLastRetrievalTime(dataSource, thirdPartyDataType,
             synchronizationEntityId);
     }
 }

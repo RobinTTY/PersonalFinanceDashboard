@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Mutations;
 
@@ -27,13 +27,9 @@ internal static class MutationErrors
     /// Creates an error for a failed request to a third party.
     /// </summary>
     /// <param name="error">The error returned by the third party.</param>
-    /// <param name="fallbackMessage">The message to use if the third party didn't describe the error.</param>
     /// <param name="code">The error code from <see cref="ErrorCodes"/>.</param>
-    public static GraphQLException ThirdPartyRequestFailed(BasicResponse error, string fallbackMessage, string code)
-    {
-        var message = error.Summary != null ? $"{error.Summary} {error.Detail}" : fallbackMessage;
-        return Create(message, code);
-    }
+    public static GraphQLException ThirdPartyRequestFailed(ThirdPartyError error, string code) =>
+        Create(error.Message, code);
 
     /// <summary>
     /// Creates an error with the given message.

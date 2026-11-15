@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using RobinTTY.NordigenApiClient.Models.Responses;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
@@ -11,6 +12,9 @@ using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
+/// <summary>
+/// Maps between GoCardless (Nordigen API client) types and the application's types.
+/// </summary>
 public static class GoCardlessTypeExtensions
 {
     /// <summary>
@@ -19,20 +23,27 @@ public static class GoCardlessTypeExtensions
     public static string ToExternalId(this Guid goCardlessId) => goCardlessId.ToString("D");
 
     /// <summary>
-    /// Maps a <see cref="NordigenApiResponse{TResult,TError}"/> to a <see cref="ThirdPartyResponse{TResponse,TError}"/>,
+    /// Maps a <see cref="NordigenApiResponse{TResult,TError}"/> to a <see cref="ThirdPartyResponse{TResult}"/>,
     /// applying <paramref name="map"/> to the result only when the request was successful.
     /// </summary>
     /// <param name="response">The Nordigen response to map.</param>
     /// <param name="map">Projection applied to the result when the request succeeded.</param>
-    public static ThirdPartyResponse<TResult, TError> ToThirdPartyResponse<TSource, TResult, TError>(
+    public static ThirdPartyResponse<TResult> ToThirdPartyResponse<TSource, TResult, TError>(
         this NordigenApiResponse<TSource, TError> response, Func<TSource, TResult> map)
         where TSource : class
-        where TError : class
+        where TResult : notnull
+        where TError : BasicResponse
     {
         return response.IsSuccess
-            ? new ThirdPartyResponse<TResult, TError>(true, map(response.Result!), null)
-            : new ThirdPartyResponse<TResult, TError>(false, default, response.Error);
+            ? ThirdPartyResponse<TResult>.Success(map(response.Result!))
+            : ThirdPartyResponse<TResult>.Failure(response.Error!.ToThirdPartyError());
     }
+
+    /// <summary>
+    /// Maps an error returned by GoCardless to a <see cref="ThirdPartyError"/>.
+    /// </summary>
+    public static ThirdPartyError ToThirdPartyError(this BasicResponse error) =>
+        new(error.Summary ?? "The request to GoCardless failed.", error.Detail);
 
     /// <summary>
     /// Maps a <see cref="Institution"/> to a <see cref="BankingInstitution"/>.

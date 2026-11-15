@@ -1,101 +1,114 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 
+/// <summary>
+/// Synchronizes the banking institutions of the registered data providers with the database.
+/// </summary>
 public class BankingInstitutionSyncHandler(
     ApplicationDbContext dbContext,
-    GoCardlessDataProviderService dataProvider,
+    BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     ILogger<BankingInstitutionSyncHandler> logger) : IBankingInstitutionSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? bankingInstitutionId = null, bool forceThirdPartySync = false)
     {
-        var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
-        if (dataIsStale || forceThirdPartySync)
+        if (bankingInstitutionId.HasValue)
+            return await SynchronizeInstitution(bankingInstitutionId.Value, forceThirdPartySync);
+
+        var success = true;
+        foreach (var provider in providers.All)
+            success &= await SynchronizeAllInstitutions(provider, forceThirdPartySync);
+
+        return success;
+    }
+
+    private async Task<bool> SynchronizeInstitution(Guid bankingInstitutionId, bool forceThirdPartySync)
+    {
+        var institution = await dbContext.BankingInstitutions
+            .SingleOrDefaultAsync(bankingInstitution => bankingInstitution.Id == bankingInstitutionId);
+        if (institution == null)
         {
-            string? externalInstitutionId = null;
-            if (bankingInstitutionId.HasValue)
-            {
-                var institution = await dbContext.BankingInstitutions
-                    .SingleOrDefaultAsync(bankingInstitution => bankingInstitution.Id == bankingInstitutionId);
-                if (institution == null)
-                {
-                    logger.LogWarning("Banking institution with id {id} does not exist.", bankingInstitutionId);
-                    return false;
-                }
-
-                if (institution.Source != DataSource.GoCardless)
-                    return true;
-
-                externalInstitutionId = institution.ExternalId;
-            }
-
-            var institutions = await GetBankingInstitutions(externalInstitutionId);
-            if (institutions == null)
-            {
-                logger.LogWarning("Could not retrieve banking institutions from {dataProvider}",
-                    nameof(GoCardlessDataProviderService));
-                return false;
-            }
-
-            if (bankingInstitutionId.HasValue)
-            {
-                await AddOrUpdateBankingInstitutions(institutions);
-                await dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                await AddUpdateOrDeleteBankingInstitutions(institutions);
-                await dbContext.SaveChangesAsync();
-                await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.BankingInstitutions);
-            }
-
-            logger.LogInformation("Synced {Count} banking institutions", institutions.Count);
+            logger.LogWarning("Banking institution with id {id} does not exist.", bankingInstitutionId);
+            return false;
         }
-        else
+
+        // Institutions without a provider (e.g. manually created ones) aren't synchronized
+        if (!providers.TryGet(institution.Source, out var provider) ||
+            !await IsSynchronizationDue(provider.Source, forceThirdPartySync))
+            return true;
+
+        var response = await provider.GetBankingInstitution(institution.ExternalId!);
+        if (!response.IsSuccessful)
         {
-            logger.LogDebug("{dataType} data is not stale. Skipping synchronization with third party.",
-                ThirdPartyDataType.BankingInstitutions);
+            LogFailure(provider.Source, response.Error);
+            return false;
         }
+
+        await AddOrUpdateBankingInstitutions(provider.Source, [response.Result]);
+        await dbContext.SaveChangesAsync();
+        logger.LogInformation("Synced banking institution with id {id} from {dataSource}", bankingInstitutionId,
+            provider.Source);
 
         return true;
     }
 
-    private async Task<List<BankingInstitution>?> GetBankingInstitutions(string? bankingInstitutionId)
+    private async Task<bool> SynchronizeAllInstitutions(IBankDataProvider provider, bool forceThirdPartySync)
     {
-        List<BankingInstitution>? bankingInstitutions = null;
+        if (!await IsSynchronizationDue(provider.Source, forceThirdPartySync))
+            return true;
 
-        if (bankingInstitutionId != null)
+        var response = await provider.GetBankingInstitutions();
+        if (!response.IsSuccessful)
         {
-            var response = await dataProvider.GetBankingInstitution(bankingInstitutionId);
-            if (response.IsSuccessful)
-                bankingInstitutions = [response.Result];
-        }
-        else
-        {
-            var response = await dataProvider.GetBankingInstitutions();
-            if (response.IsSuccessful)
-                bankingInstitutions = [.. response.Result];
+            LogFailure(provider.Source, response.Error);
+            return false;
         }
 
-        return bankingInstitutions;
+        await AddUpdateOrDeleteBankingInstitutions(provider.Source, response.Result);
+        await dbContext.SaveChangesAsync();
+        await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.BankingInstitutions);
+        logger.LogInformation("Synced {Count} banking institutions from {dataSource}", response.Result.Count,
+            provider.Source);
+
+        return true;
+    }
+
+    private async Task<bool> IsSynchronizationDue(DataSource source, bool forceThirdPartySync)
+    {
+        if (forceThirdPartySync ||
+            await dataRetrievalMetadataService.DataIsStale(source, ThirdPartyDataType.BankingInstitutions))
+            return true;
+
+        logger.LogDebug("{dataType} data of {dataSource} is not stale. Skipping synchronization with third party.",
+            ThirdPartyDataType.BankingInstitutions, source);
+        return false;
+    }
+
+    private void LogFailure(DataSource source, ThirdPartyError error)
+    {
+        logger.LogWarning(
+            "Could not retrieve banking institutions from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
+            source, error.Summary, error.Detail);
     }
 
     /// <summary>
     /// Uses the provided banking institutions to update the database. Upserts existing entries and removes any existing entities that are
     /// not contained in the provided data.
     /// </summary>
+    /// <param name="source">The data source the institutions were retrieved from.</param>
     /// <param name="bankingInstitutions">A list of banking institutions to be saved in the database.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    private async Task AddUpdateOrDeleteBankingInstitutions(List<BankingInstitution> bankingInstitutions)
+    private async Task AddUpdateOrDeleteBankingInstitutions(DataSource source,
+        IReadOnlyList<BankingInstitution> bankingInstitutions)
     {
         // Institutions of other data sources (e.g. manually created ones) aren't managed by this sync
         var allInstitutionsInDb = await dbContext.BankingInstitutions
-            .Where(institution => institution.Source == DataSource.GoCardless).ToListAsync();
+            .Where(institution => institution.Source == source).ToListAsync();
         // Optimization for initial seeding (empty db)
         if (allInstitutionsInDb.Count == 0)
         {
@@ -112,15 +125,16 @@ public class BankingInstitutionSyncHandler(
             .Where(db => !incomingInstitutionsDict.ContainsKey(db.ExternalId!)).ToList();
         dbContext.BankingInstitutions.RemoveRange(institutionsToDelete);
 
-        await AddOrUpdateBankingInstitutions(bankingInstitutions, dbInstitutionsDict);
+        await AddOrUpdateBankingInstitutions(source, bankingInstitutions, dbInstitutionsDict);
     }
 
-    private async Task AddOrUpdateBankingInstitutions(List<BankingInstitution> bankingInstitutions,
+    private async Task AddOrUpdateBankingInstitutions(DataSource source,
+        IReadOnlyList<BankingInstitution> bankingInstitutions,
         Dictionary<string, BankingInstitution>? dbInstitutionsDict = null)
     {
         var externalIds = bankingInstitutions.Select(bi => bi.ExternalId!).ToList();
         dbInstitutionsDict ??= await dbContext.BankingInstitutions
-            .Where(bi => bi.Source == DataSource.GoCardless && externalIds.Contains(bi.ExternalId!))
+            .Where(bi => bi.Source == source && externalIds.Contains(bi.ExternalId!))
             .ToDictionaryAsync(bi => bi.ExternalId!);
 
         foreach (var incoming in bankingInstitutions.DistinctBy(bi => bi.ExternalId))

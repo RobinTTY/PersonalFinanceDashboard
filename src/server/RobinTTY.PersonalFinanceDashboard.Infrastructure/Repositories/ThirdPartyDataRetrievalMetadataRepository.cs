@@ -6,17 +6,18 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext, TimeProvider timeProvider)
 {
     /// <summary>
-    /// Retrieves a single third-party data retrieval metadata record based on the specified data type.
+    /// Retrieves a single third-party data retrieval metadata record based on the specified data source and type.
     /// </summary>
+    /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="dataType">The type of third-party data for which the retrieval metadata is being requested.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to retrieve the metadata. For example, for account data, this would be the account id.</param>
     /// <returns>The metadata record for the specified data type, or null if no match is found.</returns>
-    public async Task<ThirdPartyDataRetrievalMetadata?> GetThirdPartyDataRetrievalMetadata(
+    public async Task<ThirdPartyDataRetrievalMetadata?> GetThirdPartyDataRetrievalMetadata(DataSource dataSource,
         ThirdPartyDataType dataType, Guid? synchronizationEntityId)
     {
         return await dbContext.ThirdPartyDataRetrievalMetadata
-            .SingleOrDefaultAsync(metadata =>
-                metadata.DataType == dataType && metadata.SynchronizationEntityId == synchronizationEntityId);
+            .SingleOrDefaultAsync(metadata => metadata.DataSource == dataSource && metadata.DataType == dataType &&
+                                              metadata.SynchronizationEntityId == synchronizationEntityId);
     }
 
     /// <summary>
@@ -34,12 +35,14 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     /// Resets the last retrieval time for the synchronization entity with the given id and data type to the current time.
     /// If no record exists for the given entry, one will be created.
     /// </summary>
+    /// <param name="dataSource">The data source the data was retrieved from.</param>
     /// <param name="dataType">The data type for which to reset the last retrieval time.</param>
     /// <param name="synchronizationEntityId">The id of the synchronization entity for which the last retrieval time should be reset. For example, for account data, this would be the account id.</param>
-    /// <returns>True if the last retrieval time was reset successfully, false otherwise.</returns>
-    public async Task ResetLastRetrievalTime(ThirdPartyDataType dataType, Guid? synchronizationEntityId)
+    public async Task ResetLastRetrievalTime(DataSource dataSource, ThirdPartyDataType dataType,
+        Guid? synchronizationEntityId)
     {
-        var existingMetadata = await GetThirdPartyDataRetrievalMetadata(dataType, synchronizationEntityId);
+        var existingMetadata =
+            await GetThirdPartyDataRetrievalMetadata(dataSource, dataType, synchronizationEntityId);
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
         if (existingMetadata is null)
@@ -47,7 +50,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
             var newMetadata = new ThirdPartyDataRetrievalMetadata
             {
                 DataType = dataType,
-                DataSource = DataSource.GoCardless,
+                DataSource = dataSource,
                 SynchronizationEntityId = synchronizationEntityId,
                 LastRetrievalTime = utcNow,
                 RetrievalInterval = GetRetrievalInterval(dataType)

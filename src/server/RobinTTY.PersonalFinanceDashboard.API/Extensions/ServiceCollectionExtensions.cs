@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
@@ -72,7 +73,10 @@ public static class ServiceCollectionExtensions
             return services
                 .AddSingleton(TimeProvider.System)
                 .AddSingleton<NordigenClient>()
-                .AddSingleton<GoCardlessDataProviderService>();
+                .AddSingleton<GoCardlessBankDataProvider>()
+                // Resolved through the concrete type, so it can be replaced (e.g. in tests) by registering that type
+                .AddSingleton<IBankDataProvider>(provider => provider.GetRequiredService<GoCardlessBankDataProvider>())
+                .AddSingleton<BankDataProviderRegistry>();
         }
 
         /// <summary>

@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -40,30 +41,32 @@ internal sealed class SyncTestEnvironment : IDisposable
     }
 
     public Task<bool> SyncTransactions(Guid? accountId = null, bool force = false) =>
-        Run(dbContext => new TransactionSyncHandler(dbContext, GoCardless.CreateService(),
+        Run(dbContext => new TransactionSyncHandler(dbContext, CreateProviders(),
                 CreateMetadataService(dbContext), Time, NullLogger<TransactionSyncHandler>.Instance)
             .SynchronizeData(accountId, force));
 
     public Task<bool> SyncBankAccounts(Guid? accountId = null, bool force = false) =>
-        Run(dbContext => new BankAccountSyncHandler(dbContext, GoCardless.CreateService(),
+        Run(dbContext => new BankAccountSyncHandler(dbContext, CreateProviders(),
                 CreateMetadataService(dbContext), Time, NullLogger<BankAccountSyncHandler>.Instance)
             .SynchronizeData(accountId, force));
 
     public Task<bool> SyncAuthenticationRequests(Guid? requestId = null, bool force = false) =>
-        Run(dbContext => new AuthenticationRequestSyncHandler(dbContext, GoCardless.CreateService(),
+        Run(dbContext => new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
                 CreateMetadataService(dbContext), NullLogger<AuthenticationRequestSyncHandler>.Instance)
             .SynchronizeData(requestId, force));
 
     public Task<bool> SyncBankingInstitutions(Guid? institutionId = null, bool force = false) =>
-        Run(dbContext => new BankingInstitutionSyncHandler(dbContext, GoCardless.CreateService(),
+        Run(dbContext => new BankingInstitutionSyncHandler(dbContext, CreateProviders(),
                 CreateMetadataService(dbContext), NullLogger<BankingInstitutionSyncHandler>.Instance)
             .SynchronizeData(institutionId, force));
 
     public AuthenticationRequestRepository CreateAuthenticationRequestRepository(ApplicationDbContext dbContext) =>
-        new(dbContext, GoCardless.CreateService(),
-            new AuthenticationRequestSyncHandler(dbContext, GoCardless.CreateService(),
+        new(dbContext, CreateProviders(),
+            new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
                 CreateMetadataService(dbContext), NullLogger<AuthenticationRequestSyncHandler>.Instance),
             NullLogger<AuthenticationRequestRepository>.Instance);
+
+    public BankDataProviderRegistry CreateProviders() => new([GoCardless.CreateService()]);
 
     public ThirdPartyDataRetrievalMetadataService CreateMetadataService(ApplicationDbContext dbContext) =>
         new(new ThirdPartyDataRetrievalMetadataRepository(dbContext, Time), Time);

@@ -75,9 +75,9 @@ public class AuthenticationRequestRepositoryTests : IDisposable
 
         await using (var dbContext = _env.CreateDbContext())
         {
-            var response = await _env.CreateAuthenticationRequestRepository(dbContext)
+            var error = await _env.CreateAuthenticationRequestRepository(dbContext)
                 .DeleteAuthenticationRequest(requestId);
-            Assert.True(response.IsSuccessful);
+            Assert.Null(error);
         }
 
         Assert.Empty(await GetRequests());
@@ -91,9 +91,9 @@ public class AuthenticationRequestRepositoryTests : IDisposable
 
         await using (var dbContext = _env.CreateDbContext())
         {
-            var response = await _env.CreateAuthenticationRequestRepository(dbContext)
+            var error = await _env.CreateAuthenticationRequestRepository(dbContext)
                 .DeleteAuthenticationRequest(requestId);
-            Assert.False(response.IsSuccessful);
+            Assert.NotNull(error);
         }
 
         Assert.Single(await GetRequests());
@@ -104,10 +104,10 @@ public class AuthenticationRequestRepositoryTests : IDisposable
     {
         await using var dbContext = _env.CreateDbContext();
 
-        var response = await _env.CreateAuthenticationRequestRepository(dbContext)
+        var error = await _env.CreateAuthenticationRequestRepository(dbContext)
             .DeleteAuthenticationRequest(Guid.NewGuid());
 
-        Assert.False(response.IsSuccessful);
+        Assert.NotNull(error);
         Assert.Equal(0, _env.GoCardless.TotalRequestCount);
     }
 
