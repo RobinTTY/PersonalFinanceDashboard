@@ -86,6 +86,18 @@ public class BankingInstitutionSyncHandlerTests : IDisposable
         Assert.Single(await GetInstitutions());
     }
 
+    [Fact]
+    public async Task FailedRequest_IsOnlyRetriedAfterADelay()
+    {
+        await _env.SyncBankingInstitutions();
+        await _env.SyncBankingInstitutions();
+        Assert.Equal(1, _env.GoCardless.RequestCount(InstitutionsPath));
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        await _env.SyncBankingInstitutions();
+        Assert.Equal(2, _env.GoCardless.RequestCount(InstitutionsPath));
+    }
+
     private async Task<List<BankingInstitution>> GetInstitutions()
     {
         await using var dbContext = _env.CreateDbContext();

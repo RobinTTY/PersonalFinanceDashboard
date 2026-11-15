@@ -8,6 +8,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchroniza
 public class BankAccountSyncHandlerTests : IDisposable
 {
     private static readonly Guid AccountId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
+    private static readonly Guid OtherAccountId = Guid.Parse("a2000000-0000-0000-0000-000000000002");
     private const string InstitutionId = "TESTBANK_TESTDEFF";
 
     private readonly SyncTestEnvironment _env = new();
@@ -72,6 +73,31 @@ public class BankAccountSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task FailedAccount_IsOnlyRetriedAfterADelay()
+    {
+        // No response is configured for the other account, so its request fails
+        await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1),
+            TestData.Account(AccountId, currency: "EUR"), TestData.Account(OtherAccountId, currency: "EUR")));
+        _env.GoCardless.Respond(BalancesPath(AccountId), Balances(50m));
+
+        await _env.SyncBankAccounts();
+        await _env.SyncBankAccounts();
+        Assert.Equal(1, _env.GoCardless.RequestCount(BalancesPath(OtherAccountId)));
+
+        // The failure is recorded for the account that failed, not the one that succeeded
+        var failed =
+            await _env.GetRetrievalMetadata(ThirdPartyDataType.BankAccounts, await GetAccountId(OtherAccountId));
+        Assert.Equal(1, failed.ConsecutiveFailures);
+        var succeeded = await _env.GetRetrievalMetadata(ThirdPartyDataType.BankAccounts, await GetAccountId(AccountId));
+        Assert.Equal(0, succeeded.ConsecutiveFailures);
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        await _env.SyncBankAccounts();
+        Assert.Equal(2, _env.GoCardless.RequestCount(BalancesPath(OtherAccountId)));
+        Assert.Equal(1, _env.GoCardless.RequestCount(BalancesPath(AccountId)));
+    }
+
+    [Fact]
     public async Task ManualAccount_IsNotFetched()
     {
         var account = TestData.ManualAccount();
@@ -80,6 +106,14 @@ public class BankAccountSyncHandlerTests : IDisposable
         Assert.True(await _env.SyncBankAccounts(account.Id, force: true));
 
         Assert.Equal(0, _env.GoCardless.TotalRequestCount);
+    }
+
+    private async Task<Guid> GetAccountId(Guid accountExternalId)
+    {
+        await using var dbContext = _env.CreateDbContext();
+        var account = await dbContext.BankAccounts.SingleAsync(account =>
+            account.ExternalId == accountExternalId.ToString());
+        return account.Id!.Value;
     }
 
     private async Task<BankAccount> GetAccount()

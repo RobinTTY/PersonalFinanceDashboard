@@ -15,9 +15,25 @@ public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
     public required DataSource DataSource { get; set; }
 
     /// <summary>
-    /// The <see cref="DateTime"/> at which the data was retrieved last.
+    /// The <see cref="DateTime"/> at which the data was retrieved successfully the last time.
     /// </summary>
     public required DateTime LastRetrievalTime { get; set; }
+
+    /// <summary>
+    /// The number of retrievals that failed since the last successful one.
+    /// </summary>
+    public int ConsecutiveFailures { get; set; }
+
+    /// <summary>
+    /// The error of the last failed retrieval, <see langword="null"/> if the last retrieval was successful.
+    /// </summary>
+    public string? LastError { get; set; }
+
+    /// <summary>
+    /// The earliest time a failed retrieval is retried. Takes precedence over <see cref="RetrievalInterval"/>
+    /// while set, and is reset by a successful retrieval.
+    /// </summary>
+    public DateTime? NextRetryTime { get; set; }
 
     // TODO: This may be removed 
     /// <summary>

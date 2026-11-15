@@ -66,6 +66,8 @@ public class BankingInstitutionSyncHandler(
         if (!response.IsSuccessful)
         {
             LogFailure(provider.Source, response.Error);
+            await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
+                ThirdPartyDataType.BankingInstitutions, null, response.Error);
             return false;
         }
 
@@ -81,10 +83,11 @@ public class BankingInstitutionSyncHandler(
     private async Task<bool> IsSynchronizationDue(DataSource source, bool forceThirdPartySync)
     {
         if (forceThirdPartySync ||
-            await dataRetrievalMetadataService.DataIsStale(source, ThirdPartyDataType.BankingInstitutions))
+            await dataRetrievalMetadataService.IsRetrievalDue(source, ThirdPartyDataType.BankingInstitutions))
             return true;
 
-        logger.LogDebug("{dataType} data of {dataSource} is not stale. Skipping synchronization with third party.",
+        logger.LogDebug(
+            "{dataType} data of {dataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
             ThirdPartyDataType.BankingInstitutions, source);
         return false;
     }

@@ -114,6 +114,84 @@ public class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task FailedRequest_IsRetriedWithAnIncreasingDelay()
+    {
+        await SeedAccountsWithActiveRequest(AccountId);
+
+        await _env.SyncTransactions();
+        await _env.SyncTransactions();
+        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+
+        // The first retry happens after an hour, the second one two hours later
+        _env.Time.Advance(TimeSpan.FromMinutes(59));
+        await _env.SyncTransactions();
+        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+
+        _env.Time.Advance(TimeSpan.FromMinutes(1));
+        await _env.SyncTransactions();
+        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        await _env.SyncTransactions();
+        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        await _env.SyncTransactions();
+        Assert.Equal(3, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+    }
+
+    [Fact]
+    public async Task FailedRequest_IsRecordedUntilARetrySucceeds()
+    {
+        await SeedAccountsWithActiveRequest(AccountId);
+        var accountId = await GetAccountId(AccountId);
+
+        await _env.SyncTransactions();
+
+        var failed = await _env.GetRetrievalMetadata(ThirdPartyDataType.Transactions, accountId);
+        Assert.Equal(1, failed.ConsecutiveFailures);
+        Assert.Contains("Not found", failed.LastError);
+        Assert.Equal(_env.UtcNow.AddHours(1), failed.NextRetryTime);
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        await _env.SyncTransactions();
+
+        var succeeded = await _env.GetRetrievalMetadata(ThirdPartyDataType.Transactions, accountId);
+        Assert.Equal(0, succeeded.ConsecutiveFailures);
+        Assert.Null(succeeded.LastError);
+        Assert.Null(succeeded.NextRetryTime);
+        Assert.Equal(_env.UtcNow, succeeded.LastRetrievalTime);
+    }
+
+    [Fact]
+    public async Task RateLimitedRequest_IsRetriedOnceTheRateLimitResets()
+    {
+        await SeedAccountsWithActiveRequest(AccountId);
+        _env.GoCardless.RespondRateLimited(TransactionsPath(AccountId), TimeSpan.FromHours(3));
+
+        await _env.SyncTransactions();
+        _env.Time.Advance(TimeSpan.FromHours(2));
+        await _env.SyncTransactions();
+        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+
+        _env.Time.Advance(TimeSpan.FromHours(1));
+        await _env.SyncTransactions();
+        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+    }
+
+    [Fact]
+    public async Task ForcedSync_IgnoresTheRetryDelay()
+    {
+        await SeedAccountsWithActiveRequest(AccountId);
+
+        await _env.SyncTransactions();
+        await _env.SyncTransactions(force: true);
+
+        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+    }
+
+    [Fact]
     public async Task ManualAccount_IsNotSynced()
     {
         var account = TestData.ManualAccount();
@@ -127,6 +205,14 @@ public class TransactionSyncHandlerTests : IDisposable
     private Task SeedAccountsWithActiveRequest(params Guid[] accountIds) =>
         _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1),
             accountIds.Select(id => TestData.Account(id)).ToArray()));
+
+    private async Task<Guid> GetAccountId(Guid accountExternalId)
+    {
+        await using var dbContext = _env.CreateDbContext();
+        var account = await dbContext.BankAccounts.SingleAsync(account =>
+            account.ExternalId == accountExternalId.ToString());
+        return account.Id!.Value;
+    }
 
     private async Task<List<Transaction>> GetTransactions(Guid accountExternalId)
     {

@@ -3,7 +3,7 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
-public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext, TimeProvider timeProvider)
+public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext)
 {
     /// <summary>
     /// Retrieves a single third-party data retrieval metadata record based on the specified data source and type.
@@ -21,49 +21,37 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     }
 
     /// <summary>
-    /// Adds a new third-party data retrieval metadata record to the database.
+    /// Gets the metadata record for the given data, or adds a new one for data that was never retrieved.
+    /// Changes to the record are persisted by <see cref="SaveChanges"/>.
     /// </summary>
-    /// <param name="metadata">The metadata entity containing information about the third-party data retrieval, such as data type, data source, last retrieval time, and retrieval interval.</param>
-    /// <returns>The metadata entity that was added to the database, including any database-generated values.</returns>
-    private async Task AddThirdPartyDataRetrievalMetadata(ThirdPartyDataRetrievalMetadata metadata)
+    /// <param name="dataSource">The data source the data is retrieved from.</param>
+    /// <param name="dataType">The type of the data.</param>
+    /// <param name="synchronizationEntityId">Optional id of the synchronization entity. For example, for account data, this would be the account id.</param>
+    /// <returns>The tracked metadata record.</returns>
+    public async Task<ThirdPartyDataRetrievalMetadata> GetOrAddThirdPartyDataRetrievalMetadata(
+        DataSource dataSource, ThirdPartyDataType dataType, Guid? synchronizationEntityId)
     {
-        await dbContext.ThirdPartyDataRetrievalMetadata.AddAsync(metadata);
-        await dbContext.SaveChangesAsync();
+        var metadata = await GetThirdPartyDataRetrievalMetadata(dataSource, dataType, synchronizationEntityId);
+        if (metadata is not null)
+            return metadata;
+
+        metadata = new ThirdPartyDataRetrievalMetadata
+        {
+            DataType = dataType,
+            DataSource = dataSource,
+            SynchronizationEntityId = synchronizationEntityId,
+            LastRetrievalTime = DateTime.MinValue,
+            RetrievalInterval = GetRetrievalInterval(dataType)
+        };
+        dbContext.ThirdPartyDataRetrievalMetadata.Add(metadata);
+
+        return metadata;
     }
 
     /// <summary>
-    /// Resets the last retrieval time for the synchronization entity with the given id and data type to the current time.
-    /// If no record exists for the given entry, one will be created.
+    /// Saves the changes made to metadata records.
     /// </summary>
-    /// <param name="dataSource">The data source the data was retrieved from.</param>
-    /// <param name="dataType">The data type for which to reset the last retrieval time.</param>
-    /// <param name="synchronizationEntityId">The id of the synchronization entity for which the last retrieval time should be reset. For example, for account data, this would be the account id.</param>
-    public async Task ResetLastRetrievalTime(DataSource dataSource, ThirdPartyDataType dataType,
-        Guid? synchronizationEntityId)
-    {
-        var existingMetadata =
-            await GetThirdPartyDataRetrievalMetadata(dataSource, dataType, synchronizationEntityId);
-        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
-
-        if (existingMetadata is null)
-        {
-            var newMetadata = new ThirdPartyDataRetrievalMetadata
-            {
-                DataType = dataType,
-                DataSource = dataSource,
-                SynchronizationEntityId = synchronizationEntityId,
-                LastRetrievalTime = utcNow,
-                RetrievalInterval = GetRetrievalInterval(dataType)
-            };
-
-            await AddThirdPartyDataRetrievalMetadata(newMetadata);
-        }
-        else
-        {
-            existingMetadata.LastRetrievalTime = utcNow;
-            await dbContext.SaveChangesAsync();
-        }
-    }
+    public async Task SaveChanges() => await dbContext.SaveChangesAsync();
 
     private static TimeSpan GetRetrievalInterval(ThirdPartyDataType dataType)
     {

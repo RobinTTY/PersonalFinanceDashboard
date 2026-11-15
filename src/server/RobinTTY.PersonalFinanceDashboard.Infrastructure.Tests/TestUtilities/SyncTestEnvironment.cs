@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
+using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
@@ -66,10 +67,18 @@ internal sealed class SyncTestEnvironment : IDisposable
                 CreateMetadataService(dbContext), NullLogger<AuthenticationRequestSyncHandler>.Instance),
             NullLogger<AuthenticationRequestRepository>.Instance);
 
+    public async Task<ThirdPartyDataRetrievalMetadata> GetRetrievalMetadata(ThirdPartyDataType dataType,
+        Guid? synchronizationEntityId = null)
+    {
+        await using var dbContext = CreateDbContext();
+        return await dbContext.ThirdPartyDataRetrievalMetadata.SingleAsync(metadata =>
+            metadata.DataType == dataType && metadata.SynchronizationEntityId == synchronizationEntityId);
+    }
+
     public BankDataProviderRegistry CreateProviders() => new([GoCardless.CreateService()]);
 
     public ThirdPartyDataRetrievalMetadataService CreateMetadataService(ApplicationDbContext dbContext) =>
-        new(new ThirdPartyDataRetrievalMetadataRepository(dbContext, Time), Time);
+        new(new ThirdPartyDataRetrievalMetadataRepository(dbContext), Time);
 
     public void Dispose() => _connection.Dispose();
 

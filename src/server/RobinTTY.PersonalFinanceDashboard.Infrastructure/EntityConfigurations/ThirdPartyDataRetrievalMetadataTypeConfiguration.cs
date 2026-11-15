@@ -10,6 +10,7 @@ public class
     public void Configure(EntityTypeBuilder<ThirdPartyDataRetrievalMetadata> builder)
     {
         builder.Property(entity => entity.LastRetrievalTime).HasConversion<UtcDateTimeConverter>();
+        builder.Property(entity => entity.NextRetryTime).HasConversion<UtcDateTimeConverter>();
         builder.HasData(
             new ThirdPartyDataRetrievalMetadata
             {

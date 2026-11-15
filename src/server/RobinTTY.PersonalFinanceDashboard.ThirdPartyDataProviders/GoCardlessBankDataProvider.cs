@@ -59,8 +59,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             var response =
                 await client.RequisitionsEndpoint.GetRequisitions(pageSize, requisitions.Count, cancellationToken);
             if (!response.IsSuccess)
-                return ThirdPartyResponse<IReadOnlyList<AuthenticationRequest>>.Failure(
-                    response.Error!.ToThirdPartyError());
+                return ThirdPartyResponse<IReadOnlyList<AuthenticationRequest>>.Failure(response.ToThirdPartyError());
 
             var page = response.Result!;
             requisitions.AddRange(page.Results);
@@ -103,17 +102,18 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             return InvalidId(authenticationRequestId);
 
         var response = await client.RequisitionsEndpoint.DeleteRequisition(requisitionId, cancellationToken);
-        return response.IsSuccess ? null : response.Error!.ToThirdPartyError();
+        return response.IsSuccess ? null : response.ToThirdPartyError();
     }
 
     /// <inheritdoc />
     /// <remarks>The balance, general account information and account details are separate GoCardless requests,
     /// so the latter two are only made if the account's details are requested.</remarks>
-    public async Task<IReadOnlyList<ThirdPartyResponse<BankAccount>>> GetBankAccounts(
+    public async Task<IReadOnlyDictionary<string, ThirdPartyResponse<BankAccount>>> GetBankAccounts(
         IReadOnlyDictionary<string, bool> accounts, CancellationToken cancellationToken = default)
     {
-        var tasks = accounts.Select(account => GetBankAccount(account.Key, account.Value, cancellationToken));
-        return await Task.WhenAll(tasks);
+        var responses = await Task.WhenAll(accounts.Select(async account =>
+            (Id: account.Key, Response: await GetBankAccount(account.Key, account.Value, cancellationToken))));
+        return responses.ToDictionary(response => response.Id, response => response.Response);
     }
 
     private async Task<ThirdPartyResponse<BankAccount>> GetBankAccount(string externalAccountId,
@@ -141,8 +141,13 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             accountDetailsResponse);
         if (errors.Count > 0)
         {
-            return ThirdPartyResponse<BankAccount>.Failure(
-                new ThirdPartyError($"Failed to retrieve data for account {accountId}.", string.Join("; ", errors)));
+            TimeSpan?[] retryAfter =
+            [
+                balanceResponse.GetRetryAfter(), generalAccountInfoResponse?.GetRetryAfter(),
+                accountDetailsResponse?.GetRetryAfter()
+            ];
+            return ThirdPartyResponse<BankAccount>.Failure(new ThirdPartyError(
+                $"Failed to retrieve data for account {accountId}.", string.Join("; ", errors), retryAfter.Max()));
         }
 
         var bankAccount = GoCardlessTypeExtensions.CreateBankAccount(accountId, generalAccountInfoResponse?.Result,

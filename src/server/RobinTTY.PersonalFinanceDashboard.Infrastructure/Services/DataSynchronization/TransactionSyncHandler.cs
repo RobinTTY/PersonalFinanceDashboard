@@ -56,12 +56,12 @@ public class TransactionSyncHandler(
 
         foreach (var account in accounts)
         {
-            var dataIsStale = await dataRetrievalMetadataService.DataIsStale(provider.Source,
+            var retrievalIsDue = await dataRetrievalMetadataService.IsRetrievalDue(provider.Source,
                 ThirdPartyDataType.Transactions, account.Id);
-            if (!dataIsStale && !forceThirdPartySync)
+            if (!retrievalIsDue && !forceThirdPartySync)
             {
                 logger.LogDebug(
-                    "Transaction data for account with id {accountId} is not stale. Skipping synchronization with third party.",
+                    "Transaction data for account with id {accountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
                     account.Id);
                 continue;
             }
@@ -69,9 +69,11 @@ public class TransactionSyncHandler(
             var response = await provider.GetTransactions(account.ExternalId);
             if (!response.IsSuccessful)
             {
+                var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
+                    ThirdPartyDataType.Transactions, account.Id, response.Error);
                 logger.LogWarning(
-                    "Encountered error while getting transactions for account with id {accountId} from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
-                    account.Id, provider.Source, response.Error.Summary, response.Error.Detail);
+                    "Encountered error while getting transactions for account with id {accountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
+                    account.Id, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
                 if (abortOnFailure)
                     return false;
 

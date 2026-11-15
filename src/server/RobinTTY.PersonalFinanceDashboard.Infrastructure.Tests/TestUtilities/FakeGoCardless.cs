@@ -15,13 +15,35 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 /// </summary>
 internal sealed class FakeGoCardless : HttpMessageHandler
 {
-    private readonly ConcurrentDictionary<string, string> _responses = new();
+    private sealed record FakeResponse(
+        HttpStatusCode StatusCode,
+        string Json,
+        IReadOnlyDictionary<string, string>? Headers = null);
+
+    private static readonly FakeResponse NotFound = new(HttpStatusCode.NotFound,
+        """{"summary":"Not found","detail":"No fake response configured","status_code":404}""");
+
+    private readonly ConcurrentDictionary<string, FakeResponse> _responses = new();
     private readonly ConcurrentQueue<string> _requestedPaths = new();
 
     /// <summary>
     /// Sets the response for requests whose path ends with <paramref name="path"/>, e.g. "requisitions/".
     /// </summary>
-    public void Respond(string path, string json) => _responses[path] = json;
+    public void Respond(string path, string json) => _responses[path] = new FakeResponse(HttpStatusCode.OK, json);
+
+    /// <summary>
+    /// Answers requests whose path ends with <paramref name="path"/> with a 429, as if the rate limit of the
+    /// accounts endpoint was exceeded.
+    /// </summary>
+    /// <param name="path">The path to answer.</param>
+    /// <param name="resetAfter">The time until the rate limit resets.</param>
+    public void RespondRateLimited(string path, TimeSpan resetAfter) =>
+        _responses[path] = new FakeResponse(HttpStatusCode.TooManyRequests,
+            """{"summary":"Rate limit exceeded","detail":"Too many requests","status_code":429}""",
+            new Dictionary<string, string>
+            {
+                ["HTTP_X_RATELIMIT_ACCOUNT_SUCCESS_RESET"] = ((int)resetAfter.TotalSeconds).ToString()
+            });
 
     /// <summary>
     /// Removes the response for <paramref name="path"/>, so requests to it get a 404 again.
@@ -55,15 +77,21 @@ internal sealed class FakeGoCardless : HttpMessageHandler
         if (request.Content != null)
             LastRequestBody = await request.Content.ReadAsStringAsync(cancellationToken);
 
-        var json = _responses.FirstOrDefault(response => path.EndsWith(response.Key)).Value;
-        return json != null
-            ? CreateResponse(HttpStatusCode.OK, json)
-            : CreateResponse(HttpStatusCode.NotFound,
-                """{"summary":"Not found","detail":"No fake response configured","status_code":404}""");
+        var response = _responses.FirstOrDefault(response => path.EndsWith(response.Key)).Value ?? NotFound;
+        return CreateResponse(response);
     }
 
-    private static HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string json) =>
-        new(statusCode) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
+    private static HttpResponseMessage CreateResponse(FakeResponse response)
+    {
+        var message = new HttpResponseMessage(response.StatusCode)
+        {
+            Content = new StringContent(response.Json, Encoding.UTF8, "application/json")
+        };
+        foreach (var (name, value) in response.Headers ?? new Dictionary<string, string>())
+            message.Headers.Add(name, value);
+
+        return message;
+    }
 
     private static string CreateUnsignedToken(DateTimeOffset expires)
     {

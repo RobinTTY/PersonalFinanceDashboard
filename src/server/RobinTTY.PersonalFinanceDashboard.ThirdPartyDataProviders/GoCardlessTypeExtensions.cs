@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using RobinTTY.NordigenApiClient.Models.Responses;
@@ -36,7 +37,33 @@ public static class GoCardlessTypeExtensions
     {
         return response.IsSuccess
             ? ThirdPartyResponse<TResult>.Success(map(response.Result!))
-            : ThirdPartyResponse<TResult>.Failure(response.Error!.ToThirdPartyError());
+            : ThirdPartyResponse<TResult>.Failure(response.ToThirdPartyError());
+    }
+
+    /// <summary>
+    /// Maps the error of a failed <see cref="NordigenApiResponse{TResult,TError}"/> to a <see cref="ThirdPartyError"/>,
+    /// including when to retry if the request was rate limited.
+    /// </summary>
+    public static ThirdPartyError ToThirdPartyError<TSource, TError>(this NordigenApiResponse<TSource, TError> response)
+        where TSource : class
+        where TError : BasicResponse =>
+        response.Error!.ToThirdPartyError() with { RetryAfter = response.GetRetryAfter() };
+
+    /// <summary>
+    /// Gets how long to wait before retrying a rate limited request, <see langword="null"/> if the request wasn't
+    /// rate limited.
+    /// </summary>
+    public static TimeSpan? GetRetryAfter<TSource, TError>(this NordigenApiResponse<TSource, TError> response)
+        where TSource : class
+        where TError : BasicResponse
+    {
+        if (response.StatusCode != HttpStatusCode.TooManyRequests)
+            return null;
+
+        // The accounts endpoint has its own, stricter limit
+        var seconds = response.RateLimits?.RemainingSecondsInTimeWindowAccountsEndpoint ??
+                      response.RateLimits?.RemainingSecondsInTimeWindow;
+        return seconds is null ? null : TimeSpan.FromSeconds(seconds.Value);
     }
 
     /// <summary>

@@ -69,8 +69,9 @@ public interface IBankDataProvider
     /// <param name="accounts">The provider's ids of the accounts, mapped to whether details that rarely change
     /// (e.g. name, currency, IBAN and institution) should be retrieved as well.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>A response for each requested account.</returns>
-    Task<IReadOnlyList<ThirdPartyResponse<BankAccount>>> GetBankAccounts(IReadOnlyDictionary<string, bool> accounts,
+    /// <returns>A response for each requested account, keyed by the provider's id of the account.</returns>
+    Task<IReadOnlyDictionary<string, ThirdPartyResponse<BankAccount>>> GetBankAccounts(
+        IReadOnlyDictionary<string, bool> accounts,
         CancellationToken cancellationToken = default);
 
     /// <summary>

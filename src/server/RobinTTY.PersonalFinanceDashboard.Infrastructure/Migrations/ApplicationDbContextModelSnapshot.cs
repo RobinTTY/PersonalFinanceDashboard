@@ -197,13 +197,22 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ConsecutiveFailures")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("DataSource")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("DataType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("LastError")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("LastRetrievalTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("NextRetryTime")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("RetrievalInterval")
@@ -220,6 +229,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f948e52f-ad17-44b8-9cdf-e0b952f139b3"),
+                            ConsecutiveFailures = 0,
                             DataSource = 1,
                             DataType = 1,
                             LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -228,6 +238,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("0b53ec13-5a8c-4910-bfff-1ba06c3f3859"),
+                            ConsecutiveFailures = 0,
                             DataSource = 1,
                             DataType = 2,
                             LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

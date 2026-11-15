@@ -60,7 +60,7 @@ public class BankDataProviderRegistryTests
         public Task<ThirdPartyError?> DeleteAuthenticationRequest(string authenticationRequestId,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
-        public Task<IReadOnlyList<ThirdPartyResponse<BankAccount>>> GetBankAccounts(
+        public Task<IReadOnlyDictionary<string, ThirdPartyResponse<BankAccount>>> GetBankAccounts(
             IReadOnlyDictionary<string, bool> accounts, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
 

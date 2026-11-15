@@ -46,7 +46,7 @@ public class BankAccountSyncHandler(
         foreach (var accounts in accountsBySource)
         {
             if (providers.TryGet(accounts.Key, out var provider))
-                await SynchronizeBankAccounts(provider, accounts, forceThirdPartySync);
+                await SynchronizeBankAccounts(provider, accounts.ToList(), forceThirdPartySync);
         }
 
         return true;
@@ -74,26 +74,30 @@ public class BankAccountSyncHandler(
     /// <param name="provider">The provider the accounts originate from.</param>
     /// <param name="bankAccounts">The bank accounts to synchronize, if their data is stale.</param>
     /// <param name="forceSync">Indicates whether to force synchronization with the third party API.</param>
-    private async Task SynchronizeBankAccounts(IBankDataProvider provider, IEnumerable<BankAccount> bankAccounts,
+    private async Task SynchronizeBankAccounts(IBankDataProvider provider,
+        IReadOnlyCollection<BankAccount> bankAccounts,
         bool forceSync)
     {
         var accountsToFetch = await DetermineStaleBankAccounts(provider.Source, bankAccounts, forceSync);
         if (accountsToFetch.Count == 0)
             return;
 
+        var accountIds = bankAccounts.ToDictionary(account => account.ExternalId!, account => account.Id);
         var fetchedBankAccounts = new List<BankAccount>();
-        foreach (var response in await provider.GetBankAccounts(accountsToFetch))
+        foreach (var (externalId, response) in await provider.GetBankAccounts(accountsToFetch))
         {
             if (response.IsSuccessful)
             {
                 fetchedBankAccounts.Add(response.Result);
+                continue;
             }
-            else
-            {
-                logger.LogWarning(
-                    "Encountered error while getting bank account from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
-                    provider.Source, response.Error.Summary, response.Error.Detail);
-            }
+
+            var accountId = accountIds[externalId];
+            var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
+                ThirdPartyDataType.BankAccounts, accountId, response.Error);
+            logger.LogWarning(
+                "Encountered error while getting bank account with id {bankAccountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
+                accountId, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
         }
 
         var updatedBankAccounts = await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts);
@@ -123,16 +127,16 @@ public class BankAccountSyncHandler(
 
         foreach (var bankAccount in bankAccounts)
         {
-            var dataIsStale =
-                await dataRetrievalMetadataService.DataIsStale(source, ThirdPartyDataType.BankAccounts, bankAccount.Id);
-            if (dataIsStale || forceSync)
+            var retrievalIsDue = await dataRetrievalMetadataService.IsRetrievalDue(source,
+                ThirdPartyDataType.BankAccounts, bankAccount.Id);
+            if (retrievalIsDue || forceSync)
             {
                 accountsToFetch.Add(bankAccount.ExternalId!, bankAccount.Currency == null);
             }
             else
             {
                 logger.LogDebug(
-                    "Bank account data for account with id {bankAccountId} is not stale. Skipping synchronization with third party.",
+                    "Bank account data for account with id {bankAccountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
                     bankAccount.Id);
             }
         }

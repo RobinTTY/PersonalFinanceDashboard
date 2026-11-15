@@ -65,6 +65,8 @@ public class AuthenticationRequestSyncHandler(
         if (!response.IsSuccessful)
         {
             LogFailure(provider.Source, response.Error);
+            await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
+                ThirdPartyDataType.AuthenticationRequests, null, response.Error);
             return false;
         }
 
@@ -83,10 +85,11 @@ public class AuthenticationRequestSyncHandler(
     private async Task<bool> IsSynchronizationDue(DataSource source, bool forceThirdPartySync)
     {
         if (forceThirdPartySync ||
-            await dataRetrievalMetadataService.DataIsStale(source, ThirdPartyDataType.AuthenticationRequests))
+            await dataRetrievalMetadataService.IsRetrievalDue(source, ThirdPartyDataType.AuthenticationRequests))
             return true;
 
-        logger.LogDebug("{dataType} data of {dataSource} is not stale. Skipping synchronization with third party.",
+        logger.LogDebug(
+            "{dataType} data of {dataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
             ThirdPartyDataType.AuthenticationRequests, source);
         return false;
     }

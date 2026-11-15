@@ -5,7 +5,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 /// </summary>
 /// <param name="Summary">A short description of the error.</param>
 /// <param name="Detail">Additional details about the error, if the provider supplied any.</param>
-public sealed record ThirdPartyError(string Summary, string? Detail = null)
+/// <param name="RetryAfter">How long to wait before retrying, if the provider rate limited the request.</param>
+public sealed record ThirdPartyError(string Summary, string? Detail = null, TimeSpan? RetryAfter = null)
 {
     /// <summary>
     /// The summary and details combined into a single message.
