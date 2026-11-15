@@ -45,18 +45,26 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("ThirdPartyId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ThirdPartyId")
-                        .IsUnique();
+                    b.HasIndex("Source", "ExternalId")
+                        .IsUnique()
+                        .HasFilter("\"ExternalId\" IS NOT NULL");
 
-                    b.ToTable("AuthenticationRequests");
+                    b.ToTable("AuthenticationRequests", t =>
+                        {
+                            t.HasCheckConstraint("CK_AuthenticationRequest_ExternalIdMatchesSource", "(\"Source\" = 'Manual') = (\"ExternalId\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>
@@ -86,6 +94,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Iban")
                         .HasColumnType("TEXT");
 
@@ -98,18 +109,22 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("OwnerName")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ThirdPartyId")
+                    b.Property<string>("Source")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AssociatedInstitutionId");
 
-                    b.HasIndex("ThirdPartyId")
+                    b.HasIndex("Source", "ExternalId")
                         .IsUnique()
-                        .HasFilter("\"ThirdPartyId\" <> '00000000-0000-0000-0000-000000000000'");
+                        .HasFilter("\"ExternalId\" IS NOT NULL");
 
-                    b.ToTable("BankAccounts");
+                    b.ToTable("BankAccounts", t =>
+                        {
+                            t.HasCheckConstraint("CK_BankAccount_ExternalIdMatchesSource", "(\"Source\" = 'Manual') = (\"ExternalId\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", b =>
@@ -126,6 +141,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("LogoUri")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -134,17 +152,20 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ThirdPartyId")
+                    b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ThirdPartyId")
+                    b.HasIndex("Source", "ExternalId")
                         .IsUnique()
-                        .HasFilter("\"ThirdPartyId\" <> ''");
+                        .HasFilter("\"ExternalId\" IS NOT NULL");
 
-                    b.ToTable("BankingInstitutions");
+                    b.ToTable("BankingInstitutions", t =>
+                        {
+                            t.HasCheckConstraint("CK_BankingInstitution_ExternalIdMatchesSource", "(\"Source\" = 'Manual') = (\"ExternalId\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", b =>
@@ -237,6 +258,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -247,7 +271,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("Payer")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ThirdPartyId")
+                    b.Property<string>("Source")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ValueDate")
@@ -255,11 +280,14 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BankAccountId", "ThirdPartyId")
+                    b.HasIndex("BankAccountId", "Source", "ExternalId")
                         .IsUnique()
-                        .HasFilter("\"ThirdPartyId\" <> '00000000-0000-0000-0000-000000000000'");
+                        .HasFilter("\"ExternalId\" IS NOT NULL");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", t =>
+                        {
+                            t.HasCheckConstraint("CK_Transaction_ExternalIdMatchesSource", "(\"Source\" = 'Manual') = (\"ExternalId\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("TagTransaction", b =>

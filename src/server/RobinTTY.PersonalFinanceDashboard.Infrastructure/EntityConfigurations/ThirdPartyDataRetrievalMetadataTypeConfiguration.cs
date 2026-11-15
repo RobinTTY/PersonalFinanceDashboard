@@ -15,7 +15,7 @@ public class
             {
                 Id = new Guid("f948e52f-ad17-44b8-9cdf-e0b952f139b3"),
                 DataType = ThirdPartyDataType.BankingInstitutions,
-                DataSource = ThirdPartyDataSource.GoCardless,
+                DataSource = DataSource.GoCardless,
                 LastRetrievalTime = DateTime.MinValue,
                 RetrievalInterval = TimeSpan.FromDays(7)
             },
@@ -23,7 +23,7 @@ public class
             {
                 Id = new Guid("0b53ec13-5a8c-4910-bfff-1ba06c3f3859"),
                 DataType = ThirdPartyDataType.AuthenticationRequests,
-                DataSource = ThirdPartyDataSource.GoCardless,
+                DataSource = DataSource.GoCardless,
                 LastRetrievalTime = DateTime.MinValue,
                 RetrievalInterval = TimeSpan.FromDays(7)
             }

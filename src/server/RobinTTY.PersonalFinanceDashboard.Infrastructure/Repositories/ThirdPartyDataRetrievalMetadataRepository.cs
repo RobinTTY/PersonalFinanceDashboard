@@ -47,7 +47,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
             var newMetadata = new ThirdPartyDataRetrievalMetadata
             {
                 DataType = dataType,
-                DataSource = ThirdPartyDataSource.GoCardless,
+                DataSource = DataSource.GoCardless,
                 SynchronizationEntityId = synchronizationEntityId,
                 LastRetrievalTime = utcNow,
                 RetrievalInterval = GetRetrievalInterval(dataType)

@@ -26,7 +26,8 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
 
         var request = (await GetRequests()).Single();
         Assert.Equal(AuthenticationStatus.Active, request.Status);
-        Assert.Equal([AccountId, OtherAccountId], request.AssociatedAccounts.Select(a => a.ThirdPartyId).Order());
+        Assert.Equal([AccountId.ToString(), OtherAccountId.ToString()],
+            request.AssociatedAccounts.Select(a => a.ExternalId).Order());
     }
 
     [Fact]
@@ -41,8 +42,8 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
         await using var dbContext = _env.CreateDbContext();
         Assert.Equal(2, await dbContext.BankAccounts.CountAsync());
         var requests = await GetRequests();
-        Assert.Single(requests.Single(r => r.ThirdPartyId == RequestId).AssociatedAccounts);
-        Assert.Equal(2, requests.Single(r => r.ThirdPartyId == OtherRequestId).AssociatedAccounts.Count);
+        Assert.Single(requests.Single(r => r.ExternalId == RequestId.ToString()).AssociatedAccounts);
+        Assert.Equal(2, requests.Single(r => r.ExternalId == OtherRequestId.ToString()).AssociatedAccounts.Count);
     }
 
     [Fact]
@@ -66,7 +67,7 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
 
         await _env.SyncAuthenticationRequests();
 
-        Assert.Equal(RequestId, (await GetRequests()).Single().ThirdPartyId);
+        Assert.Equal(RequestId.ToString(), (await GetRequests()).Single().ExternalId);
     }
 
     [Fact]

@@ -10,7 +10,7 @@ const noop = () => {};
 const c24Account: Account = {
   __typename: 'BankAccount',
   id: '1',
-  thirdPartyId: 'acc_001',
+  externalId: 'acc_001',
   iban: 'DE89370400440532013000',
   name: 'C24 Gemeinschaftskonto',
   description: null,
@@ -30,7 +30,7 @@ const c24Account: Account = {
 const sparkasseAccount: Account = {
   __typename: 'BankAccount',
   id: '2',
-  thirdPartyId: 'acc_002',
+  externalId: 'acc_002',
   iban: 'DE91100000000123456789',
   name: 'Sparkasse Girokonto',
   description: null,

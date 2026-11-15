@@ -22,28 +22,22 @@ public class BankAccountSyncHandler(
     /// <returns>A boolean value indicating whether the synchronization process was successful.</returns>
     public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false)
     {
-        Guid? thirdPartyBankAccountId = null;
-
-        // If a specific bank account id is provided, we only want to fetch and update that account. In this case, we need to get the corresponding third party id to fetch the data from the API.
+        BankAccount? bankAccountToSync = null;
         if (internalBankAccountId.HasValue)
         {
-            thirdPartyBankAccountId = dbContext.BankAccounts
-                .SingleOrDefault(bankAccount => bankAccount.Id == internalBankAccountId)?.ThirdPartyId;
-            if (thirdPartyBankAccountId == null)
+            bankAccountToSync = await dbContext.BankAccounts
+                .SingleOrDefaultAsync(bankAccount => bankAccount.Id == internalBankAccountId);
+            if (bankAccountToSync == null)
             {
                 logger.LogWarning("Bank account with id {bankAccountId} does not exist.", internalBankAccountId);
                 return false;
             }
+
+            if (bankAccountToSync.Source != DataSource.GoCardless)
+                return true;
         }
 
-        // Fetch bank accounts from third party
-        var bankAccounts =
-            await FetchBankAccountsFromApi(internalBankAccountId, thirdPartyBankAccountId, forceThirdPartySync);
-        if (bankAccounts == null)
-        {
-            logger.LogWarning("Failed to fetch bank accounts from third party API.");
-            return false;
-        }
+        var bankAccounts = await FetchBankAccountsFromApi(bankAccountToSync, forceThirdPartySync);
 
         var updatedBankAccounts = await AddOrUpdateBankAccounts(bankAccounts);
         foreach (var bankAccount in updatedBankAccounts)
@@ -60,14 +54,12 @@ public class BankAccountSyncHandler(
     /// <summary>
     /// Fetches bank accounts from the third party API. If a specific bank account id is provided, only that account will be fetched. Otherwise, all bank accounts associated with active authentication requests that are not older than 90 days will be fetched.
     /// </summary>
-    /// <param name="bankAccountId">The internal id of the bank account to fetch.</param>
-    /// <param name="thirdPartyBankAccountId">The id of the bank account to fetch. If <see langword="null"/>, all bank accounts associated with active authentication requests that are not older than 90 days will be fetched.</param>
+    /// <param name="bankAccount">The GoCardless bank account to fetch. If <see langword="null"/>, all bank accounts associated with active authentication requests that are not older than 90 days will be fetched.</param>
     /// <param name="forceSync">Indicates whether to force synchronization with the third party API.</param>
-    /// <returns></returns>
-    private async Task<List<BankAccount>?> FetchBankAccountsFromApi(Guid? bankAccountId, Guid? thirdPartyBankAccountId,
-        bool forceSync)
+    /// <returns>The successfully fetched bank accounts.</returns>
+    private async Task<List<BankAccount>> FetchBankAccountsFromApi(BankAccount? bankAccount, bool forceSync)
     {
-        var accountsToFetch = await DetermineStaleBankAccounts(bankAccountId, thirdPartyBankAccountId, forceSync);
+        var accountsToFetch = await DetermineStaleBankAccounts(bankAccount, forceSync);
         var responses = await dataProvider.GetBankAccounts(accountsToFetch);
 
         var bankAccounts = new List<BankAccount>();
@@ -89,50 +81,43 @@ public class BankAccountSyncHandler(
     }
 
     /// <summary>
-    /// Identifies stale bank accounts that require synchronization. If a third-party bank account ID is specified, checks whether its data is stale or a force synchronization is required.
+    /// Identifies stale bank accounts that require synchronization. If a bank account is specified, checks whether its data is stale or a force synchronization is required.
     /// If no specific account is specified, evaluates all associated bank accounts to determine their synchronization status.
     /// Currency information is used as an indicator of whether metadata needs to be fetched for the account, as this information requires additional API calls to be retrieved but doesn't usually change.
     /// </summary>
-    /// <param name="bankAccountId">The internal ID of a specific bank account to evaluate for staleness. If <see langword="null"/>, all associated bank accounts are considered.</param>
-    /// <param name="thirdPartyBankAccountId">The external ID of a specific third-party bank account to evaluate for staleness. If <see langword="null"/>, this parameter is ignored.</param>
+    /// <param name="bankAccount">A specific GoCardless bank account to evaluate for staleness. If <see langword="null"/>, all associated bank accounts are considered.</param>
     /// <param name="forceSync">Indicates whether synchronization should be forced regardless of staleness status.</param>
-    /// <returns>A dictionary where the key is the GUID of a bank account and the value indicates whether it requires synchronization.</returns>
-    private async Task<Dictionary<Guid, bool>> DetermineStaleBankAccounts(Guid? bankAccountId,
-        Guid? thirdPartyBankAccountId, bool forceSync)
+    /// <returns>A dictionary where the key is the external id of a bank account and the value indicates whether its metadata needs to be fetched.</returns>
+    private async Task<Dictionary<string, bool>> DetermineStaleBankAccounts(BankAccount? bankAccount, bool forceSync)
     {
-        var accountsToFetch = new Dictionary<Guid, bool>();
+        var accountsToFetch = new Dictionary<string, bool>();
 
-        if (thirdPartyBankAccountId.HasValue)
+        if (bankAccount != null)
         {
             var dataIsStale =
-                await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts, bankAccountId);
+                await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankAccounts, bankAccount.Id);
             if (!dataIsStale && !forceSync)
             {
                 logger.LogDebug(
                     "Bank account data for account with id {bankAccountId} is not stale. Skipping synchronization with third party.",
-                    bankAccountId);
+                    bankAccount.Id);
             }
             else
             {
-                var account =
-                    dbContext.BankAccounts.FirstOrDefault(account =>
-                        account.ThirdPartyId == thirdPartyBankAccountId.Value);
-                accountsToFetch = new Dictionary<Guid, bool>
-                {
-                    { thirdPartyBankAccountId.Value, account?.Currency == null }
-                };
+                accountsToFetch.Add(bankAccount.ExternalId!, bankAccount.Currency == null);
             }
         }
         else
         {
-            var authRequests = dbContext.AuthenticationRequests
-                .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToList();
+            var authRequests = await dbContext.AuthenticationRequests
+                .Where(authenticationRequest => authenticationRequest.Source == DataSource.GoCardless)
+                .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToListAsync();
 
             // An account can be linked to multiple active authentication requests
             var accountIdsIncludeMetadataPairs = authRequests
                 .Where(authenticationRequest => authenticationRequest.IsActive(timeProvider.GetUtcNow().UtcDateTime))
                 .SelectMany(authenticationRequest => authenticationRequest.AssociatedAccounts)
-                .Select(acc => (internalId: acc.Id, id: acc.ThirdPartyId, includeMetadata: acc.Currency == null))
+                .Select(acc => (internalId: acc.Id, id: acc.ExternalId!, includeMetadata: acc.Currency == null))
                 .DistinctBy(pair => pair.id);
 
             foreach (var pair in accountIdsIncludeMetadataPairs)
@@ -165,35 +150,36 @@ public class BankAccountSyncHandler(
     /// that were added or updated in the database.</returns>
     private async Task<List<BankAccount>> AddOrUpdateBankAccounts(List<BankAccount> bankAccounts)
     {
-        var accountIds = bankAccounts.Select(account => account.ThirdPartyId).Distinct().ToList();
+        var accountIds = bankAccounts.Select(account => account.ExternalId!).Distinct().ToList();
         var existingAccounts = await dbContext.BankAccounts
             .Include(account => account.AssociatedAuthenticationRequests)
             .Include(account => account.AssociatedInstitution)
-            .Where(account => accountIds.Contains(account.ThirdPartyId))
-            .ToDictionaryAsync(account => account.ThirdPartyId);
+            .Where(account => account.Source == DataSource.GoCardless && accountIds.Contains(account.ExternalId!))
+            .ToDictionaryAsync(account => account.ExternalId!);
 
         var requestIds = bankAccounts
             .SelectMany(account => account.AssociatedAuthenticationRequests)
-            .Select(request => request.ThirdPartyId)
+            .Select(request => request.ExternalId!)
             .Distinct()
             .ToList();
         var trackedRequests = await dbContext.AuthenticationRequests
-            .Where(request => requestIds.Contains(request.ThirdPartyId))
-            .ToDictionaryAsync(request => request.ThirdPartyId);
+            .Where(request => request.Source == DataSource.GoCardless && requestIds.Contains(request.ExternalId!))
+            .ToDictionaryAsync(request => request.ExternalId!);
 
         var institutionIds = bankAccounts
-            .Select(account => account.AssociatedInstitution?.ThirdPartyId)
+            .Select(account => account.AssociatedInstitution?.ExternalId)
             .OfType<string>()
             .Distinct()
             .ToList();
         var trackedInstitutions = await dbContext.BankingInstitutions
-            .Where(institution => institutionIds.Contains(institution.ThirdPartyId))
-            .ToDictionaryAsync(institution => institution.ThirdPartyId);
+            .Where(institution =>
+                institution.Source == DataSource.GoCardless && institutionIds.Contains(institution.ExternalId!))
+            .ToDictionaryAsync(institution => institution.ExternalId!);
 
         var updatedBankAccounts = new List<BankAccount>();
         foreach (var updatedBankAccount in bankAccounts)
         {
-            if (existingAccounts.TryGetValue(updatedBankAccount.ThirdPartyId, out var existingBankAccount))
+            if (existingAccounts.TryGetValue(updatedBankAccount.ExternalId!, out var existingBankAccount))
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
                 logger.LogInformation(
@@ -204,7 +190,7 @@ public class BankAccountSyncHandler(
             {
                 existingBankAccount = BankAccount.CreateWithoutNavigationProperties(updatedBankAccount);
                 dbContext.BankAccounts.Add(existingBankAccount);
-                existingAccounts[existingBankAccount.ThirdPartyId] = existingBankAccount;
+                existingAccounts[existingBankAccount.ExternalId!] = existingBankAccount;
             }
 
             UpdateAssociatedAuthenticationRequests(updatedBankAccount, existingBankAccount, trackedRequests);
@@ -225,19 +211,19 @@ public class BankAccountSyncHandler(
     /// <param name="trackedRequests">The authentication requests already in the database, keyed by their third party id.
     /// Newly added requests are added to it.</param>
     private void UpdateAssociatedAuthenticationRequests(BankAccount updatedBankAccount,
-        BankAccount existingBankAccount, Dictionary<Guid, AuthenticationRequest> trackedRequests)
+        BankAccount existingBankAccount, Dictionary<string, AuthenticationRequest> trackedRequests)
     {
         foreach (var request in updatedBankAccount.AssociatedAuthenticationRequests)
         {
-            if (!trackedRequests.TryGetValue(request.ThirdPartyId, out var trackedRequest))
+            if (!trackedRequests.TryGetValue(request.ExternalId!, out var trackedRequest))
             {
                 trackedRequest = request;
                 dbContext.AuthenticationRequests.Add(trackedRequest);
-                trackedRequests[trackedRequest.ThirdPartyId] = trackedRequest;
+                trackedRequests[trackedRequest.ExternalId!] = trackedRequest;
             }
 
             var associationDoesNotExistYet = existingBankAccount.AssociatedAuthenticationRequests
-                .All(existingRequest => existingRequest.ThirdPartyId != trackedRequest.ThirdPartyId);
+                .All(existingRequest => existingRequest.ExternalId != trackedRequest.ExternalId);
             if (associationDoesNotExistYet)
             {
                 existingBankAccount.AssociatedAuthenticationRequests.Add(trackedRequest);
@@ -259,11 +245,11 @@ public class BankAccountSyncHandler(
         if (institution == null)
             return;
 
-        if (!trackedInstitutions.TryGetValue(institution.ThirdPartyId, out var trackedInstitution))
+        if (!trackedInstitutions.TryGetValue(institution.ExternalId!, out var trackedInstitution))
         {
             trackedInstitution = institution;
             dbContext.BankingInstitutions.Add(trackedInstitution);
-            trackedInstitutions[trackedInstitution.ThirdPartyId] = trackedInstitution;
+            trackedInstitutions[trackedInstitution.ExternalId!] = trackedInstitution;
         }
 
         existingBankAccount.AssociatedInstitution = trackedInstitution;

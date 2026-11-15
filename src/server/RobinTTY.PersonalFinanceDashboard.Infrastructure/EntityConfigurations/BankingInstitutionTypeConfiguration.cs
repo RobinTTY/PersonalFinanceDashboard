@@ -8,9 +8,6 @@ public class BankingInstitutionTypeConfiguration : IEntityTypeConfiguration<Bank
 {
     public void Configure(EntityTypeBuilder<BankingInstitution> builder)
     {
-        // Manually created institutions have an empty third party id and are excluded
-        builder.HasIndex(entity => entity.ThirdPartyId)
-            .IsUnique()
-            .HasFilter($"\"{nameof(BankingInstitution.ThirdPartyId)}\" <> ''");
+        builder.ConfigureSource();
     }
 }

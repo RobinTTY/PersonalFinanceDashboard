@@ -15,14 +15,30 @@ public class TransactionSyncHandler(
 {
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {
+        List<(Guid Id, string ExternalId)> accounts;
+        if (internalAccountId.HasValue)
+        {
+            var account = await dbContext.BankAccounts.SingleOrDefaultAsync(a => a.Id == internalAccountId);
+            if (account == null)
+            {
+                logger.LogWarning("Bank account with id {accountId} does not exist.", internalAccountId);
+                return false;
+            }
+
+            if (account.Source != DataSource.GoCardless)
+                return true;
+
+            accounts = [(internalAccountId.Value, account.ExternalId!)];
+        }
+        else
+        {
+            accounts = await GetActiveAccounts();
+        }
+
         var transactions = new List<Transaction>();
         var syncedAccountIds = new List<Guid>();
 
-        var accountIds = internalAccountId.HasValue
-            ? [internalAccountId.Value]
-            : GetActiveAccountIds();
-
-        foreach (var accountId in accountIds)
+        foreach (var (accountId, externalAccountId) in accounts)
         {
             var dataIsStale =
                 await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.Transactions, accountId);
@@ -34,7 +50,7 @@ public class TransactionSyncHandler(
                 continue;
             }
 
-            var transactionsForAccount = await FetchTransactionsForAccount(accountId);
+            var transactionsForAccount = await FetchTransactionsForAccount(accountId, externalAccountId);
             if (transactionsForAccount == null)
             {
                 // Only the explicitly-requested single account aborts the whole sync on failure.
@@ -66,28 +82,25 @@ public class TransactionSyncHandler(
         return true;
     }
 
-    private List<Guid> GetActiveAccountIds()
+    private async Task<List<(Guid Id, string ExternalId)>> GetActiveAccounts()
     {
         var validSince = timeProvider.GetUtcNow().UtcDateTime.AddDays(-90);
 
-        return dbContext.BankAccounts
-            .Where(account => account.AssociatedAuthenticationRequests.Any(request =>
-                request.Status == AuthenticationStatus.Active &&
-                request.CreatedAt > validSince))
-            .Select(account => account.Id)
-            .Where(id => id.HasValue)
-            .Cast<Guid>()
-            .ToList();
+        var accounts = await dbContext.BankAccounts
+            .Where(account => account.Source == DataSource.GoCardless &&
+                              account.AssociatedAuthenticationRequests.Any(request =>
+                                  request.Status == AuthenticationStatus.Active &&
+                                  request.CreatedAt > validSince))
+            .Select(account => new { account.Id, account.ExternalId })
+            .ToListAsync();
+
+        return accounts.Select(account => (account.Id!.Value, account.ExternalId!)).ToList();
     }
 
-    private async Task<List<Transaction>?> FetchTransactionsForAccount(Guid internalAccountId)
+    private async Task<List<Transaction>?> FetchTransactionsForAccount(Guid internalAccountId,
+        string externalAccountId)
     {
-        var thirdPartyAccountId =
-            dbContext.BankAccounts.SingleOrDefault(account => account.Id == internalAccountId)?.ThirdPartyId;
-        if (thirdPartyAccountId == null)
-            return null;
-
-        var response = await dataProvider.GetTransactions(thirdPartyAccountId.Value);
+        var response = await dataProvider.GetTransactions(externalAccountId);
         if (!response.IsSuccessful)
         {
             logger.LogWarning(
@@ -102,34 +115,36 @@ public class TransactionSyncHandler(
     private async Task AddOrUpdateTransactions(List<Transaction> updatedTransactions)
     {
         var accountIds = updatedTransactions
-            .Select(transaction => transaction.BankAccount?.ThirdPartyId)
-            .OfType<Guid>()
+            .Select(transaction => transaction.BankAccount?.ExternalId)
+            .OfType<string>()
             .Distinct()
             .ToList();
         var accounts = await dbContext.BankAccounts
-            .Where(account => accountIds.Contains(account.ThirdPartyId))
-            .ToDictionaryAsync(account => account.ThirdPartyId);
+            .Where(account => account.Source == DataSource.GoCardless && accountIds.Contains(account.ExternalId!))
+            .ToDictionaryAsync(account => account.ExternalId!);
 
         // Keyed like the unique index, since third party ids are only unique per account
-        var transactionIds = updatedTransactions.Select(transaction => transaction.ThirdPartyId).Distinct().ToList();
+        var transactionIds = updatedTransactions.Select(transaction => transaction.ExternalId!).Distinct().ToList();
         var existingTransactions = await dbContext.Transactions
             .Include(transaction => transaction.BankAccount)
-            .Where(transaction => transactionIds.Contains(transaction.ThirdPartyId) &&
+            .Where(transaction => transaction.Source == DataSource.GoCardless &&
+                                  transactionIds.Contains(transaction.ExternalId!) &&
                                   transaction.BankAccount != null &&
-                                  accountIds.Contains(transaction.BankAccount.ThirdPartyId))
-            .ToDictionaryAsync(transaction => (transaction.BankAccount!.ThirdPartyId, transaction.ThirdPartyId));
+                                  transaction.BankAccount.Source == DataSource.GoCardless &&
+                                  accountIds.Contains(transaction.BankAccount.ExternalId!))
+            .ToDictionaryAsync(transaction => (transaction.BankAccount!.ExternalId!, transaction.ExternalId!));
 
         foreach (var updatedTransaction in updatedTransactions)
         {
             if (updatedTransaction.BankAccount == null ||
-                !accounts.TryGetValue(updatedTransaction.BankAccount.ThirdPartyId, out var account))
+                !accounts.TryGetValue(updatedTransaction.BankAccount.ExternalId!, out var account))
             {
                 logger.LogWarning("Skipping transaction {transactionId} without a known bank account.",
-                    updatedTransaction.ThirdPartyId);
+                    updatedTransaction.ExternalId);
                 continue;
             }
 
-            var key = (account.ThirdPartyId, updatedTransaction.ThirdPartyId);
+            var key = (account.ExternalId!, updatedTransaction.ExternalId!);
             if (existingTransactions.TryGetValue(key, out var existingTransaction))
             {
                 // TODO: Do we ever expect transactions to change after they have been retrieved?

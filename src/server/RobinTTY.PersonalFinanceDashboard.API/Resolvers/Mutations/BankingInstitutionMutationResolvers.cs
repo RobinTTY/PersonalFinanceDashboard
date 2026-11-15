@@ -21,9 +21,8 @@ public class BankingInstitutionMutationResolvers
     public async Task<BankingInstitution> CreateBankingInstitution(BankingInstitutionRepository repository,
         CreateBankingInstitutionInput input)
     {
-        // Manually created institutions have no third party id
-        var bankingInstitution =
-            new BankingInstitution(string.Empty, input.Bic, input.Name, input.LogoUri, input.Countries);
+        var bankingInstitution = new BankingInstitution(DataSource.Manual, null, input.Bic, input.Name, input.LogoUri,
+            input.Countries);
         return await repository.AddBankingInstitution(bankingInstitution);
     }
 

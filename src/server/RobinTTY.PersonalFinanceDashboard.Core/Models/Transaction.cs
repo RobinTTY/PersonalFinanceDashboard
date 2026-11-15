@@ -5,7 +5,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 /// <summary>
 /// A transaction represents a monetary exchange between 2 parties.
 /// </summary>
-public class Transaction : ThirdPartyEntity
+public class Transaction : SourcedEntity
 {
     /// <summary>
     /// The id of the transaction provided by the banking institution.
@@ -77,7 +77,8 @@ public class Transaction : ThirdPartyEntity
     /// <summary>
     /// Creates a new instance of <see cref="Transaction"/>.
     /// </summary>
-    /// <param name="thirdPartyId">The id of the transaction provided by the third party data provider.</param>
+    /// <param name="source">Where the transaction originates from.</param>
+    /// <param name="externalId">The id the data source assigned to the transaction, <see langword="null"/> for manual transactions.</param>
     /// <param name="bankTransactionId">The id of the transaction provided by the third party data retrieval service.</param>
     /// <param name="valueDate">Date at which the transaction amount becomes available to the payee.</param>
     /// <param name="payer">The name of the party which owes the money.</param>
@@ -88,11 +89,10 @@ public class Transaction : ThirdPartyEntity
     /// <param name="notes">User created notes for this transaction.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain subcategories).</param>
     /// <param name="bankAccount">The bank account associated with the transaction, representing the source or destination of funds.</param>
-    public Transaction(Guid thirdPartyId, string? bankTransactionId, DateTime? valueDate, string? payer, string? payee,
-        decimal amount,
-        string currency, string category, string notes, List<Tag> tags, BankAccount? bankAccount)
+    public Transaction(DataSource source, string? externalId, string? bankTransactionId, DateTime? valueDate,
+        string? payer, string? payee, decimal amount, string currency, string category, string notes, List<Tag> tags,
+        BankAccount? bankAccount) : base(source, externalId)
     {
-        ThirdPartyId = thirdPartyId;
         BankTransactionId = bankTransactionId;
         ValueDate = valueDate;
         Payer = payer;
@@ -112,7 +112,8 @@ public class Transaction : ThirdPartyEntity
     /// <returns>New instance of <see cref="Transaction"/> without navigation properties set.</returns>
     public static Transaction CreateWithoutNavigationProperties(Transaction transaction)
     {
-        return new Transaction(transaction.ThirdPartyId, transaction.BankTransactionId, transaction.ValueDate,
+        return new Transaction(transaction.Source, transaction.ExternalId, transaction.BankTransactionId,
+            transaction.ValueDate,
             transaction.Payer, transaction.Payee, transaction.Amount, transaction.Currency, transaction.Category,
             transaction.Notes, [], null);
     }

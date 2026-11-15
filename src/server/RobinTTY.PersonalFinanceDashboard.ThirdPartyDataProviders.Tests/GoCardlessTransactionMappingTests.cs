@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using NordigenTransaction = RobinTTY.NordigenApiClient.Models.Responses.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Tests;
@@ -106,11 +107,23 @@ public class GoCardlessTransactionMappingTests
 
         Assert.Equal("Jane Doe", mapped.Payer);
         Assert.Equal("Corner Shop", mapped.Payee);
-        Assert.Equal(AccountId, mapped.BankAccount?.ThirdPartyId);
+        Assert.Equal(AccountId.ToString(), mapped.BankAccount?.ExternalId);
+    }
+
+    [Fact]
+    public void MappedTransactions_AreFromGoCardlessWithLowercaseIds()
+    {
+        var transaction = CreateTransaction(internalTransactionId: "A9A6B2F4-1C2D-4E5F-8A9B-0C1D2E3F4A5B");
+
+        var mapped = new[] { transaction }.ToTransactions(AccountId).Single();
+
+        Assert.Equal(DataSource.GoCardless, mapped.Source);
+        Assert.Equal("a9a6b2f4-1c2d-4e5f-8a9b-0c1d2e3f4a5b", mapped.ExternalId);
+        Assert.Equal(DataSource.GoCardless, mapped.BankAccount?.Source);
     }
 
     private static List<Guid> Map(Guid accountId, params NordigenTransaction[] transactions) =>
-        transactions.ToTransactions(accountId).Select(transaction => transaction.ThirdPartyId).ToList();
+        transactions.ToTransactions(accountId).Select(transaction => Guid.Parse(transaction.ExternalId!)).ToList();
 
     /// <summary>
     /// Creates a transaction the way the API client would, by deserializing a GoCardless response.

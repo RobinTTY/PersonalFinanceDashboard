@@ -26,7 +26,7 @@ public class AuthenticationRequestRepositoryTests : IDisposable
             Assert.True(response.IsSuccessful);
         }
 
-        Assert.Equal(RequestId, (await GetRequests()).Single().ThirdPartyId);
+        Assert.Equal(RequestId.ToString(), (await GetRequests()).Single().ExternalId);
     }
 
     [Fact]

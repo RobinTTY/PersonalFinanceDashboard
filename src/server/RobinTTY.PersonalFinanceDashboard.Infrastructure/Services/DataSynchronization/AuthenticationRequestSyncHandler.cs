@@ -17,19 +17,19 @@ public class AuthenticationRequestSyncHandler(
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.AuthenticationRequests);
         if (dataIsStale || forceThirdPartySync)
         {
-            Guid? thirdPartyId = null;
+            string? externalId = null;
             if (authenticationRequestId.HasValue)
             {
-                thirdPartyId = dbContext.AuthenticationRequests
-                    .SingleOrDefault(authRequest => authRequest.Id == authenticationRequestId)?.ThirdPartyId;
-                if (thirdPartyId == null)
+                externalId = (await dbContext.AuthenticationRequests
+                    .SingleOrDefaultAsync(authRequest => authRequest.Id == authenticationRequestId))?.ExternalId;
+                if (externalId == null)
                 {
                     logger.LogWarning("Authentication request with id {id} does not exist.", authenticationRequestId);
                     return false;
                 }
             }
 
-            var authenticationRequests = await GetAuthenticationRequests(thirdPartyId);
+            var authenticationRequests = await GetAuthenticationRequests(externalId);
             if (authenticationRequests == null)
             {
                 return false;
@@ -37,7 +37,7 @@ public class AuthenticationRequestSyncHandler(
 
             var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(authenticationRequests);
             var numOfRemovedAuthRequests = 0;
-            if (!thirdPartyId.HasValue)
+            if (externalId == null)
             {
                 numOfRemovedAuthRequests = await RemoveNotIncludedAuthenticationRequests(authenticationRequests);
                 await dataRetrievalMetadataService.ResetDataExpiry(ThirdPartyDataType.AuthenticationRequests);
@@ -54,13 +54,13 @@ public class AuthenticationRequestSyncHandler(
         return true;
     }
 
-    private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests(Guid? authenticationRequestId)
+    private async Task<List<AuthenticationRequest>?> GetAuthenticationRequests(string? externalId)
     {
         List<AuthenticationRequest>? authRequests = null;
 
-        if (authenticationRequestId.HasValue)
+        if (externalId != null)
         {
-            var response = await dataProvider.GetAuthenticationRequest(authenticationRequestId.Value);
+            var response = await dataProvider.GetAuthenticationRequest(externalId);
             if (response.IsSuccessful)
                 authRequests = [response.Result];
         }
@@ -81,26 +81,26 @@ public class AuthenticationRequestSyncHandler(
     /// <returns>The number of newly added authentication requests.</returns>
     private async Task<int> AddOrUpdateAuthenticationRequests(params List<AuthenticationRequest> authenticationRequests)
     {
-        var requestIds = authenticationRequests.Select(request => request.ThirdPartyId).Distinct().ToList();
+        var requestIds = authenticationRequests.Select(request => request.ExternalId!).Distinct().ToList();
         var existingRequests = await dbContext.AuthenticationRequests
             .Include(request => request.AssociatedAccounts)
-            .Where(request => requestIds.Contains(request.ThirdPartyId))
-            .ToDictionaryAsync(request => request.ThirdPartyId);
+            .Where(request => request.Source == DataSource.GoCardless && requestIds.Contains(request.ExternalId!))
+            .ToDictionaryAsync(request => request.ExternalId!);
 
         // An account can belong to multiple requests (e.g. after renewing consent), so it's only looked up once
         var accountIds = authenticationRequests
             .SelectMany(request => request.AssociatedAccounts)
-            .Select(account => account.ThirdPartyId)
+            .Select(account => account.ExternalId!)
             .Distinct()
             .ToList();
         var trackedAccounts = await dbContext.BankAccounts
-            .Where(account => accountIds.Contains(account.ThirdPartyId))
-            .ToDictionaryAsync(account => account.ThirdPartyId);
+            .Where(account => account.Source == DataSource.GoCardless && accountIds.Contains(account.ExternalId!))
+            .ToDictionaryAsync(account => account.ExternalId!);
 
         var numOfAddedAuthRequests = 0;
         foreach (var updatedAuthenticationRequest in authenticationRequests)
         {
-            if (existingRequests.TryGetValue(updatedAuthenticationRequest.ThirdPartyId, out var existingRequest))
+            if (existingRequests.TryGetValue(updatedAuthenticationRequest.ExternalId!, out var existingRequest))
             {
                 existingRequest.Status = updatedAuthenticationRequest.Status;
                 existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
@@ -110,7 +110,7 @@ public class AuthenticationRequestSyncHandler(
                 existingRequest =
                     AuthenticationRequest.CreateWithoutNavigationProperties(updatedAuthenticationRequest);
                 dbContext.AuthenticationRequests.Add(existingRequest);
-                existingRequests[existingRequest.ThirdPartyId] = existingRequest;
+                existingRequests[existingRequest.ExternalId!] = existingRequest;
 
                 numOfAddedAuthRequests++;
             }
@@ -124,20 +124,20 @@ public class AuthenticationRequestSyncHandler(
     }
 
     private void UpdateAssociatedBankAccounts(AuthenticationRequest updatedAuthenticationRequest,
-        AuthenticationRequest existingRequest, Dictionary<Guid, BankAccount> trackedAccounts)
+        AuthenticationRequest existingRequest, Dictionary<string, BankAccount> trackedAccounts)
     {
         foreach (var account in updatedAuthenticationRequest.AssociatedAccounts)
         {
-            if (!trackedAccounts.TryGetValue(account.ThirdPartyId, out var trackedAccount))
+            if (!trackedAccounts.TryGetValue(account.ExternalId!, out var trackedAccount))
             {
                 trackedAccount = account;
                 dbContext.BankAccounts.Add(trackedAccount);
-                trackedAccounts[trackedAccount.ThirdPartyId] = trackedAccount;
+                trackedAccounts[trackedAccount.ExternalId!] = trackedAccount;
             }
 
             // If the account is already tracked, check first if the existing authentication request already contains the association
             var associationDoesNotExistYet = existingRequest.AssociatedAccounts
-                .All(bankAccount => bankAccount.ThirdPartyId != trackedAccount.ThirdPartyId);
+                .All(bankAccount => bankAccount.ExternalId != trackedAccount.ExternalId);
             if (associationDoesNotExistYet)
             {
                 existingRequest.AssociatedAccounts.Add(trackedAccount);
@@ -154,10 +154,10 @@ public class AuthenticationRequestSyncHandler(
     /// <returns>The number of removed authentication requests.</returns>
     private async Task<int> RemoveNotIncludedAuthenticationRequests(List<AuthenticationRequest> authenticationRequests)
     {
-        var thirdPartyIds = authenticationRequests.Select(req => req.ThirdPartyId).ToList();
+        var externalIds = authenticationRequests.Select(req => req.ExternalId!).ToList();
 
         return await dbContext.AuthenticationRequests
-            .Where(req => !thirdPartyIds.Contains(req.ThirdPartyId))
+            .Where(req => req.Source == DataSource.GoCardless && !externalIds.Contains(req.ExternalId!))
             .ExecuteDeleteAsync();
     }
 

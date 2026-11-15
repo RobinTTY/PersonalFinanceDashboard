@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { GetBankingInstitutions } from '@graphql-queries/GetBankingInstitutions';
+import { DataSource } from '@graphql-types/graphql';
 import { IconSearch } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Group, Loader, Stack, Text, TextInput } from '@mantine/core';
@@ -28,7 +29,11 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
     variables: { first: 3000 },
   });
 
-  const banks = data?.bankingInstitutions?.edges?.map((edge) => edge.node) ?? [];
+  // Only GoCardless institutions can be authenticated with, manually created ones are skipped
+  const banks =
+    data?.bankingInstitutions?.edges
+      ?.map((edge) => edge.node)
+      .filter((bank) => bank.source === DataSource.GoCardless && bank.externalId != null) ?? [];
 
   const filteredBanks = banks
     .filter((bank) => bank.name.toLowerCase().includes(bankSearch.toLowerCase()))
@@ -81,7 +86,7 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                 }}
               >
                 {rowItems.map((bank) => {
-                  const bankId = String(bank.thirdPartyId);
+                  const bankId = String(bank.externalId);
                   const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
                   const countries = bank.countries ?? [];
                   const visibleCountries = countries.slice(0, MAX_VISIBLE_COUNTRIES);

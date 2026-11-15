@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Core.Models.Base;
 using BankAccount = RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount;
 using NordigenBankAccount = RobinTTY.NordigenApiClient.Models.Responses.BankAccount;
 using NordigenTransaction = RobinTTY.NordigenApiClient.Models.Responses.Transaction;
@@ -12,6 +13,11 @@ namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 public static class GoCardlessTypeExtensions
 {
+    /// <summary>
+    /// Converts a GoCardless id to the format stored as <see cref="SourcedEntity.ExternalId"/>.
+    /// </summary>
+    public static string ToExternalId(this Guid goCardlessId) => goCardlessId.ToString("D");
+
     /// <summary>
     /// Maps a <see cref="NordigenApiResponse{TResult,TError}"/> to a <see cref="ThirdPartyResponse{TResponse,TError}"/>,
     /// applying <paramref name="map"/> to the result only when the request was successful.
@@ -33,8 +39,8 @@ public static class GoCardlessTypeExtensions
     /// </summary>
     public static BankingInstitution ToBankingInstitution(this Institution institution)
     {
-        return new BankingInstitution(institution.Id, institution.Bic, institution.Name, institution.Logo,
-            institution.Countries);
+        return new BankingInstitution(DataSource.GoCardless, institution.Id, institution.Bic, institution.Name,
+            institution.Logo, institution.Countries);
     }
 
     /// <summary>
@@ -42,9 +48,11 @@ public static class GoCardlessTypeExtensions
     /// </summary>
     public static AuthenticationRequest ToAuthenticationRequest(this Requisition requisition)
     {
-        return new AuthenticationRequest(requisition.Id, requisition.Status.ToAuthenticationStatus(),
-            requisition.AuthenticationLink, requisition.Created,
-            requisition.Accounts.Select(accountId => new BankAccount(accountId)).ToList());
+        return new AuthenticationRequest(DataSource.GoCardless, requisition.Id.ToExternalId(),
+            requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink, requisition.Created,
+            requisition.Accounts
+                .Select(accountId => new BankAccount(DataSource.GoCardless, accountId.ToExternalId()))
+                .ToList());
     }
 
     /// <summary>
@@ -60,7 +68,8 @@ public static class GoCardlessTypeExtensions
     {
         return new BankAccount
         (
-            thirdPartyId: accountId,
+            source: DataSource.GoCardless,
+            externalId: accountId.ToExternalId(),
             accountType: accountDetails?.CashAccountType is { } cashAccountType
                 ? Enum.GetName(cashAccountType)
                 : null,
@@ -74,7 +83,8 @@ public static class GoCardlessTypeExtensions
             ownerName: accountDetails?.OwnerName,
             transactions: [],
             associatedInstitution: generalAccountInfo != null
-                ? new BankingInstitution { ThirdPartyId = generalAccountInfo.InstitutionId }
+                ? new BankingInstitution
+                    { Source = DataSource.GoCardless, ExternalId = generalAccountInfo.InstitutionId }
                 : null,
             associatedAuthenticationRequests: []);
     }
@@ -95,7 +105,7 @@ public static class GoCardlessTypeExtensions
 
     /// <summary>
     /// Maps the booked transactions of a GoCardless account to <see cref="Transaction"/>s, giving each one a
-    /// <see cref="Transaction.ThirdPartyId"/> that is stable across syncs.
+    /// <see cref="SourcedEntity.ExternalId"/> that is stable across syncs.
     /// </summary>
     /// <param name="transactions">The transactions as returned by GoCardless, in the order of the response.</param>
     /// <param name="goCardlessAccountId">The GoCardless id of the account the transactions belong to.</param>
@@ -109,14 +119,14 @@ public static class GoCardlessTypeExtensions
 
         return transactions.Select(transaction =>
         {
-            var thirdPartyId = GetTransactionId(transaction, goCardlessAccountId, contentOccurrences);
+            var externalId = GetTransactionId(transaction, goCardlessAccountId, contentOccurrences).ToExternalId();
             var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
 
             // The debtor sends the money (payer), the creditor receives it (payee)
-            return new Transaction(thirdPartyId, transaction.TransactionId, valueDate,
+            return new Transaction(DataSource.GoCardless, externalId, transaction.TransactionId, valueDate,
                 payer: transaction.DebtorName, payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
                 transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
-                new BankAccount { ThirdPartyId = goCardlessAccountId });
+                new BankAccount(DataSource.GoCardless, goCardlessAccountId.ToExternalId()));
         }).ToList();
     }
 

@@ -2,7 +2,10 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
-public class AuthenticationRequest : ThirdPartyEntity
+/// <summary>
+/// A request to access the accounts of a banking institution, which the user authenticates at the data source.
+/// </summary>
+public class AuthenticationRequest : SourcedEntity
 {
     /// <summary>
     /// The status of this authentication request.
@@ -29,7 +32,6 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// </summary>
     public AuthenticationRequest()
     {
-        ThirdPartyId = Guid.Empty;
         Status = AuthenticationStatus.Unknown;
         AuthenticationLink = new Uri("https://www.placeholder.example/");
         CreatedAt = DateTime.UtcNow;
@@ -39,14 +41,14 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// Required constructor for Ef Core.
     /// </summary>
-    /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
+    /// <param name="source">The data source the authentication request was made at.</param>
+    /// <param name="externalId">The id the data source assigned to the authentication request.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
-        DateTime createdAt)
+    public AuthenticationRequest(DataSource source, string externalId, AuthenticationStatus status,
+        Uri authenticationLink, DateTime createdAt) : base(source, externalId)
     {
-        ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
         CreatedAt = createdAt;
@@ -55,16 +57,15 @@ public class AuthenticationRequest : ThirdPartyEntity
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
     /// </summary>
-    /// <param name="thirdPartyId">The unique id assigned by the third party data retrieval service.</param>
+    /// <param name="source">The data source the authentication request was made at.</param>
+    /// <param name="externalId">The id the data source assigned to the authentication request.</param>
     /// <param name="status">The status of this authentication request.</param>
     /// <param name="authenticationLink">A <see cref="Uri"/> which can be used to start the authentication via the third party provider.</param>
     /// <param name="createdAt">The date when the authentication request was created. Usually authentication requests are valid for 90 days.</param>
     /// <param name="associatedAccounts">The ids of the accounts associated with this authentication request.</param>
-    public AuthenticationRequest(Guid thirdPartyId, AuthenticationStatus status, Uri authenticationLink,
-        DateTime createdAt,
-        List<BankAccount> associatedAccounts)
+    public AuthenticationRequest(DataSource source, string externalId, AuthenticationStatus status,
+        Uri authenticationLink, DateTime createdAt, List<BankAccount> associatedAccounts) : base(source, externalId)
     {
-        ThirdPartyId = thirdPartyId;
         Status = status;
         AuthenticationLink = authenticationLink;
         AssociatedAccounts = associatedAccounts;
@@ -73,7 +74,8 @@ public class AuthenticationRequest : ThirdPartyEntity
 
     public static AuthenticationRequest CreateWithoutNavigationProperties(AuthenticationRequest authenticationRequest)
     {
-        return new AuthenticationRequest(authenticationRequest.ThirdPartyId, authenticationRequest.Status,
+        return new AuthenticationRequest(authenticationRequest.Source, authenticationRequest.ExternalId!,
+            authenticationRequest.Status,
             authenticationRequest.AuthenticationLink, authenticationRequest.CreatedAt);
     }
 }

@@ -20,9 +20,8 @@ public class BankAccountMutationResolvers
     /// <param name="input">The banking account to create.</param>
     public async Task<BankAccount> CreateBankAccount(BankAccountRepository repository, CreateBankAccountInput input)
     {
-        // Manually created accounts have no third party id
-        var bankAccount = new BankAccount(Guid.Empty, input.Name, input.Description, input.Balance, input.Currency,
-            input.Iban, input.Bic, input.Bban, input.OwnerName, input.AccountType);
+        var bankAccount = new BankAccount(DataSource.Manual, null, input.Name, input.Description, input.Balance,
+            input.Currency, input.Iban, input.Bic, input.Bban, input.OwnerName, input.AccountType);
         return await repository.AddBankAccount(bankAccount);
     }
 

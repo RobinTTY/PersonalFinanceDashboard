@@ -39,13 +39,17 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     /// <summary>
     /// Gets an existing authentication request (requisitions).
     /// </summary>
-    /// <param name="requisitionId">The id of the requisition to be retrieved.</param>
+    /// <param name="requisitionId">The external id of the requisition to be retrieved.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>The <see cref="AuthenticationRequest"/> which matches the institutionId, as far as it exists.</returns>
     public async Task<ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>> GetAuthenticationRequest(
-        Guid requisitionId, CancellationToken cancellationToken = default)
+        string requisitionId, CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId, cancellationToken);
+        if (!Guid.TryParse(requisitionId, out var id))
+            return new ThirdPartyResponse<AuthenticationRequest?, BasicResponse?>(false, null,
+                InvalidId<BasicResponse>(requisitionId));
+
+        var response = await client.RequisitionsEndpoint.GetRequisition(id, cancellationToken);
         return response.ToThirdPartyResponse(requisition => requisition.ToAuthenticationRequest())!;
     }
 
@@ -110,9 +114,13 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     }
 
     public async Task<ThirdPartyResponse<BasicResponse, BasicResponse>> DeleteAuthenticationRequest(
-        Guid authenticationId, CancellationToken cancellationToken = default)
+        string authenticationId, CancellationToken cancellationToken = default)
     {
-        var response = await client.RequisitionsEndpoint.DeleteRequisition(authenticationId, cancellationToken);
+        if (!Guid.TryParse(authenticationId, out var id))
+            return new ThirdPartyResponse<BasicResponse, BasicResponse>(false, null,
+                InvalidId<BasicResponse>(authenticationId));
+
+        var response = await client.RequisitionsEndpoint.DeleteRequisition(id, cancellationToken);
         return new ThirdPartyResponse<BasicResponse, BasicResponse>(response.IsSuccess, response.Result,
             response.Error);
     }
@@ -120,11 +128,11 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     /// <summary>
     /// Gets bank accounts by their ids with per-account metadata inclusion control. This includes general account information, account details, and balances.
     /// </summary>
-    /// <param name="accountMetadataPreferences">A dictionary mapping account IDs to a boolean value indicating whether not to include account metadata during the fetch operation.</param>
+    /// <param name="accountMetadataPreferences">A dictionary mapping external account ids to a boolean value indicating whether to include account metadata during the fetch operation.</param>
     /// <param name="cancellationToken">An optional token to signal cancellation.</param>
     /// <returns>API responses containing the fetched bank accounts or in the case of failure, the error.</returns>
     public async Task<List<ThirdPartyResponse<BankAccount, AccountsError>>> GetBankAccounts(
-        IDictionary<Guid, bool> accountMetadataPreferences, CancellationToken cancellationToken = default)
+        IDictionary<string, bool> accountMetadataPreferences, CancellationToken cancellationToken = default)
     {
         var tasks = accountMetadataPreferences.Select(kvp => GetBankAccount(kvp.Key, kvp.Value, cancellationToken))
             .ToList();
@@ -133,9 +141,13 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         return tasks.Select(task => task.Result).ToList();
     }
 
-    private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(Guid accountId,
+    private async Task<ThirdPartyResponse<BankAccount, AccountsError>> GetBankAccount(string externalAccountId,
         bool includeMetadata, CancellationToken cancellationToken = default)
     {
+        if (!Guid.TryParse(externalAccountId, out var accountId))
+            return new ThirdPartyResponse<BankAccount, AccountsError>(false, null,
+                InvalidId<AccountsError>(externalAccountId));
+
         Task<NordigenApiResponse<NordigenApiClient.Models.Responses.BankAccount, BasicResponse>>?
             generalAccountInfoTask = null;
         Task<NordigenApiResponse<BankAccountDetails, AccountsError>>? accountDetailsTask = null;
@@ -212,8 +224,12 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
     }
 
     public async Task<ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>> GetTransactions(
-        Guid goCardlessAccountId, CancellationToken cancellationToken = default)
+        string externalAccountId, CancellationToken cancellationToken = default)
     {
+        if (!Guid.TryParse(externalAccountId, out var goCardlessAccountId))
+            return new ThirdPartyResponse<IEnumerable<Transaction>, AccountsError>(false, null,
+                InvalidId<AccountsError>(externalAccountId));
+
         var response =
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
 
@@ -221,4 +237,10 @@ public class GoCardlessDataProviderService(NordigenClient client, ILogger<GoCard
         return response.ToThirdPartyResponse(result =>
             result.BookedTransactions.ToTransactions(goCardlessAccountId).AsEnumerable());
     }
+
+    /// <summary>
+    /// Creates the error returned for an id that isn't a GoCardless id.
+    /// </summary>
+    private static TError InvalidId<TError>(string externalId) where TError : BasicResponse, new() =>
+        new() { Summary = "Invalid id.", Detail = $"\"{externalId}\" is not a valid GoCardless id." };
 }

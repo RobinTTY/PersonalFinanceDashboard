@@ -42,7 +42,7 @@ public class TransactionSyncHandlerTests : IDisposable
 
         var transactions = await GetTransactions(AccountId);
         Assert.Equal(2, transactions.Count);
-        Assert.Equal(-12m, transactions.Single(t => t.ThirdPartyId == TransactionId).Amount);
+        Assert.Equal(-12m, transactions.Single(t => t.ExternalId == TransactionId.ToString()).Amount);
     }
 
     [Fact]
@@ -62,9 +62,9 @@ public class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task SameThirdPartyIdInTwoAccounts_CreatesATransactionForEachAccount()
+    public async Task SameExternalIdInTwoAccounts_CreatesATransactionForEachAccount()
     {
-        // Third party ids are only unique per account
+        // External ids are only unique per account
         await SeedAccountsWithActiveRequest(AccountId, OtherAccountId);
         _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
         _env.GoCardless.Respond(TransactionsPath(OtherAccountId), Transactions((TransactionId, -20m)));
@@ -113,15 +113,26 @@ public class TransactionSyncHandlerTests : IDisposable
         Assert.Empty(await GetTransactions(OtherAccountId));
     }
 
+    [Fact]
+    public async Task ManualAccount_IsNotSynced()
+    {
+        var account = TestData.ManualAccount();
+        await _env.Seed(account);
+
+        Assert.True(await _env.SyncTransactions(account.Id, force: true));
+
+        Assert.Equal(0, _env.GoCardless.TotalRequestCount);
+    }
+
     private Task SeedAccountsWithActiveRequest(params Guid[] accountIds) =>
         _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1),
             accountIds.Select(id => TestData.Account(id)).ToArray()));
 
-    private async Task<List<Transaction>> GetTransactions(Guid accountThirdPartyId)
+    private async Task<List<Transaction>> GetTransactions(Guid accountExternalId)
     {
         await using var dbContext = _env.CreateDbContext();
         return await dbContext.Transactions
-            .Where(transaction => transaction.BankAccount!.ThirdPartyId == accountThirdPartyId)
+            .Where(transaction => transaction.BankAccount!.ExternalId == accountExternalId.ToString())
             .ToListAsync();
     }
 }

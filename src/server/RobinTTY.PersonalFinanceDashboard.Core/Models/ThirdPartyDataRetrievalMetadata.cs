@@ -12,7 +12,7 @@ public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
     /// <summary>
     /// The source of the data.
     /// </summary>
-    public required ThirdPartyDataSource DataSource { get; set; }
+    public required DataSource DataSource { get; set; }
 
     /// <summary>
     /// The <see cref="DateTime"/> at which the data was retrieved last.
@@ -31,14 +31,14 @@ public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
     /// retrieval times and intervals for different accounts.
     /// </summary>
     public Guid? SynchronizationEntityId { get; set; }
-    
-    public ThirdPartyDataRetrievalMetadata() 
+
+    public ThirdPartyDataRetrievalMetadata()
     {
     }
 
     public ThirdPartyDataRetrievalMetadata(Guid id,
         ThirdPartyDataType dataType,
-        ThirdPartyDataSource dataSource,
+        DataSource dataSource,
         DateTime lastRetrievalTime,
         TimeSpan retrievalInterval)
     {

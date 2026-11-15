@@ -18,7 +18,7 @@ public class BankingInstitutionSyncHandlerTests : IDisposable
 
         Assert.True(await _env.SyncBankingInstitutions());
 
-        Assert.Equal(["BANK_A", "BANK_B"], (await GetInstitutions()).Select(i => i.ThirdPartyId).Order());
+        Assert.Equal(["BANK_A", "BANK_B"], (await GetInstitutions()).Select(i => i.ExternalId).Order());
     }
 
     [Fact]
@@ -30,19 +30,19 @@ public class BankingInstitutionSyncHandlerTests : IDisposable
         await _env.SyncBankingInstitutions();
 
         var institutions = await GetInstitutions();
-        Assert.Equal(["BANK_A", "BANK_NEW"], institutions.Select(i => i.ThirdPartyId).Order());
-        Assert.Equal("Renamed Bank A", institutions.Single(i => i.ThirdPartyId == "BANK_A").Name);
+        Assert.Equal(["BANK_A", "BANK_NEW"], institutions.Select(i => i.ExternalId).Order());
+        Assert.Equal("Renamed Bank A", institutions.Single(i => i.ExternalId == "BANK_A").Name);
     }
 
     [Fact]
     public async Task ManuallyCreatedInstitutions_AreKept()
     {
-        await _env.Seed(TestData.Institution("BANK_A"), TestData.Institution(string.Empty));
+        await _env.Seed(TestData.Institution("BANK_A"), TestData.ManualInstitution());
         _env.GoCardless.Respond(InstitutionsPath, Institutions(("BANK_A", "Bank A")));
 
         await _env.SyncBankingInstitutions();
 
-        Assert.Contains(await GetInstitutions(), institution => institution.ThirdPartyId == string.Empty);
+        Assert.Contains(await GetInstitutions(), institution => institution.Source == DataSource.Manual);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class BankingInstitutionSyncHandlerTests : IDisposable
         await using var dbContext = _env.CreateDbContext();
         var storedAccount = await dbContext.BankAccounts.Include(a => a.AssociatedInstitution).SingleAsync();
         Assert.Null(storedAccount.AssociatedInstitution);
-        Assert.DoesNotContain(await GetInstitutions(), institution => institution.ThirdPartyId == "BANK_OLD");
+        Assert.DoesNotContain(await GetInstitutions(), institution => institution.ExternalId == "BANK_OLD");
     }
 
     [Fact]

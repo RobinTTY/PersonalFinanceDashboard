@@ -12,7 +12,9 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
   DateTime: { input: Date; output: Date; }
+  /** The `Decimal` scalar type represents a decimal floating-point number. */
   Decimal: { input: number; output: number; }
   URL: { input: unknown; output: unknown; }
   UUID: { input: unknown; output: unknown; }
@@ -23,9 +25,10 @@ export type AuthenticationRequest = {
   associatedAccounts: Array<BankAccount>;
   authenticationLink: Scalars['URL']['output'];
   createdAt: Scalars['DateTime']['output'];
+  externalId: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
+  source: DataSource;
   status: AuthenticationStatus;
-  thirdPartyId: Scalars['UUID']['output'];
 };
 
 export type AuthenticationRequestFilterInput = {
@@ -33,10 +36,11 @@ export type AuthenticationRequestFilterInput = {
   associatedAccounts?: InputMaybe<ListFilterInputTypeOfBankAccountFilterInput>;
   authenticationLink?: InputMaybe<UrlOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  externalId?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   or?: InputMaybe<Array<AuthenticationRequestFilterInput>>;
+  source?: InputMaybe<DataSourceOperationFilterInput>;
   status?: InputMaybe<AuthenticationStatusOperationFilterInput>;
-  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
 };
 
 export enum AuthenticationStatus {
@@ -65,12 +69,13 @@ export type BankAccount = {
   bic: Maybe<Scalars['String']['output']>;
   currency: Maybe<Scalars['String']['output']>;
   description: Maybe<Scalars['String']['output']>;
+  externalId: Maybe<Scalars['String']['output']>;
   iban: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
   includeInAnalytics: Scalars['Boolean']['output'];
   name: Maybe<Scalars['String']['output']>;
   ownerName: Maybe<Scalars['String']['output']>;
-  thirdPartyId: Scalars['UUID']['output'];
+  source: DataSource;
   transactions: Array<Transaction>;
 };
 
@@ -84,13 +89,14 @@ export type BankAccountFilterInput = {
   bic?: InputMaybe<StringOperationFilterInput>;
   currency?: InputMaybe<StringOperationFilterInput>;
   description?: InputMaybe<StringOperationFilterInput>;
+  externalId?: InputMaybe<StringOperationFilterInput>;
   iban?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   includeInAnalytics?: InputMaybe<BooleanOperationFilterInput>;
   name?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<BankAccountFilterInput>>;
   ownerName?: InputMaybe<StringOperationFilterInput>;
-  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
+  source?: InputMaybe<DataSourceOperationFilterInput>;
   transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
 };
 
@@ -118,21 +124,23 @@ export type BankingInstitution = {
   __typename: 'BankingInstitution';
   bic: Scalars['String']['output'];
   countries: Array<Scalars['String']['output']>;
+  externalId: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
   logoUri: Scalars['URL']['output'];
   name: Scalars['String']['output'];
-  thirdPartyId: Scalars['String']['output'];
+  source: DataSource;
 };
 
 export type BankingInstitutionFilterInput = {
   and?: InputMaybe<Array<BankingInstitutionFilterInput>>;
   bic?: InputMaybe<StringOperationFilterInput>;
   countries?: InputMaybe<ListStringOperationFilterInput>;
+  externalId?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   logoUri?: InputMaybe<UrlOperationFilterInput>;
   name?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<BankingInstitutionFilterInput>>;
-  thirdPartyId?: InputMaybe<StringOperationFilterInput>;
+  source?: InputMaybe<DataSourceOperationFilterInput>;
 };
 
 /** A connection to a list of items. */
@@ -242,6 +250,18 @@ export type CreateTransactionInput = {
 export type CreateTransactionPayload = {
   __typename: 'CreateTransactionPayload';
   transaction: Maybe<Transaction>;
+};
+
+export enum DataSource {
+  GoCardless = 'GO_CARDLESS',
+  Manual = 'MANUAL'
+}
+
+export type DataSourceOperationFilterInput = {
+  eq?: InputMaybe<DataSource>;
+  in?: InputMaybe<Array<DataSource>>;
+  neq?: InputMaybe<DataSource>;
+  nin?: InputMaybe<Array<DataSource>>;
 };
 
 export type DateTimeOperationFilterInput = {
@@ -654,12 +674,13 @@ export type Transaction = {
   bankTransactionId: Maybe<Scalars['String']['output']>;
   category: Scalars['String']['output'];
   currency: Scalars['String']['output'];
+  externalId: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
   notes: Scalars['String']['output'];
   payee: Maybe<Scalars['String']['output']>;
   payer: Maybe<Scalars['String']['output']>;
+  source: DataSource;
   tags: Array<Tag>;
-  thirdPartyId: Scalars['UUID']['output'];
   valueDate: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -670,13 +691,14 @@ export type TransactionFilterInput = {
   bankTransactionId?: InputMaybe<StringOperationFilterInput>;
   category?: InputMaybe<StringOperationFilterInput>;
   currency?: InputMaybe<StringOperationFilterInput>;
+  externalId?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   notes?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<TransactionFilterInput>>;
   payee?: InputMaybe<StringOperationFilterInput>;
   payer?: InputMaybe<StringOperationFilterInput>;
+  source?: InputMaybe<DataSourceOperationFilterInput>;
   tags?: InputMaybe<ListFilterInputTypeOfTagFilterInput>;
-  thirdPartyId?: InputMaybe<UuidOperationFilterInput>;
   valueDate?: InputMaybe<DateTimeOperationFilterInput>;
 };
 
@@ -779,7 +801,7 @@ export type UuidOperationFilterInput = {
   nlte?: InputMaybe<Scalars['UUID']['input']>;
 };
 
-export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
+export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> };
 
 export type BankAccountDetailsFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null };
 
@@ -793,7 +815,7 @@ export type CreateAuthenticationRequestMutationVariables = Exact<{
 }>;
 
 
-export type CreateAuthenticationRequestMutation = { createAuthenticationRequest: { __typename: 'CreateAuthenticationRequestPayload', authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null } };
+export type CreateAuthenticationRequestMutation = { createAuthenticationRequest: { __typename: 'CreateAuthenticationRequestPayload', authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null } };
 
 export type DeleteAuthenticationRequestMutationVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
@@ -815,19 +837,19 @@ export type GetAuthRequestWithAccountsQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
+export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> } | null };
 
 export type GetAuthRequestsWithAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, thirdPartyId: unknown, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> }> };
+export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null }> }> };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];
 }>;
 
 
-export type GetAuthenticationRequestQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, thirdPartyId: unknown, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null };
+export type GetAuthenticationRequestQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null }> } | null };
 
 export type GetBankAccountQueryVariables = Exact<{
   accountId: Scalars['UUID']['input'];
@@ -847,7 +869,7 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
 }>;
 
 
-export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, thirdPartyId: string, name: string, bic: string, logoUri: unknown, countries: Array<string> } }> | null } | null };
+export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, source: DataSource, externalId: string | null, name: string, bic: string, logoUri: unknown, countries: Array<string> } }> | null } | null };
 
 export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

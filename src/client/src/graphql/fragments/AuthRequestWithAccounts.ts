@@ -4,13 +4,13 @@ import { AuthRequestWithAccountsFragment } from '../types/graphql';
 export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsFragment> = gql`
   fragment AuthRequestWithAccounts on AuthenticationRequest {
     id
-    thirdPartyId
+    externalId
     status
     authenticationLink
     createdAt
     associatedAccounts {
       id
-      thirdPartyId
+      externalId
       iban
       name
       description

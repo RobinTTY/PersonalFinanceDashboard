@@ -41,10 +41,10 @@ public class BankAccountSyncHandlerTests : IDisposable
         var account = await GetAccount();
         Assert.Equal("EUR", account.Currency);
         Assert.Equal("Giro account", account.Name);
-        Assert.Equal(InstitutionId, account.AssociatedInstitution?.ThirdPartyId);
+        Assert.Equal(InstitutionId, account.AssociatedInstitution?.ExternalId);
 
         await using var dbContext = _env.CreateDbContext();
-        Assert.Equal(1, await dbContext.BankingInstitutions.CountAsync(i => i.ThirdPartyId == InstitutionId));
+        Assert.Equal(1, await dbContext.BankingInstitutions.CountAsync(i => i.ExternalId == InstitutionId));
     }
 
     [Fact]
@@ -71,11 +71,22 @@ public class BankAccountSyncHandlerTests : IDisposable
         Assert.Equal(0, _env.GoCardless.RequestCount(BalancesPath(AccountId)));
     }
 
+    [Fact]
+    public async Task ManualAccount_IsNotFetched()
+    {
+        var account = TestData.ManualAccount();
+        await _env.Seed(account);
+
+        Assert.True(await _env.SyncBankAccounts(account.Id, force: true));
+
+        Assert.Equal(0, _env.GoCardless.TotalRequestCount);
+    }
+
     private async Task<BankAccount> GetAccount()
     {
         await using var dbContext = _env.CreateDbContext();
         return await dbContext.BankAccounts
             .Include(account => account.AssociatedInstitution)
-            .SingleAsync(account => account.ThirdPartyId == AccountId);
+            .SingleAsync(account => account.ExternalId == AccountId.ToString());
     }
 }

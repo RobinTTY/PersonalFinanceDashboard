@@ -22,6 +22,7 @@ public class TransactionMutationResolvers
     {
         var transaction = new Transaction
         {
+            Source = DataSource.Manual,
             BankTransactionId = null,
             Amount = input.Amount,
             Category = input.Category,

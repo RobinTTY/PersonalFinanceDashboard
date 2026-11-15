@@ -109,7 +109,7 @@ export const handlers = [
         authenticationRequest: {
           __typename: 'AuthenticationRequest',
           id: 'a0000000-0000-0000-0000-000000000000',
-          thirdPartyId: 'b0000000-0000-0000-0000-000000000000',
+          externalId: 'b0000000-0000-0000-0000-000000000000',
           status: 'CREATED',
           authenticationLink: `https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/${variables.institutionId}`,
           associatedAccounts: [],

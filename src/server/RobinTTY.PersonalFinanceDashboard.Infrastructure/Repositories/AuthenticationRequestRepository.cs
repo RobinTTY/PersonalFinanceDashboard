@@ -110,7 +110,7 @@ public class AuthenticationRequestRepository
             );
         }
 
-        var request = await _dataProviderService.DeleteAuthenticationRequest(authRequest.ThirdPartyId);
+        var request = await _dataProviderService.DeleteAuthenticationRequest(authRequest.ExternalId!);
         if (request.IsSuccessful)
         {
             _dbContext.AuthenticationRequests.Remove(authRequest);

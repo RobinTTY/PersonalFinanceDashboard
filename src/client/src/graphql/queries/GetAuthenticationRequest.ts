@@ -5,7 +5,7 @@ export const GetAuthenticationRequest: TypedDocumentNode<GetAuthenticationReques
   query GetAuthenticationRequest($authenticationId: UUID!) {
     authenticationRequest(authenticationId: $authenticationId) {
       id
-      thirdPartyId
+      externalId
       status
       authenticationLink
       associatedAccounts {

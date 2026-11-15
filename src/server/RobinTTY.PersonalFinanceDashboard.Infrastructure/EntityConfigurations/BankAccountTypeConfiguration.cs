@@ -11,10 +11,6 @@ public class BankAccountTypeConfiguration : IEntityTypeConfiguration<BankAccount
         builder.HasOne(account => account.AssociatedInstitution)
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
-
-        // Manually created accounts have an empty third party id and are excluded
-        builder.HasIndex(entity => entity.ThirdPartyId)
-            .IsUnique()
-            .HasFilter($"\"{nameof(BankAccount.ThirdPartyId)}\" <> '{Guid.Empty}'");
+        builder.ConfigureSource();
     }
 }

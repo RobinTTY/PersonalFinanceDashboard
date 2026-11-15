@@ -17,19 +17,24 @@ public class BankingInstitutionSyncHandler(
         var dataIsStale = await dataRetrievalMetadataService.DataIsStale(ThirdPartyDataType.BankingInstitutions);
         if (dataIsStale || forceThirdPartySync)
         {
-            string? thirdPartyBankingInstitutionId = null;
+            string? externalInstitutionId = null;
             if (bankingInstitutionId.HasValue)
             {
-                thirdPartyBankingInstitutionId = dbContext.BankingInstitutions
-                    .SingleOrDefault(bankingInstitution => bankingInstitution.Id == bankingInstitutionId)?.ThirdPartyId;
-                if (thirdPartyBankingInstitutionId == null)
+                var institution = await dbContext.BankingInstitutions
+                    .SingleOrDefaultAsync(bankingInstitution => bankingInstitution.Id == bankingInstitutionId);
+                if (institution == null)
                 {
                     logger.LogWarning("Banking institution with id {id} does not exist.", bankingInstitutionId);
                     return false;
                 }
+
+                if (institution.Source != DataSource.GoCardless)
+                    return true;
+
+                externalInstitutionId = institution.ExternalId;
             }
 
-            var institutions = await GetBankingInstitutions(thirdPartyBankingInstitutionId);
+            var institutions = await GetBankingInstitutions(externalInstitutionId);
             if (institutions == null)
             {
                 logger.LogWarning("Could not retrieve banking institutions from {dataProvider}",
@@ -88,23 +93,23 @@ public class BankingInstitutionSyncHandler(
     /// <returns>A task representing the asynchronous operation.</returns>
     private async Task AddUpdateOrDeleteBankingInstitutions(List<BankingInstitution> bankingInstitutions)
     {
-        // Manually created institutions aren't managed by the sync
+        // Institutions of other data sources (e.g. manually created ones) aren't managed by this sync
         var allInstitutionsInDb = await dbContext.BankingInstitutions
-            .Where(institution => institution.ThirdPartyId != string.Empty).ToListAsync();
+            .Where(institution => institution.Source == DataSource.GoCardless).ToListAsync();
         // Optimization for initial seeding (empty db)
         if (allInstitutionsInDb.Count == 0)
         {
-            dbContext.AddRange(bankingInstitutions);
+            dbContext.AddRange(bankingInstitutions.DistinctBy(bi => bi.ExternalId));
             return;
         }
 
         var incomingInstitutionsDict = bankingInstitutions
-            .DistinctBy(bi => bi.ThirdPartyId)
-            .ToDictionary(bi => bi.ThirdPartyId);
-        var dbInstitutionsDict = allInstitutionsInDb.ToDictionary(bi => bi.ThirdPartyId);
+            .DistinctBy(bi => bi.ExternalId)
+            .ToDictionary(bi => bi.ExternalId!);
+        var dbInstitutionsDict = allInstitutionsInDb.ToDictionary(bi => bi.ExternalId!);
 
         var institutionsToDelete = allInstitutionsInDb
-            .Where(db => !incomingInstitutionsDict.ContainsKey(db.ThirdPartyId)).ToList();
+            .Where(db => !incomingInstitutionsDict.ContainsKey(db.ExternalId!)).ToList();
         dbContext.BankingInstitutions.RemoveRange(institutionsToDelete);
 
         await AddOrUpdateBankingInstitutions(bankingInstitutions, dbInstitutionsDict);
@@ -113,13 +118,14 @@ public class BankingInstitutionSyncHandler(
     private async Task AddOrUpdateBankingInstitutions(List<BankingInstitution> bankingInstitutions,
         Dictionary<string, BankingInstitution>? dbInstitutionsDict = null)
     {
+        var externalIds = bankingInstitutions.Select(bi => bi.ExternalId!).ToList();
         dbInstitutionsDict ??= await dbContext.BankingInstitutions
-            .Where(bi => bankingInstitutions.Select(i => i.ThirdPartyId).Contains(bi.ThirdPartyId))
-            .ToDictionaryAsync(bi => bi.ThirdPartyId);
+            .Where(bi => bi.Source == DataSource.GoCardless && externalIds.Contains(bi.ExternalId!))
+            .ToDictionaryAsync(bi => bi.ExternalId!);
 
-        foreach (var incoming in bankingInstitutions.DistinctBy(bi => bi.ThirdPartyId))
+        foreach (var incoming in bankingInstitutions.DistinctBy(bi => bi.ExternalId))
         {
-            if (dbInstitutionsDict.TryGetValue(incoming.ThirdPartyId, out var existing))
+            if (dbInstitutionsDict.TryGetValue(incoming.ExternalId!, out var existing))
             {
                 existing.Bic = incoming.Bic;
                 existing.Name = incoming.Name;

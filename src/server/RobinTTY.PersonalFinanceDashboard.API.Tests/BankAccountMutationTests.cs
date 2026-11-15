@@ -1,3 +1,4 @@
+using System.Text.Json;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
@@ -5,6 +6,20 @@ namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
+
+    [Fact]
+    public async Task CreateBankAccount_IsManual()
+    {
+        var response = await _client.PostGraphQl("""
+                                                 mutation($input: CreateBankAccountInput!) {
+                                                   createBankAccount(input: $input) { bankAccount { source externalId } }
+                                                 }
+                                                 """, new { input = new { name = "Cash" } });
+
+        var account = response.Data("createBankAccount", "bankAccount");
+        Assert.Equal("MANUAL", account.GetProperty("source").GetString());
+        Assert.Equal(JsonValueKind.Null, account.GetProperty("externalId").ValueKind);
+    }
 
     [Fact]
     public async Task UpdateBankAccount_ChangesNameAndDescription()

@@ -12,7 +12,7 @@ export const CreateAuthenticationRequest: TypedDocumentNode<CreateAuthentication
     ) {
       authenticationRequest {
         id,
-        thirdPartyId,
+        externalId,
         associatedAccounts{
           id
         }
