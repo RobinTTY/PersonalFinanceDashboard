@@ -32,6 +32,8 @@
   <ItemGroup>
     <!-- Shared with the Infrastructure tests -->
     <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\FakeGoCardless.cs" Link="TestUtilities\FakeGoCardless.cs"/>
+    <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\GoCardlessJson.cs" Link="TestUtilities\GoCardlessJson.cs"/>
+    <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\TestData.cs" Link="TestUtilities\TestData.cs"/>
   </ItemGroup>
 
 </Project>

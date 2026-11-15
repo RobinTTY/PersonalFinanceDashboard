@@ -14,7 +14,6 @@ export const GetBankingInstitutions: TypedDocumentNode<GetBankingInstitutionsQue
         node {
           id
           source
-          externalId
           name
           bic
           logoUri

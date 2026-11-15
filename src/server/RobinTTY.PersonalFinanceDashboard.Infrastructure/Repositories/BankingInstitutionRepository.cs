@@ -43,6 +43,14 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
+    /// Gets the <see cref="BankingInstitution"/> matching the specified id, without synchronizing it first.
+    /// </summary>
+    /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
+    /// <returns>The <see cref="BankingInstitution"/> if one is matched, otherwise <see langword="null"/>.</returns>
+    public async Task<BankingInstitution?> FindBankingInstitution(Guid institutionId) =>
+        await _dbContext.BankingInstitutions.SingleOrDefaultAsync(institution => institution.Id == institutionId);
+
+    /// <summary>
     /// Gets all <see cref="BankingInstitution"/>s.
     /// </summary>
     /// <returns>A list of <see cref="BankingInstitution"/>s.</returns>

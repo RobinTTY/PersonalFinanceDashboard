@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
@@ -24,6 +25,18 @@ public class ApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretId", "secret-id");
         builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretKey", "secret-key");
         builder.ConfigureTestServices(services => services.AddSingleton(GoCardless.CreateService()));
+    }
+
+    /// <summary>
+    /// Saves the entity to the API's database and returns it with its generated id.
+    /// </summary>
+    internal async Task<TEntity> Seed<TEntity>(TEntity entity) where TEntity : class
+    {
+        using var scope = Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Add(entity);
+        await dbContext.SaveChangesAsync();
+        return entity;
     }
 
     protected override void Dispose(bool disposing)

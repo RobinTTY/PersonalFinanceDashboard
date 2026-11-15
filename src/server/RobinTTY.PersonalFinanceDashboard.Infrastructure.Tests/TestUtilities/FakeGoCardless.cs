@@ -23,9 +23,19 @@ internal sealed class FakeGoCardless : HttpMessageHandler
     /// </summary>
     public void Respond(string path, string json) => _responses[path] = json;
 
+    /// <summary>
+    /// Removes the response for <paramref name="path"/>, so requests to it get a 404 again.
+    /// </summary>
+    public void Remove(string path) => _responses.TryRemove(path, out _);
+
     public int RequestCount(string path) => _requestedPaths.Count(requested => requested.EndsWith(path));
 
     public int TotalRequestCount => _requestedPaths.Count;
+
+    /// <summary>
+    /// The body of the last request that had one.
+    /// </summary>
+    public string? LastRequestBody { get; private set; }
 
     public GoCardlessDataProviderService CreateService()
     {
@@ -37,17 +47,19 @@ internal sealed class FakeGoCardless : HttpMessageHandler
         return new GoCardlessDataProviderService(client, NullLogger<GoCardlessDataProviderService>.Instance);
     }
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         var path = request.RequestUri!.AbsolutePath;
         _requestedPaths.Enqueue(path);
+        if (request.Content != null)
+            LastRequestBody = await request.Content.ReadAsStringAsync(cancellationToken);
 
         var json = _responses.FirstOrDefault(response => path.EndsWith(response.Key)).Value;
-        return Task.FromResult(json != null
+        return json != null
             ? CreateResponse(HttpStatusCode.OK, json)
             : CreateResponse(HttpStatusCode.NotFound,
-                """{"summary":"Not found","detail":"No fake response configured","status_code":404}"""));
+                """{"summary":"Not found","detail":"No fake response configured","status_code":404}""");
     }
 
     private static HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string json) =>

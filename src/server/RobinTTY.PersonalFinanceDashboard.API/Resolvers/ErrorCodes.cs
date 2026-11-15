@@ -26,6 +26,11 @@ public static class ErrorCodes
     public const string InvalidRedirectUri = "INVALID_REDIRECT_URI";
 
     /// <summary>
+    /// The institution can't be connected to a bank data provider, e.g. because it was created manually.
+    /// </summary>
+    public const string InstitutionNotConnectable = "INSTITUTION_NOT_CONNECTABLE";
+
+    /// <summary>
     /// The authentication request couldn't be created at the third party.
     /// </summary>
     public const string CreateAuthenticationRequestFailed = "CREATE_AUTHENTICATION_REQUEST_FAILED";

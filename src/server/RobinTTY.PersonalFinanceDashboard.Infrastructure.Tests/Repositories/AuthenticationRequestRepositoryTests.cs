@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
 
@@ -22,11 +23,23 @@ public class AuthenticationRequestRepositoryTests : IDisposable
         await using (var dbContext = _env.CreateDbContext())
         {
             var response = await _env.CreateAuthenticationRequestRepository(dbContext)
-                .AddAuthenticationRequest("SANDBOXFINANCE_SFIN0000", RedirectUri);
-            Assert.True(response.IsSuccessful);
+                .AddAuthenticationRequest(TestData.Institution("SANDBOXFINANCE_SFIN0000"), RedirectUri);
+            Assert.IsType<CreateAuthenticationRequestResult.Created>(response);
         }
 
         Assert.Equal(RequestId.ToString(), (await GetRequests()).Single().ExternalId);
+    }
+
+    [Fact]
+    public async Task AddAuthenticationRequest_SendsTheExternalInstitutionIdToGoCardless()
+    {
+        _env.GoCardless.Respond(RequisitionsPath, RequisitionJson(RequestId, "CR", _env.UtcNow));
+
+        await using var dbContext = _env.CreateDbContext();
+        await _env.CreateAuthenticationRequestRepository(dbContext)
+            .AddAuthenticationRequest(TestData.Institution("SANDBOXFINANCE_SFIN0000"), RedirectUri);
+
+        Assert.Contains("\"SANDBOXFINANCE_SFIN0000\"", _env.GoCardless.LastRequestBody);
     }
 
     [Fact]
@@ -35,11 +48,23 @@ public class AuthenticationRequestRepositoryTests : IDisposable
         await using (var dbContext = _env.CreateDbContext())
         {
             var response = await _env.CreateAuthenticationRequestRepository(dbContext)
-                .AddAuthenticationRequest("UNKNOWN", RedirectUri);
-            Assert.False(response.IsSuccessful);
+                .AddAuthenticationRequest(TestData.Institution("UNKNOWN"), RedirectUri);
+            Assert.IsType<CreateAuthenticationRequestResult.ProviderFailed>(response);
         }
 
         Assert.Empty(await GetRequests());
+    }
+
+    [Fact]
+    public async Task AddAuthenticationRequest_ManualInstitutionIsNotConnectable()
+    {
+        await using var dbContext = _env.CreateDbContext();
+
+        var response = await _env.CreateAuthenticationRequestRepository(dbContext)
+            .AddAuthenticationRequest(TestData.ManualInstitution(), RedirectUri);
+
+        Assert.IsType<CreateAuthenticationRequestResult.NotConnectable>(response);
+        Assert.Equal(0, _env.GoCardless.TotalRequestCount);
     }
 
     [Fact]

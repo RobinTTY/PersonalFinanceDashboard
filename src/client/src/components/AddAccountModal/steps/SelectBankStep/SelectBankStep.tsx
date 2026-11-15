@@ -33,7 +33,7 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
   const banks =
     data?.bankingInstitutions?.edges
       ?.map((edge) => edge.node)
-      .filter((bank) => bank.source === DataSource.GoCardless && bank.externalId != null) ?? [];
+      .filter((bank) => bank.source === DataSource.GoCardless && bank.id != null) ?? [];
 
   const filteredBanks = banks
     .filter((bank) => bank.name.toLowerCase().includes(bankSearch.toLowerCase()))
@@ -86,7 +86,7 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
                 }}
               >
                 {rowItems.map((bank) => {
-                  const bankId = String(bank.externalId);
+                  const bankId = String(bank.id);
                   const logoUri = bank.logoUri ? String(bank.logoUri) : undefined;
                   const countries = bank.countries ?? [];
                   const visibleCountries = countries.slice(0, MAX_VISIBLE_COUNTRIES);

@@ -4,7 +4,7 @@ import { CreateAuthenticationRequestMutation } from '../types/graphql';
 export const CreateAuthenticationRequest: TypedDocumentNode<CreateAuthenticationRequestMutation> =
   gql(`
   mutation CreateAuthenticationRequest(
-    $institutionId: String!
+    $institutionId: UUID!
     $redirectUri: String!
   ) {
     createAuthenticationRequest(

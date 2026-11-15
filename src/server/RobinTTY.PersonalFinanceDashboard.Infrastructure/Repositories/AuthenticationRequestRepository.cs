@@ -63,27 +63,35 @@ public class AuthenticationRequestRepository
     /// <summary>
     /// Adds a new <see cref="AuthenticationRequest"/>.
     /// </summary>
-    /// <param name="institutionId">The id of the institution to create a <see cref="AuthenticationRequest"/> for.</param>
+    /// <param name="institution">The institution to create a <see cref="AuthenticationRequest"/> for.</param>
     /// <param name="redirectUri">The URI of the page to redirect to after successful authentication.</param>
-    /// <returns>The data provider's response containing the added <see cref="AuthenticationRequest"/>, or the error.</returns>
-    public async Task<ThirdPartyResponse<AuthenticationRequest, BasicResponse>> AddAuthenticationRequest(
-        string institutionId, Uri redirectUri)
+    /// <returns>The created <see cref="AuthenticationRequest"/>, or why it couldn't be created.</returns>
+    public async Task<CreateAuthenticationRequestResult> AddAuthenticationRequest(BankingInstitution institution,
+        Uri redirectUri)
     {
-        var request = await _dataProviderService.CreateAuthenticationRequest(institutionId, redirectUri);
-
-        if (request.IsSuccessful)
+        // The data sources supporting authentication requests; every other source can't be connected
+        ThirdPartyResponse<AuthenticationRequest, BasicResponse> request;
+        switch (institution.Source)
         {
-            await _dbContext.AuthenticationRequests.AddAsync(request.Result);
-            await _dbContext.SaveChangesAsync();
+            case DataSource.GoCardless:
+                request = await _dataProviderService.CreateAuthenticationRequest(institution.ExternalId!, redirectUri);
+                break;
+            default:
+                return new CreateAuthenticationRequestResult.NotConnectable();
         }
-        else
+
+        if (!request.IsSuccessful)
         {
             _logger.LogError(
                 "Creation of new authentication request failed. The data provider returned the following error: " +
                 "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+            return new CreateAuthenticationRequestResult.ProviderFailed(request.Error);
         }
 
-        return request;
+        await _dbContext.AuthenticationRequests.AddAsync(request.Result);
+        await _dbContext.SaveChangesAsync();
+
+        return new CreateAuthenticationRequestResult.Created(request.Result);
     }
 
     /// <summary>

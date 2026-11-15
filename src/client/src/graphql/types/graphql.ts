@@ -170,7 +170,7 @@ export type BooleanOperationFilterInput = {
 
 export type CreateAuthenticationRequestInput = {
   /** The id of the institution which the authentication request should be created for. */
-  institutionId: Scalars['String']['input'];
+  institutionId: Scalars['UUID']['input'];
   /** The URI to redirect to after the authentication is completed. */
   redirectUri: Scalars['String']['input'];
 };
@@ -810,7 +810,7 @@ export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknow
 export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
 
 export type CreateAuthenticationRequestMutationVariables = Exact<{
-  institutionId: Scalars['String']['input'];
+  institutionId: Scalars['UUID']['input'];
   redirectUri: Scalars['String']['input'];
 }>;
 
@@ -869,7 +869,7 @@ export type GetBankingInstitutionsQueryVariables = Exact<{
 }>;
 
 
-export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, source: DataSource, externalId: string | null, name: string, bic: string, logoUri: unknown, countries: Array<string> } }> | null } | null };
+export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: 'BankingInstitutionsConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'BankingInstitutionsEdge', node: { __typename: 'BankingInstitution', id: unknown | null, source: DataSource, name: string, bic: string, logoUri: unknown, countries: Array<string> } }> | null } | null };
 
 export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
