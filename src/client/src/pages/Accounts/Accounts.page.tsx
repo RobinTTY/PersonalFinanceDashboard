@@ -70,6 +70,7 @@ export function AccountsPage() {
     variables: { accountId: accountId ?? '', first: PAGE_SIZE },
     skip: !accountId,
     notifyOnNetworkStatusChange: true,
+    context: { notifyOnError: false },
   });
 
   const edges = data?.transactionsByAccountId?.edges ?? [];

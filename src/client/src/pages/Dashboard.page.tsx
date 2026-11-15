@@ -12,7 +12,9 @@ import { NetWorthLabel, NetWorthPanel } from '@/components/NetWorthPanel/NetWort
 const CHART_HEIGHT = 320;
 
 export function DashboardPage() {
-  const { data, loading, error } = useQuery(GetNetWorthHistory);
+  const { data, loading, error } = useQuery(GetNetWorthHistory, {
+    context: { notifyOnError: false },
+  });
 
   const accounts = useMemo<NetWorthAccount[]>(
     () =>

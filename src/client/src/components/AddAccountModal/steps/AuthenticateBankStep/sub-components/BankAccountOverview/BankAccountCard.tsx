@@ -25,6 +25,7 @@ export function BankAccountCard({ accountId, onInstitutionLoaded }: BankAccountC
   const { data, loading, error } = useQuery(GetBankAccount, {
     variables: { accountId },
     fetchPolicy: 'network-only',
+    context: { notifyOnError: false },
   });
 
   const account = data?.bankAccount;

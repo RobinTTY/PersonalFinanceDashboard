@@ -27,6 +27,7 @@ export function SelectBankStep({ selectedBank, onBankSelect }: SelectBankStepPro
   const [bankSearch, setBankSearch] = useState('');
   const { loading, error, data } = useQuery(GetBankingInstitutions, {
     variables: { first: 3000 },
+    context: { notifyOnError: false },
   });
 
   // Only GoCardless institutions can be authenticated with, manually created ones are skipped

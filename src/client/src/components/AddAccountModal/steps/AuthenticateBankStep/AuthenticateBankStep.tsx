@@ -9,6 +9,7 @@ import { BankAuthenticationSuccess } from './sub-components/BankAuthenticationSu
 import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
+const STATUS_QUERY_CONTEXT = { notifyOnError: false };
 
 enum AuthenticationState {
   Waiting,
@@ -68,7 +69,10 @@ export function AuthenticateBankStep({
     pollIndex.current += 1;
 
     pollingTimeoutRef.current = setTimeout(() => {
-      fetchAuthenticationRequest({ variables: { authenticationId } });
+      fetchAuthenticationRequest({
+        variables: { authenticationId },
+        context: STATUS_QUERY_CONTEXT,
+      });
     }, delay);
   };
 
@@ -80,7 +84,10 @@ export function AuthenticateBankStep({
 
     pollingActive.current = true;
     if (autoCheck) {
-      fetchAuthenticationRequest({ variables: { authenticationId } });
+      fetchAuthenticationRequest({
+        variables: { authenticationId },
+        context: STATUS_QUERY_CONTEXT,
+      });
     } else {
       scheduleNextPoll();
     }
@@ -127,7 +134,7 @@ export function AuthenticateBankStep({
     clearTimeout(pollingTimeoutRef.current);
     userInitiatedAuthFetch.current = true;
     pollingActive.current = false;
-    fetchAuthenticationRequest({ variables: { authenticationId } });
+    fetchAuthenticationRequest({ variables: { authenticationId }, context: STATUS_QUERY_CONTEXT });
   };
 
   /** Resets the polling state back to the beginning and returns the component to the waiting view so the user can try again. */

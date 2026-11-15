@@ -39,7 +39,7 @@ export function IncludeInAnalyticsSwitch({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.currentTarget.checked;
 
-    void setIncludeInAnalytics({
+    setIncludeInAnalytics({
       variables: { bankAccountId: accountId, includeInAnalytics: nextValue },
       optimisticResponse: {
         setBankAccountIncludeInAnalytics: {
@@ -51,7 +51,8 @@ export function IncludeInAnalyticsSwitch({
           },
         },
       },
-    });
+      // The optimistic update is rolled back and the error link shows a notification
+    }).catch(() => {});
 
     markAnalyticsDirty?.();
   };

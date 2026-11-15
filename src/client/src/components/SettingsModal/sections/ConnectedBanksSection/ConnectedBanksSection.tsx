@@ -10,9 +10,10 @@ import { ConnectedBankCard } from './ConnectedBankCard';
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
 
 export function ConnectedBanksSection() {
-  const { data, loading, error } = useQuery(GetAuthRequestsWithAccounts);
+  const { data, loading, error } = useQuery(GetAuthRequestsWithAccounts, {
+    context: { notifyOnError: false },
+  });
   const [pendingDeletion, setPendingDeletion] = useState<AuthRequestWithAccounts | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteAuthenticationRequest, { loading: deleting }] = useMutation(
     DeleteAuthenticationRequest,
     { refetchQueries: [GetAuthRequestsWithAccounts] }
@@ -23,7 +24,6 @@ export function ConnectedBanksSection() {
       return;
     }
     setPendingDeletion(null);
-    setDeleteError(null);
   };
 
   const confirmDelete = async () => {
@@ -36,9 +36,8 @@ export function ConnectedBanksSection() {
         variables: { authenticationId: pendingDeletion.id },
       });
       setPendingDeletion(null);
-      setDeleteError(null);
-    } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : 'Failed to delete connection.');
+    } catch {
+      // The error is shown as a notification by the error link, the confirmation stays open to retry
     }
   };
 
@@ -87,10 +86,7 @@ export function ConnectedBanksSection() {
               key={String(bank.id)}
               bank={bank}
               isDeleting={deleting && pendingDeletion?.id === bank.id}
-              onRequestDelete={(authRequest) => {
-                setDeleteError(null);
-                setPendingDeletion(authRequest);
-              }}
+              onRequestDelete={setPendingDeletion}
             />
           ))}
         </Stack>
@@ -111,11 +107,6 @@ export function ConnectedBanksSection() {
             </Text>
             ? This will stop syncing the associated accounts.
           </Text>
-          {deleteError && (
-            <Alert color="red" icon={<IconAlertCircle size={16} />}>
-              {deleteError}
-            </Alert>
-          )}
           <Group justify="flex-end" gap="sm">
             <Button variant="default" onClick={closeConfirmation} disabled={deleting}>
               Cancel

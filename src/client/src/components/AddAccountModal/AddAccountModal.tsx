@@ -41,8 +41,9 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
     autoCheck: false,
   });
 
-  const [createAuthenticationRequest, { loading: createAuthLoading, error: createAuthError }] =
-    useMutation(CreateAuthenticationRequest);
+  const [createAuthenticationRequest, { loading: createAuthLoading }] = useMutation(
+    CreateAuthenticationRequest
+  );
 
   /**
    * If the user has completed the GoCardless authentication flow but hasn't returned to the app yet, we can detect that via localStorage and skip them directly to the final step of the flow.
@@ -65,9 +66,15 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
       return;
     }
 
-    const result = await createAuthenticationRequest({
-      variables: { institutionId: selectedBank, redirectUri: window.location.href },
-    });
+    let result;
+    try {
+      result = await createAuthenticationRequest({
+        variables: { institutionId: selectedBank, redirectUri: window.location.href },
+      });
+    } catch {
+      // The error is shown as a notification by the error link
+      return;
+    }
 
     const id = result.data?.createAuthenticationRequest?.authenticationRequest?.id;
     const link =
@@ -187,12 +194,6 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
                 <Button variant="default" onClick={handleBack}>
                   Back
                 </Button>
-                {/* TODO: this auth error should be displayed in a notification component, not inline */}
-                {createAuthError && (
-                  <Text c="red" size="sm" mr="auto">
-                    {createAuthError.message}
-                  </Text>
-                )}
                 <Button
                   disabled={!selectedBank}
                   loading={createAuthLoading}
