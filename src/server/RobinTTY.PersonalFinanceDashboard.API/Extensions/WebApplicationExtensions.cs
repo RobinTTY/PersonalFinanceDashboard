@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
@@ -15,14 +14,9 @@ public static class WebApplicationExtensions
     /// Configures the app to use all necessary GraphQL features.
     /// </summary>
     /// <param name="app">The <see cref="WebApplication"/> instance to configure.</param>
-    /// <param name="args">Command line arguments to be passed to the host.</param>
-    public static void UseGraphQl(this WebApplication app, string[] args)
+    public static void UseGraphQl(this WebApplication app)
     {
         app.MapGraphQL();
-
-        // Allows exporting the GraphQL Schema via the command line: dotnet run -- schema export --output schema.graphql
-        // https://chillicream.com/docs/hotchocolate/v13/server/command-line
-        app.RunWithGraphQLCommands(args);
     }
 
     /// <summary>
