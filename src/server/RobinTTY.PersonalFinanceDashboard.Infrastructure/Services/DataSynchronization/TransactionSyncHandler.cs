@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
@@ -102,7 +103,7 @@ public class TransactionSyncHandler(
 
     private async Task<List<SyncedAccount>> GetActiveAccounts()
     {
-        var validSince = timeProvider.GetUtcNow().UtcDateTime.AddDays(-90);
+        var validSince = timeProvider.GetUtcNow().UtcDateTime - AuthenticationRequestExtensions.AccessValidity;
 
         var accounts = await dbContext.BankAccounts
             .Where(account => account.ExternalId != null &&

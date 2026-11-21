@@ -8,6 +8,7 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
     status
     authenticationLink
     createdAt
+    accessExpiresAt
     associatedAccounts {
       id
       externalId
@@ -23,6 +24,12 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
         name
         bic
         logoUri
+      }
+      syncStatus {
+        state
+        lastSuccessfulSync
+        lastError
+        nextRetry
       }
     }
   }

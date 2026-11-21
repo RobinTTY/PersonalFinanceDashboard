@@ -16,6 +16,7 @@ export const dashboardData = {
       {
         __typename: 'BankAccount',
         id: '56ea92c0-c578-41fd-ba27-836dfc90ae06',
+        syncStatus: { __typename: 'SyncStatus', state: 'UP_TO_DATE' },
         balance: 92.3,
         currency: 'EUR',
         transactions: [
@@ -196,6 +197,7 @@ export const dashboardData = {
       {
         __typename: 'BankAccount',
         id: '588946a8-da08-471b-b944-4890a2ce6281',
+        syncStatus: { __typename: 'SyncStatus', state: 'UP_TO_DATE' },
         balance: 0.0,
         currency: 'EUR',
         transactions: [],
@@ -203,6 +205,7 @@ export const dashboardData = {
       {
         __typename: 'BankAccount',
         id: '097c2685-71b1-48a3-8161-937f2ddec43f',
+        syncStatus: { __typename: 'SyncStatus', state: 'UP_TO_DATE' },
         balance: 346.64,
         currency: 'EUR',
         transactions: [
@@ -306,6 +309,7 @@ export const dashboardData = {
       {
         __typename: 'BankAccount',
         id: 'b45b24fc-2a58-46b9-887d-a3a5820ed30e',
+        syncStatus: { __typename: 'SyncStatus', state: 'RETRYING' },
         balance: 0.0,
         currency: 'EUR',
         transactions: [],

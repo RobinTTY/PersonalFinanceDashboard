@@ -7,6 +7,27 @@ import type { GetAuthRequestsWithAccountsQuery } from '@graphql-types/graphql';
 
 type AuthenticationRequest = GetAuthRequestsWithAccountsQuery['authenticationRequests'][number];
 
+// Relative to now, so the connections show a realistic sync and expiry state whenever the mocks run
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
+const fromNow = (milliseconds: number) => new Date(Date.now() + milliseconds).toISOString();
+
+const upToDate = {
+  __typename: 'SyncStatus',
+  state: 'UP_TO_DATE',
+  lastSuccessfulSync: fromNow(-2 * HOUR),
+  lastError: null,
+  nextRetry: null,
+};
+
+const retrying = {
+  __typename: 'SyncStatus',
+  state: 'RETRYING',
+  lastSuccessfulSync: fromNow(-26 * HOUR),
+  lastError: 'Rate limit exceeded. Too many requests',
+  nextRetry: fromNow(2 * HOUR),
+};
+
 export const authenticationRequestsData: AuthenticationRequest[] = [
   {
     __typename: 'AuthenticationRequest',
@@ -16,6 +37,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
     authenticationLink:
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/SANDBOXFINANCE_GENODES1RGF',
     createdAt: '2026-05-02T21:39:39.958Z',
+    accessExpiresAt: fromNow(60 * DAY),
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -35,6 +57,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'GENODES1RGF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANDBOXFINANCE_SFIN0000.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -54,6 +77,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'GENODES1RGF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANDBOXFINANCE_SFIN0000.png',
         },
+        syncStatus: upToDate,
       },
     ],
   },
@@ -65,6 +89,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
     authenticationLink:
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/C24_DEFFDEFF',
     createdAt: '2026-05-02T22:34:19.324Z',
+    accessExpiresAt: fromNow(75 * DAY),
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -84,6 +109,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -103,6 +129,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -122,6 +149,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
     ],
   },
@@ -133,6 +161,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
     authenticationLink:
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/SANTANDER_DE_SCFBDE33',
     createdAt: '2026-07-12T00:16:31.018Z',
+    accessExpiresAt: fromNow(10 * DAY),
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -152,6 +181,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
           bic: 'SCFBDE33XXX',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANTANDER_PL_CORP_WBKPPLPP.png',
         },
+        syncStatus: retrying,
       },
     ],
   },
