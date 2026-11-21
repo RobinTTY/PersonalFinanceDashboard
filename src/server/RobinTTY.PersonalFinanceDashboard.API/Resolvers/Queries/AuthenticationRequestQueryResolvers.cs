@@ -22,14 +22,15 @@ public class AuthenticationRequestQueryResolvers
     /// Whether to retrieve the authentication request from its data provider first, e.g. while waiting for the user
     /// to grant access. Once access was granted, its accounts are retrieved too.
     /// </param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     [UseSingleOrDefault]
     [UseProjection]
     public async Task<IQueryable<AuthenticationRequest?>> GetAuthenticationRequest(
         AuthenticationRequestRepository repository, IDataSynchronizer synchronizer, Guid authenticationId,
-        bool refresh = false)
+        CancellationToken cancellationToken, bool refresh = false)
     {
         if (refresh)
-            await synchronizer.RefreshAuthenticationRequest(authenticationId);
+            await synchronizer.RefreshAuthenticationRequest(authenticationId, cancellationToken);
 
         return repository.GetAuthenticationRequest(authenticationId);
     }

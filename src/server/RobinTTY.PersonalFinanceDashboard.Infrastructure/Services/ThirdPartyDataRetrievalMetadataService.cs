@@ -33,12 +33,14 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="thirdPartyDataType">The data type for which to check.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to check.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns><see langword="true"/> if the data should be retrieved, <see langword="false"/> otherwise.</returns>
     public async Task<bool> IsRetrievalDue(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
-        Guid? synchronizationEntityId = null)
+        Guid? synchronizationEntityId = null, CancellationToken cancellationToken = default)
     {
         var retrievalMetadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId,
+                cancellationToken);
 
         if (retrievalMetadata is null)
         {
@@ -57,18 +59,20 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="dataSource">The data source the data was retrieved from.</param>
     /// <param name="thirdPartyDataType">The data type for which to reset the data expiry.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to reset the data expiry.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task ResetDataExpiry(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
-        Guid? synchronizationEntityId = null)
+        Guid? synchronizationEntityId = null, CancellationToken cancellationToken = default)
     {
         var metadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId,
+                cancellationToken);
 
         metadata.LastRetrievalTime = timeProvider.GetUtcNow().UtcDateTime;
         metadata.ConsecutiveFailures = 0;
         metadata.LastError = null;
         metadata.NextRetryTime = null;
 
-        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges(cancellationToken);
         RecordedRetrievals++;
     }
 
@@ -80,12 +84,14 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="thirdPartyDataType">The data type that failed to be retrieved.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity that failed to be retrieved.</param>
     /// <param name="error">The error returned by the provider.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The earliest time the retrieval is retried.</returns>
     public async Task<DateTime> RecordFailedRetrieval(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
-        Guid? synchronizationEntityId, ThirdPartyError error)
+        Guid? synchronizationEntityId, ThirdPartyError error, CancellationToken cancellationToken = default)
     {
         var metadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId,
+                cancellationToken);
 
         metadata.ConsecutiveFailures++;
         metadata.LastError = error.Message;
@@ -95,7 +101,7 @@ public class ThirdPartyDataRetrievalMetadataService(
             retryDelay = error.RetryAfter.Value;
         metadata.NextRetryTime = timeProvider.GetUtcNow().UtcDateTime + retryDelay;
 
-        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges(cancellationToken);
         RecordedRetrievals++;
 
         return metadata.NextRetryTime.Value;
@@ -107,11 +113,13 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="thirdPartyDataType">The type of the data.</param>
     /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<DateTime?> GetRetrieveFrom(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
-        Guid synchronizationEntityId)
+        Guid synchronizationEntityId, CancellationToken cancellationToken = default)
     {
         var metadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId,
+                cancellationToken);
         return metadata?.RetrieveFrom;
     }
 
@@ -122,13 +130,15 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// <param name="thirdPartyDataType">The type of the data.</param>
     /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
     /// <param name="retrieveFrom">The date of the earliest data to retrieve.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task SetRetrieveFrom(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
-        Guid synchronizationEntityId, DateTime retrieveFrom)
+        Guid synchronizationEntityId, DateTime retrieveFrom, CancellationToken cancellationToken = default)
     {
         var metadata = await thirdPartyDataRetrievalMetadataRepository
-            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId,
+                cancellationToken);
         metadata.RetrieveFrom = retrieveFrom;
-        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges(cancellationToken);
     }
 
     /// <summary>
@@ -137,11 +147,13 @@ public class ThirdPartyDataRetrievalMetadataService(
     /// </summary>
     /// <param name="dataSource">The data source the entity originates from.</param>
     /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
-    public async Task RemoveMetadata(DataSource dataSource, Guid synchronizationEntityId)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task RemoveMetadata(DataSource dataSource, Guid synchronizationEntityId,
+        CancellationToken cancellationToken = default)
     {
         await thirdPartyDataRetrievalMetadataRepository.RemoveThirdPartyDataRetrievalMetadata(dataSource,
-            synchronizationEntityId);
-        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+            synchronizationEntityId, cancellationToken);
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges(cancellationToken);
     }
 
     /// <summary>

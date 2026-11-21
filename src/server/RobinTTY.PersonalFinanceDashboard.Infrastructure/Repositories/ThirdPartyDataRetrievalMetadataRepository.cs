@@ -11,13 +11,15 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="dataType">The type of third-party data for which the retrieval metadata is being requested.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity for which to retrieve the metadata. For example, for account data, this would be the account id.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The metadata record for the specified data type, or null if no match is found.</returns>
     public async Task<ThirdPartyDataRetrievalMetadata?> GetThirdPartyDataRetrievalMetadata(DataSource dataSource,
-        ThirdPartyDataType dataType, Guid? synchronizationEntityId)
+        ThirdPartyDataType dataType, Guid? synchronizationEntityId, CancellationToken cancellationToken = default)
     {
         return await dbContext.ThirdPartyDataRetrievalMetadata
             .SingleOrDefaultAsync(metadata => metadata.DataSource == dataSource && metadata.DataType == dataType &&
-                                              metadata.SynchronizationEntityId == synchronizationEntityId);
+                                              metadata.SynchronizationEntityId == synchronizationEntityId,
+                cancellationToken);
     }
 
     /// <summary>
@@ -27,11 +29,14 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     /// <param name="dataSource">The data source the data is retrieved from.</param>
     /// <param name="dataType">The type of the data.</param>
     /// <param name="synchronizationEntityId">Optional id of the synchronization entity. For example, for account data, this would be the account id.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The tracked metadata record.</returns>
     public async Task<ThirdPartyDataRetrievalMetadata> GetOrAddThirdPartyDataRetrievalMetadata(
-        DataSource dataSource, ThirdPartyDataType dataType, Guid? synchronizationEntityId)
+        DataSource dataSource, ThirdPartyDataType dataType, Guid? synchronizationEntityId,
+        CancellationToken cancellationToken = default)
     {
-        var metadata = await GetThirdPartyDataRetrievalMetadata(dataSource, dataType, synchronizationEntityId);
+        var metadata = await GetThirdPartyDataRetrievalMetadata(dataSource, dataType, synchronizationEntityId,
+            cancellationToken);
         if (metadata is not null)
             return metadata;
 
@@ -54,19 +59,23 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     /// </summary>
     /// <param name="dataSource">The data source the entity originates from.</param>
     /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
-    public async Task RemoveThirdPartyDataRetrievalMetadata(DataSource dataSource, Guid synchronizationEntityId)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task RemoveThirdPartyDataRetrievalMetadata(DataSource dataSource, Guid synchronizationEntityId,
+        CancellationToken cancellationToken = default)
     {
         var metadata = await dbContext.ThirdPartyDataRetrievalMetadata
             .Where(metadata => metadata.DataSource == dataSource &&
                                metadata.SynchronizationEntityId == synchronizationEntityId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         dbContext.ThirdPartyDataRetrievalMetadata.RemoveRange(metadata);
     }
 
     /// <summary>
     /// Saves the changes made to metadata records.
     /// </summary>
-    public async Task SaveChanges() => await dbContext.SaveChangesAsync();
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task SaveChanges(CancellationToken cancellationToken = default) =>
+        await dbContext.SaveChangesAsync(cancellationToken);
 
     private static TimeSpan GetRetrievalInterval(ThirdPartyDataType dataType)
     {

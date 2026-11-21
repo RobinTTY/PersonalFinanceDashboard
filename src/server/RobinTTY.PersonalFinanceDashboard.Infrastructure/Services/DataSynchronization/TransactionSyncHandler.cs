@@ -29,38 +29,20 @@ public class TransactionSyncHandler(
             : new ContentKey(transaction.BankTransactionId, 0, null, null);
     }
 
-    public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(bool forceThirdPartySync = false,
+        CancellationToken cancellationToken = default)
     {
-        if (internalAccountId.HasValue)
-        {
-            var account = await dbContext.BankAccounts.SingleOrDefaultAsync(a => a.Id == internalAccountId);
-            if (account == null)
-            {
-                logger.LogWarning("Bank account with id {accountId} does not exist.", internalAccountId);
-                return false;
-            }
-
-            // Accounts without a provider (e.g. manually created ones) aren't synchronized
-            if (!providers.TryGet(account.Source, out var provider))
-                return true;
-
-            // Only the explicitly requested single account fails the whole sync on failure
-            return await SynchronizeAccounts(provider,
-                [new SyncedAccount(internalAccountId.Value, account.Source, account.ExternalId!)],
-                forceThirdPartySync, abortOnFailure: true);
-        }
-
-        foreach (var accounts in (await GetActiveAccounts()).GroupBy(account => account.Source))
+        foreach (var accounts in (await GetActiveAccounts(cancellationToken)).GroupBy(account => account.Source))
         {
             if (providers.TryGet(accounts.Key, out var provider))
-                await SynchronizeAccounts(provider, accounts.ToList(), forceThirdPartySync, abortOnFailure: false);
+                await SynchronizeAccounts(provider, accounts.ToList(), forceThirdPartySync, cancellationToken);
         }
 
         return true;
     }
 
-    private async Task<bool> SynchronizeAccounts(IBankDataProvider provider, List<SyncedAccount> accounts,
-        bool forceThirdPartySync, bool abortOnFailure)
+    private async Task SynchronizeAccounts(IBankDataProvider provider, List<SyncedAccount> accounts,
+        bool forceThirdPartySync, CancellationToken cancellationToken)
     {
         var transactions = new List<Transaction>();
         var syncedAccountIds = new List<Guid>();
@@ -68,7 +50,7 @@ public class TransactionSyncHandler(
         foreach (var account in accounts)
         {
             var retrievalIsDue = await dataRetrievalMetadataService.IsRetrievalDue(provider.Source,
-                ThirdPartyDataType.Transactions, account.Id);
+                ThirdPartyDataType.Transactions, account.Id, cancellationToken);
             if (!retrievalIsDue && !forceThirdPartySync)
             {
                 logger.LogDebug(
@@ -78,44 +60,39 @@ public class TransactionSyncHandler(
             }
 
             var retrieveFrom = await dataRetrievalMetadataService.GetRetrieveFrom(provider.Source,
-                ThirdPartyDataType.Transactions, account.Id);
-            var response = await provider.GetTransactions(account.ExternalId, retrieveFrom);
+                ThirdPartyDataType.Transactions, account.Id, cancellationToken);
+            var response = await provider.GetTransactions(account.ExternalId, retrieveFrom, cancellationToken);
             if (!response.IsSuccessful)
             {
                 var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
-                    ThirdPartyDataType.Transactions, account.Id, response.Error);
+                    ThirdPartyDataType.Transactions, account.Id, response.Error, cancellationToken);
                 logger.LogWarning(
                     "Encountered error while getting transactions for account with id {accountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
                     account.Id, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
-                if (abortOnFailure)
-                    return false;
-
                 continue;
             }
 
             transactions.AddRange(retrieveFrom.HasValue
-                ? await RemoveAlreadyRetrieved(account.Id, retrieveFrom.Value, response.Result)
+                ? await RemoveAlreadyRetrieved(account.Id, retrieveFrom.Value, response.Result, cancellationToken)
                 : response.Result);
             syncedAccountIds.Add(account.Id);
         }
 
         if (syncedAccountIds.Count == 0)
-            return true;
+            return;
 
-        await AddOrUpdateTransactions(provider.Source, transactions);
+        await AddOrUpdateTransactions(provider.Source, transactions, cancellationToken);
         foreach (var accountId in syncedAccountIds)
         {
             logger.LogDebug("Resetting data expiry for transactions for account with id {accountId}", accountId);
             await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.Transactions,
-                accountId);
+                accountId, cancellationToken);
         }
 
         logger.LogInformation("Synced {Count} transactions from {dataSource}", transactions.Count, provider.Source);
-
-        return true;
     }
 
-    private async Task<List<SyncedAccount>> GetActiveAccounts()
+    private async Task<List<SyncedAccount>> GetActiveAccounts(CancellationToken cancellationToken)
     {
         var validSince = timeProvider.GetUtcNow().UtcDateTime - AuthenticationRequestExtensions.AccessValidity;
 
@@ -125,7 +102,7 @@ public class TransactionSyncHandler(
                                   request.Status == AuthenticationStatus.Active &&
                                   request.CreatedAt > validSince))
             .Select(account => new { account.Id, account.Source, account.ExternalId })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return accounts.Select(account => new SyncedAccount(account.Id!.Value, account.Source, account.ExternalId!))
             .ToList();
@@ -139,9 +116,10 @@ public class TransactionSyncHandler(
     /// <param name="accountId">The id of the account.</param>
     /// <param name="retrieveFrom">The day from which the account's transactions are retrieved.</param>
     /// <param name="fetchedTransactions">The transactions retrieved from the data source.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The transactions that weren't retrieved before.</returns>
     private async Task<List<Transaction>> RemoveAlreadyRetrieved(Guid accountId, DateTime retrieveFrom,
-        IReadOnlyList<Transaction> fetchedTransactions)
+        IReadOnlyList<Transaction> fetchedTransactions, CancellationToken cancellationToken)
     {
         var fetchedIds = fetchedTransactions.Select(transaction => transaction.ExternalId!).ToList();
         var earlierTransactions = await dbContext.Transactions
@@ -149,7 +127,7 @@ public class TransactionSyncHandler(
                                   transaction.ValueDate >= retrieveFrom &&
                                   transaction.ValueDate < retrieveFrom.AddDays(1) &&
                                   !fetchedIds.Contains(transaction.ExternalId!))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         // Counted, so a transaction that occurs twice on that day is only removed as often as it was retrieved
         var remaining = earlierTransactions.GroupBy(ContentKey.Of)
             .ToDictionary(group => group.Key, group => group.Count());
@@ -174,7 +152,8 @@ public class TransactionSyncHandler(
         return newTransactions;
     }
 
-    private async Task AddOrUpdateTransactions(DataSource source, List<Transaction> updatedTransactions)
+    private async Task AddOrUpdateTransactions(DataSource source, List<Transaction> updatedTransactions,
+        CancellationToken cancellationToken)
     {
         var accountIds = updatedTransactions
             .Select(transaction => transaction.BankAccount?.ExternalId)
@@ -183,7 +162,7 @@ public class TransactionSyncHandler(
             .ToList();
         var accounts = await dbContext.BankAccounts
             .Where(account => account.Source == source && accountIds.Contains(account.ExternalId!))
-            .ToDictionaryAsync(account => account.ExternalId!);
+            .ToDictionaryAsync(account => account.ExternalId!, cancellationToken);
 
         // Keyed like the unique index, since external transaction ids are only unique per account
         var transactionIds = updatedTransactions.Select(transaction => transaction.ExternalId!).Distinct().ToList();
@@ -194,7 +173,8 @@ public class TransactionSyncHandler(
                                   transaction.BankAccount != null &&
                                   transaction.BankAccount.Source == source &&
                                   accountIds.Contains(transaction.BankAccount.ExternalId!))
-            .ToDictionaryAsync(transaction => (transaction.BankAccount!.ExternalId!, transaction.ExternalId!));
+            .ToDictionaryAsync(transaction => (transaction.BankAccount!.ExternalId!, transaction.ExternalId!),
+                cancellationToken);
 
         foreach (var updatedTransaction in updatedTransactions)
         {
@@ -221,6 +201,6 @@ public class TransactionSyncHandler(
             }
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

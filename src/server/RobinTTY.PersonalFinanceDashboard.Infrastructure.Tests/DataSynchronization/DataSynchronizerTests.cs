@@ -124,6 +124,30 @@ public class DataSynchronizerTests : IDisposable
         Assert.False(IsSynchronizationRequested());
     }
 
+    [Fact]
+    public async Task CancelledSynchronization_StopsWithoutRecordingAFailedRetrieval()
+    {
+        await SeedActiveRequest();
+        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        _env.GoCardless.HoldResponses();
+        using var cancellation = new CancellationTokenSource();
+
+        var synchronization = _env.Synchronize(synchronizer =>
+            synchronizer.Synchronize(ThirdPartyDataType.Transactions, cancellationToken: cancellation.Token));
+        // Cancels while GoCardless is being asked
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+        while (_env.GoCardless.TotalRequestCount == 0 && DateTime.UtcNow < deadline)
+            await Task.Delay(10);
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            synchronization.WaitAsync(TimeSpan.FromSeconds(5)));
+        await using var dbContext = _env.CreateDbContext();
+        Assert.False(await dbContext.ThirdPartyDataRetrievalMetadata.AnyAsync(metadata =>
+            metadata.DataType == ThirdPartyDataType.Transactions));
+        Assert.Equal(0, _env.Notifier.Count);
+    }
+
     private Task<bool> SynchronizeTransactions() =>
         _env.Synchronize(synchronizer => synchronizer.Synchronize(ThirdPartyDataType.Transactions));
 

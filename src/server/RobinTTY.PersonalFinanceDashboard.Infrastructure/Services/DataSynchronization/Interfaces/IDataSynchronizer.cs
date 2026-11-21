@@ -12,16 +12,19 @@ public interface IDataSynchronizer
     /// Synchronizes all data that is due for retrieval.
     /// </summary>
     /// <param name="forceThirdPartySync">Whether to retrieve the data even if it isn't due.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>Whether all data was synchronized successfully.</returns>
-    Task<bool> SynchronizeAll(bool forceThirdPartySync = false);
+    Task<bool> SynchronizeAll(bool forceThirdPartySync = false, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Synchronizes the data of one type that is due for retrieval.
     /// </summary>
     /// <param name="dataType">The type of the data to synchronize.</param>
     /// <param name="forceThirdPartySync">Whether to retrieve the data even if it isn't due.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>Whether the data was synchronized successfully.</returns>
-    Task<bool> Synchronize(ThirdPartyDataType dataType, bool forceThirdPartySync = false);
+    Task<bool> Synchronize(ThirdPartyDataType dataType, bool forceThirdPartySync = false,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves an authentication request from its data provider, e.g. while waiting for the user to grant access.
@@ -29,6 +32,8 @@ public interface IDataSynchronizer
     /// which retrieves their transactions.
     /// </summary>
     /// <param name="authenticationRequestId">The id of the authentication request.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>Whether the authentication request was synchronized successfully.</returns>
-    Task<bool> RefreshAuthenticationRequest(Guid authenticationRequestId);
+    Task<bool> RefreshAuthenticationRequest(Guid authenticationRequestId,
+        CancellationToken cancellationToken = default);
 }

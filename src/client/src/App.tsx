@@ -7,11 +7,13 @@ import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { createCache } from './graphql/cache';
 import { createLink } from './graphql/link';
+import { refetchSynchronizedQueries } from './graphql/refetchSynchronizedQueries';
 import { Router } from './Router';
 import { theme } from './theme';
 
-const client = new ApolloClient({
-  link: createLink(),
+const client: ApolloClient = new ApolloClient({
+  // Synchronizations that completed while disconnected are refetched
+  link: createLink({ onReconnected: () => void refetchSynchronizedQueries(client) }),
   cache: createCache(),
   devtools: {
     enabled: import.meta.env.DEV,

@@ -24,19 +24,23 @@ public sealed class DataSynchronizationBackgroundService(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            await SynchronizeAll();
+            await SynchronizeAll(stoppingToken);
             await WaitForNextRun(stoppingToken);
         }
     }
 
-    private async Task SynchronizeAll()
+    private async Task SynchronizeAll(CancellationToken stoppingToken)
     {
         try
         {
             using var scope = scopeFactory.CreateScope();
             var synchronizer = scope.ServiceProvider.GetRequiredService<IDataSynchronizer>();
-            if (!await synchronizer.SynchronizeAll())
+            if (!await synchronizer.SynchronizeAll(cancellationToken: stoppingToken))
                 logger.LogWarning("Not all third-party data could be synchronized.");
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            logger.LogInformation("Stopped synchronizing third-party data because the app is shutting down.");
         }
         catch (Exception exception)
         {

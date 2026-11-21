@@ -1,4 +1,5 @@
 import { useApolloClient, useSubscription } from '@apollo/client/react';
+import { refetchSynchronizedQueries } from '@/graphql/refetchSynchronizedQueries';
 import { DataSynchronized } from '@/graphql/subscriptions/DataSynchronized';
 
 /**
@@ -12,7 +13,7 @@ export function useRefetchOnDataSynchronized() {
     context: { notifyOnError: false },
     ignoreResults: true,
     onData: () => {
-      void client.refetchQueries({ include: 'active' });
+      void refetchSynchronizedQueries(client);
     },
   });
 }

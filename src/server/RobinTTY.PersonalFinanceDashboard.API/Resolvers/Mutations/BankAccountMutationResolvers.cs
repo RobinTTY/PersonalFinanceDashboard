@@ -68,9 +68,12 @@ public class BankAccountMutationResolvers
     /// Synchronizes bank account data with third-party data providers.
     /// </summary>
     /// <param name="synchronizer">Runs the synchronization.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
-    public async Task<bool> SynchronizeBankAccountData(IDataSynchronizer synchronizer)
+    public async Task<bool> SynchronizeBankAccountData(IDataSynchronizer synchronizer,
+        CancellationToken cancellationToken)
     {
-        return await synchronizer.Synchronize(ThirdPartyDataType.BankAccounts, forceThirdPartySync: true);
+        return await synchronizer.Synchronize(ThirdPartyDataType.BankAccounts, forceThirdPartySync: true,
+            cancellationToken);
     }
 }

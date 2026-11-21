@@ -12,10 +12,11 @@ public sealed class DataSynchronizationLock
     /// <summary>
     /// Waits until no other synchronization is running.
     /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A handle that releases the lock when disposed.</returns>
-    public async Task<IDisposable> Acquire()
+    public async Task<IDisposable> Acquire(CancellationToken cancellationToken = default)
     {
-        await _semaphore.WaitAsync();
+        await _semaphore.WaitAsync(cancellationToken);
         return new Releaser(_semaphore);
     }
 

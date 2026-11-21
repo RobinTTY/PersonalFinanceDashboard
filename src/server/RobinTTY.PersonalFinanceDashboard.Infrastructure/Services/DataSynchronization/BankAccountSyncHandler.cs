@@ -22,13 +22,15 @@ public class BankAccountSyncHandler(
     /// </summary>
     /// <param name="internalBankAccountId">The internal ID of a specific bank account to synchronize. If <see langword="null"/>, all bank accounts will be synchronized.</param>
     /// <param name="forceThirdPartySync">Indicates whether to force synchronization with the third-party API.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A boolean value indicating whether the synchronization process was successful.</returns>
-    public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false,
+        CancellationToken cancellationToken = default)
     {
         if (internalBankAccountId.HasValue)
         {
             var bankAccount = await dbContext.BankAccounts
-                .SingleOrDefaultAsync(account => account.Id == internalBankAccountId);
+                .SingleOrDefaultAsync(account => account.Id == internalBankAccountId, cancellationToken);
             if (bankAccount == null)
             {
                 logger.LogWarning("Bank account with id {bankAccountId} does not exist.", internalBankAccountId);
@@ -37,16 +39,17 @@ public class BankAccountSyncHandler(
 
             // Accounts without a provider (e.g. manually created ones) aren't synchronized
             if (providers.TryGet(bankAccount.Source, out var provider))
-                await SynchronizeBankAccounts(provider, [bankAccount], forceThirdPartySync);
+                await SynchronizeBankAccounts(provider, [bankAccount], forceThirdPartySync, cancellationToken);
 
             return true;
         }
 
-        var accountsBySource = (await GetAccountsOfActiveAuthenticationRequests()).GroupBy(account => account.Source);
+        var accountsBySource = (await GetAccountsOfActiveAuthenticationRequests(cancellationToken))
+            .GroupBy(account => account.Source);
         foreach (var accounts in accountsBySource)
         {
             if (providers.TryGet(accounts.Key, out var provider))
-                await SynchronizeBankAccounts(provider, accounts.ToList(), forceThirdPartySync);
+                await SynchronizeBankAccounts(provider, accounts.ToList(), forceThirdPartySync, cancellationToken);
         }
 
         return true;
@@ -55,10 +58,12 @@ public class BankAccountSyncHandler(
     /// <summary>
     /// Gets the bank accounts associated with active authentication requests that are not older than 90 days.
     /// </summary>
-    private async Task<List<BankAccount>> GetAccountsOfActiveAuthenticationRequests()
+    private async Task<List<BankAccount>> GetAccountsOfActiveAuthenticationRequests(
+        CancellationToken cancellationToken)
     {
         var authRequests = await dbContext.AuthenticationRequests
-            .Include(authenticationRequest => authenticationRequest.AssociatedAccounts).ToListAsync();
+            .Include(authenticationRequest => authenticationRequest.AssociatedAccounts)
+            .ToListAsync(cancellationToken);
 
         // An account can be linked to multiple active authentication requests
         return authRequests
@@ -74,17 +79,19 @@ public class BankAccountSyncHandler(
     /// <param name="provider">The provider the accounts originate from.</param>
     /// <param name="bankAccounts">The bank accounts to synchronize, if their data is stale.</param>
     /// <param name="forceSync">Indicates whether to force synchronization with the third party API.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     private async Task SynchronizeBankAccounts(IBankDataProvider provider,
         IReadOnlyCollection<BankAccount> bankAccounts,
-        bool forceSync)
+        bool forceSync, CancellationToken cancellationToken)
     {
-        var accountsToFetch = await DetermineStaleBankAccounts(provider.Source, bankAccounts, forceSync);
+        var accountsToFetch =
+            await DetermineStaleBankAccounts(provider.Source, bankAccounts, forceSync, cancellationToken);
         if (accountsToFetch.Count == 0)
             return;
 
         var accountIds = bankAccounts.ToDictionary(account => account.ExternalId!, account => account.Id);
         var fetchedBankAccounts = new List<BankAccount>();
-        foreach (var (externalId, response) in await provider.GetBankAccounts(accountsToFetch))
+        foreach (var (externalId, response) in await provider.GetBankAccounts(accountsToFetch, cancellationToken))
         {
             if (response.IsSuccessful)
             {
@@ -94,19 +101,20 @@ public class BankAccountSyncHandler(
 
             var accountId = accountIds[externalId];
             var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
-                ThirdPartyDataType.BankAccounts, accountId, response.Error);
+                ThirdPartyDataType.BankAccounts, accountId, response.Error, cancellationToken);
             logger.LogWarning(
                 "Encountered error while getting bank account with id {bankAccountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
                 accountId, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
         }
 
-        await TakeOverPredecessors(provider.Source, fetchedBankAccounts);
-        var updatedBankAccounts = await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts);
+        await TakeOverPredecessors(provider.Source, fetchedBankAccounts, cancellationToken);
+        var updatedBankAccounts =
+            await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts, cancellationToken);
         foreach (var bankAccount in updatedBankAccounts)
         {
             logger.LogDebug("Resetting data expiry for bank account with id {bankAccountId}", bankAccount.Id);
             await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.BankAccounts,
-                bankAccount.Id);
+                bankAccount.Id, cancellationToken);
         }
 
         logger.LogInformation("Synced {Count} bank accounts from {dataSource}", fetchedBankAccounts.Count,
@@ -120,7 +128,9 @@ public class BankAccountSyncHandler(
     /// </summary>
     /// <param name="source">The data source the accounts were retrieved from.</param>
     /// <param name="fetchedBankAccounts">The accounts retrieved from the data source.</param>
-    private async Task TakeOverPredecessors(DataSource source, List<BankAccount> fetchedBankAccounts)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    private async Task TakeOverPredecessors(DataSource source, List<BankAccount> fetchedBankAccounts,
+        CancellationToken cancellationToken)
     {
         var utcNow = timeProvider.GetUtcNow().UtcDateTime;
         foreach (var fetched in fetchedBankAccounts.Where(account => account.Iban != null))
@@ -129,7 +139,7 @@ public class BankAccountSyncHandler(
                 .Include(account => account.AssociatedAuthenticationRequests)
                 .Where(account => account.Source == source && account.Iban == fetched.Iban &&
                                   account.ExternalId != fetched.ExternalId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
             // Accounts that are still synchronized through another connection aren't replaced
             var predecessor = candidates.FirstOrDefault(account =>
                 !account.AssociatedAuthenticationRequests.Any(request => request.IsActive(utcNow)));
@@ -138,30 +148,31 @@ public class BankAccountSyncHandler(
 
             var placeholder = await dbContext.BankAccounts
                 .Include(account => account.AssociatedAuthenticationRequests)
-                .SingleOrDefaultAsync(account => account.Source == source && account.ExternalId == fetched.ExternalId);
+                .SingleOrDefaultAsync(account => account.Source == source && account.ExternalId == fetched.ExternalId,
+                    cancellationToken);
             if (placeholder != null)
             {
                 foreach (var request in placeholder.AssociatedAuthenticationRequests
                              .Where(request => !predecessor.AssociatedAuthenticationRequests.Contains(request)))
                     predecessor.AssociatedAuthenticationRequests.Add(request);
 
-                await dataRetrievalMetadataService.RemoveMetadata(source, placeholder.Id!.Value);
+                await dataRetrievalMetadataService.RemoveMetadata(source, placeholder.Id!.Value, cancellationToken);
                 dbContext.BankAccounts.Remove(placeholder);
                 // Frees the external id before the predecessor takes it
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
 
             // Transactions the earlier connection retrieved have different ids, so they aren't retrieved again
             var lastTransactionDate = await dbContext.Transactions
                 .Where(transaction => transaction.BankAccount!.Id == predecessor.Id)
-                .MaxAsync(transaction => transaction.ValueDate);
+                .MaxAsync(transaction => transaction.ValueDate, cancellationToken);
             predecessor.ExternalId = fetched.ExternalId;
-            await dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync(cancellationToken);
             // Earlier retrieval failures and expiries don't apply to the new connection
-            await dataRetrievalMetadataService.RemoveMetadata(source, predecessor.Id!.Value);
+            await dataRetrievalMetadataService.RemoveMetadata(source, predecessor.Id!.Value, cancellationToken);
             if (lastTransactionDate != null)
                 await dataRetrievalMetadataService.SetRetrieveFrom(source, ThirdPartyDataType.Transactions,
-                    predecessor.Id!.Value, lastTransactionDate.Value.Date);
+                    predecessor.Id!.Value, lastTransactionDate.Value.Date, cancellationToken);
 
             logger.LogInformation(
                 "Bank account with id {bankAccountId} was reconnected and now has the external id {externalId}.",
@@ -176,16 +187,17 @@ public class BankAccountSyncHandler(
     /// <param name="source">The data source the accounts originate from.</param>
     /// <param name="bankAccounts">The bank accounts to evaluate for staleness.</param>
     /// <param name="forceSync">Indicates whether synchronization should be forced regardless of staleness status.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A dictionary where the key is the external id of a bank account and the value indicates whether its metadata needs to be fetched.</returns>
     private async Task<Dictionary<string, bool>> DetermineStaleBankAccounts(DataSource source,
-        IEnumerable<BankAccount> bankAccounts, bool forceSync)
+        IEnumerable<BankAccount> bankAccounts, bool forceSync, CancellationToken cancellationToken)
     {
         var accountsToFetch = new Dictionary<string, bool>();
 
         foreach (var bankAccount in bankAccounts)
         {
             var retrievalIsDue = await dataRetrievalMetadataService.IsRetrievalDue(source,
-                ThirdPartyDataType.BankAccounts, bankAccount.Id);
+                ThirdPartyDataType.BankAccounts, bankAccount.Id, cancellationToken);
             if (retrievalIsDue || forceSync)
             {
                 accountsToFetch.Add(bankAccount.ExternalId!, bankAccount.Currency == null);
@@ -208,16 +220,18 @@ public class BankAccountSyncHandler(
     /// </summary>
     /// <param name="source">The data source the accounts were retrieved from.</param>
     /// <param name="bankAccounts">The list of bank accounts to add or update in the database.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of bank accounts
     /// that were added or updated in the database.</returns>
-    private async Task<List<BankAccount>> AddOrUpdateBankAccounts(DataSource source, List<BankAccount> bankAccounts)
+    private async Task<List<BankAccount>> AddOrUpdateBankAccounts(DataSource source, List<BankAccount> bankAccounts,
+        CancellationToken cancellationToken)
     {
         var accountIds = bankAccounts.Select(account => account.ExternalId!).Distinct().ToList();
         var existingAccounts = await dbContext.BankAccounts
             .Include(account => account.AssociatedAuthenticationRequests)
             .Include(account => account.AssociatedInstitution)
             .Where(account => account.Source == source && accountIds.Contains(account.ExternalId!))
-            .ToDictionaryAsync(account => account.ExternalId!);
+            .ToDictionaryAsync(account => account.ExternalId!, cancellationToken);
 
         var requestIds = bankAccounts
             .SelectMany(account => account.AssociatedAuthenticationRequests)
@@ -226,7 +240,7 @@ public class BankAccountSyncHandler(
             .ToList();
         var trackedRequests = await dbContext.AuthenticationRequests
             .Where(request => request.Source == source && requestIds.Contains(request.ExternalId!))
-            .ToDictionaryAsync(request => request.ExternalId!);
+            .ToDictionaryAsync(request => request.ExternalId!, cancellationToken);
 
         var institutionIds = bankAccounts
             .Select(account => account.AssociatedInstitution?.ExternalId)
@@ -235,7 +249,7 @@ public class BankAccountSyncHandler(
             .ToList();
         var trackedInstitutions = await dbContext.BankingInstitutions
             .Where(institution => institution.Source == source && institutionIds.Contains(institution.ExternalId!))
-            .ToDictionaryAsync(institution => institution.ExternalId!);
+            .ToDictionaryAsync(institution => institution.ExternalId!, cancellationToken);
 
         var updatedBankAccounts = new List<BankAccount>();
         foreach (var updatedBankAccount in bankAccounts)
@@ -259,7 +273,7 @@ public class BankAccountSyncHandler(
             updatedBankAccounts.Add(existingBankAccount);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return updatedBankAccounts;
     }

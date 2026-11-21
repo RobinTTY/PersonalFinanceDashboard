@@ -2,5 +2,5 @@
 
 public interface IBankingInstitutionSyncHandler
 {
-    Task<bool> SynchronizeData(Guid? bankingInstitutionId = null, bool forceThirdPartySync = false);
+    Task<bool> SynchronizeData(bool forceThirdPartySync = false, CancellationToken cancellationToken = default);
 }

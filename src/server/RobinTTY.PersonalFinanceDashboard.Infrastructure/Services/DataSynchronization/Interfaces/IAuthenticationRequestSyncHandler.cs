@@ -2,5 +2,6 @@
 
 public interface IAuthenticationRequestSyncHandler
 {
-    Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false);
+    Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false,
+        CancellationToken cancellationToken = default);
 }

@@ -64,9 +64,12 @@ public class AuthenticationMutationResolvers
     /// Synchronizes authentication request data with third-party data providers.
     /// </summary>
     /// <param name="synchronizer">Runs the synchronization.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
-    public async Task<bool> SynchronizeAuthenticationRequestData(IDataSynchronizer synchronizer)
+    public async Task<bool> SynchronizeAuthenticationRequestData(IDataSynchronizer synchronizer,
+        CancellationToken cancellationToken)
     {
-        return await synchronizer.Synchronize(ThirdPartyDataType.AuthenticationRequests, forceThirdPartySync: true);
+        return await synchronizer.Synchronize(ThirdPartyDataType.AuthenticationRequests, forceThirdPartySync: true,
+            cancellationToken);
     }
 }

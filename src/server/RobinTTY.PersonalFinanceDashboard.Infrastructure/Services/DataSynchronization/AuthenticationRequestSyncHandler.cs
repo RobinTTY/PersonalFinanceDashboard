@@ -18,22 +18,25 @@ public class AuthenticationRequestSyncHandler(
     TimeProvider timeProvider,
     ILogger<AuthenticationRequestSyncHandler> logger) : IAuthenticationRequestSyncHandler
 {
-    public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false)
+    public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false,
+        CancellationToken cancellationToken = default)
     {
         if (authenticationRequestId.HasValue)
-            return await SynchronizeAuthenticationRequest(authenticationRequestId.Value, forceThirdPartySync);
+            return await SynchronizeAuthenticationRequest(authenticationRequestId.Value, forceThirdPartySync,
+                cancellationToken);
 
         var success = true;
         foreach (var provider in providers.All)
-            success &= await SynchronizeAllAuthenticationRequests(provider, forceThirdPartySync);
+            success &= await SynchronizeAllAuthenticationRequests(provider, forceThirdPartySync, cancellationToken);
 
         return success;
     }
 
-    private async Task<bool> SynchronizeAuthenticationRequest(Guid authenticationRequestId, bool forceThirdPartySync)
+    private async Task<bool> SynchronizeAuthenticationRequest(Guid authenticationRequestId, bool forceThirdPartySync,
+        CancellationToken cancellationToken)
     {
         var authenticationRequest = await dbContext.AuthenticationRequests
-            .SingleOrDefaultAsync(authRequest => authRequest.Id == authenticationRequestId);
+            .SingleOrDefaultAsync(authRequest => authRequest.Id == authenticationRequestId, cancellationToken);
         if (authenticationRequest == null)
         {
             logger.LogWarning("Authentication request with id {id} does not exist.", authenticationRequestId);
@@ -41,42 +44,45 @@ public class AuthenticationRequestSyncHandler(
         }
 
         if (!providers.TryGet(authenticationRequest.Source, out var provider) ||
-            !await IsSynchronizationDue(provider.Source, forceThirdPartySync))
+            !await IsSynchronizationDue(provider.Source, forceThirdPartySync, cancellationToken))
             return true;
 
-        var response = await provider.GetAuthenticationRequest(authenticationRequest.ExternalId!);
+        var response = await provider.GetAuthenticationRequest(authenticationRequest.ExternalId!, cancellationToken);
         if (!response.IsSuccessful)
         {
             LogFailure(provider.Source, response.Error);
             return false;
         }
 
-        var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(provider.Source, [response.Result]);
+        var numOfAddedAuthRequests =
+            await AddOrUpdateAuthenticationRequests(provider.Source, [response.Result], cancellationToken);
         LogSynchronizationResults(provider.Source, 1, numOfAddedAuthRequests, 0);
 
         return true;
     }
 
     private async Task<bool> SynchronizeAllAuthenticationRequests(IBankDataProvider provider,
-        bool forceThirdPartySync)
+        bool forceThirdPartySync, CancellationToken cancellationToken)
     {
-        if (!await IsSynchronizationDue(provider.Source, forceThirdPartySync))
+        if (!await IsSynchronizationDue(provider.Source, forceThirdPartySync, cancellationToken))
             return true;
 
-        var response = await provider.GetAuthenticationRequests();
+        var response = await provider.GetAuthenticationRequests(cancellationToken);
         if (!response.IsSuccessful)
         {
             LogFailure(provider.Source, response.Error);
             await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
-                ThirdPartyDataType.AuthenticationRequests, null, response.Error);
+                ThirdPartyDataType.AuthenticationRequests, null, response.Error, cancellationToken);
             return false;
         }
 
         var authenticationRequests = response.Result;
-        var numOfAddedAuthRequests = await AddOrUpdateAuthenticationRequests(provider.Source, authenticationRequests);
+        var numOfAddedAuthRequests =
+            await AddOrUpdateAuthenticationRequests(provider.Source, authenticationRequests, cancellationToken);
         var numOfRemovedAuthRequests =
-            await RemoveNotIncludedAuthenticationRequests(provider.Source, authenticationRequests);
-        await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.AuthenticationRequests);
+            await RemoveNotIncludedAuthenticationRequests(provider.Source, authenticationRequests, cancellationToken);
+        await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.AuthenticationRequests,
+            cancellationToken: cancellationToken);
 
         LogSynchronizationResults(provider.Source, authenticationRequests.Count, numOfAddedAuthRequests,
             numOfRemovedAuthRequests);
@@ -84,10 +90,12 @@ public class AuthenticationRequestSyncHandler(
         return true;
     }
 
-    private async Task<bool> IsSynchronizationDue(DataSource source, bool forceThirdPartySync)
+    private async Task<bool> IsSynchronizationDue(DataSource source, bool forceThirdPartySync,
+        CancellationToken cancellationToken)
     {
         if (forceThirdPartySync ||
-            await dataRetrievalMetadataService.IsRetrievalDue(source, ThirdPartyDataType.AuthenticationRequests))
+            await dataRetrievalMetadataService.IsRetrievalDue(source, ThirdPartyDataType.AuthenticationRequests,
+                cancellationToken: cancellationToken))
             return true;
 
         logger.LogDebug(
@@ -101,15 +109,16 @@ public class AuthenticationRequestSyncHandler(
     /// </summary>
     /// <param name="source">The data source the authentication requests were retrieved from.</param>
     /// <param name="authenticationRequests">A list of authentication requests to add or update in the database.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The number of newly added authentication requests.</returns>
     private async Task<int> AddOrUpdateAuthenticationRequests(DataSource source,
-        IReadOnlyCollection<AuthenticationRequest> authenticationRequests)
+        IReadOnlyCollection<AuthenticationRequest> authenticationRequests, CancellationToken cancellationToken)
     {
         var requestIds = authenticationRequests.Select(request => request.ExternalId!).Distinct().ToList();
         var existingRequests = await dbContext.AuthenticationRequests
             .Include(request => request.AssociatedAccounts)
             .Where(request => request.Source == source && requestIds.Contains(request.ExternalId!))
-            .ToDictionaryAsync(request => request.ExternalId!);
+            .ToDictionaryAsync(request => request.ExternalId!, cancellationToken);
 
         // An account can belong to multiple requests (e.g. after renewing consent), so it's only looked up once
         var accountIds = authenticationRequests
@@ -119,7 +128,7 @@ public class AuthenticationRequestSyncHandler(
             .ToList();
         var trackedAccounts = await dbContext.BankAccounts
             .Where(account => account.Source == source && accountIds.Contains(account.ExternalId!))
-            .ToDictionaryAsync(account => account.ExternalId!);
+            .ToDictionaryAsync(account => account.ExternalId!, cancellationToken);
 
         var numOfAddedAuthRequests = 0;
         foreach (var updatedAuthenticationRequest in authenticationRequests)
@@ -142,7 +151,7 @@ public class AuthenticationRequestSyncHandler(
             UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest, trackedAccounts);
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return numOfAddedAuthRequests;
     }
@@ -181,15 +190,16 @@ public class AuthenticationRequestSyncHandler(
     /// <param name="source">The data source the authentication requests were retrieved from.</param>
     /// <param name="authenticationRequests">The authentication requests to compare the ones stored in the
     /// database to.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The number of removed authentication requests.</returns>
     private async Task<int> RemoveNotIncludedAuthenticationRequests(DataSource source,
-        IReadOnlyCollection<AuthenticationRequest> authenticationRequests)
+        IReadOnlyCollection<AuthenticationRequest> authenticationRequests, CancellationToken cancellationToken)
     {
         var externalIds = authenticationRequests.Select(req => req.ExternalId!).ToList();
 
         return await dbContext.AuthenticationRequests
             .Where(req => req.Source == source && !externalIds.Contains(req.ExternalId!))
-            .ExecuteDeleteAsync();
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
     private void LogFailure(DataSource source, ThirdPartyError error)

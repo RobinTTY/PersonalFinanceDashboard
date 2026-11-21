@@ -225,7 +225,7 @@ public class TransactionSyncHandlerTests : IDisposable
         var account = TestData.ManualAccount();
         await _env.Seed(account);
 
-        Assert.True(await _env.SyncTransactions(account.Id, force: true));
+        Assert.True(await _env.SyncTransactions(force: true));
 
         Assert.Equal(0, _env.GoCardless.TotalRequestCount);
     }

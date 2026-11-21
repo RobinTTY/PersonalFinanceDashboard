@@ -81,28 +81,49 @@ public sealed class DataSynchronizationBackgroundServiceTests : IAsyncDisposable
         await _synchronizer.WaitForRun();
     }
 
+    [Fact]
+    public async Task Stopping_CancelsTheRunningSynchronization()
+    {
+        _synchronizer.RunUntilCancelled = true;
+        await _service.StartAsync(CancellationToken.None);
+        await _synchronizer.WaitForRun();
+
+        await _service.StopAsync(CancellationToken.None).WaitAsync(Timeout);
+
+        Assert.True(_synchronizer.WasCancelled);
+    }
+
     private sealed class RecordingSynchronizer : IDataSynchronizer
     {
         private readonly Channel<bool> _runs = Channel.CreateUnbounded<bool>();
 
         public bool ThrowOnNextRun { get; set; }
+        public bool RunUntilCancelled { get; set; }
+        public bool WasCancelled { get; private set; }
 
         public async Task WaitForRun() => await _runs.Reader.ReadAsync().AsTask().WaitAsync(Timeout);
 
-        public Task<bool> SynchronizeAll(bool forceThirdPartySync = false)
+        public async Task<bool> SynchronizeAll(bool forceThirdPartySync = false,
+            CancellationToken cancellationToken = default)
         {
             _runs.Writer.TryWrite(true);
+            if (RunUntilCancelled)
+            {
+                cancellationToken.Register(() => WasCancelled = true);
+                await Task.Delay(System.Threading.Timeout.InfiniteTimeSpan, cancellationToken);
+            }
+
             if (!ThrowOnNextRun)
-                return Task.FromResult(true);
+                return true;
 
             ThrowOnNextRun = false;
             throw new InvalidOperationException("Synchronization failed");
         }
 
-        public Task<bool> Synchronize(ThirdPartyDataType dataType, bool forceThirdPartySync = false) =>
-            throw new NotSupportedException();
+        public Task<bool> Synchronize(ThirdPartyDataType dataType, bool forceThirdPartySync = false,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
-        public Task<bool> RefreshAuthenticationRequest(Guid authenticationRequestId) =>
-            throw new NotSupportedException();
+        public Task<bool> RefreshAuthenticationRequest(Guid authenticationRequestId,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 }

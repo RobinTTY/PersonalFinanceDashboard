@@ -45,9 +45,9 @@ internal sealed class SyncTestEnvironment : IDisposable
         await dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> SyncTransactions(Guid? accountId = null, bool force = false) =>
+    public Task<bool> SyncTransactions(bool force = false, CancellationToken cancellationToken = default) =>
         Run(dbContext => CreateTransactionSyncHandler(dbContext, CreateMetadataService(dbContext))
-            .SynchronizeData(accountId, force));
+            .SynchronizeData(force, cancellationToken));
 
     public Task<bool> SyncBankAccounts(Guid? accountId = null, bool force = false) =>
         Run(dbContext => CreateBankAccountSyncHandler(dbContext, CreateMetadataService(dbContext))
@@ -57,9 +57,9 @@ internal sealed class SyncTestEnvironment : IDisposable
         Run(dbContext => CreateAuthenticationRequestSyncHandler(dbContext, CreateMetadataService(dbContext))
             .SynchronizeData(requestId, force));
 
-    public Task<bool> SyncBankingInstitutions(Guid? institutionId = null, bool force = false) =>
+    public Task<bool> SyncBankingInstitutions(bool force = false) =>
         Run(dbContext => CreateBankingInstitutionSyncHandler(dbContext, CreateMetadataService(dbContext))
-            .SynchronizeData(institutionId, force));
+            .SynchronizeData(force));
 
     /// <summary>
     /// Runs <paramref name="synchronize"/> with a <see cref="DataSynchronizer"/> that has its own context.
