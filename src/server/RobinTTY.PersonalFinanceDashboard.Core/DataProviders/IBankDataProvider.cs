@@ -79,7 +79,9 @@ public interface IBankDataProvider
     /// that only carries the account's source and external id.
     /// </summary>
     /// <param name="accountId">The provider's id of the account.</param>
+    /// <param name="dateFrom">The date of the earliest transactions to get, <see langword="null"/> to get all the
+    /// provider has.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
-    Task<ThirdPartyResponse<IReadOnlyList<Transaction>>> GetTransactions(string accountId,
+    Task<ThirdPartyResponse<IReadOnlyList<Transaction>>> GetTransactions(string accountId, DateTime? dateFrom = null,
         CancellationToken cancellationToken = default);
 }

@@ -1,18 +1,25 @@
-import { AuthenticationStatus, AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
-import { IconBuildingBank, IconTrash } from '@tabler/icons-react';
-import { formatBalance, getInitials } from '@utility';
+import {
+  AuthenticationStatus,
+  AuthRequestWithAccountsFragment,
+  SyncState,
+} from '@graphql-types/graphql';
+import { IconBuildingBank, IconPlugConnected, IconTrash } from '@tabler/icons-react';
+import { formatBalance, formatRelativeTime, getInitials } from '@utility';
 import {
   Accordion,
   ActionIcon,
   Avatar,
   Badge,
+  Button,
   Divider,
   Group,
   Stack,
   Text,
   Tooltip,
 } from '@mantine/core';
+import { ReconnectInstitution } from '@/components/AddAccountModal/AddAccountModal';
 import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
+import { SyncStatusIndicator } from '@/components/SyncStatusIndicator/SyncStatusIndicator';
 import classes from './ConnectedBanksSection.module.css';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
@@ -36,6 +43,35 @@ const STATUS_LABELS: Record<AuthenticationStatus, string> = {
   [AuthenticationStatus.Unknown]: 'Unknown',
 };
 
+// Connections expiring sooner than this are highlighted, so they can be renewed in time
+const EXPIRY_WARNING_DAYS = 14;
+const DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Shows when the access of an active or expired connection ends, highlighted once it's close.
+ */
+function AccessExpiry({ bank }: { bank: AuthRequestWithAccounts }) {
+  if (bank.status !== AuthenticationStatus.Active && bank.status !== AuthenticationStatus.Expired) {
+    return null;
+  }
+
+  const expiresAt = bank.accessExpiresAt;
+  const remaining = expiresAt.getTime() - Date.now();
+  if (remaining <= 0) {
+    return (
+      <Text size="xs" c="red">
+        Access expired {formatRelativeTime(expiresAt)}
+      </Text>
+    );
+  }
+
+  return (
+    <Text size="xs" c={remaining < EXPIRY_WARNING_DAYS * DAY ? 'orange' : 'dimmed'}>
+      Access expires {formatRelativeTime(expiresAt)}
+    </Text>
+  );
+}
+
 /**
  * Sub-component to render individual linked accounts within a connected bank card.
  * @param account The bank account to display details for.
@@ -46,7 +82,7 @@ function AccountRow({ account }: { account: ConnectedBankAccount }) {
 
   return (
     <div className={classes.accountCard}>
-      <Stack gap={2} mb="xs">
+      <Stack gap={2} mb="xs" align="flex-start">
         <Text fw={600} size="sm">
           {title}
         </Text>
@@ -55,6 +91,7 @@ function AccountRow({ account }: { account: ConnectedBankAccount }) {
             {account.iban}
           </Text>
         )}
+        <SyncStatusIndicator status={account.syncStatus} />
       </Stack>
       <Stack gap="xs">
         {account.accountType && (
@@ -105,13 +142,23 @@ function AccountRow({ account }: { account: ConnectedBankAccount }) {
 interface ConnectedBankCardProps {
   bank: AuthRequestWithAccounts;
   onRequestDelete: (bank: AuthRequestWithAccounts) => void;
+  onReconnect: (institution: ReconnectInstitution) => void;
   isDeleting: boolean;
 }
 
-export function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: ConnectedBankCardProps) {
+export function ConnectedBankCard({
+  bank,
+  onRequestDelete,
+  onReconnect,
+  isDeleting,
+}: ConnectedBankCardProps) {
   const institution = bank.associatedAccounts[0]?.associatedInstitution;
   const status = bank.status;
   const accountCount = bank.associatedAccounts.length;
+  // Once a newer connection took over the accounts, this one doesn't need to be renewed anymore
+  const needsReconnect = bank.associatedAccounts.some(
+    (account) => account.syncStatus.state === SyncState.NeedsReauthentication
+  );
 
   return (
     <div className={classes.bankCard}>
@@ -137,10 +184,21 @@ export function ConnectedBankCard({ bank, onRequestDelete, isDeleting }: Connect
                 day: 'numeric',
               })}
             </Text>
+            <AccessExpiry bank={bank} />
           </Stack>
         </Group>
 
         <Group gap="xs" wrap="nowrap" flex="0 0 auto">
+          {needsReconnect && institution?.id != null && (
+            <Button
+              size="compact-xs"
+              variant="light"
+              leftSection={<IconPlugConnected size={14} />}
+              onClick={() => onReconnect({ id: String(institution.id), name: institution.name })}
+            >
+              Reconnect
+            </Button>
+          )}
           <Badge variant="light" color={STATUS_COLORS[status]} size="sm">
             {STATUS_LABELS[status]}
           </Badge>

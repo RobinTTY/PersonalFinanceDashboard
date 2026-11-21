@@ -9,6 +9,11 @@ interface SyncStatusProps {
   status: Status;
 }
 
+interface SyncStatusIndicatorProps extends SyncStatusProps {
+  /** Called when the user wants to reconnect a bank whose access expired. Without it, nothing is clickable. */
+  onReconnect?: () => void;
+}
+
 function formatLastSync(lastSuccessfulSync: Date | null) {
   return lastSuccessfulSync ? `Synced ${formatRelativeTime(lastSuccessfulSync)}` : 'Not synced yet';
 }
@@ -24,7 +29,7 @@ function formatRetry(nextRetry: Date | null) {
  * Shows how up to date an account is with its bank: when it was synced, or that syncing failed or
  * needs the bank to be reconnected.
  */
-export function SyncStatusIndicator({ status }: SyncStatusProps) {
+export function SyncStatusIndicator({ status, onReconnect }: SyncStatusIndicatorProps) {
   switch (status.state) {
     case SyncState.UpToDate:
       return (
@@ -74,8 +79,10 @@ export function SyncStatusIndicator({ status }: SyncStatusProps) {
             variant="light"
             size="sm"
             tt="none"
-            tabIndex={0}
             leftSection={<IconPlugConnectedX size={12} />}
+            {...(onReconnect
+              ? { component: 'button', onClick: onReconnect, style: { cursor: 'pointer' } }
+              : { tabIndex: 0 })}
           >
             Reconnect bank
           </Badge>

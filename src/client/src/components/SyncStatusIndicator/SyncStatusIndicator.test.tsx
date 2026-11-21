@@ -71,6 +71,13 @@ describe('SyncStatusIndicator', () => {
     expect(screen.getByText('Reconnect bank')).toBeInTheDocument();
   });
 
+  it('reconnects the bank when the badge is clicked', async () => {
+    const onReconnect = vi.fn();
+    render(<SyncStatusIndicator status={needsReauthentication} onReconnect={onReconnect} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Reconnect bank' }));
+    expect(onReconnect).toHaveBeenCalledTimes(1);
+  });
+
   it('shows nothing for manual accounts', () => {
     // The container also holds Mantine's style elements, so it's never empty
     const { container } = render(<SyncStatusIndicator status={notSynced} />);

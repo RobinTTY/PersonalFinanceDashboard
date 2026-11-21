@@ -2,6 +2,7 @@ import { BankAccountSummaryFragment } from '@graphql-types/graphql';
 import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
 import { formatBalance, getInitials } from '@utility';
 import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
+import { useOpenSettings } from '@/components/SettingsModal/OpenSettingsContext';
 import {
   SyncStatusDot,
   SyncStatusIndicator,
@@ -25,6 +26,7 @@ export function AccountsHeader({
   onAccountChange,
   onAddAccount,
 }: AccountsHeaderProps) {
+  const openSettings = useOpenSettings();
   const institution = currentAccount?.associatedInstitution;
   const accountLabel =
     currentAccount?.name ?? currentAccount?.iban ?? (loadingAccounts ? 'Loading…' : 'No account');
@@ -72,7 +74,12 @@ export function AccountsHeader({
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-          {currentAccount && <SyncStatusIndicator status={currentAccount.syncStatus} />}
+          {currentAccount && (
+            <SyncStatusIndicator
+              status={currentAccount.syncStatus}
+              onReconnect={openSettings ? () => openSettings('Connected Banks') : undefined}
+            />
+          )}
         </Stack>
 
         <Stack gap={2} align="flex-end" style={{ flex: 1 }}>

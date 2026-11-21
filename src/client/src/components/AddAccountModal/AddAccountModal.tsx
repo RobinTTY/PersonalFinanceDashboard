@@ -18,13 +18,22 @@ export interface PendingAuthState {
   authenticationLink: string;
 }
 
+/** A bank whose expired connection is renewed. */
+export interface ReconnectInstitution {
+  /** The internal id of the institution. */
+  id: string;
+  name: string;
+}
+
 interface AddAccountModalProps {
   opened: boolean;
   onClose: () => void;
   pendingAuth?: PendingAuthState;
+  /** Skips choosing the account type and bank, and renews the connection to this bank instead. */
+  reconnect?: ReconnectInstitution;
 }
 
-export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModalProps) {
+export function AddAccountModal({ opened, onClose, pendingAuth, reconnect }: AddAccountModalProps) {
   useFlushAnalyticsRefetchOnClose(opened);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedType, setSelectedAccountType] = useState<AccountType | undefined>(undefined);
@@ -60,6 +69,13 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
       setStep(3);
     }
   }, [pendingAuth]);
+
+  useEffect(() => {
+    if (opened && reconnect) {
+      setSelectedBank(reconnect.id);
+      setStep(2);
+    }
+  }, [opened, reconnect]);
 
   const handleSynchronizeWithBank = async () => {
     if (!selectedBank) {
@@ -123,7 +139,12 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
 
   const stepConfig = {
     1: { title: 'Choose Account Type', subtitle: 'Select the type of account you want to add.' },
-    2: { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
+    2: reconnect
+      ? {
+          title: `Reconnect ${reconnect.name}`,
+          subtitle: 'Renew the access to your accounts at this bank.',
+        }
+      : { title: 'Select Bank', subtitle: 'Choose the bank you want to synchronize.' },
     3: {
       title: 'Authenticate with GoCardless',
       subtitle: 'Authenticate with your bank through GoCardless to complete the setup.',
@@ -141,7 +162,10 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
       centered
       classNames={{
         content: classes.modalContent,
-        body: step === 2 ? `${classes.modalBody} ${classes.modalBodyLarge}` : classes.modalBody,
+        body:
+          step === 2 && !reconnect
+            ? `${classes.modalBody} ${classes.modalBodyLarge}`
+            : classes.modalBody,
       }}
     >
       <Modal.Overlay />
@@ -165,9 +189,15 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
               />
             )}
 
-            {step === 2 && (
-              <SelectBankStep selectedBank={selectedBank} onBankSelect={setSelectedBank} />
-            )}
+            {step === 2 &&
+              (reconnect ? (
+                <Text size="sm">
+                  You'll be forwarded to {reconnect.name} through GoCardless to confirm the access
+                  again. Your accounts keep their transactions and settings.
+                </Text>
+              ) : (
+                <SelectBankStep selectedBank={selectedBank} onBankSelect={setSelectedBank} />
+              ))}
 
             {step === 3 && (
               <AuthenticateBankStep
@@ -191,8 +221,8 @@ export function AddAccountModal({ opened, onClose, pendingAuth }: AddAccountModa
               </>
             ) : step === 2 ? (
               <>
-                <Button variant="default" onClick={handleBack}>
-                  Back
+                <Button variant="default" onClick={reconnect ? handleClose : handleBack}>
+                  {reconnect ? 'Cancel' : 'Back'}
                 </Button>
                 <Button
                   disabled={!selectedBank}

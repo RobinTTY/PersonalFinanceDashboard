@@ -5,12 +5,17 @@ import { GetAuthRequestsWithAccounts } from '@graphql-queries/GetAuthRequestsWit
 import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
 import { IconAlertCircle, IconBuildingBank } from '@tabler/icons-react';
 import { Alert, Button, Group, Loader, Modal, Stack, Text } from '@mantine/core';
+import {
+  AddAccountModal,
+  ReconnectInstitution,
+} from '@/components/AddAccountModal/AddAccountModal';
 import { ConnectedBankCard } from './ConnectedBankCard';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
 
 export function ConnectedBanksSection() {
-  const { data, loading, error } = useQuery(GetAuthRequestsWithAccounts, {
+  const [reconnecting, setReconnecting] = useState<ReconnectInstitution>();
+  const { data, loading, error, refetch } = useQuery(GetAuthRequestsWithAccounts, {
     context: { notifyOnError: false },
   });
   const [pendingDeletion, setPendingDeletion] = useState<AuthRequestWithAccounts | null>(null);
@@ -87,6 +92,7 @@ export function ConnectedBanksSection() {
               bank={bank}
               isDeleting={deleting && pendingDeletion?.id === bank.id}
               onRequestDelete={setPendingDeletion}
+              onReconnect={setReconnecting}
             />
           ))}
         </Stack>
@@ -117,6 +123,16 @@ export function ConnectedBanksSection() {
           </Group>
         </Stack>
       </Modal>
+
+      <AddAccountModal
+        opened={reconnecting !== undefined}
+        reconnect={reconnecting}
+        onClose={() => {
+          setReconnecting(undefined);
+          // The new connection replaces this one for the reconnected accounts
+          void refetch();
+        }}
+      />
     </Stack>
   );
 }

@@ -218,6 +218,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<TimeSpan>("RetrievalInterval")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("RetrieveFrom")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid?>("SynchronizationEntityId")
                         .HasColumnType("TEXT");
 

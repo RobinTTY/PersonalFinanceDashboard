@@ -53,6 +53,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: false,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c1000000-0000-0000-0000-000000000001',
           name: 'Sandbox Finance',
           bic: 'GENODES1RGF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANDBOXFINANCE_SFIN0000.png',
@@ -73,6 +74,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: false,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c1000000-0000-0000-0000-000000000001',
           name: 'Sandbox Finance',
           bic: 'GENODES1RGF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANDBOXFINANCE_SFIN0000.png',
@@ -105,6 +107,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: true,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c2000000-0000-0000-0000-000000000002',
           name: 'C24',
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
@@ -125,6 +128,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: true,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c2000000-0000-0000-0000-000000000002',
           name: 'C24',
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
@@ -145,6 +149,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: true,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c2000000-0000-0000-0000-000000000002',
           name: 'C24',
           bic: 'DEFFDEFF',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
@@ -177,6 +182,7 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
         includeInAnalytics: true,
         associatedInstitution: {
           __typename: 'BankingInstitution',
+          id: 'c3000000-0000-0000-0000-000000000003',
           name: 'Santander',
           bic: 'SCFBDE33XXX',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANTANDER_PL_CORP_WBKPPLPP.png',

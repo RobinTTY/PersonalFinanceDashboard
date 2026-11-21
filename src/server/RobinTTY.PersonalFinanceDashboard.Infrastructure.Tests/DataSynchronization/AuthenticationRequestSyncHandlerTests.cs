@@ -31,6 +31,18 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task AccountsOfExpiredRequests_AreNotAdded()
+    {
+        // E.g. the old ids of accounts that were taken over by a reconnect
+        _env.GoCardless.Respond(RequisitionsPath,
+            Requisitions(Requisition(RequestId, "EX", _env.UtcNow.AddDays(-100), AccountId)));
+
+        Assert.True(await _env.SyncAuthenticationRequests());
+
+        Assert.Empty((await GetRequests()).Single().AssociatedAccounts);
+    }
+
+    [Fact]
     public async Task AccountSharedByTwoRequests_IsAddedOnce()
     {
         _env.GoCardless.Respond(RequisitionsPath, Requisitions(

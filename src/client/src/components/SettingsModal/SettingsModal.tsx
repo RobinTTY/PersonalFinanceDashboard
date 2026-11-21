@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IconAdjustments,
   IconBell,
@@ -51,11 +51,19 @@ const sections: SettingsSection[] = [
 interface SettingsModalProps {
   opened: boolean;
   onClose: () => void;
+  /** The label of the section to show when the modal opens, otherwise the last shown one. */
+  section?: string;
 }
 
-export function SettingsModal({ opened, onClose }: SettingsModalProps) {
-  const [activeLabel, setActiveLabel] = useState('Preferences');
+export function SettingsModal({ opened, onClose, section }: SettingsModalProps) {
+  const [activeLabel, setActiveLabel] = useState(section ?? 'Preferences');
   useFlushAnalyticsRefetchOnClose(opened);
+
+  useEffect(() => {
+    if (opened && section) {
+      setActiveLabel(section);
+    }
+  }, [opened, section]);
 
   return (
     <Modal.Root

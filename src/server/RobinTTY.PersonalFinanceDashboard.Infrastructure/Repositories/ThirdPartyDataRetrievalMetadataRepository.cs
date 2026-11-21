@@ -49,6 +49,21 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     }
 
     /// <summary>
+    /// Removes all metadata records of the given synchronization entity. The removal is persisted by
+    /// <see cref="SaveChanges"/>.
+    /// </summary>
+    /// <param name="dataSource">The data source the entity originates from.</param>
+    /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
+    public async Task RemoveThirdPartyDataRetrievalMetadata(DataSource dataSource, Guid synchronizationEntityId)
+    {
+        var metadata = await dbContext.ThirdPartyDataRetrievalMetadata
+            .Where(metadata => metadata.DataSource == dataSource &&
+                               metadata.SynchronizationEntityId == synchronizationEntityId)
+            .ToListAsync();
+        dbContext.ThirdPartyDataRetrievalMetadata.RemoveRange(metadata);
+    }
+
+    /// <summary>
     /// Saves the changes made to metadata records.
     /// </summary>
     public async Task SaveChanges() => await dbContext.SaveChangesAsync();

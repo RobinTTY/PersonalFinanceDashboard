@@ -1,13 +1,21 @@
+import { useState } from 'react';
 import { IconGauge, IconNotes, IconPresentationAnalytics } from '@tabler/icons-react';
 import { Outlet } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { DeferredAnalyticsRefetchProvider } from '@/components/IncludeInAnalyticsSwitch/DeferredAnalyticsRefetch';
 import { Navbar } from '@/components/Navbar/Navbar';
 import { LinksGroupProps } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
+import { OpenSettingsProvider } from '@/components/SettingsModal/OpenSettingsContext';
 import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
 
 export function AppLayout() {
-  const [settingsOpened, { open: openSettings, close: closeSettings }] = useDisclosure(false);
+  const [settingsOpened, { open, close: closeSettings }] = useDisclosure(false);
+  const [settingsSection, setSettingsSection] = useState<string>();
+
+  const openSettings = (section?: string) => {
+    setSettingsSection(section);
+    open();
+  };
 
   const navLinks: LinksGroupProps[] = [
     { label: 'Dashboard', icon: IconGauge, link: '/dashboard' },
@@ -16,14 +24,20 @@ export function AppLayout() {
   ];
 
   return (
-    <DeferredAnalyticsRefetchProvider>
-      <div style={{ display: 'flex', height: '100vh' }}>
-        <Navbar links={navLinks} onUserProfileClick={openSettings} />
-        <main style={{ flex: 1, overflow: 'auto', padding: 'var(--mantine-spacing-md)' }}>
-          <Outlet />
-        </main>
-        <SettingsModal opened={settingsOpened} onClose={closeSettings} />
-      </div>
-    </DeferredAnalyticsRefetchProvider>
+    <OpenSettingsProvider value={openSettings}>
+      <DeferredAnalyticsRefetchProvider>
+        <div style={{ display: 'flex', height: '100vh' }}>
+          <Navbar links={navLinks} onUserProfileClick={() => openSettings()} />
+          <main style={{ flex: 1, overflow: 'auto', padding: 'var(--mantine-spacing-md)' }}>
+            <Outlet />
+          </main>
+          <SettingsModal
+            opened={settingsOpened}
+            onClose={closeSettings}
+            section={settingsSection}
+          />
+        </div>
+      </DeferredAnalyticsRefetchProvider>
+    </OpenSettingsProvider>
   );
 }

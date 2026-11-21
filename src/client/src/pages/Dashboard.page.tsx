@@ -8,6 +8,7 @@ import {
   NetWorthAccount,
 } from '@/components/NetWorthLineChart/utility/buildNetWorthHistory';
 import { NetWorthLabel, NetWorthPanel } from '@/components/NetWorthPanel/NetWorthPanel';
+import { SyncStatusAlert } from '@/components/SyncStatusIndicator/SyncStatusAlert';
 
 const CHART_HEIGHT = 320;
 
@@ -27,11 +28,13 @@ export function DashboardPage() {
   );
 
   const { dataByLabel, currency } = useMemo(() => buildNetWorthHistory(accounts), [accounts]);
+  const syncStates = (data?.bankAccounts?.nodes ?? []).map((account) => account.syncStatus.state);
 
   const hasData = accounts.length > 0 && !loading && !error;
 
   return (
     <Stack>
+      <SyncStatusAlert states={syncStates} />
       <Card withBorder radius="md" padding="lg">
         {hasData ? (
           <NetWorthPanel dataByLabel={dataByLabel} height={CHART_HEIGHT} currency={currency} />

@@ -21,6 +21,7 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
       ownerName
       includeInAnalytics
       associatedInstitution {
+        id
         name
         bic
         logoUri

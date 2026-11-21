@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
@@ -14,6 +15,7 @@ public class AuthenticationRequestSyncHandler(
     ApplicationDbContext dbContext,
     BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
+    TimeProvider timeProvider,
     ILogger<AuthenticationRequestSyncHandler> logger) : IAuthenticationRequestSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false)
@@ -152,6 +154,11 @@ public class AuthenticationRequestSyncHandler(
         {
             if (!trackedAccounts.TryGetValue(account.ExternalId!, out var trackedAccount))
             {
+                // Accounts of inactive requests can't be synchronized. After a reconnect, their old ids would
+                // otherwise come back as empty accounts next to the ones that took their place.
+                if (!updatedAuthenticationRequest.IsActive(timeProvider.GetUtcNow().UtcDateTime))
+                    continue;
+
                 trackedAccount = account;
                 dbContext.BankAccounts.Add(trackedAccount);
                 trackedAccounts[trackedAccount.ExternalId!] = trackedAccount;

@@ -95,6 +95,49 @@ public class ThirdPartyDataRetrievalMetadataService(
     }
 
     /// <summary>
+    /// Gets the date from which the data is retrieved, <see langword="null"/> to retrieve all of it.
+    /// </summary>
+    /// <param name="dataSource">The data source the data is retrieved from.</param>
+    /// <param name="thirdPartyDataType">The type of the data.</param>
+    /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
+    public async Task<DateTime?> GetRetrieveFrom(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
+        Guid synchronizationEntityId)
+    {
+        var metadata = await thirdPartyDataRetrievalMetadataRepository
+            .GetThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+        return metadata?.RetrieveFrom;
+    }
+
+    /// <summary>
+    /// Sets the date from which the data is retrieved, and makes it due for retrieval.
+    /// </summary>
+    /// <param name="dataSource">The data source the data is retrieved from.</param>
+    /// <param name="thirdPartyDataType">The type of the data.</param>
+    /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
+    /// <param name="retrieveFrom">The date of the earliest data to retrieve.</param>
+    public async Task SetRetrieveFrom(DataSource dataSource, ThirdPartyDataType thirdPartyDataType,
+        Guid synchronizationEntityId, DateTime retrieveFrom)
+    {
+        var metadata = await thirdPartyDataRetrievalMetadataRepository
+            .GetOrAddThirdPartyDataRetrievalMetadata(dataSource, thirdPartyDataType, synchronizationEntityId);
+        metadata.RetrieveFrom = retrieveFrom;
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+    }
+
+    /// <summary>
+    /// Removes the retrieval metadata of all data types of the given synchronization entity, so its data is
+    /// retrieved on the next synchronization.
+    /// </summary>
+    /// <param name="dataSource">The data source the entity originates from.</param>
+    /// <param name="synchronizationEntityId">The id of the synchronization entity, e.g. an account id.</param>
+    public async Task RemoveMetadata(DataSource dataSource, Guid synchronizationEntityId)
+    {
+        await thirdPartyDataRetrievalMetadataRepository.RemoveThirdPartyDataRetrievalMetadata(dataSource,
+            synchronizationEntityId);
+        await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+    }
+
+    /// <summary>
     /// Gets the delay before retrying a failed retrieval: <see cref="InitialRetryDelay"/>, doubled for every
     /// further consecutive failure, but never longer than the regular retrieval interval.
     /// </summary>

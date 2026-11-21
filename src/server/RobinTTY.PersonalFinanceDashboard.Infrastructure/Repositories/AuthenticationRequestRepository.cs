@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
@@ -14,6 +15,8 @@ public class AuthenticationRequestRepository
     private readonly ApplicationDbContext _dbContext;
     private readonly BankDataProviderRegistry _providers;
     private readonly IAuthenticationRequestSyncHandler _authenticationRequestSyncHandler;
+    private readonly IBankAccountSyncHandler _bankAccountSyncHandler;
+    private readonly TimeProvider _timeProvider;
     private readonly ILogger<AuthenticationRequestRepository> _logger;
 
     /// <summary>
@@ -22,16 +25,22 @@ public class AuthenticationRequestRepository
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="providers">The data providers authentication requests are made at.</param>
     /// <param name="authenticationRequestSyncHandler">Handles the synchronization of authentication request data.</param>
+    /// <param name="bankAccountSyncHandler">Handles the synchronization of the accounts of authentication requests.</param>
+    /// <param name="timeProvider">Provides the current time.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public AuthenticationRequestRepository(
         ApplicationDbContext dbContext,
         BankDataProviderRegistry providers,
         IAuthenticationRequestSyncHandler authenticationRequestSyncHandler,
+        IBankAccountSyncHandler bankAccountSyncHandler,
+        TimeProvider timeProvider,
         ILogger<AuthenticationRequestRepository> logger)
     {
         _dbContext = dbContext;
         _providers = providers;
         _authenticationRequestSyncHandler = authenticationRequestSyncHandler;
+        _bankAccountSyncHandler = bankAccountSyncHandler;
+        _timeProvider = timeProvider;
         _logger = logger;
     }
 
@@ -44,7 +53,24 @@ public class AuthenticationRequestRepository
     {
         // TODO: Maybe let the API consumer choose whether to force the third party data sync
         await _authenticationRequestSyncHandler.SynchronizeData(authenticationId, true);
+        await SynchronizeAccountsOfActiveRequest(authenticationId);
         return _dbContext.AuthenticationRequests.Where(authentication => authentication.Id == authenticationId);
+    }
+
+    /// <summary>
+    /// Synchronizes the accounts of an active authentication request, e.g. right after the user granted access.
+    /// Accounts of a reconnected bank thereby take the place of the earlier ones before they are returned.
+    /// </summary>
+    private async Task SynchronizeAccountsOfActiveRequest(Guid authenticationId)
+    {
+        var request = await _dbContext.AuthenticationRequests
+            .Include(request => request.AssociatedAccounts)
+            .SingleOrDefaultAsync(request => request.Id == authenticationId);
+        if (request == null || !request.IsActive(_timeProvider.GetUtcNow().UtcDateTime))
+            return;
+
+        foreach (var accountId in request.AssociatedAccounts.Select(account => account.Id!.Value).ToList())
+            await _bankAccountSyncHandler.SynchronizeData(accountId);
     }
 
     /// <summary>

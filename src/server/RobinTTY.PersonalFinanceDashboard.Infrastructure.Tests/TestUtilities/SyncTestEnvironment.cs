@@ -53,7 +53,7 @@ internal sealed class SyncTestEnvironment : IDisposable
 
     public Task<bool> SyncAuthenticationRequests(Guid? requestId = null, bool force = false) =>
         Run(dbContext => new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), NullLogger<AuthenticationRequestSyncHandler>.Instance)
+                CreateMetadataService(dbContext), Time, NullLogger<AuthenticationRequestSyncHandler>.Instance)
             .SynchronizeData(requestId, force));
 
     public Task<bool> SyncBankingInstitutions(Guid? institutionId = null, bool force = false) =>
@@ -64,8 +64,10 @@ internal sealed class SyncTestEnvironment : IDisposable
     public AuthenticationRequestRepository CreateAuthenticationRequestRepository(ApplicationDbContext dbContext) =>
         new(dbContext, CreateProviders(),
             new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), NullLogger<AuthenticationRequestSyncHandler>.Instance),
-            NullLogger<AuthenticationRequestRepository>.Instance);
+                CreateMetadataService(dbContext), Time, NullLogger<AuthenticationRequestSyncHandler>.Instance),
+            new BankAccountSyncHandler(dbContext, CreateProviders(), CreateMetadataService(dbContext), Time,
+                NullLogger<BankAccountSyncHandler>.Instance),
+            Time, NullLogger<AuthenticationRequestRepository>.Instance);
 
     public async Task<ThirdPartyDataRetrievalMetadata> GetRetrievalMetadata(ThirdPartyDataType dataType,
         Guid? synchronizationEntityId = null)

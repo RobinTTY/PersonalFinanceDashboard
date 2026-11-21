@@ -100,6 +100,7 @@ public class BankAccountSyncHandler(
                 accountId, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
         }
 
+        await TakeOverPredecessors(provider.Source, fetchedBankAccounts);
         var updatedBankAccounts = await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts);
         foreach (var bankAccount in updatedBankAccounts)
         {
@@ -110,6 +111,62 @@ public class BankAccountSyncHandler(
 
         logger.LogInformation("Synced {Count} bank accounts from {dataSource}", fetchedBankAccounts.Count,
             provider.Source);
+    }
+
+    /// <summary>
+    /// After a bank is reconnected, the provider assigns its accounts new ids. Each fetched account takes the place
+    /// of an earlier account with the same IBAN that is no longer synchronized, so that account keeps its id,
+    /// transactions and settings. The placeholder created for the new id is removed.
+    /// </summary>
+    /// <param name="source">The data source the accounts were retrieved from.</param>
+    /// <param name="fetchedBankAccounts">The accounts retrieved from the data source.</param>
+    private async Task TakeOverPredecessors(DataSource source, List<BankAccount> fetchedBankAccounts)
+    {
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+        foreach (var fetched in fetchedBankAccounts.Where(account => account.Iban != null))
+        {
+            var candidates = await dbContext.BankAccounts
+                .Include(account => account.AssociatedAuthenticationRequests)
+                .Where(account => account.Source == source && account.Iban == fetched.Iban &&
+                                  account.ExternalId != fetched.ExternalId)
+                .ToListAsync();
+            // Accounts that are still synchronized through another connection aren't replaced
+            var predecessor = candidates.FirstOrDefault(account =>
+                !account.AssociatedAuthenticationRequests.Any(request => request.IsActive(utcNow)));
+            if (predecessor == null)
+                continue;
+
+            var placeholder = await dbContext.BankAccounts
+                .Include(account => account.AssociatedAuthenticationRequests)
+                .SingleOrDefaultAsync(account => account.Source == source && account.ExternalId == fetched.ExternalId);
+            if (placeholder != null)
+            {
+                foreach (var request in placeholder.AssociatedAuthenticationRequests
+                             .Where(request => !predecessor.AssociatedAuthenticationRequests.Contains(request)))
+                    predecessor.AssociatedAuthenticationRequests.Add(request);
+
+                await dataRetrievalMetadataService.RemoveMetadata(source, placeholder.Id!.Value);
+                dbContext.BankAccounts.Remove(placeholder);
+                // Frees the external id before the predecessor takes it
+                await dbContext.SaveChangesAsync();
+            }
+
+            // Transactions the earlier connection retrieved have different ids, so they aren't retrieved again
+            var lastTransactionDate = await dbContext.Transactions
+                .Where(transaction => transaction.BankAccount!.Id == predecessor.Id)
+                .MaxAsync(transaction => transaction.ValueDate);
+            predecessor.ExternalId = fetched.ExternalId;
+            await dbContext.SaveChangesAsync();
+            // Earlier retrieval failures and expiries don't apply to the new connection
+            await dataRetrievalMetadataService.RemoveMetadata(source, predecessor.Id!.Value);
+            if (lastTransactionDate != null)
+                await dataRetrievalMetadataService.SetRetrieveFrom(source, ThirdPartyDataType.Transactions,
+                    predecessor.Id!.Value, lastTransactionDate.Value.Date);
+
+            logger.LogInformation(
+                "Bank account with id {bankAccountId} was reconnected and now has the external id {externalId}.",
+                predecessor.Id, predecessor.ExternalId);
+        }
     }
 
     /// <summary>

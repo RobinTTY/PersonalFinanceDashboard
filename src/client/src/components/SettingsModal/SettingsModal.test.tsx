@@ -43,6 +43,11 @@ describe('SettingsModal', () => {
     expect(screen.getByRole('heading', { name: 'Notifications' })).toBeInTheDocument();
   });
 
+  it('opens at the requested section', () => {
+    render(<SettingsModal opened onClose={noop} section="About" />);
+    expect(screen.getByRole('heading', { name: 'About' })).toBeInTheDocument();
+  });
+
   it('calls onClose when the close button is clicked', () => {
     const onClose = vi.fn();
     render(<SettingsModal opened onClose={onClose} />);

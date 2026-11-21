@@ -8,6 +8,9 @@ export const GetNetWorthHistory: TypedDocumentNode<GetNetWorthHistoryQuery> = gq
         id
         balance
         currency
+        syncStatus {
+          state
+        }
         transactions {
           valueDate
           amount
