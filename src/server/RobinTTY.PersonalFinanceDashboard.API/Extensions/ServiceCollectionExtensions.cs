@@ -90,7 +90,8 @@ public static class ServiceCollectionExtensions
                 .AddScoped<IAuthenticationRequestSyncHandler, AuthenticationRequestSyncHandler>()
                 .AddScoped<IBankAccountSyncHandler, BankAccountSyncHandler>()
                 .AddScoped<ITransactionSyncHandler, TransactionSyncHandler>()
-                .AddScoped<ThirdPartyDataRetrievalMetadataService>();
+                .AddScoped<ThirdPartyDataRetrievalMetadataService>()
+                .AddScoped<BankAccountSyncStatusService>();
         }
 
         /// <summary>
