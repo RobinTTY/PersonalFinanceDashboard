@@ -18,10 +18,8 @@ public sealed class BankAccountQueryResolvers
     /// <param name="accountId">The id of the account to lookup.</param>
     [UseSingleOrDefault]
     [UseProjection]
-    public async Task<IQueryable<BankAccount?>> GetBankAccount(BankAccountRepository repository, Guid accountId)
-    {
-        return await repository.GetBankAccount(accountId);
-    }
+    public IQueryable<BankAccount?> GetBankAccount(BankAccountRepository repository, Guid accountId) =>
+        repository.GetBankAccount(accountId);
 
     /// <summary>
     /// Look up accounts.
@@ -30,8 +28,6 @@ public sealed class BankAccountQueryResolvers
     [UsePaging]
     [UseProjection]
     [UseFiltering]
-    public async Task<IQueryable<BankAccount>> GetBankAccounts(BankAccountRepository repository)
-    {
-        return await repository.GetBankAccounts();
-    }
+    public IQueryable<BankAccount> GetBankAccounts(BankAccountRepository repository) =>
+        repository.GetBankAccounts();
 }

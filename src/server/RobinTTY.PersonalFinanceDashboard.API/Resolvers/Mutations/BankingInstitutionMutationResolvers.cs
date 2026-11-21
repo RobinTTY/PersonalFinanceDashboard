@@ -58,10 +58,10 @@ public class BankingInstitutionMutationResolvers
     /// <summary>
     /// Synchronizes banking institution data with third-party data providers.
     /// </summary>
-    /// <param name="syncHandler">The handler responsible for managing the data synchronization process.</param>
+    /// <param name="synchronizer">Runs the synchronization.</param>
     /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
-    public async Task<bool> SynchronizeBankingInstitutionData(IBankingInstitutionSyncHandler syncHandler)
+    public async Task<bool> SynchronizeBankingInstitutionData(IDataSynchronizer synchronizer)
     {
-        return await syncHandler.SynchronizeData(forceThirdPartySync: true);
+        return await synchronizer.Synchronize(ThirdPartyDataType.BankingInstitutions, forceThirdPartySync: true);
     }
 }

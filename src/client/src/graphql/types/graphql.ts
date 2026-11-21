@@ -268,6 +268,13 @@ export type DataSourceOperationFilterInput = {
   nin?: InputMaybe<Array<DataSource>>;
 };
 
+/** A synchronization that retrieved data from a data provider. */
+export type DataSynchronization = {
+  __typename: 'DataSynchronization';
+  /** When the synchronization completed. */
+  completedAt: Scalars['DateTime']['output'];
+};
+
 export type DateTimeOperationFilterInput = {
   eq?: InputMaybe<Scalars['DateTime']['input']>;
   gt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -561,6 +568,7 @@ export type Query = {
 /** AuthenticationRequest related query resolvers. */
 export type QueryAuthenticationRequestArgs = {
   authenticationId: Scalars['UUID']['input'];
+  refresh?: Scalars['Boolean']['input'];
 };
 
 
@@ -630,6 +638,16 @@ export type StringOperationFilterInput = {
   nstartsWith?: InputMaybe<Scalars['String']['input']>;
   or?: InputMaybe<Array<StringOperationFilterInput>>;
   startsWith?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Subscriptions to the synchronization of third-party data. */
+export type Subscription = {
+  __typename: 'Subscription';
+  /**
+   * Is sent whenever a synchronization retrieved data from a data provider, successfully or not, so the data and
+   * its sync status can be refetched.
+   */
+  dataSynchronized: DataSynchronization;
 };
 
 export enum SyncState {
@@ -879,13 +897,6 @@ export type GetBankAccountQueryVariables = Exact<{
 
 export type GetBankAccountQuery = { bankAccount: { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null } | null };
 
-export type GetBankAccountSyncStatusQueryVariables = Exact<{
-  accountId: Scalars['UUID']['input'];
-}>;
-
-
-export type GetBankAccountSyncStatusQuery = { bankAccount: { __typename: 'BankAccount', id: unknown | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } } | null };
-
 export type GetBankAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -914,3 +925,8 @@ export type GetTransactionsByAccountIdQueryVariables = Exact<{
 
 
 export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string } }> | null } | null };
+
+export type DataSynchronizedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataSynchronizedSubscription = { dataSynchronized: { __typename: 'DataSynchronization', completedAt: Date } };

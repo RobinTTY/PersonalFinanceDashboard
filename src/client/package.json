@@ -29,6 +29,7 @@
     "country-flag-icons": "^1.6.20",
     "echarts": "^6.0.0",
     "graphql": "^16.13.1",
+    "graphql-ws": "^6.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.4",

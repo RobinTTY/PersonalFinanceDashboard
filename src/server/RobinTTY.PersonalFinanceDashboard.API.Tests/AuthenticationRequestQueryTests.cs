@@ -1,11 +1,33 @@
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
 public class AuthenticationRequestQueryTests(ApiFactory factory) : IClassFixture<ApiFactory>
 {
+    private const string StatusQuery = """
+                                       query($id: UUID!, $refresh: Boolean!) {
+                                         authenticationRequest(authenticationId: $id, refresh: $refresh) { status }
+                                       }
+                                       """;
+
     private readonly HttpClient _client = factory.CreateClient();
+
+    [Fact]
+    public async Task AuthenticationRequest_IsOnlyRetrievedFromGoCardlessWhenRefreshed()
+    {
+        var externalId = Guid.NewGuid();
+        var request = await factory.Seed(TestData.Request(externalId, DateTime.UtcNow));
+        factory.GoCardless.Respond(RequisitionPath(externalId), RequisitionJson(externalId, "LN", DateTime.UtcNow));
+
+        await _client.PostGraphQl(StatusQuery, new { id = request.Id, refresh = false });
+        Assert.Equal(0, factory.GoCardless.RequestCount(RequisitionPath(externalId)));
+
+        var response = await _client.PostGraphQl(StatusQuery, new { id = request.Id, refresh = true });
+        Assert.Equal(1, factory.GoCardless.RequestCount(RequisitionPath(externalId)));
+        Assert.Equal("ACTIVE", response.Data("authenticationRequest", "status").GetString());
+    }
 
     [Fact]
     public async Task AccessExpiresAt_Is90DaysAfterTheRequestWasCreated()

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
+using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
@@ -24,7 +25,13 @@ public class ApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("AppConfiguration:DatabaseConfiguration:ConnectionString", $"Data Source={_databasePath}");
         builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretId", "secret-id");
         builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretKey", "secret-key");
-        builder.ConfigureTestServices(services => services.AddSingleton(GoCardless.CreateService()));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton(GoCardless.CreateService());
+            // Tests decide when data is synchronized
+            services.Remove(services.Single(service =>
+                service.ImplementationType == typeof(DataSynchronizationBackgroundService)));
+        });
     }
 
     /// <summary>

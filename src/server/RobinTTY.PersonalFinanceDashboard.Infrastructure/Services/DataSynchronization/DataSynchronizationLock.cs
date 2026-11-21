@@ -4,7 +4,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchron
 /// Lets only one synchronization with a third party run at a time. Concurrent requests would otherwise retrieve
 /// the same data and both try to insert it.
 /// </summary>
-/// <remarks>The lock isn't reentrant, so a sync handler must not call another one while holding it.</remarks>
+/// <remarks>The lock isn't reentrant. <see cref="DataSynchronizer"/> holds it for a whole synchronization.</remarks>
 public sealed class DataSynchronizationLock
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);

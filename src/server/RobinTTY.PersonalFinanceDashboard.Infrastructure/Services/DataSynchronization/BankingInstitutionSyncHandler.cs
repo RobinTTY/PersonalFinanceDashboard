@@ -13,12 +13,10 @@ public class BankingInstitutionSyncHandler(
     ApplicationDbContext dbContext,
     BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
-    DataSynchronizationLock synchronizationLock,
     ILogger<BankingInstitutionSyncHandler> logger) : IBankingInstitutionSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? bankingInstitutionId = null, bool forceThirdPartySync = false)
     {
-        using var acquiredLock = await synchronizationLock.Acquire();
         if (bankingInstitutionId.HasValue)
             return await SynchronizeInstitution(bankingInstitutionId.Value, forceThirdPartySync);
 

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLazyQuery, useQuery } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { GetBankAccounts } from '@graphql-queries/GetBankAccounts';
-import { GetBankAccountSyncStatus } from '@graphql-queries/GetBankAccountSyncStatus';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -76,23 +75,6 @@ export function AccountsPage() {
 
   const edges = data?.transactionsByAccountId?.edges ?? [];
   const pageInfo = data?.transactionsByAccountId?.pageInfo;
-
-  // Loading the transactions syncs them on the server, which the account's sync status in the header
-  // only shows once it's fetched again. Once per account, so loading further pages doesn't repeat it.
-  const [refreshSyncStatus] = useLazyQuery(GetBankAccountSyncStatus, {
-    fetchPolicy: 'network-only',
-  });
-  const syncStatusRefreshedFor = useRef<string | null>(null);
-  const transactionsLoaded = !!accountId && !isFetchingTransactions && data !== undefined;
-  useEffect(() => {
-    if (!transactionsLoaded || syncStatusRefreshedFor.current === accountId) {
-      return;
-    }
-    syncStatusRefreshedFor.current = accountId;
-    refreshSyncStatus({ variables: { accountId }, context: { notifyOnError: false } }).catch(
-      () => {}
-    );
-  }, [transactionsLoaded, accountId, refreshSyncStatus]);
 
   const parentRef = useRef<HTMLDivElement>(null);
   const fetchingMoreRef = useRef(false);

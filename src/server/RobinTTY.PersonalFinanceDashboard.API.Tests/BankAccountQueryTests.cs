@@ -1,6 +1,7 @@
 using System.Text.Json;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
@@ -14,6 +15,19 @@ public class BankAccountQueryTests(ApiFactory factory) : IClassFixture<ApiFactor
                                              bankAccount(accountId: $id) { syncStatus { state lastError nextRetry } }
                                            }
                                            """;
+
+    [Fact]
+    public async Task BankAccount_IsReadWithoutRetrievingItFromGoCardless()
+    {
+        var externalId = Guid.NewGuid();
+        var account = TestData.Account(externalId);
+        await factory.Seed(TestData.Request(Guid.NewGuid(), DateTime.UtcNow.AddDays(-1), account));
+
+        await _client.PostGraphQl("query($id: UUID!) { bankAccount(accountId: $id) { name } }",
+            new { id = account.Id });
+
+        Assert.Equal(0, factory.GoCardless.RequestCount(BalancesPath(externalId)));
+    }
 
     [Fact]
     public async Task SyncStatus_OfAManualAccountIsNotSynced()
@@ -33,6 +47,7 @@ public class BankAccountQueryTests(ApiFactory factory) : IClassFixture<ApiFactor
         // No GoCardless response is configured, so syncing the account fails
         var account = TestData.Account(Guid.NewGuid());
         await factory.Seed(TestData.Request(Guid.NewGuid(), DateTime.UtcNow.AddDays(-1), account));
+        await _client.PostGraphQl("mutation { synchronizeBankAccountData { boolean } }");
 
         var response = await _client.PostGraphQl(SyncStatusQuery, new { id = account.Id });
 

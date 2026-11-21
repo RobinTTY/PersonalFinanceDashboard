@@ -16,22 +16,6 @@ public class AuthenticationRequestRepositoryTests : IDisposable
     public void Dispose() => _env.Dispose();
 
     [Fact]
-    public async Task GetAuthenticationRequest_SyncsTheAccountsOfAnActiveRequest()
-    {
-        var accountId = Guid.NewGuid();
-        var request = TestData.Request(RequestId, _env.UtcNow.AddDays(-1), TestData.Account(accountId));
-        await _env.Seed(request);
-        _env.GoCardless.Respond(RequisitionPath(RequestId),
-            RequisitionJson(RequestId, "LN", _env.UtcNow.AddDays(-1), accountId));
-        _env.GoCardless.Respond(BalancesPath(accountId), Balances(42m));
-
-        await using var dbContext = _env.CreateDbContext();
-        await _env.CreateAuthenticationRequestRepository(dbContext).GetAuthenticationRequest(request.Id!.Value);
-
-        Assert.Equal(1, _env.GoCardless.RequestCount(BalancesPath(accountId)));
-    }
-
-    [Fact]
     public async Task AddAuthenticationRequest_SavesTheCreatedRequest()
     {
         _env.GoCardless.Respond(RequisitionsPath, RequisitionJson(RequestId, "CR", _env.UtcNow));

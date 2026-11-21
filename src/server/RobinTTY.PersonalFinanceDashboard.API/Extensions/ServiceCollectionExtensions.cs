@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RobinTTY.NordigenApiClient;
 using RobinTTY.NordigenApiClient.Models;
+using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Subscriptions;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
@@ -57,6 +58,8 @@ public static class ServiceCollectionExtensions
                 .AddProjections()
                 // Enables filtering of query results (e.g. filtering based on a certain property)
                 .AddFiltering()
+                // Notifies clients of synchronized data
+                .AddInMemorySubscriptions()
                 .ModifyOptions(options => { options.StripLeadingIFromInterface = true; })
                 // TODO: Configure cost analyzer at some point (enforces maximum query costs)
                 .ModifyCostOptions(options => { options.EnforceCostLimits = false; });
@@ -85,8 +88,13 @@ public static class ServiceCollectionExtensions
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
         public IServiceCollection AddThirdPartyDataSynchronizationServices()
         {
+            services.AddHostedService<DataSynchronizationBackgroundService>();
+
             return services
                 .AddSingleton<DataSynchronizationLock>()
+                .AddSingleton<DataSynchronizationTrigger>()
+                .AddSingleton<IDataSynchronizationNotifier, SubscriptionDataSynchronizationNotifier>()
+                .AddScoped<IDataSynchronizer, DataSynchronizer>()
                 .AddScoped<IBankingInstitutionSyncHandler, BankingInstitutionSyncHandler>()
                 .AddScoped<IAuthenticationRequestSyncHandler, AuthenticationRequestSyncHandler>()
                 .AddScoped<IBankAccountSyncHandler, BankAccountSyncHandler>()

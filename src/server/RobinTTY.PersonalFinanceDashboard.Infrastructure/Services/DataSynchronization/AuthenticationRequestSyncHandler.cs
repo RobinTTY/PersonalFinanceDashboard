@@ -16,12 +16,10 @@ public class AuthenticationRequestSyncHandler(
     BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     TimeProvider timeProvider,
-    DataSynchronizationLock synchronizationLock,
     ILogger<AuthenticationRequestSyncHandler> logger) : IAuthenticationRequestSyncHandler
 {
     public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false)
     {
-        using var acquiredLock = await synchronizationLock.Acquire();
         if (authenticationRequestId.HasValue)
             return await SynchronizeAuthenticationRequest(authenticationRequestId.Value, forceThirdPartySync);
 

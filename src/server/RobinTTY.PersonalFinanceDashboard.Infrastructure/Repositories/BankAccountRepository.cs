@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -11,26 +10,18 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly IBankAccountSyncHandler _bankAccountSyncHandler;
-    private readonly ITransactionSyncHandler _transactionSyncHandler;
     private readonly ILogger<BankAccountRepository> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccountRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
-    /// <param name="bankAccountSyncHandler">Handles the synchronization of third party bank account data.</param>
-    /// <param name="transactionSyncHandler">Handles the synchronization of third party transaction data.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
     public BankAccountRepository(
         ApplicationDbContext dbContext,
-        IBankAccountSyncHandler bankAccountSyncHandler,
-        ITransactionSyncHandler transactionSyncHandler,
         ILogger<BankAccountRepository> logger)
     {
         _dbContext = dbContext;
-        _bankAccountSyncHandler = bankAccountSyncHandler;
-        _transactionSyncHandler = transactionSyncHandler;
         _logger = logger;
     }
 
@@ -39,25 +30,14 @@ public class BankAccountRepository
     /// </summary>
     /// <param name="accountId">The id of the <see cref="BankAccount"/> to retrieve.</param>
     /// <returns>The <see cref="BankAccount"/> if one ist matched otherwise <see langword="null"/>.</returns>
-    public async Task<IQueryable<BankAccount?>> GetBankAccount(Guid accountId)
-    {
-        await _bankAccountSyncHandler.SynchronizeData(accountId);
-
-        return _dbContext.BankAccounts.Where(account => account.Id == accountId);
-    }
+    public IQueryable<BankAccount?> GetBankAccount(Guid accountId) =>
+        _dbContext.BankAccounts.Where(account => account.Id == accountId);
 
     /// <summary>
     /// Gets a list of <see cref="BankAccount"/>s.
     /// </summary>
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
-    public async Task<IQueryable<BankAccount>> GetBankAccounts()
-    {
-        await _bankAccountSyncHandler.SynchronizeData();
-        // Keeps nested transactions in line with the balances, which the net worth history is calculated from
-        await _transactionSyncHandler.SynchronizeData();
-
-        return _dbContext.BankAccounts.OrderBy(account => account.Name);
-    }
+    public IQueryable<BankAccount> GetBankAccounts() => _dbContext.BankAccounts.OrderBy(account => account.Name);
 
     /// <summary>
     /// Adds a new <see cref="BankAccount"/>.

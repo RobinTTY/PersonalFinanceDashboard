@@ -63,10 +63,10 @@ public class AuthenticationMutationResolvers
     /// <summary>
     /// Synchronizes authentication request data with third-party data providers.
     /// </summary>
-    /// <param name="syncHandler">The handler responsible for managing the data synchronization process.</param>
+    /// <param name="synchronizer">Runs the synchronization.</param>
     /// <returns>A boolean value indicating whether the synchronization was successful.</returns>
-    public async Task<bool> SynchronizeAuthenticationRequestData(IAuthenticationRequestSyncHandler syncHandler)
+    public async Task<bool> SynchronizeAuthenticationRequestData(IDataSynchronizer synchronizer)
     {
-        return await syncHandler.SynchronizeData(forceThirdPartySync: true);
+        return await synchronizer.Synchronize(ThirdPartyDataType.AuthenticationRequests, forceThirdPartySync: true);
     }
 }

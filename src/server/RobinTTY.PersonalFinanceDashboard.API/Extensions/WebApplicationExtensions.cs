@@ -16,6 +16,8 @@ public static class WebApplicationExtensions
     /// <param name="app">The <see cref="WebApplication"/> instance to configure.</param>
     public static void UseGraphQl(this WebApplication app)
     {
+        // Subscriptions are delivered over WebSockets
+        app.UseWebSockets();
         app.MapGraphQL();
     }
 

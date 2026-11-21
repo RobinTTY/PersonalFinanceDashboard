@@ -22,6 +22,11 @@ public class ThirdPartyDataRetrievalMetadataService(
     public static readonly TimeSpan InitialRetryDelay = TimeSpan.FromHours(1);
 
     /// <summary>
+    /// The number of retrievals recorded through this instance, successful or not.
+    /// </summary>
+    public int RecordedRetrievals { get; private set; }
+
+    /// <summary>
     /// Checks whether the data of the given <see cref="ThirdPartyDataType"/> and data source should be retrieved,
     /// either because it has gone stale or because a failed retrieval is due to be retried.
     /// </summary>
@@ -64,6 +69,7 @@ public class ThirdPartyDataRetrievalMetadataService(
         metadata.NextRetryTime = null;
 
         await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+        RecordedRetrievals++;
     }
 
     /// <summary>
@@ -90,6 +96,7 @@ public class ThirdPartyDataRetrievalMetadataService(
         metadata.NextRetryTime = timeProvider.GetUtcNow().UtcDateTime + retryDelay;
 
         await thirdPartyDataRetrievalMetadataRepository.SaveChanges();
+        RecordedRetrievals++;
 
         return metadata.NextRetryTime.Value;
     }

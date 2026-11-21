@@ -2,7 +2,7 @@
 using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
- 
+
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Queries;
 
 /// <summary>
@@ -18,11 +18,8 @@ public class BankingInstitutionQueryResolvers
     /// <param name="institutionId">The id of the banking institution to retrieve.</param>
     [UseSingleOrDefault]
     [UseProjection]
-    public async Task<IQueryable<BankingInstitution?>> GetBankingInstitution(BankingInstitutionRepository repository,
-        Guid institutionId)
-    {
-        return await repository.GetBankingInstitution(institutionId);
-    }
+    public IQueryable<BankingInstitution?> GetBankingInstitution(BankingInstitutionRepository repository,
+        Guid institutionId) => repository.GetBankingInstitution(institutionId);
 
     /// <summary>
     /// Look up banking institutions.
@@ -31,9 +28,6 @@ public class BankingInstitutionQueryResolvers
     /// <param name="countryCode">Optional filter by country the institution operates in.</param>
     [UsePaging(MaxPageSize = 3000)]
     [UseProjection]
-    public async Task<IQueryable<BankingInstitution>> GetBankingInstitutions(BankingInstitutionRepository repository,
-        string? countryCode = null)
-    {
-        return await repository.GetBankingInstitutions(countryCode);
-    }
+    public IQueryable<BankingInstitution> GetBankingInstitutions(BankingInstitutionRepository repository,
+        string? countryCode = null) => repository.GetBankingInstitutions(countryCode);
 }

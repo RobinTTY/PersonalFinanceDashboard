@@ -7,10 +7,12 @@ import { Navbar } from '@/components/Navbar/Navbar';
 import { LinksGroupProps } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
 import { OpenSettingsProvider } from '@/components/SettingsModal/OpenSettingsContext';
 import { SettingsModal } from '@/components/SettingsModal/SettingsModal';
+import { useRefetchOnDataSynchronized } from '@/hooks/useRefetchOnDataSynchronized';
 
 export function AppLayout() {
   const [settingsOpened, { open, close: closeSettings }] = useDisclosure(false);
   const [settingsSection, setSettingsSection] = useState<string>();
+  useRefetchOnDataSynchronized();
 
   const openSettings = (section?: string) => {
     setSettingsSection(section);

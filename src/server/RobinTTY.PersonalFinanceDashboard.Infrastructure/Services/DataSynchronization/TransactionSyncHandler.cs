@@ -15,7 +15,6 @@ public class TransactionSyncHandler(
     BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     TimeProvider timeProvider,
-    DataSynchronizationLock synchronizationLock,
     ILogger<TransactionSyncHandler> logger) : ITransactionSyncHandler
 {
     private sealed record SyncedAccount(Guid Id, DataSource Source, string ExternalId);
@@ -32,7 +31,6 @@ public class TransactionSyncHandler(
 
     public async Task<bool> SynchronizeData(Guid? internalAccountId = null, bool forceThirdPartySync = false)
     {
-        using var acquiredLock = await synchronizationLock.Acquire();
         if (internalAccountId.HasValue)
         {
             var account = await dbContext.BankAccounts.SingleOrDefaultAsync(a => a.Id == internalAccountId);

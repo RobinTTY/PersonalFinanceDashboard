@@ -15,7 +15,6 @@ public class BankAccountSyncHandler(
     BankDataProviderRegistry providers,
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     TimeProvider timeProvider,
-    DataSynchronizationLock synchronizationLock,
     ILogger<BankAccountSyncHandler> logger) : IBankAccountSyncHandler
 {
     /// <summary>
@@ -26,7 +25,6 @@ public class BankAccountSyncHandler(
     /// <returns>A boolean value indicating whether the synchronization process was successful.</returns>
     public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false)
     {
-        using var acquiredLock = await synchronizationLock.Acquire();
         if (internalBankAccountId.HasValue)
         {
             var bankAccount = await dbContext.BankAccounts

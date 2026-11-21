@@ -4,6 +4,7 @@ export const scalarTypePolicies = {
   AuthenticationRequest: {
     fields: { accessExpiresAt: dateTimeTypePolicy, createdAt: dateTimeTypePolicy },
   },
+  DataSynchronization: { fields: { completedAt: dateTimeTypePolicy } },
   SyncStatus: { fields: { lastSuccessfulSync: dateTimeTypePolicy, nextRetry: dateTimeTypePolicy } },
   Transaction: { fields: { valueDate: dateTimeTypePolicy } },
 };
