@@ -1,5 +1,6 @@
 import { gql, TypedDocumentNode } from '@apollo/client';
 import { AuthRequestWithAccountsFragment } from '../types/graphql';
+import { SyncStatusFields } from './SyncStatusFields';
 
 export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsFragment> = gql`
   fragment AuthRequestWithAccounts on AuthenticationRequest {
@@ -27,11 +28,9 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
         logoUri
       }
       syncStatus {
-        state
-        lastSuccessfulSync
-        lastError
-        nextRetry
+        ...SyncStatusFields
       }
     }
   }
+  ${SyncStatusFields}
 `;

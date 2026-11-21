@@ -1,5 +1,6 @@
 import { gql, TypedDocumentNode } from '@apollo/client';
 import { BankAccountSummaryFragment } from '../types/graphql';
+import { SyncStatusFields } from './SyncStatusFields';
 
 export const BankAccountSummary: TypedDocumentNode<BankAccountSummaryFragment> = gql`
   fragment BankAccountSummary on BankAccount {
@@ -13,10 +14,8 @@ export const BankAccountSummary: TypedDocumentNode<BankAccountSummaryFragment> =
       logoUri
     }
     syncStatus {
-      state
-      lastSuccessfulSync
-      lastError
-      nextRetry
+      ...SyncStatusFields
     }
   }
+  ${SyncStatusFields}
 `;

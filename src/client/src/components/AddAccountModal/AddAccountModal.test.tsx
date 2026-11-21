@@ -75,4 +75,21 @@ describe('AddAccountModal', () => {
     rerender(<AddAccountModal opened onClose={onClose} />);
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
   });
+
+  describe('when reconnecting a bank', () => {
+    const reconnect = { id: 'institution-1', name: 'Test Bank' };
+
+    it('skips choosing the account type and bank', () => {
+      render(<AddAccountModal opened onClose={noop} reconnect={reconnect} />);
+      expect(screen.getByRole('heading', { name: 'Reconnect Test Bank' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Synchronize' })).not.toBeDisabled();
+    });
+
+    it('closes instead of going back to the bank list', () => {
+      const onClose = vi.fn();
+      render(<AddAccountModal opened onClose={onClose} reconnect={reconnect} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
 });

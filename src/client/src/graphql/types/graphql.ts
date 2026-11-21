@@ -826,6 +826,8 @@ export type BankAccountDetailsFragment = { __typename: 'BankAccount', id: unknow
 
 export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } };
 
+export type SyncStatusFieldsFragment = { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null };
+
 export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
 
 export type CreateAuthenticationRequestMutationVariables = Exact<{
@@ -876,6 +878,13 @@ export type GetBankAccountQueryVariables = Exact<{
 
 
 export type GetBankAccountQuery = { bankAccount: { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null } | null };
+
+export type GetBankAccountSyncStatusQueryVariables = Exact<{
+  accountId: Scalars['UUID']['input'];
+}>;
+
+
+export type GetBankAccountSyncStatusQuery = { bankAccount: { __typename: 'BankAccount', id: unknown | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } } | null };
 
 export type GetBankAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { SyncState, SyncStatus } from '@graphql-types/graphql';
 import { IconPlugConnectedX, IconRefreshAlert } from '@tabler/icons-react';
 import { formatRelativeTime } from '@utility';
@@ -12,6 +13,17 @@ interface SyncStatusProps {
 interface SyncStatusIndicatorProps extends SyncStatusProps {
   /** Called when the user wants to reconnect a bank whose access expired. Without it, nothing is clickable. */
   onReconnect?: () => void;
+}
+
+/**
+ * Re-renders the component every minute, so relative times like "Synced 5 minutes ago" stay current.
+ */
+function useRerenderEveryMinute() {
+  const [, setMinutes] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setMinutes((minutes) => minutes + 1), 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 }
 
 function formatLastSync(lastSuccessfulSync: Date | null) {
@@ -30,6 +42,8 @@ function formatRetry(nextRetry: Date | null) {
  * needs the bank to be reconnected.
  */
 export function SyncStatusIndicator({ status, onReconnect }: SyncStatusIndicatorProps) {
+  useRerenderEveryMinute();
+
   switch (status.state) {
     case SyncState.UpToDate:
       return (
