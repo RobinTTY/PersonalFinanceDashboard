@@ -13,9 +13,5 @@ export interface CurrentUser {
  * with no prop-drilling and no bespoke context provider.
  */
 export function useCurrentUser(): CurrentUser {
-  return {
-    name: 'Robin Müller',
-    email: 'muellerobin95@gmail.com',
-    avatarUrl: 'https://avatars.githubusercontent.com/u/27669180',
-  };
+  return { name: 'Local user' };
 }
