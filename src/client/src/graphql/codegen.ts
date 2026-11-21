@@ -11,7 +11,8 @@ const env = loadEnv('development', 'env-settings', 'VITE_');
 const config: CodegenConfig = {
   overwrite: true,
   schema: env.VITE_API_URL,
-  documents: ['src/**/*.{ts,tsx}'],
+  // Tests may define documents that aren't part of the schema
+  documents: ['src/**/*.{ts,tsx}', '!src/**/*.test.{ts,tsx}'],
   ignoreNoDocuments: true,
   hooks: { afterAllFileWrite: ['prettier --write'] },
   generates: {

@@ -76,6 +76,8 @@ export type BankAccount = {
   name: Maybe<Scalars['String']['output']>;
   ownerName: Maybe<Scalars['String']['output']>;
   source: DataSource;
+  /** How up to date the account is with the data source it originates from. */
+  syncStatus: SyncStatus;
   transactions: Array<Transaction>;
 };
 
@@ -628,6 +630,21 @@ export type StringOperationFilterInput = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export enum SyncState {
+  NeedsReauthentication = 'NEEDS_REAUTHENTICATION',
+  NotSynced = 'NOT_SYNCED',
+  Retrying = 'RETRYING',
+  UpToDate = 'UP_TO_DATE'
+}
+
+export type SyncStatus = {
+  __typename: 'SyncStatus';
+  lastError: Maybe<Scalars['String']['output']>;
+  lastSuccessfulSync: Maybe<Scalars['DateTime']['output']>;
+  nextRetry: Maybe<Scalars['DateTime']['output']>;
+  state: SyncState;
+};
+
 export type SynchronizeAuthenticationRequestDataPayload = {
   __typename: 'SynchronizeAuthenticationRequestDataPayload';
   boolean: Maybe<Scalars['Boolean']['output']>;
@@ -805,7 +822,7 @@ export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationReque
 
 export type BankAccountDetailsFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null };
 
-export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null };
+export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } };
 
 export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
 
@@ -861,7 +878,7 @@ export type GetBankAccountQuery = { bankAccount: { __typename: 'BankAccount', id
 export type GetBankAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBankAccountsQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null }> | null } | null };
+export type GetBankAccountsQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, balance: number | null, currency: string | null, associatedInstitution: { __typename: 'BankingInstitution', name: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> | null } | null };
 
 export type GetBankingInstitutionsQueryVariables = Exact<{
   countryCode?: InputMaybe<Scalars['String']['input']>;

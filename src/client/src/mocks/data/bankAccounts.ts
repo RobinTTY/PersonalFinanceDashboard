@@ -3,7 +3,17 @@
 // balances, dates, amounts and public bank metadata are kept for realism. Regenerate
 // by re-querying the backend and re-applying the same placeholder substitutions.
 
-import type { GetBankAccountsQuery } from '@graphql-types/graphql';
+import { SyncState, type GetBankAccountsQuery } from '@graphql-types/graphql';
+
+const HOUR = 60 * 60 * 1000;
+
+const upToDate = {
+  __typename: 'SyncStatus',
+  state: SyncState.UpToDate,
+  lastSuccessfulSync: new Date(Date.now() - 2 * HOUR),
+  lastError: null,
+  nextRetry: null,
+} as const;
 
 export const bankAccountsData = {
   bankAccounts: {
@@ -21,6 +31,7 @@ export const bankAccountsData = {
           name: 'C24',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -34,6 +45,7 @@ export const bankAccountsData = {
           name: 'C24',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -47,6 +59,7 @@ export const bankAccountsData = {
           name: 'C24',
           logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
         },
+        syncStatus: upToDate,
       },
       {
         __typename: 'BankAccount',
@@ -59,6 +72,13 @@ export const bankAccountsData = {
           __typename: 'BankingInstitution',
           name: 'Santander',
           logoUri: 'https://cdn-logos.gocardless.com/ais/SANTANDER_PL_CORP_WBKPPLPP.png',
+        },
+        syncStatus: {
+          __typename: 'SyncStatus',
+          state: SyncState.Retrying,
+          lastSuccessfulSync: new Date(Date.now() - 26 * HOUR),
+          lastError: 'Rate limit exceeded. Too many requests',
+          nextRetry: new Date(Date.now() + 2 * HOUR),
         },
       },
     ],

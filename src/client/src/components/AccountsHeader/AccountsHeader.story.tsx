@@ -1,48 +1,50 @@
-import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
+import { BankAccountSummaryFragment, SyncState } from '@graphql-types/graphql';
 import { ComponentPreview } from '../storybook/ComponentPreview';
 import { AccountsHeader } from './AccountsHeader';
 
-type Account = AuthRequestWithAccountsFragment['associatedAccounts'][number];
+type Account = BankAccountSummaryFragment;
 
 const noop = () => {};
 
 const c24Account: Account = {
   __typename: 'BankAccount',
   id: '1',
-  externalId: 'acc_001',
   iban: 'DE89370400440532013000',
   name: 'C24 Gemeinschaftskonto',
-  description: null,
-  accountType: 'CACC',
   balance: 468.15,
   currency: 'EUR',
-  ownerName: 'Robin Mueller',
-  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'C24 Bank',
-    bic: 'DEFFDEFFXXX',
     logoUri: null,
+  },
+  syncStatus: {
+    __typename: 'SyncStatus',
+    state: SyncState.UpToDate,
+    lastSuccessfulSync: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    lastError: null,
+    nextRetry: null,
   },
 };
 
 const sparkasseAccount: Account = {
   __typename: 'BankAccount',
   id: '2',
-  externalId: 'acc_002',
   iban: 'DE91100000000123456789',
   name: 'Sparkasse Girokonto',
-  description: null,
-  accountType: 'CACC',
   balance: 1234.56,
   currency: 'EUR',
-  ownerName: 'Robin Mueller',
-  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'Sparkasse',
-    bic: 'SSKMDEMMXXX',
     logoUri: null,
+  },
+  syncStatus: {
+    __typename: 'SyncStatus',
+    state: SyncState.Retrying,
+    lastSuccessfulSync: new Date(Date.now() - 26 * 60 * 60 * 1000),
+    lastError: 'Rate limit exceeded. Too many requests',
+    nextRetry: new Date(Date.now() + 2 * 60 * 60 * 1000),
   },
 };
 
@@ -67,6 +69,20 @@ export function MultipleAccounts() {
     <ComponentPreview canvas={{ center: false }} withSpacing>
       <AccountsHeader
         currentAccount={c24Account}
+        accounts={[c24Account, sparkasseAccount]}
+        loadingAccounts={false}
+        onAccountChange={noop}
+        onAddAccount={noop}
+      />
+    </ComponentPreview>
+  );
+}
+
+export function SyncFailed() {
+  return (
+    <ComponentPreview canvas={{ center: false }} withSpacing>
+      <AccountsHeader
+        currentAccount={sparkasseAccount}
         accounts={[c24Account, sparkasseAccount]}
         loadingAccounts={false}
         onAccountChange={noop}

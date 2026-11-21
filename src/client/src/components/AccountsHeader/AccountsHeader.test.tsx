@@ -1,49 +1,51 @@
-import { AuthRequestWithAccountsFragment } from '@graphql-types/graphql';
+import { BankAccountSummaryFragment, SyncState } from '@graphql-types/graphql';
 import { axe, render } from '@test-utils';
 import { fireEvent, screen } from '@testing-library/react';
 import { AccountsHeader } from './AccountsHeader';
 
-type Account = AuthRequestWithAccountsFragment['associatedAccounts'][number];
+type Account = BankAccountSummaryFragment;
 
 const noop = () => {};
 
 const c24Account: Account = {
   __typename: 'BankAccount',
   id: '1',
-  externalId: 'acc_001',
   iban: 'DE89370400440532013000',
   name: 'C24 Gemeinschaftskonto',
-  description: null,
-  accountType: 'CACC',
   balance: 468.15,
   currency: 'EUR',
-  ownerName: 'Robin Mueller',
-  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'C24 Bank',
-    bic: 'DEFFDEFFXXX',
     logoUri: null,
+  },
+  syncStatus: {
+    __typename: 'SyncStatus',
+    state: SyncState.UpToDate,
+    lastSuccessfulSync: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    lastError: null,
+    nextRetry: null,
   },
 };
 
 const sparkasseAccount: Account = {
   __typename: 'BankAccount',
   id: '2',
-  externalId: 'acc_002',
   iban: 'DE91100000000123456789',
   name: 'Sparkasse Girokonto',
-  description: null,
-  accountType: 'CACC',
   balance: 1234.56,
   currency: 'EUR',
-  ownerName: 'Robin Mueller',
-  includeInAnalytics: true,
   associatedInstitution: {
     __typename: 'BankingInstitution',
     name: 'Sparkasse',
-    bic: 'SSKMDEMMXXX',
     logoUri: null,
+  },
+  syncStatus: {
+    __typename: 'SyncStatus',
+    state: SyncState.Retrying,
+    lastSuccessfulSync: new Date(Date.now() - 26 * 60 * 60 * 1000),
+    lastError: 'Rate limit exceeded. Too many requests',
+    nextRetry: new Date(Date.now() + 2 * 60 * 60 * 1000),
   },
 };
 
@@ -180,7 +182,37 @@ describe('AccountsHeader', () => {
       />
     );
     fireEvent.click(screen.getByText('C24 Gemeinschaftskonto'));
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Sparkasse Girokonto' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Sparkasse Girokonto/ }));
     expect(onAccountChange).toHaveBeenCalledWith('2');
+  });
+
+  it('shows the sync status of the current account', () => {
+    render(
+      <AccountsHeader
+        currentAccount={c24Account}
+        accounts={[c24Account]}
+        loadingAccounts={false}
+        onAccountChange={noop}
+        onAddAccount={noop}
+      />
+    );
+    expect(screen.getByText('Synced 2 hours ago')).toBeInTheDocument();
+  });
+
+  it('marks accounts whose sync failed in the menu', () => {
+    render(
+      <AccountsHeader
+        currentAccount={c24Account}
+        accounts={[c24Account, sparkasseAccount]}
+        loadingAccounts={false}
+        onAccountChange={noop}
+        onAddAccount={noop}
+      />
+    );
+    fireEvent.click(screen.getByText('C24 Gemeinschaftskonto'));
+    expect(
+      screen.getByRole('menuitem', { name: 'Sparkasse Girokonto Sync failed' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'C24 Gemeinschaftskonto' })).toBeInTheDocument();
   });
 });

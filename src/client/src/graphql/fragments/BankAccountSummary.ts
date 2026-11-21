@@ -12,5 +12,11 @@ export const BankAccountSummary: TypedDocumentNode<BankAccountSummaryFragment> =
       name
       logoUri
     }
+    syncStatus {
+      state
+      lastSuccessfulSync
+      lastError
+      nextRetry
+    }
   }
 `;
