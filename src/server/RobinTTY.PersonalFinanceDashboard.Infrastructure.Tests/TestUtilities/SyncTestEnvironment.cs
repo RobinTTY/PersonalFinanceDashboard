@@ -20,6 +20,7 @@ internal sealed class SyncTestEnvironment : IDisposable
     public FakeGoCardless GoCardless { get; } = new();
     public FakeTimeProvider Time { get; } = new(new DateTimeOffset(2026, 11, 13, 12, 0, 0, TimeSpan.Zero));
     public DateTime UtcNow => Time.GetUtcNow().UtcDateTime;
+    public DataSynchronizationLock SyncLock { get; } = new();
 
     public SyncTestEnvironment()
     {
@@ -43,30 +44,31 @@ internal sealed class SyncTestEnvironment : IDisposable
 
     public Task<bool> SyncTransactions(Guid? accountId = null, bool force = false) =>
         Run(dbContext => new TransactionSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), Time, NullLogger<TransactionSyncHandler>.Instance)
+                CreateMetadataService(dbContext), Time, SyncLock, NullLogger<TransactionSyncHandler>.Instance)
             .SynchronizeData(accountId, force));
 
     public Task<bool> SyncBankAccounts(Guid? accountId = null, bool force = false) =>
         Run(dbContext => new BankAccountSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), Time, NullLogger<BankAccountSyncHandler>.Instance)
+                CreateMetadataService(dbContext), Time, SyncLock, NullLogger<BankAccountSyncHandler>.Instance)
             .SynchronizeData(accountId, force));
 
     public Task<bool> SyncAuthenticationRequests(Guid? requestId = null, bool force = false) =>
         Run(dbContext => new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), Time, NullLogger<AuthenticationRequestSyncHandler>.Instance)
+                CreateMetadataService(dbContext), Time, SyncLock, NullLogger<AuthenticationRequestSyncHandler>.Instance)
             .SynchronizeData(requestId, force));
 
     public Task<bool> SyncBankingInstitutions(Guid? institutionId = null, bool force = false) =>
         Run(dbContext => new BankingInstitutionSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), NullLogger<BankingInstitutionSyncHandler>.Instance)
+                CreateMetadataService(dbContext), SyncLock, NullLogger<BankingInstitutionSyncHandler>.Instance)
             .SynchronizeData(institutionId, force));
 
     public AuthenticationRequestRepository CreateAuthenticationRequestRepository(ApplicationDbContext dbContext) =>
         new(dbContext, CreateProviders(),
             new AuthenticationRequestSyncHandler(dbContext, CreateProviders(),
-                CreateMetadataService(dbContext), Time, NullLogger<AuthenticationRequestSyncHandler>.Instance),
+                CreateMetadataService(dbContext), Time, SyncLock,
+                NullLogger<AuthenticationRequestSyncHandler>.Instance),
             new BankAccountSyncHandler(dbContext, CreateProviders(), CreateMetadataService(dbContext), Time,
-                NullLogger<BankAccountSyncHandler>.Instance),
+                SyncLock, NullLogger<BankAccountSyncHandler>.Instance),
             Time, NullLogger<AuthenticationRequestRepository>.Instance);
 
     public async Task<ThirdPartyDataRetrievalMetadata> GetRetrievalMetadata(ThirdPartyDataType dataType,

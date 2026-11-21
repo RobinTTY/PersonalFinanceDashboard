@@ -91,6 +91,23 @@ public class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task ConcurrentSyncs_RetrieveTheTransactionsOnlyOnce()
+    {
+        await SeedAccountsWithActiveRequest(AccountId);
+        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+
+        // The second sync starts while the first one is still waiting for GoCardless
+        var releaseResponses = _env.GoCardless.HoldResponses();
+        var first = _env.SyncTransactions();
+        var second = _env.SyncTransactions();
+        releaseResponses();
+
+        Assert.All(await Task.WhenAll(first, second), Assert.True);
+        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Single(await GetTransactions(AccountId));
+    }
+
+    [Fact]
     public async Task AccountsOfAuthRequestsOlderThan90Days_AreNotSynced()
     {
         await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-91), TestData.Account(AccountId)));

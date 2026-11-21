@@ -25,6 +25,7 @@ internal sealed class FakeGoCardless : HttpMessageHandler
 
     private readonly ConcurrentDictionary<string, FakeResponse> _responses = new();
     private readonly ConcurrentQueue<string> _requestedPaths = new();
+    private TaskCompletionSource? _heldResponses;
 
     /// <summary>
     /// Sets the response for requests whose path ends with <paramref name="path"/>, e.g. "requisitions/".
@@ -49,6 +50,20 @@ internal sealed class FakeGoCardless : HttpMessageHandler
     /// Removes the response for <paramref name="path"/>, so requests to it get a 404 again.
     /// </summary>
     public void Remove(string path) => _responses.TryRemove(path, out _);
+
+    /// <summary>
+    /// Holds back all responses until the returned action is called, so requests stay in flight.
+    /// </summary>
+    public Action HoldResponses()
+    {
+        var heldResponses = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _heldResponses = heldResponses;
+        return () =>
+        {
+            _heldResponses = null;
+            heldResponses.SetResult();
+        };
+    }
 
     public int RequestCount(string path) => _requestedPaths.Count(requested => requested.EndsWith(path));
 
@@ -76,6 +91,8 @@ internal sealed class FakeGoCardless : HttpMessageHandler
         _requestedPaths.Enqueue(path);
         if (request.Content != null)
             LastRequestBody = await request.Content.ReadAsStringAsync(cancellationToken);
+        if (_heldResponses is { } heldResponses)
+            await heldResponses.Task.WaitAsync(cancellationToken);
 
         var response = _responses.FirstOrDefault(response => path.EndsWith(response.Key)).Value ?? NotFound;
         return CreateResponse(response);
