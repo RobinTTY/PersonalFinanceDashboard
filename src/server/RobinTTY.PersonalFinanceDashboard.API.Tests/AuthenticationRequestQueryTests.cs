@@ -1,6 +1,6 @@
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
-using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
+using static RobinTTY.PersonalFinanceDashboard.TestUtilities.GoCardlessJson;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
@@ -44,5 +44,19 @@ public class AuthenticationRequestQueryTests(ApiFactory factory) : IClassFixture
 
         var expiresAt = response.Data("authenticationRequest", "accessExpiresAt").GetDateTime();
         Assert.Equal(createdAt.AddDays(90), expiresAt.ToUniversalTime());
+    }
+
+    [Fact]
+    public async Task AuthenticationRequests_AreListedWithTheirAccounts()
+    {
+        var account = TestData.Account(Guid.NewGuid());
+        var request = await factory.Seed(TestData.Request(Guid.NewGuid(), DateTime.UtcNow, account));
+
+        var response = await _client.PostGraphQl("query { authenticationRequests { id associatedAccounts { id } } }");
+
+        var listed = Assert.Single(response.Data("authenticationRequests").EnumerateArray(),
+            node => node.GetProperty("id").GetString() == request.Id.ToString());
+        var listedAccount = Assert.Single(listed.GetProperty("associatedAccounts").EnumerateArray());
+        Assert.Equal(account.Id.ToString(), listedAccount.GetProperty("id").GetString());
     }
 }

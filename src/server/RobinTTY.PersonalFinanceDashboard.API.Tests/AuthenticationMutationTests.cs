@@ -1,6 +1,6 @@
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
-using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
+using static RobinTTY.PersonalFinanceDashboard.TestUtilities.GoCardlessJson;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 

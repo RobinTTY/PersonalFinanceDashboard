@@ -16,11 +16,13 @@ dotnet_diagnostic.CA1873.severity = none
 # Factory methods on generic types, e.g. ThirdPartyResponse<T>.Success, are intended
 dotnet_diagnostic.CA1000.severity = none
 
-[*.Tests/**.cs]
+[{*.Tests,*.TestUtilities}/**.cs]
 # Test names separate their parts with underscores
 dotnet_diagnostic.CA1707.severity = none
 # Arrays in test data are created once per test
 dotnet_diagnostic.CA1861.severity = none
+# The tests run in seconds, so passing TestContext.Current.CancellationToken everywhere isn't worth the noise
+dotnet_diagnostic.xUnit1051.severity = none
 
 [*.csproj]
 indent_size = 2

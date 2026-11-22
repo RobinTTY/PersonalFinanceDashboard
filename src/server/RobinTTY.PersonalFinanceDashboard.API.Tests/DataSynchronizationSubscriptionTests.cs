@@ -2,7 +2,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 

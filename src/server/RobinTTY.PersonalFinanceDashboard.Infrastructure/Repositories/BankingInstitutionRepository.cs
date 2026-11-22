@@ -51,7 +51,7 @@ public class BankingInstitutionRepository
             ? _dbContext.BankingInstitutions
             : _dbContext.BankingInstitutions.Where(institution => institution.Countries.Contains(countryCode));
 
-        return query.OrderBy(institution => institution.Name);
+        return query.OrderBy(institution => institution.Name).ThenBy(institution => institution.Id);
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
-using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 

@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
-using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
+using static RobinTTY.PersonalFinanceDashboard.TestUtilities.GoCardlessJson;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.Repositories;
 

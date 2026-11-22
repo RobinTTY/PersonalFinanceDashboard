@@ -37,7 +37,8 @@ public class BankAccountRepository
     /// Gets a list of <see cref="BankAccount"/>s.
     /// </summary>
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
-    public IQueryable<BankAccount> GetBankAccounts() => _dbContext.BankAccounts.OrderBy(account => account.Name);
+    public IQueryable<BankAccount> GetBankAccounts() =>
+        _dbContext.BankAccounts.OrderBy(account => account.Name).ThenBy(account => account.Id);
 
     /// <summary>
     /// Adds a new <see cref="BankAccount"/>.

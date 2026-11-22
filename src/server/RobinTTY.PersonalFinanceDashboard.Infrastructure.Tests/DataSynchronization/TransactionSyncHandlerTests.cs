@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchronization;

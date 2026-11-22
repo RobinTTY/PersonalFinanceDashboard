@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -11,7 +12,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-    <PackageReference Include="xunit"/>
+    <PackageReference Include="xunit.v3"/>
     <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,13 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.API\RobinTTY.PersonalFinanceDashboard.API.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Shared with the Infrastructure tests -->
-    <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\FakeGoCardless.cs" Link="TestUtilities\FakeGoCardless.cs"/>
-    <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\GoCardlessJson.cs" Link="TestUtilities\GoCardlessJson.cs"/>
-    <Compile Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests\TestUtilities\TestData.cs" Link="TestUtilities\TestData.cs"/>
+    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.TestUtilities\RobinTTY.PersonalFinanceDashboard.TestUtilities.csproj"/>
   </ItemGroup>
 
 </Project>

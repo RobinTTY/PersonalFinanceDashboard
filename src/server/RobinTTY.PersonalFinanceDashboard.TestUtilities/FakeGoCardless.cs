@@ -8,13 +8,13 @@ using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.NordigenApiClient.Models.Jwt;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+namespace RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 /// <summary>
 /// Answers GoCardless API requests with configured responses and records which endpoints were called.
 /// Requests without a configured response get a 404.
 /// </summary>
-internal sealed class FakeGoCardless : HttpMessageHandler
+public sealed class FakeGoCardless : HttpMessageHandler
 {
     private sealed record FakeResponse(
         HttpStatusCode StatusCode,

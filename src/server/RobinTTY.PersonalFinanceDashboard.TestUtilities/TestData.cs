@@ -1,12 +1,12 @@
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
-namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+namespace RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 /// <summary>
 /// Creates entities to seed the database with.
 /// </summary>
-internal static class TestData
+public static class TestData
 {
     public static BankingInstitution Institution(string externalId) =>
         new(DataSource.GoCardless, externalId, "TESTDEFF", "Test Bank", new Uri("https://localhost/logo.png"), ["DE"]);
@@ -24,7 +24,7 @@ internal static class TestData
             new Uri("https://localhost/link"), createdAt, accounts.ToList());
 
     public static Transaction Transaction(Guid externalId, BankAccount account, decimal amount,
-        string category = "", string notes = "") =>
-        new(DataSource.GoCardless, externalId.ToExternalId(), $"bank-{externalId}", new DateTime(2026, 11, 10), null,
-            null, amount, "EUR", category, notes, [], account);
+        string category = "", string notes = "", DateTime? valueDate = null) =>
+        new(DataSource.GoCardless, externalId.ToExternalId(), $"bank-{externalId}",
+            valueDate ?? new DateTime(2026, 11, 10), null, null, amount, "EUR", category, notes, [], account);
 }

@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Text.Json;
 
-namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
+namespace RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 /// <summary>
 /// Builds GoCardless API responses and the paths they are served at.
 /// </summary>
-internal static class GoCardlessJson
+public static class GoCardlessJson
 {
     public const string RequisitionsPath = "requisitions/";
     public const string InstitutionsPath = "institutions/";

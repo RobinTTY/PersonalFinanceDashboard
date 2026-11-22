@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -11,7 +12,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-    <PackageReference Include="xunit"/>
+    <PackageReference Include="xunit.v3"/>
     <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.Infrastructure\RobinTTY.PersonalFinanceDashboard.Infrastructure.csproj"/>
     <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders\RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.csproj"/>
+    <ProjectReference Include="..\RobinTTY.PersonalFinanceDashboard.TestUtilities\RobinTTY.PersonalFinanceDashboard.TestUtilities.csproj"/>
   </ItemGroup>
 
 </Project>

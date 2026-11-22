@@ -38,7 +38,9 @@ public class TransactionRepository
     {
         return _dbContext.Transactions
             .Where(transaction => transaction.BankAccount != null && transaction.BankAccount.Id == accountId)
-            .OrderByDescending(transaction => transaction.ValueDate);
+            .OrderByDescending(transaction => transaction.ValueDate)
+            // Same-day transactions need a fixed order to be paged
+            .ThenBy(transaction => transaction.Id);
     }
 
     /// <summary>
