@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using RobinTTY.PersonalFinanceDashboard.Api.Extensions;
+using RobinTTY.PersonalFinanceDashboard.Api.Utility;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Environment;
@@ -12,6 +14,7 @@ builder.Services
     .AddConfiguredHttpClient(builder.Configuration)
     .AddApplicationConfiguration()
     .AddApplicationServices()
+    .AddGoCardless(AppConfiguration.GoCardlessSectionName)
     .AddRepositories()
     .AddGraphQlServices()
     .AddThirdPartyDataSynchronizationServices();

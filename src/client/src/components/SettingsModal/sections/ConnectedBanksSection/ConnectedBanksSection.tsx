@@ -9,7 +9,7 @@ import {
   AddAccountModal,
   ReconnectInstitution,
 } from '@/components/AddAccountModal/AddAccountModal';
-import { ConnectedBankCard } from './ConnectedBankCard';
+import { ConnectedBankCard, getConnectionInstitution } from './ConnectedBankCard';
 
 type AuthRequestWithAccounts = AuthRequestWithAccountsFragment;
 
@@ -48,7 +48,7 @@ export function ConnectedBanksSection() {
 
   const banks = data?.authenticationRequests ?? [];
   const pendingInstitutionName =
-    pendingDeletion?.associatedAccounts[0]?.associatedInstitution?.name ?? 'this bank';
+    (pendingDeletion && getConnectionInstitution(pendingDeletion)?.name) ?? 'this bank';
 
   return (
     <Stack gap="lg">

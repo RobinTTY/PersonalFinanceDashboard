@@ -17,16 +17,22 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 internal sealed class SyncTestEnvironment : IDisposable
 {
     private readonly SqliteConnection _connection;
+    private readonly bool _useFakeProvider;
 
     public FakeGoCardless GoCardless { get; } = new();
+    public FakeBankDataProvider Provider { get; } = new();
     public FakeTimeProvider Time { get; } = new(new DateTimeOffset(2026, 11, 13, 12, 0, 0, TimeSpan.Zero));
     public DateTime UtcNow => Time.GetUtcNow().UtcDateTime;
     public DataSynchronizationLock SyncLock { get; } = new();
     public DataSynchronizationTrigger Trigger { get; } = new();
     public CountingNotifier Notifier { get; } = new();
 
-    public SyncTestEnvironment()
+    /// <param name="useFakeProvider">Whether the handlers get their data from <see cref="Provider"/> instead
+    /// of <see cref="GoCardless"/>.</param>
+    public SyncTestEnvironment(bool useFakeProvider = false)
     {
+        _useFakeProvider = useFakeProvider;
+
         // The in-memory database lives as long as the connection is open
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
@@ -78,7 +84,8 @@ internal sealed class SyncTestEnvironment : IDisposable
             metadata.DataType == dataType && metadata.SynchronizationEntityId == synchronizationEntityId);
     }
 
-    public BankDataProviderRegistry CreateProviders() => new([GoCardless.CreateService()]);
+    public BankDataProviderRegistry CreateProviders() =>
+        new([_useFakeProvider ? Provider : GoCardless.CreateService()]);
 
     public ThirdPartyDataRetrievalMetadataService CreateMetadataService(ApplicationDbContext dbContext) =>
         new(new ThirdPartyDataRetrievalMetadataRepository(dbContext), Time);

@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using RobinTTY.NordigenApiClient;
-using RobinTTY.NordigenApiClient.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Subscriptions;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
@@ -15,7 +13,6 @@ using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
-using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 
@@ -75,10 +72,6 @@ public static class ServiceCollectionExtensions
         {
             return services
                 .AddSingleton(TimeProvider.System)
-                .AddSingleton<NordigenClient>()
-                .AddSingleton<GoCardlessBankDataProvider>()
-                // Resolved through the concrete type, so it can be replaced (e.g. in tests) by registering that type
-                .AddSingleton<IBankDataProvider>(provider => provider.GetRequiredService<GoCardlessBankDataProvider>())
                 .AddSingleton<BankDataProviderRegistry>();
         }
 
@@ -110,21 +103,12 @@ public static class ServiceCollectionExtensions
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
         public IServiceCollection AddApplicationConfiguration()
         {
-            services.AddOptions<NordigenApiClientConfiguration>()
-                .BindConfiguration(NordigenApiClientConfiguration.SectionName)
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
             services.AddOptions<DatabaseConfiguration>()
                 .BindConfiguration(DatabaseConfiguration.SectionName)
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            return services.AddSingleton(provider =>
-            {
-                var config = provider.GetRequiredService<IOptions<NordigenApiClientConfiguration>>().Value;
-                return new NordigenClientCredentials(config.SecretId, config.SecretKey);
-            });
+            return services;
         }
 
         /// <summary>

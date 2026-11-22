@@ -10,6 +10,12 @@ export const AuthRequestWithAccounts: TypedDocumentNode<AuthRequestWithAccountsF
     authenticationLink
     createdAt
     accessExpiresAt
+    institution {
+      id
+      name
+      bic
+      logoUri
+    }
     associatedAccounts {
       id
       externalId

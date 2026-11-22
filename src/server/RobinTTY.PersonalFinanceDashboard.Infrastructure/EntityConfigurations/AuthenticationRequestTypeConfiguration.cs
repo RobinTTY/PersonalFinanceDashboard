@@ -8,6 +8,9 @@ public class AuthenticationRequestTypeConfiguration : IEntityTypeConfiguration<A
 {
     public void Configure(EntityTypeBuilder<AuthenticationRequest> builder)
     {
+        builder.HasOne(request => request.Institution)
+            .WithMany()
+            .OnDelete(DeleteBehavior.SetNull);
         builder.ConfigureSource();
         builder.Property(entity => entity.CreatedAt).HasConversion<UtcDateTimeConverter>();
     }

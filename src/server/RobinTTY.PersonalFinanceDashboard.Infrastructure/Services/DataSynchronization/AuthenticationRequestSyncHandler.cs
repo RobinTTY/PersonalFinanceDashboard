@@ -130,6 +130,15 @@ public class AuthenticationRequestSyncHandler(
             .Where(account => account.Source == source && accountIds.Contains(account.ExternalId!))
             .ToDictionaryAsync(account => account.ExternalId!, cancellationToken);
 
+        var institutionIds = authenticationRequests
+            .Select(request => request.Institution?.ExternalId)
+            .OfType<string>()
+            .Distinct()
+            .ToList();
+        var trackedInstitutions = await dbContext.BankingInstitutions
+            .Where(institution => institution.Source == source && institutionIds.Contains(institution.ExternalId!))
+            .ToDictionaryAsync(institution => institution.ExternalId!, cancellationToken);
+
         var numOfAddedAuthRequests = 0;
         foreach (var updatedAuthenticationRequest in authenticationRequests)
         {
@@ -147,6 +156,11 @@ public class AuthenticationRequestSyncHandler(
 
                 numOfAddedAuthRequests++;
             }
+
+            // Institutions are synchronized before authentication requests, so unknown ones aren't added
+            if (updatedAuthenticationRequest.Institution?.ExternalId is { } institutionId &&
+                trackedInstitutions.TryGetValue(institutionId, out var institution))
+                existingRequest.Institution = institution;
 
             UpdateAssociatedBankAccounts(updatedAuthenticationRequest, existingRequest, trackedAccounts);
         }

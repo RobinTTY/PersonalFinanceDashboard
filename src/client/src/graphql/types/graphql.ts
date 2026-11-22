@@ -29,6 +29,7 @@ export type AuthenticationRequest = {
   createdAt: Scalars['DateTime']['output'];
   externalId: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
+  institution: Maybe<BankingInstitution>;
   source: DataSource;
   status: AuthenticationStatus;
 };
@@ -40,6 +41,7 @@ export type AuthenticationRequestFilterInput = {
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   externalId?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
+  institution?: InputMaybe<BankingInstitutionFilterInput>;
   or?: InputMaybe<Array<AuthenticationRequestFilterInput>>;
   source?: InputMaybe<DataSourceOperationFilterInput>;
   status?: InputMaybe<AuthenticationStatusOperationFilterInput>;
@@ -838,7 +840,7 @@ export type UuidOperationFilterInput = {
   nlte?: InputMaybe<Scalars['UUID']['input']>;
 };
 
-export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> };
+export type AuthRequestWithAccountsFragment = { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, institution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> };
 
 export type BankAccountDetailsFragment = { __typename: 'BankAccount', id: unknown | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', name: string, bic: string, logoUri: unknown } | null };
 
@@ -876,12 +878,12 @@ export type GetAuthRequestWithAccountsQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> } | null };
+export type GetAuthRequestWithAccountsQuery = { authenticationRequest: { __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, institution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> } | null };
 
 export type GetAuthRequestsWithAccountsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> }> };
+export type GetAuthRequestsWithAccountsQuery = { authenticationRequests: Array<{ __typename: 'AuthenticationRequest', id: unknown | null, externalId: string | null, status: AuthenticationStatus, authenticationLink: unknown, createdAt: Date, accessExpiresAt: Date, institution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, associatedAccounts: Array<{ __typename: 'BankAccount', id: unknown | null, externalId: string | null, iban: string | null, name: string | null, description: string | null, accountType: string | null, balance: number | null, currency: string | null, ownerName: string | null, includeInAnalytics: boolean, associatedInstitution: { __typename: 'BankingInstitution', id: unknown | null, name: string, bic: string, logoUri: unknown } | null, syncStatus: { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null } }> }> };
 
 export type GetAuthenticationRequestQueryVariables = Exact<{
   authenticationId: Scalars['UUID']['input'];

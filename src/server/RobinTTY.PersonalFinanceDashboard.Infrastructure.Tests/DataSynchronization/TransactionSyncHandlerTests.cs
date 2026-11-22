@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
-using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities.GoCardlessJson;
+using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchronization;
 
@@ -12,7 +13,7 @@ public class TransactionSyncHandlerTests : IDisposable
     private static readonly Guid TransactionId = Guid.Parse("70000000-0000-0000-0000-000000000001");
     private static readonly Guid OtherTransactionId = Guid.Parse("70000000-0000-0000-0000-000000000002");
 
-    private readonly SyncTestEnvironment _env = new();
+    private readonly SyncTestEnvironment _env = new(useFakeProvider: true);
 
     public void Dispose() => _env.Dispose();
 
@@ -20,8 +21,7 @@ public class TransactionSyncHandlerTests : IDisposable
     public async Task NewTransactions_AreAddedToTheirAccount()
     {
         await SeedAccountsWithActiveRequest(AccountId);
-        _env.GoCardless.Respond(TransactionsPath(AccountId),
-            Transactions((TransactionId, -10m), (OtherTransactionId, 25m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m), (OtherTransactionId, 25m));
 
         Assert.True(await _env.SyncTransactions());
 
@@ -33,11 +33,10 @@ public class TransactionSyncHandlerTests : IDisposable
     public async Task SyncedAgain_ExistingTransactionsAreUpdatedInsteadOfDuplicated()
     {
         await SeedAccountsWithActiveRequest(AccountId);
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
         await _env.SyncTransactions();
 
-        _env.GoCardless.Respond(TransactionsPath(AccountId),
-            Transactions((TransactionId, -12m), (OtherTransactionId, 5m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -12m), (OtherTransactionId, 5m));
         await _env.SyncTransactions(force: true);
 
         var transactions = await GetTransactions(AccountId);
@@ -51,7 +50,7 @@ public class TransactionSyncHandlerTests : IDisposable
         var account = TestData.Account(AccountId);
         await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), account),
             TestData.Transaction(TransactionId, account, -10m, category: "Groceries", notes: "Weekly shopping"));
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -11m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -11m));
 
         await _env.SyncTransactions();
 
@@ -66,8 +65,8 @@ public class TransactionSyncHandlerTests : IDisposable
     {
         // External ids are only unique per account
         await SeedAccountsWithActiveRequest(AccountId, OtherAccountId);
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
-        _env.GoCardless.Respond(TransactionsPath(OtherAccountId), Transactions((TransactionId, -20m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
+        _env.Provider.RespondTransactions(OtherAccountId, (TransactionId, -20m));
 
         await _env.SyncTransactions();
 
@@ -79,15 +78,15 @@ public class TransactionSyncHandlerTests : IDisposable
     public async Task FreshTransactions_AreOnlyFetchedAgainAfterOneDay()
     {
         await SeedAccountsWithActiveRequest(AccountId);
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
 
         await _env.SyncTransactions();
         await _env.SyncTransactions();
-        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(1, TransactionRequests(AccountId));
 
         _env.Time.Advance(TimeSpan.FromDays(1));
         await _env.SyncTransactions();
-        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(2, TransactionRequests(AccountId));
     }
 
     [Fact]
@@ -97,7 +96,7 @@ public class TransactionSyncHandlerTests : IDisposable
 
         Assert.True(await _env.SyncTransactions());
 
-        Assert.Equal(0, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(0, TransactionRequests(AccountId));
     }
 
     [Fact]
@@ -105,7 +104,7 @@ public class TransactionSyncHandlerTests : IDisposable
     {
         // No response is configured for the other account, so its request fails
         await SeedAccountsWithActiveRequest(AccountId, OtherAccountId);
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
 
         Assert.True(await _env.SyncTransactions());
 
@@ -120,24 +119,24 @@ public class TransactionSyncHandlerTests : IDisposable
 
         await _env.SyncTransactions();
         await _env.SyncTransactions();
-        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(1, TransactionRequests(AccountId));
 
         // The first retry happens after an hour, the second one two hours later
         _env.Time.Advance(TimeSpan.FromMinutes(59));
         await _env.SyncTransactions();
-        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(1, TransactionRequests(AccountId));
 
         _env.Time.Advance(TimeSpan.FromMinutes(1));
         await _env.SyncTransactions();
-        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(2, TransactionRequests(AccountId));
 
         _env.Time.Advance(TimeSpan.FromHours(1));
         await _env.SyncTransactions();
-        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(2, TransactionRequests(AccountId));
 
         _env.Time.Advance(TimeSpan.FromHours(1));
         await _env.SyncTransactions();
-        Assert.Equal(3, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(3, TransactionRequests(AccountId));
     }
 
     [Fact]
@@ -154,7 +153,7 @@ public class TransactionSyncHandlerTests : IDisposable
         Assert.Equal(_env.UtcNow.AddHours(1), failed.NextRetryTime);
 
         _env.Time.Advance(TimeSpan.FromHours(1));
-        _env.GoCardless.Respond(TransactionsPath(AccountId), Transactions((TransactionId, -10m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
         await _env.SyncTransactions();
 
         var succeeded = await _env.GetRetrievalMetadata(ThirdPartyDataType.Transactions, accountId);
@@ -168,16 +167,17 @@ public class TransactionSyncHandlerTests : IDisposable
     public async Task RateLimitedRequest_IsRetriedOnceTheRateLimitResets()
     {
         await SeedAccountsWithActiveRequest(AccountId);
-        _env.GoCardless.RespondRateLimited(TransactionsPath(AccountId), TimeSpan.FromHours(3));
+        _env.Provider.Fail(nameof(IBankDataProvider.GetTransactions), AccountId.ToExternalId(),
+            new ThirdPartyError("Rate limit exceeded", RetryAfter: TimeSpan.FromHours(3)));
 
         await _env.SyncTransactions();
         _env.Time.Advance(TimeSpan.FromHours(2));
         await _env.SyncTransactions();
-        Assert.Equal(1, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(1, TransactionRequests(AccountId));
 
         _env.Time.Advance(TimeSpan.FromHours(1));
         await _env.SyncTransactions();
-        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(2, TransactionRequests(AccountId));
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class TransactionSyncHandlerTests : IDisposable
         await _env.SyncTransactions();
         await _env.SyncTransactions(force: true);
 
-        Assert.Equal(2, _env.GoCardless.RequestCount(TransactionsPath(AccountId)));
+        Assert.Equal(2, TransactionRequests(AccountId));
     }
 
     [Fact]
@@ -208,8 +208,7 @@ public class TransactionSyncHandlerTests : IDisposable
             RetrievalInterval = TimeSpan.FromDays(1),
             RetrieveFrom = new DateTime(2026, 11, 10)
         });
-        _env.GoCardless.Respond(TransactionsPath(AccountId),
-            Transactions((TransactionId, -10m), (OtherTransactionId, 25m)));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m), (OtherTransactionId, 25m));
 
         await _env.SyncTransactions();
         await _env.SyncTransactions(force: true);
@@ -227,8 +226,11 @@ public class TransactionSyncHandlerTests : IDisposable
 
         Assert.True(await _env.SyncTransactions(force: true));
 
-        Assert.Equal(0, _env.GoCardless.TotalRequestCount);
+        Assert.Equal(0, _env.Provider.TotalCallCount);
     }
+
+    private int TransactionRequests(Guid accountExternalId) =>
+        _env.Provider.CallCount(nameof(IBankDataProvider.GetTransactions), accountExternalId.ToExternalId());
 
     private Task SeedAccountsWithActiveRequest(params Guid[] accountIds) =>
         _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1),

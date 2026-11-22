@@ -48,6 +48,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("InstitutionId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -56,6 +59,8 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId");
 
                     b.HasIndex("Source", "ExternalId")
                         .IsUnique()
@@ -332,6 +337,16 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasForeignKey("AssociatedAuthenticationRequestsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.AuthenticationRequest", b =>
+                {
+                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankingInstitution", "Institution")
+                        .WithMany()
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Institution");
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>

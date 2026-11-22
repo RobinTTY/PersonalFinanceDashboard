@@ -9,7 +9,7 @@ import { BankAuthenticationSuccess } from './sub-components/BankAuthenticationSu
 import classes from './AuthenticateBankStep.module.css';
 
 const POLL_DELAYS = [30_000, 60_000, 120_000, 180_000, 240_000, 300_000];
-const STATUS_QUERY_CONTEXT = { notifyOnError: false };
+const STATUS_QUERY_CONTEXT = { notifyOnError: false, refetchOnDataSynchronized: false };
 
 enum AuthenticationState {
   Waiting,

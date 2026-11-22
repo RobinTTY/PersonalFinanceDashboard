@@ -20,6 +20,13 @@ function createBank(
     authenticationLink: null,
     createdAt: new Date(Date.now() - 30 * DAY),
     accessExpiresAt: new Date(Date.now() + 60 * DAY),
+    institution: {
+      __typename: 'BankingInstitution',
+      id: 'institution-1',
+      name: 'Test Bank',
+      bic: 'TESTDEFFXXX',
+      logoUri: null,
+    },
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -75,6 +82,16 @@ function withSyncState(bank: AuthRequestWithAccountsFragment, state: SyncState) 
 }
 
 describe('ConnectedBankCard', () => {
+  it('shows the institution of a connection without linked accounts', () => {
+    renderCard(createBank({ status: AuthenticationStatus.Pending, associatedAccounts: [] }));
+    expect(screen.getByText('Test Bank')).toBeInTheDocument();
+  });
+
+  it('shows the institution of linked accounts for connections stored without one', () => {
+    renderCard(createBank({ institution: null }));
+    expect(screen.getByText('Test Bank')).toBeInTheDocument();
+  });
+
   it('shows when the access of an active connection expires', () => {
     renderCard(createBank());
     expect(screen.getByText('Access expires in 2 months')).toBeInTheDocument();

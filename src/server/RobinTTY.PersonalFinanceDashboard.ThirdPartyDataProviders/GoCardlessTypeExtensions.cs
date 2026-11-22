@@ -90,7 +90,11 @@ public static class GoCardlessTypeExtensions
             requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink, requisition.Created,
             requisition.Accounts
                 .Select(accountId => new BankAccount(DataSource.GoCardless, accountId.ToExternalId()))
-                .ToList());
+                .ToList())
+        {
+            Institution = new BankingInstitution
+                { Source = DataSource.GoCardless, ExternalId = requisition.InstitutionId }
+        };
     }
 
     /// <summary>

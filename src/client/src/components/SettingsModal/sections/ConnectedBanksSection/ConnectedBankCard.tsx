@@ -48,6 +48,14 @@ const EXPIRY_WARNING_DAYS = 14;
 const DAY = 24 * 60 * 60 * 1000;
 
 /**
+ * Gets the institution of a connection. Connections stored before their institution was are
+ * identified by their linked accounts.
+ */
+export function getConnectionInstitution(bank: AuthRequestWithAccounts) {
+  return bank.institution ?? bank.associatedAccounts[0]?.associatedInstitution;
+}
+
+/**
  * Shows when the access of an active or expired connection ends, highlighted once it's close.
  */
 function AccessExpiry({ bank }: { bank: AuthRequestWithAccounts }) {
@@ -152,7 +160,7 @@ export function ConnectedBankCard({
   onReconnect,
   isDeleting,
 }: ConnectedBankCardProps) {
-  const institution = bank.associatedAccounts[0]?.associatedInstitution;
+  const institution = getConnectionInstitution(bank);
   const status = bank.status;
   const accountCount = bank.associatedAccounts.length;
   // Once a newer connection took over the accounts, this one doesn't need to be renewed anymore

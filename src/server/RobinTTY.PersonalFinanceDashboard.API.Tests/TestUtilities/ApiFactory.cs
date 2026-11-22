@@ -23,8 +23,8 @@ public class ApiFactory : WebApplicationFactory<Program>
         // Not Development, so logs aren't sent to Seq
         builder.UseEnvironment("Testing");
         builder.UseSetting("AppConfiguration:DatabaseConfiguration:ConnectionString", $"Data Source={_databasePath}");
-        builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretId", "secret-id");
-        builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretKey", "secret-key");
+        builder.UseSetting("AppConfiguration:GoCardlessConfiguration:SecretId", "secret-id");
+        builder.UseSetting("AppConfiguration:GoCardlessConfiguration:SecretKey", "secret-key");
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton(GoCardless.CreateService());

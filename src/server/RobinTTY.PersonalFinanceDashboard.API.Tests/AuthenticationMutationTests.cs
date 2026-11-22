@@ -52,6 +52,25 @@ public class AuthenticationMutationTests(ApiFactory factory) : IClassFixture<Api
     }
 
     [Fact]
+    public async Task CreateAuthenticationRequest_StoresTheInstitution()
+    {
+        var institution = await factory.Seed(TestData.Institution("SANDBOX_STORED"));
+        factory.GoCardless.Respond(RequisitionsPath, RequisitionJson(Guid.NewGuid(), "CR", DateTime.UtcNow));
+        var created = await _client.PostGraphQl(CreateMutation,
+            new { institutionId = institution.Id, redirectUri = "https://localhost/" });
+        var requestId = created.Data("createAuthenticationRequest", "authenticationRequest", "id").GetGuid();
+
+        var response = await _client.PostGraphQl("""
+                                                 query($id: UUID!) {
+                                                   authenticationRequest(authenticationId: $id) { institution { id } }
+                                                 }
+                                                 """, new { id = requestId });
+
+        Assert.Equal(institution.Id,
+            response.Data("authenticationRequest", "institution", "id").GetGuid());
+    }
+
+    [Fact]
     public async Task CreateAuthenticationRequest_GoCardlessErrorIsReturned()
     {
         var institution = await factory.Seed(TestData.Institution("SANDBOX_FAILING"));

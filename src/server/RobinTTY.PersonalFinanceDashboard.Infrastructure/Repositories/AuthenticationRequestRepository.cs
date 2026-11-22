@@ -67,6 +67,7 @@ public class AuthenticationRequestRepository
             return new CreateAuthenticationRequestResult.ProviderFailed(request.Error);
         }
 
+        request.Result.Institution = institution;
         await _dbContext.AuthenticationRequests.AddAsync(request.Result);
         await _dbContext.SaveChangesAsync();
 

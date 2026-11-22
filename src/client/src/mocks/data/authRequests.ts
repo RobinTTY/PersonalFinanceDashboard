@@ -38,6 +38,13 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/SANDBOXFINANCE_GENODES1RGF',
     createdAt: '2026-05-02T21:39:39.958Z',
     accessExpiresAt: fromNow(60 * DAY),
+    institution: {
+      __typename: 'BankingInstitution',
+      id: 'c1000000-0000-0000-0000-000000000001',
+      name: 'Sandbox Finance',
+      bic: 'GENODES1RGF',
+      logoUri: 'https://cdn-logos.gocardless.com/ais/SANDBOXFINANCE_SFIN0000.png',
+    },
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -92,6 +99,13 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/C24_DEFFDEFF',
     createdAt: '2026-05-02T22:34:19.324Z',
     accessExpiresAt: fromNow(75 * DAY),
+    institution: {
+      __typename: 'BankingInstitution',
+      id: 'c2000000-0000-0000-0000-000000000002',
+      name: 'C24',
+      bic: 'DEFFDEFF',
+      logoUri: 'https://cdn-logos.gocardless.com/ais/C24_DEFFDEFF.png',
+    },
     associatedAccounts: [
       {
         __typename: 'BankAccount',
@@ -167,6 +181,13 @@ export const authenticationRequestsData: AuthenticationRequest[] = [
       'https://ob.gocardless.com/ob-psd2/start/00000000-0000-0000-0000-000000000000/SANTANDER_DE_SCFBDE33',
     createdAt: '2026-07-12T00:16:31.018Z',
     accessExpiresAt: fromNow(10 * DAY),
+    institution: {
+      __typename: 'BankingInstitution',
+      id: 'c3000000-0000-0000-0000-000000000003',
+      name: 'Santander',
+      bic: 'SCFBDE33XXX',
+      logoUri: 'https://cdn-logos.gocardless.com/ais/SANTANDER_PL_CORP_WBKPPLPP.png',
+    },
     associatedAccounts: [
       {
         __typename: 'BankAccount',

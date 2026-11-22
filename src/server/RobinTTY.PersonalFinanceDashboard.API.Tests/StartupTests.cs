@@ -21,8 +21,8 @@ public class StartupTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             base.ConfigureWebHost(builder);
-            builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretId", "");
-            builder.UseSetting("AppConfiguration:NordigenApiConfiguration:SecretKey", "");
+            builder.UseSetting("AppConfiguration:GoCardlessConfiguration:SecretId", "");
+            builder.UseSetting("AppConfiguration:GoCardlessConfiguration:SecretKey", "");
         }
     }
 }

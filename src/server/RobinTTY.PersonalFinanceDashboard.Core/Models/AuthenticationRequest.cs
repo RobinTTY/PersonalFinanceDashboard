@@ -23,6 +23,11 @@ public class AuthenticationRequest : SourcedEntity
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
+    /// The banking institution whose accounts are accessed.
+    /// </summary>
+    public BankingInstitution? Institution { get; set; }
+
+    /// <summary>
     /// The ids of the accounts associated with this authentication request.
     /// </summary>
     public List<BankAccount> AssociatedAccounts { get; set; } = [];

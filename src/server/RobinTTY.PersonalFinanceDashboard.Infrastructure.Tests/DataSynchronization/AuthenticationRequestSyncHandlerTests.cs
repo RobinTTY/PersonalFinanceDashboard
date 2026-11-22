@@ -31,6 +31,35 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task Requests_AreLinkedToTheirInstitution()
+    {
+        // E.g. a request created before institutions were stored on it
+        await _env.Seed(TestData.Institution("SANDBOXFINANCE_SFIN0000"),
+            TestData.Request(RequestId, _env.UtcNow.AddDays(-1)));
+        _env.GoCardless.Respond(RequisitionsPath, Requisitions(
+            Requisition(RequestId, "LN", _env.UtcNow.AddDays(-1)),
+            Requisition(OtherRequestId, "LN", _env.UtcNow.AddDays(-1))));
+
+        Assert.True(await _env.SyncAuthenticationRequests());
+
+        Assert.All(await GetRequests(),
+            request => Assert.Equal("SANDBOXFINANCE_SFIN0000", request.Institution?.ExternalId));
+    }
+
+    [Fact]
+    public async Task UnknownInstitution_IsNotAdded()
+    {
+        _env.GoCardless.Respond(RequisitionsPath,
+            Requisitions(Requisition(RequestId, "LN", _env.UtcNow.AddDays(-1))));
+
+        Assert.True(await _env.SyncAuthenticationRequests());
+
+        Assert.Null((await GetRequests()).Single().Institution);
+        await using var dbContext = _env.CreateDbContext();
+        Assert.Empty(dbContext.BankingInstitutions.Where(institution => institution.Source == DataSource.GoCardless));
+    }
+
+    [Fact]
     public async Task AccountsOfExpiredRequests_AreNotAdded()
     {
         // E.g. the old ids of accounts that were taken over by a reconnect
@@ -99,6 +128,9 @@ public class AuthenticationRequestSyncHandlerTests : IDisposable
     private async Task<List<AuthenticationRequest>> GetRequests()
     {
         await using var dbContext = _env.CreateDbContext();
-        return await dbContext.AuthenticationRequests.Include(request => request.AssociatedAccounts).ToListAsync();
+        return await dbContext.AuthenticationRequests
+            .Include(request => request.AssociatedAccounts)
+            .Include(request => request.Institution)
+            .ToListAsync();
     }
 }
