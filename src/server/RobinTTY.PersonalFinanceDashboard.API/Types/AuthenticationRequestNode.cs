@@ -11,8 +11,9 @@ public static partial class AuthenticationRequestNode
 {
     static partial void Configure(IObjectTypeDescriptor<AuthenticationRequest> descriptor)
     {
-        // The expiry is calculated from the creation time, so it's loaded even if the query doesn't select it
+        // The expiry is calculated from these, so they're loaded even if the query doesn't select them
         descriptor.Field(request => request.CreatedAt).IsProjected();
+        descriptor.Field(request => request.AccessValidForDays).IsProjected();
     }
 
     /// <summary>

@@ -101,6 +101,22 @@ public sealed class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task AccountsOfRequestsPastTheirAccessValidity_AreNotSynced()
+    {
+        var expired = TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-31), TestData.Account(AccountId));
+        expired.AccessValidForDays = 30;
+        var valid = TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-100), TestData.Account(OtherAccountId));
+        valid.AccessValidForDays = 180;
+        await _env.Seed(expired, valid);
+        _env.Provider.RespondTransactions(OtherAccountId);
+
+        Assert.True(await _env.SyncTransactions());
+
+        Assert.Equal(0, TransactionRequests(AccountId));
+        Assert.Equal(1, TransactionRequests(OtherAccountId));
+    }
+
+    [Fact]
     public async Task FailedRequestForOneAccount_DoesNotStopTheOthers()
     {
         // No response is configured for the other account, so its request fails

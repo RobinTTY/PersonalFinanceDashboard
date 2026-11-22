@@ -84,7 +84,10 @@ public static class GoCardlessTypeExtensions
     /// <summary>
     /// Maps a <see cref="Requisition"/> to an <see cref="AuthenticationRequest"/>.
     /// </summary>
-    public static AuthenticationRequest ToAuthenticationRequest(this Requisition requisition)
+    /// <param name="requisition">The requisition to map.</param>
+    /// <param name="accessValidForDays">How long the agreement of the requisition grants access, if known.</param>
+    public static AuthenticationRequest ToAuthenticationRequest(this Requisition requisition,
+        int? accessValidForDays = null)
     {
         return new AuthenticationRequest(DataSource.GoCardless, requisition.Id.ToExternalId(),
             requisition.Status.ToAuthenticationStatus(), requisition.AuthenticationLink, requisition.Created,
@@ -92,6 +95,7 @@ public static class GoCardlessTypeExtensions
                 .Select(accountId => new BankAccount(DataSource.GoCardless, accountId.ToExternalId()))
                 .ToList())
         {
+            AccessValidForDays = accessValidForDays,
             Institution = new BankingInstitution
             {
                 Source = DataSource.GoCardless,
@@ -235,8 +239,8 @@ public static class GoCardlessTypeExtensions
     /// Maps a <see cref="RequisitionStatus"/> to an <see cref="AuthenticationStatus"/>.
     /// </summary>
     /// <param name="status">The requisition status to map.</param>
-    /// <returns>The mapped authentication status.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="status"/> is not a valid <see cref="RequisitionStatus"/>.</exception>
+    /// <returns>The mapped authentication status, <see cref="AuthenticationStatus.Unknown"/> for statuses that
+    /// GoCardless didn't document or that aren't handled yet.</returns>
     private static AuthenticationStatus ToAuthenticationStatus(this RequisitionStatus status)
     {
         return status switch
@@ -244,11 +248,10 @@ public static class GoCardlessTypeExtensions
             RequisitionStatus.Created or RequisitionStatus.GivingConsent
                 or RequisitionStatus.UndergoingAuthentication or RequisitionStatus.SelectingAccounts
                 or RequisitionStatus.GrantingAccess => AuthenticationStatus.RequiresUserAction,
-            RequisitionStatus.Undefined or RequisitionStatus.Suspended
-                or RequisitionStatus.Rejected => AuthenticationStatus.Failed,
+            RequisitionStatus.Suspended or RequisitionStatus.Rejected => AuthenticationStatus.Failed,
             RequisitionStatus.Linked => AuthenticationStatus.Active,
             RequisitionStatus.Expired => AuthenticationStatus.Expired,
-            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+            _ => AuthenticationStatus.Unknown
         };
     }
 }

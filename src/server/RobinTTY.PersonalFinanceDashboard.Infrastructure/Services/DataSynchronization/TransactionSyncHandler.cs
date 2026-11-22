@@ -94,17 +94,25 @@ public class TransactionSyncHandler(
 
     private async Task<List<SyncedAccount>> GetActiveAccounts(CancellationToken cancellationToken)
     {
-        var validSince = timeProvider.GetUtcNow().UtcDateTime - AuthenticationRequestExtensions.AccessValidity;
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
 
         var accounts = await dbContext.BankAccounts
             .Where(account => account.ExternalId != null &&
                               account.AssociatedAuthenticationRequests.Any(request =>
-                                  request.Status == AuthenticationStatus.Active &&
-                                  request.CreatedAt > validSince))
-            .Select(account => new { account.Id, account.Source, account.ExternalId })
+                                  request.Status == AuthenticationStatus.Active))
+            .Select(account => new
+            {
+                account.Id, account.Source, account.ExternalId,
+                Requests = account.AssociatedAuthenticationRequests
+                    .Where(request => request.Status == AuthenticationStatus.Active)
+                    .ToList()
+            })
             .ToListAsync(cancellationToken);
 
-        return accounts.Select(account => new SyncedAccount(account.Id!.Value, account.Source, account.ExternalId!))
+        // The access expiry depends on each request's validity, so it's checked after loading
+        return accounts
+            .Where(account => account.Requests.Any(request => request.IsActive(utcNow)))
+            .Select(account => new SyncedAccount(account.Id!.Value, account.Source, account.ExternalId!))
             .ToList();
     }
 

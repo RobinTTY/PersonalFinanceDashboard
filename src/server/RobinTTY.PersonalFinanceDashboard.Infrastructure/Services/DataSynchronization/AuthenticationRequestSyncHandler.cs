@@ -146,6 +146,7 @@ public class AuthenticationRequestSyncHandler(
             {
                 existingRequest.Status = updatedAuthenticationRequest.Status;
                 existingRequest.AuthenticationLink = updatedAuthenticationRequest.AuthenticationLink;
+                existingRequest.AccessValidForDays ??= updatedAuthenticationRequest.AccessValidForDays;
             }
             else
             {

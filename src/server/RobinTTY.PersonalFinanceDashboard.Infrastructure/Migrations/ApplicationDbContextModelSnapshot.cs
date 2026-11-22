@@ -38,6 +38,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("AccessValidForDays")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("AuthenticationLink")
                         .IsRequired()
                         .HasColumnType("TEXT");

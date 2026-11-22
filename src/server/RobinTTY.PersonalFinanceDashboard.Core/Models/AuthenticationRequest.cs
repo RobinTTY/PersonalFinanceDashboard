@@ -23,6 +23,12 @@ public class AuthenticationRequest : SourcedEntity
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
+    /// For how many days after its creation the authentication request grants access to its accounts,
+    /// <see langword="null"/> if unknown.
+    /// </summary>
+    public int? AccessValidForDays { get; set; }
+
+    /// <summary>
     /// The banking institution whose accounts are accessed.
     /// </summary>
     public BankingInstitution? Institution { get; set; }
@@ -34,12 +40,12 @@ public class AuthenticationRequest : SourcedEntity
 
     /// <summary>
     /// Creates a new instance of <see cref="AuthenticationRequest"/>.
+    /// Required for GraphQL projections, which only set the selected properties.
     /// </summary>
     public AuthenticationRequest()
     {
         Status = AuthenticationStatus.Unknown;
         AuthenticationLink = new Uri("https://www.placeholder.example/");
-        CreatedAt = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -81,7 +87,10 @@ public class AuthenticationRequest : SourcedEntity
     {
         return new AuthenticationRequest(authenticationRequest.Source, authenticationRequest.ExternalId!,
             authenticationRequest.Status,
-            authenticationRequest.AuthenticationLink, authenticationRequest.CreatedAt);
+            authenticationRequest.AuthenticationLink, authenticationRequest.CreatedAt)
+        {
+            AccessValidForDays = authenticationRequest.AccessValidForDays
+        };
     }
 }
 

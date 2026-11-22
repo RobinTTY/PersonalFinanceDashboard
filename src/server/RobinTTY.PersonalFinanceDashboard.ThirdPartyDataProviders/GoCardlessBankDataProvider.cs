@@ -44,7 +44,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             return ThirdPartyResponse<AuthenticationRequest>.Failure(InvalidId(authenticationRequestId));
 
         var response = await client.RequisitionsEndpoint.GetRequisition(requisitionId, cancellationToken);
-        return response.ToThirdPartyResponse(requisition => requisition.ToAuthenticationRequest());
+        return response.ToThirdPartyResponse(requisition => ToAuthenticationRequest(requisition));
     }
 
     /// <inheritdoc />
@@ -68,7 +68,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
         }
 
         return ThirdPartyResponse<IReadOnlyList<AuthenticationRequest>>.Success(
-            requisitions.Select(requisition => requisition.ToAuthenticationRequest()).ToList());
+            requisitions.Select(requisition => ToAuthenticationRequest(requisition)).ToList());
     }
 
     /// <inheritdoc />
@@ -80,7 +80,12 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
                 reference: Guid.NewGuid().ToString(), cancellationToken: cancellationToken);
 
         if (response.IsSuccess)
-            return ThirdPartyResponse<AuthenticationRequest>.Success(response.Result!.ToAuthenticationRequest());
+        {
+            var requisition = response.Result!;
+            var accessValidForDays = await GetAccessValidForDays(requisition, cancellationToken);
+            return ThirdPartyResponse<AuthenticationRequest>.Success(
+                ToAuthenticationRequest(requisition, accessValidForDays));
+        }
 
         // Errors for single request fields (e.g. an unknown institution id) aren't part of the summary
         var error = response.Error!;
@@ -215,6 +220,35 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
     /// <summary>
     /// Creates the error returned for an id that isn't a GoCardless id.
     /// </summary>
+    private AuthenticationRequest ToAuthenticationRequest(Requisition requisition, int? accessValidForDays = null)
+    {
+        var request = requisition.ToAuthenticationRequest(accessValidForDays);
+        if (request.Status == AuthenticationStatus.Unknown)
+            logger.LogWarning("Requisition {RequisitionId} has the unknown status {Status}", requisition.Id,
+                requisition.Status);
+
+        return request;
+    }
+
+    /// <summary>
+    /// Gets how long the agreement of a requisition grants access. The agreement doesn't change, so this is only
+    /// requested once, when the requisition is created.
+    /// </summary>
+    /// <returns>The number of days, or <see langword="null"/> if they couldn't be retrieved.</returns>
+    private async Task<int?> GetAccessValidForDays(Requisition requisition, CancellationToken cancellationToken)
+    {
+        if (requisition.AgreementId is not { } agreementId)
+            return null;
+
+        var response = await client.AgreementsEndpoint.GetAgreement(agreementId, cancellationToken);
+        if (response.IsSuccess)
+            return (int)response.Result!.AccessValidForDays;
+
+        logger.LogWarning("Failed to retrieve agreement {AgreementId} of requisition {RequisitionId}: {Error}",
+            agreementId, requisition.Id, response.ToThirdPartyError().Message);
+        return null;
+    }
+
     private static ThirdPartyError InvalidId(string externalId) =>
         new("Invalid id.", $"\"{externalId}\" is not a valid GoCardless id.");
 }

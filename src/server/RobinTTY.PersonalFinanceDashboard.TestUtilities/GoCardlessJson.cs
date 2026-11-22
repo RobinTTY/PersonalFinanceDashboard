@@ -12,6 +12,12 @@ public static class GoCardlessJson
     public const string InstitutionsPath = "institutions/";
 
     public static string RequisitionPath(Guid requisitionId) => $"requisitions/{requisitionId}/";
+    public static string AgreementPath(Guid agreementId) => $"agreements/enduser/{agreementId}/";
+
+    /// <summary>
+    /// The id of the agreement of a requisition built by <see cref="Requisition"/>.
+    /// </summary>
+    public static Guid AgreementId(Guid requisitionId) => new(requisitionId.ToByteArray().Reverse().ToArray());
 
     public static string BalancesPath(Guid accountId) => $"accounts/{accountId}/balances/";
     public static string DetailsPath(Guid accountId) => $"accounts/{accountId}/details/";
@@ -27,7 +33,7 @@ public static class GoCardlessJson
             ["redirect"] = "https://localhost/",
             ["status"] = status,
             ["institution_id"] = "SANDBOXFINANCE_SFIN0000",
-            ["agreement"] = Guid.NewGuid(),
+            ["agreement"] = AgreementId(id),
             ["reference"] = id.ToString(),
             ["accounts"] = accounts,
             ["user_language"] = "EN",
@@ -48,6 +54,19 @@ public static class GoCardlessJson
 
     public static string RequisitionJson(Guid id, string status, DateTime created, params Guid[] accounts) =>
         JsonSerializer.Serialize(Requisition(id, status, created, accounts));
+
+    public static string Agreement(Guid id, int accessValidForDays) =>
+        JsonSerializer.Serialize(new Dictionary<string, object?>
+        {
+            ["id"] = id,
+            ["created"] = "2026-11-01T10:00:00Z",
+            ["accepted"] = null,
+            ["institution_id"] = "SANDBOXFINANCE_SFIN0000",
+            ["max_historical_days"] = 90,
+            ["access_valid_for_days"] = accessValidForDays,
+            ["access_scope"] = new[] { "balances", "details", "transactions" },
+            ["reconfirmation"] = false
+        });
 
     public static string Deleted(string summary) =>
         JsonSerializer.Serialize(new { summary, detail = summary });

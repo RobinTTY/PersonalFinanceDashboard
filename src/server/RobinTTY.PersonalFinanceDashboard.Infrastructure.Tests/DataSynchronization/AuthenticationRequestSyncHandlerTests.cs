@@ -101,6 +101,36 @@ public sealed class AuthenticationRequestSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task UndocumentedStatus_IsStoredAsUnknown()
+    {
+        _env.GoCardless.Respond(RequisitionsPath,
+            Requisitions(Requisition(RequestId, "XY", _env.UtcNow.AddDays(-1)),
+                Requisition(OtherRequestId, "LN", _env.UtcNow.AddDays(-1))));
+
+        Assert.True(await _env.SyncAuthenticationRequests());
+
+        var requests = await GetRequests();
+        Assert.Equal(AuthenticationStatus.Unknown, requests.Single(r => r.ExternalId == RequestId.ToString()).Status);
+        Assert.Equal(AuthenticationStatus.Active,
+            requests.Single(r => r.ExternalId == OtherRequestId.ToString()).Status);
+    }
+
+    [Fact]
+    public async Task ExistingRequest_KeepsItsAccessValidity()
+    {
+        // GoCardless only returns the agreement's id, the validity is retrieved when the request is created
+        var request = TestData.Request(RequestId, _env.UtcNow.AddDays(-1), TestData.Account(AccountId));
+        request.AccessValidForDays = 30;
+        await _env.Seed(request);
+        _env.GoCardless.Respond(RequisitionsPath,
+            Requisitions(Requisition(RequestId, "LN", _env.UtcNow.AddDays(-1), AccountId)));
+
+        await _env.SyncAuthenticationRequests();
+
+        Assert.Equal(30, (await GetRequests()).Single().AccessValidForDays);
+    }
+
+    [Fact]
     public async Task RequestsMissingFromTheResponse_AreRemoved()
     {
         await _env.Seed(TestData.Request(RequestId, _env.UtcNow.AddDays(-1)),

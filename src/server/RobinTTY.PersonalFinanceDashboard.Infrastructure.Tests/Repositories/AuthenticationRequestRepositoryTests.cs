@@ -32,6 +32,37 @@ public sealed class AuthenticationRequestRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task AddAuthenticationRequest_StoresTheAccessValidityOfTheAgreement()
+    {
+        _env.GoCardless.Respond(RequisitionsPath, RequisitionJson(RequestId, "CR", _env.UtcNow));
+        _env.GoCardless.Respond(AgreementPath(AgreementId(RequestId)), Agreement(AgreementId(RequestId), 30));
+
+        await using (var dbContext = _env.CreateDbContext())
+        {
+            await _env.CreateAuthenticationRequestRepository(dbContext)
+                .AddAuthenticationRequest(TestData.Institution("SANDBOXFINANCE_SFIN0000"), RedirectUri);
+        }
+
+        Assert.Equal(30, (await GetRequests()).Single().AccessValidForDays);
+    }
+
+    [Fact]
+    public async Task AddAuthenticationRequest_UnavailableAgreementIsNotStored()
+    {
+        // GoCardless' default agreement is assumed instead
+        _env.GoCardless.Respond(RequisitionsPath, RequisitionJson(RequestId, "CR", _env.UtcNow));
+
+        await using (var dbContext = _env.CreateDbContext())
+        {
+            var response = await _env.CreateAuthenticationRequestRepository(dbContext)
+                .AddAuthenticationRequest(TestData.Institution("SANDBOXFINANCE_SFIN0000"), RedirectUri);
+            Assert.IsType<CreateAuthenticationRequestResult.Created>(response);
+        }
+
+        Assert.Null((await GetRequests()).Single().AccessValidForDays);
+    }
+
+    [Fact]
     public async Task AddAuthenticationRequest_SendsTheExternalInstitutionIdToGoCardless()
     {
         _env.GoCardless.Respond(RequisitionsPath, RequisitionJson(RequestId, "CR", _env.UtcNow));
