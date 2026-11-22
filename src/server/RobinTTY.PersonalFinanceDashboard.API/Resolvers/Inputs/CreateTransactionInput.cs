@@ -3,55 +3,45 @@
 /// <summary>
 /// Payload required to create a transaction through the API.
 /// </summary>
-public record CreateTransactionInput(
-    Guid AccountId,
-    DateTime? ValueDate,
-    string? Payer,
-    string? Payee,
-    decimal Amount,
-    string Currency,
-    string Category,
-    string Notes)
+public record CreateTransactionInput
 {
     /// <summary>
     /// The id of the account to which the transaction belongs.
     /// </summary>
-    public Guid AccountId { get; set; } = AccountId;
+    public required Guid AccountId { get; init; }
 
     /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
-    public DateTime? ValueDate { get; set; } = ValueDate;
+    public DateTime? ValueDate { get; init; }
 
     /// <summary>
     /// The name of the party which owes the money.
     /// </summary>
-    public string? Payer { get; set; } = Payer;
+    public string? Payer { get; init; }
 
     /// <summary>
     /// The name of the party which is owed the money.
     /// </summary>
-    public string? Payee { get; set; } = Payee;
+    public string? Payee { get; init; }
 
     /// <summary>
     /// The amount being transacted.
     /// </summary>
-    public decimal Amount { get; set; } = Amount;
+    public required decimal Amount { get; init; }
 
     /// <summary>
     /// The currency the amount is denominated in.
     /// </summary>
-    public string Currency { get; set; } = Currency;
+    public required string Currency { get; init; }
 
     /// <summary>
     /// The category this transaction belongs to.
     /// </summary>
-    // TODO: Shouldn't this be nullable?
-    public string Category { get; set; } = Category;
+    public string? Category { get; init; }
 
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
-    // TODO: Shouldn't this be nullable?
-    public string Notes { get; set; } = Notes;
+    public string? Notes { get; init; }
 }

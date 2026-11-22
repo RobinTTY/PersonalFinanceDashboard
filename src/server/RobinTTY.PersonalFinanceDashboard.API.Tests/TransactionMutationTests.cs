@@ -46,6 +46,25 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
+    public async Task UpdateTransaction_BlankValuesRemoveCategoryAndNotes()
+    {
+        var transactionId = await CreateTransactionForNewAccount();
+        const string mutation = """
+                                mutation($input: UpdateTransactionInput!) {
+                                  updateTransaction(input: $input) { transaction { category notes } }
+                                }
+                                """;
+        await _client.PostGraphQl(mutation,
+            new { input = new { id = transactionId, category = "Groceries", notes = "Weekly shopping" } });
+
+        var response = await _client.PostGraphQl(mutation, new { input = new { id = transactionId, category = " " } });
+
+        var transaction = response.Data("updateTransaction", "transaction");
+        Assert.Equal(JsonValueKind.Null, transaction.GetProperty("category").ValueKind);
+        Assert.Equal(JsonValueKind.Null, transaction.GetProperty("notes").ValueKind);
+    }
+
+    [Fact]
     public async Task UpdateTransaction_UnknownIdReturnsNotFound()
     {
         var response = await _client.PostGraphQl("""
@@ -53,7 +72,7 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
                                                    updateTransaction(input: $input) { transaction { id } }
                                                  }
                                                  """,
-            new { input = new { id = Guid.NewGuid(), category = "", notes = "" } });
+            new { input = new { id = Guid.NewGuid() } });
 
         Assert.Equal("TRANSACTION_NOT_FOUND", response.ErrorCode());
     }
@@ -104,8 +123,6 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
                 accountId,
                 amount = -12.5m,
                 currency = "EUR",
-                category = "",
-                notes = "",
                 payee = "Supermarket",
                 valueDate = "2026-11-10T00:00:00Z"
             }

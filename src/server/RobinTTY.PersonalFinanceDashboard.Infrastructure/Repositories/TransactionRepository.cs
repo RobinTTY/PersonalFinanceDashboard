@@ -68,11 +68,11 @@ public class TransactionRepository
     /// Updates the user-entered properties of an existing <see cref="Transaction"/>.
     /// </summary>
     /// <param name="transactionId">The id of the <see cref="Transaction"/> to update.</param>
-    /// <param name="category">The category this transaction belongs to.</param>
-    /// <param name="notes">User created notes for this transaction.</param>
+    /// <param name="category">The category this transaction belongs to, blank to remove it.</param>
+    /// <param name="notes">User created notes for this transaction, blank to remove them.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The updated <see cref="Transaction"/>, or <see langword="null"/> if it doesn't exist.</returns>
-    public async Task<Transaction?> UpdateTransaction(Guid transactionId, string category, string notes,
+    public async Task<Transaction?> UpdateTransaction(Guid transactionId, string? category, string? notes,
         CancellationToken cancellationToken = default)
     {
         var transaction =
@@ -80,8 +80,8 @@ public class TransactionRepository
         if (transaction == null)
             return null;
 
-        transaction.Category = category;
-        transaction.Notes = notes;
+        transaction.Category = string.IsNullOrWhiteSpace(category) ? null : category;
+        transaction.Notes = string.IsNullOrWhiteSpace(notes) ? null : notes;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return transaction;

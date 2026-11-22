@@ -179,7 +179,7 @@ public static class GoCardlessTypeExtensions
             // The debtor sends the money (payer), the creditor receives it (payee)
             return new Transaction(DataSource.GoCardless, externalId, transaction.TransactionId, valueDate,
                 payer: transaction.DebtorName, payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
-                transaction.TransactionAmount.Currency, string.Empty, string.Empty, [],
+                transaction.TransactionAmount.Currency, category: null, notes: null, [],
                 new BankAccount(DataSource.GoCardless, goCardlessAccountId.ToExternalId()));
         }).ToList();
     }

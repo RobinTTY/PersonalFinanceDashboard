@@ -279,7 +279,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Category")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Currency")
@@ -290,7 +289,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Payee")

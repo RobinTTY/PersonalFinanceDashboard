@@ -11,12 +11,12 @@ public record UpdateTransactionInput
     public required Guid Id { get; init; }
 
     /// <summary>
-    /// The category this transaction belongs to.
+    /// The category this transaction belongs to, empty or omitted to remove it.
     /// </summary>
-    public required string Category { get; init; }
+    public string? Category { get; init; }
 
     /// <summary>
-    /// User created notes for this transaction.
+    /// User created notes for this transaction, empty or omitted to remove them.
     /// </summary>
-    public required string Notes { get; init; }
+    public string? Notes { get; init; }
 }

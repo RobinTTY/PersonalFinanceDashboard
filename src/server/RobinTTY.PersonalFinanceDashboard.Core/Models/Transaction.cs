@@ -38,16 +38,14 @@ public class Transaction : SourcedEntity
     public string Currency { get; set; }
 
     /// <summary>
-    /// The category this transaction belongs to.
+    /// The category this transaction belongs to, set by the user.
     /// </summary>
-    // TODO: Shouldn't this be nullable?
-    public string Category { get; set; }
+    public string? Category { get; set; }
 
     /// <summary>
     /// User created notes for this transaction.
     /// </summary>
-    // TODO: Shouldn't this be nullable?
-    public string Notes { get; set; }
+    public string? Notes { get; set; }
 
     /// <summary>
     /// Tags associated with the transaction (to associate expenses with certain subcategories).
@@ -64,14 +62,7 @@ public class Transaction : SourcedEntity
     /// </summary>
     public Transaction()
     {
-        BankTransactionId = null;
-        ValueDate = null;
-        Payer = null;
-        Payee = null;
-        Amount = decimal.MinValue;
         Currency = string.Empty;
-        Category = string.Empty;
-        Notes = string.Empty;
     }
 
     /// <summary>
@@ -90,7 +81,7 @@ public class Transaction : SourcedEntity
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain subcategories).</param>
     /// <param name="bankAccount">The bank account associated with the transaction, representing the source or destination of funds.</param>
     public Transaction(DataSource source, string? externalId, string? bankTransactionId, DateTime? valueDate,
-        string? payer, string? payee, decimal amount, string currency, string category, string notes, List<Tag> tags,
+        string? payer, string? payee, decimal amount, string currency, string? category, string? notes, List<Tag> tags,
         BankAccount? bankAccount) : base(source, externalId)
     {
         BankTransactionId = bankTransactionId;
