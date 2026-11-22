@@ -1,33 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <UserSecretsId>9f45828a-7036-4891-b820-3988e5f193a1</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>RobinTTY.PersonalFinanceDashboard.Api</AssemblyName>
     <RootNamespace>RobinTTY.PersonalFinanceDashboard.Api</RootNamespace>
-    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="14.3.5"/>
-    <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="14.3.5"/>
-    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="14.3.5"/>
-    <PackageReference Include="HotChocolate.Types.Analyzers" Version="14.3.5">
+    <PackageReference Include="HotChocolate.AspNetCore"/>
+    <PackageReference Include="HotChocolate.AspNetCore.CommandLine"/>
+    <PackageReference Include="HotChocolate.Data.EntityFramework"/>
+    <PackageReference Include="HotChocolate.Types.Analyzers">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="4.4.0"/>
-    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-    <PackageReference Include="Serilog.Expressions" Version="5.0.0"/>
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.AspNetCore"/>
+    <PackageReference Include="Serilog.Expressions"/>
+    <PackageReference Include="Serilog.Sinks.Console"/>
+    <PackageReference Include="Serilog.Sinks.File"/>
+    <PackageReference Include="Serilog.Sinks.Seq"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="HotChocolate"/>
+    <Using Include="Serilog"/>
   </ItemGroup>
 
   <ItemGroup>

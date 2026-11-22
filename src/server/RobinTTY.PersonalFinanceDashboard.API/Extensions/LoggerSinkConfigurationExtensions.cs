@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using Serilog.Configuration;
+﻿using Serilog.Configuration;
 using Serilog.Formatting.Compact;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;

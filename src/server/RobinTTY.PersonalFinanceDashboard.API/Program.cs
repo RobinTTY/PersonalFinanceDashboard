@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
 using RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
 using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;

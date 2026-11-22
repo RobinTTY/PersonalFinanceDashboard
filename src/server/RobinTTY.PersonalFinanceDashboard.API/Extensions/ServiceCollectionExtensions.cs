@@ -1,9 +1,4 @@
-﻿using System.Net.Http;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Subscriptions;
 using RobinTTY.PersonalFinanceDashboard.Api.Utility;
