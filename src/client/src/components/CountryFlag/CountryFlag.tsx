@@ -1,8 +1,10 @@
-import { hasFlag } from 'country-flag-icons';
-import * as Flags from 'country-flag-icons/react/3x2';
 import classes from './CountryFlag.module.css';
 
-type FlagComponent = (props: React.SVGAttributes<SVGElement>) => React.JSX.Element;
+const flagUrls = import.meta.glob<string>('/node_modules/country-flag-icons/3x2/*.svg', {
+  query: '?no-inline',
+  import: 'default',
+  eager: true,
+});
 
 interface CountryFlagProps {
   /** ISO 3166-1 alpha-2 country code (case-insensitive), e.g. "SE". */
@@ -15,10 +17,10 @@ interface CountryFlagProps {
  */
 export function CountryFlag({ code }: CountryFlagProps) {
   const normalized = code.toUpperCase();
-  if (!hasFlag(normalized)) {
+  const url = flagUrls[`/node_modules/country-flag-icons/3x2/${normalized}.svg`];
+  if (!url) {
     return null;
   }
 
-  const Flag = (Flags as Record<string, FlagComponent>)[normalized];
-  return <Flag className={classes.flag} aria-label={normalized} role="img" />;
+  return <img src={url} alt={normalized} className={classes.flag} />;
 }

@@ -1,5 +1,5 @@
 import { render } from '@test-utils';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
 import { NetWorthLineChart } from './NetWorthLineChart';
 
 const chartMock = vi.hoisted(() => ({
@@ -8,7 +8,8 @@ const chartMock = vi.hoisted(() => ({
   dispose: vi.fn(),
 }));
 
-vi.mock('echarts', () => ({
+vi.mock('echarts/core', () => ({
+  use: vi.fn(),
   init: vi.fn(() => chartMock),
   graphic: {
     LinearGradient: class {

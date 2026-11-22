@@ -1,11 +1,8 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { RouteErrorBoundary } from './components/RouteErrorBoundary/RouteErrorBoundary';
 import { AppLayout } from './layouts/AppLayout';
-import { AccountsPage } from './pages/Accounts/Accounts.page';
-import { AnalyticsPage } from './pages/Analytics.page';
-import { DashboardPage } from './pages/Dashboard.page';
-import { SettingsPage } from './pages/Settings.page';
 
+// Pages are loaded on first visit, so e.g. the dashboard chart isn't part of the initial bundle
 const router = createBrowserRouter([
   {
     path: '/',
@@ -17,10 +14,24 @@ const router = createBrowserRouter([
         errorElement: <RouteErrorBoundary />,
         children: [
           { index: true, element: <Navigate to="/dashboard" replace /> },
-          { path: 'dashboard', element: <DashboardPage /> },
-          { path: 'accounts', element: <AccountsPage /> },
-          { path: 'analytics', element: <AnalyticsPage /> },
-          { path: 'settings', element: <SettingsPage /> },
+          {
+            path: 'dashboard',
+            lazy: { Component: async () => (await import('./pages/Dashboard.page')).DashboardPage },
+          },
+          {
+            path: 'accounts',
+            lazy: {
+              Component: async () => (await import('./pages/Accounts/Accounts.page')).AccountsPage,
+            },
+          },
+          {
+            path: 'analytics',
+            lazy: { Component: async () => (await import('./pages/Analytics.page')).AnalyticsPage },
+          },
+          {
+            path: 'settings',
+            lazy: { Component: async () => (await import('./pages/Settings.page')).SettingsPage },
+          },
         ],
       },
     ],

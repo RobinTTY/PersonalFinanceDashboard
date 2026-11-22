@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react';
-import * as echarts from 'echarts';
+import { LineChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent } from 'echarts/components';
+import * as echarts from 'echarts/core';
+import { SVGRenderer } from 'echarts/renderers';
 import { useComputedColorScheme } from '@mantine/core';
+
+// Only the used parts of ECharts end up in the bundle
+echarts.use([LineChart, GridComponent, TooltipComponent, SVGRenderer]);
 
 interface NetWorthLineChartProps {
   dataByLabel: Record<string, number>;
