@@ -37,9 +37,12 @@ public class BankingInstitutionRepository
     /// Loads the <see cref="BankingInstitution"/> matching the specified id.
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to retrieve.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The <see cref="BankingInstitution"/> if one is matched, otherwise <see langword="null"/>.</returns>
-    public async Task<BankingInstitution?> FindBankingInstitution(Guid institutionId) =>
-        await _dbContext.BankingInstitutions.SingleOrDefaultAsync(institution => institution.Id == institutionId);
+    public async Task<BankingInstitution?> FindBankingInstitution(Guid institutionId,
+        CancellationToken cancellationToken = default) =>
+        await _dbContext.BankingInstitutions.SingleOrDefaultAsync(institution => institution.Id == institutionId,
+            cancellationToken);
 
     /// <summary>
     /// Gets all <see cref="BankingInstitution"/>s.
@@ -55,25 +58,16 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
-    /// Adds a list of new <see cref="BankingInstitution"/>s.
-    /// </summary>
-    /// <param name="bankingInstitutions">The list of <see cref="BankingInstitution"/>s to add.</param>
-    /// <returns>The number of records that were added.</returns>
-    public async Task<int> AddBankingInstitutions(IEnumerable<BankingInstitution> bankingInstitutions)
-    {
-        await _dbContext.BankingInstitutions.AddRangeAsync(bankingInstitutions);
-        return await _dbContext.SaveChangesAsync();
-    }
-
-    /// <summary>
     /// Adds a new <see cref="BankingInstitution"/>.
     /// </summary>
     /// <param name="bankingInstitution">The <see cref="BankingInstitution"/> to add.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The added <see cref="BankingInstitution"/>.</returns>
-    public async Task<BankingInstitution> AddBankingInstitution(BankingInstitution bankingInstitution)
+    public async Task<BankingInstitution> AddBankingInstitution(BankingInstitution bankingInstitution,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.BankingInstitutions.AddAsync(bankingInstitution);
-        await _dbContext.SaveChangesAsync();
+        var result = await _dbContext.BankingInstitutions.AddAsync(bankingInstitution, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return result.Entity;
     }
@@ -86,12 +80,13 @@ public class BankingInstitutionRepository
     /// <param name="bic">The Business Identifier Code (BIC) of the institution.</param>
     /// <param name="logoUri">A <see cref="Uri"/> for the logo of the institution.</param>
     /// <param name="countries">The countries the institution operates in.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The updated <see cref="BankingInstitution"/>, or <see langword="null"/> if it doesn't exist.</returns>
     public async Task<BankingInstitution?> UpdateBankingInstitution(Guid institutionId, string name, string bic,
-        Uri logoUri, List<string> countries)
+        Uri logoUri, List<string> countries, CancellationToken cancellationToken = default)
     {
         var institution = await _dbContext.BankingInstitutions
-            .SingleOrDefaultAsync(institution => institution.Id == institutionId);
+            .SingleOrDefaultAsync(institution => institution.Id == institutionId, cancellationToken);
         if (institution == null)
             return null;
 
@@ -99,7 +94,7 @@ public class BankingInstitutionRepository
         institution.Bic = bic;
         institution.LogoUri = logoUri;
         institution.Countries = countries;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return institution;
     }
@@ -108,10 +103,12 @@ public class BankingInstitutionRepository
     /// Deletes an existing <see cref="BankingInstitution"/>.
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteBankingInstitution(Guid institutionId)
+    public async Task<bool> DeleteBankingInstitution(Guid institutionId, CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId).ExecuteDeleteAsync();
+        var result = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId)
+            .ExecuteDeleteAsync(cancellationToken);
         return Convert.ToBoolean(result);
     }
 }

@@ -19,18 +19,20 @@ public class AuthenticationMutationResolvers
     /// <param name="institutionRepository">The injected repository to look up the institution with.</param>
     /// <param name="institutionId">The id of the institution which the authentication request should be created for.</param>
     /// <param name="redirectUri">The URI to redirect to after the authentication is completed.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<AuthenticationRequest> CreateAuthenticationRequest(AuthenticationRequestRepository repository,
-        BankingInstitutionRepository institutionRepository, Guid institutionId, string redirectUri)
+        BankingInstitutionRepository institutionRepository, Guid institutionId, string redirectUri,
+        CancellationToken cancellationToken)
     {
         if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var uri))
             throw MutationErrors.Create($"Redirect URI \"{redirectUri}\" is not a valid absolute URI.",
                 ErrorCodes.InvalidRedirectUri);
 
-        var institution = await institutionRepository.FindBankingInstitution(institutionId)
+        var institution = await institutionRepository.FindBankingInstitution(institutionId, cancellationToken)
                           ?? throw MutationErrors.NotFound<BankingInstitution>(institutionId,
                               ErrorCodes.BankingInstitutionNotFound);
 
-        var createResult = await repository.AddAuthenticationRequest(institution, uri);
+        var createResult = await repository.AddAuthenticationRequest(institution, uri, cancellationToken);
         return createResult switch
         {
             CreateAuthenticationRequestResult.Created created => created.Request,
@@ -49,10 +51,11 @@ public class AuthenticationMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="authenticationId">The id of the authentication request to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<DeleteResponse> DeleteAuthenticationRequest(AuthenticationRequestRepository repository,
-        Guid authenticationId)
+        Guid authenticationId, CancellationToken cancellationToken)
     {
-        var error = await repository.DeleteAuthenticationRequest(authenticationId);
+        var error = await repository.DeleteAuthenticationRequest(authenticationId, cancellationToken);
         if (error is null)
             return new DeleteResponse { DeletedId = authenticationId };
 

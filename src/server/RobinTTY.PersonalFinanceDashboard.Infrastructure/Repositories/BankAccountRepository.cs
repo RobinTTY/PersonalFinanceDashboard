@@ -44,10 +44,12 @@ public class BankAccountRepository
     /// Adds a new <see cref="BankAccount"/>.
     /// </summary>
     /// <param name="bankAccount">The <see cref="BankAccount"/>s to add.</param>
-    public async Task<BankAccount> AddBankAccount(BankAccount bankAccount)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<BankAccount> AddBankAccount(BankAccount bankAccount,
+        CancellationToken cancellationToken = default)
     {
         var entityEntry = _dbContext.BankAccounts.Add(bankAccount);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return entityEntry.Entity;
     }
@@ -58,16 +60,19 @@ public class BankAccountRepository
     /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to update.</param>
     /// <param name="name">The name of the account.</param>
     /// <param name="description">A description of this account.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The updated <see cref="BankAccount"/>, or <see langword="null"/> if it doesn't exist.</returns>
-    public async Task<BankAccount?> UpdateBankAccount(Guid bankAccountId, string name, string? description)
+    public async Task<BankAccount?> UpdateBankAccount(Guid bankAccountId, string name, string? description,
+        CancellationToken cancellationToken = default)
     {
-        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId);
+        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId,
+            cancellationToken);
         if (bankAccount == null)
             return null;
 
         bankAccount.Name = name;
         bankAccount.Description = description;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return bankAccount;
     }
@@ -77,15 +82,18 @@ public class BankAccountRepository
     /// </summary>
     /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to update.</param>
     /// <param name="includeInAnalytics">Whether the account should be included in analytics.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The updated <see cref="BankAccount"/> if one is matched, otherwise <see langword="null"/>.</returns>
-    public async Task<BankAccount?> SetIncludeInAnalytics(Guid bankAccountId, bool includeInAnalytics)
+    public async Task<BankAccount?> SetIncludeInAnalytics(Guid bankAccountId, bool includeInAnalytics,
+        CancellationToken cancellationToken = default)
     {
-        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId);
+        var bankAccount = await _dbContext.BankAccounts.SingleOrDefaultAsync(account => account.Id == bankAccountId,
+            cancellationToken);
         if (bankAccount == null)
             return null;
 
         bankAccount.IncludeInAnalytics = includeInAnalytics;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return bankAccount;
     }
@@ -94,10 +102,12 @@ public class BankAccountRepository
     /// Deletes an existing <see cref="BankAccount"/>.
     /// </summary>
     /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteBankAccount(Guid bankAccountId)
+    public async Task<bool> DeleteBankAccount(Guid bankAccountId, CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId).ExecuteDeleteAsync();
+        var result = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId)
+            .ExecuteDeleteAsync(cancellationToken);
         return Convert.ToBoolean(result);
     }
 }

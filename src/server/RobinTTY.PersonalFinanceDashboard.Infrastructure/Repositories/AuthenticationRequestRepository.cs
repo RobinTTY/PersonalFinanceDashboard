@@ -49,15 +49,17 @@ public class AuthenticationRequestRepository
     /// </summary>
     /// <param name="institution">The institution to create a <see cref="AuthenticationRequest"/> for.</param>
     /// <param name="redirectUri">The URI of the page to redirect to after successful authentication.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The created <see cref="AuthenticationRequest"/>, or why it couldn't be created.</returns>
     public async Task<CreateAuthenticationRequestResult> AddAuthenticationRequest(BankingInstitution institution,
-        Uri redirectUri)
+        Uri redirectUri, CancellationToken cancellationToken = default)
     {
         // Institutions without a provider (e.g. manually created ones) can't be connected
         if (!_providers.TryGet(institution.Source, out var provider))
             return new CreateAuthenticationRequestResult.NotConnectable();
 
-        var request = await provider.CreateAuthenticationRequest(institution.ExternalId!, redirectUri);
+        var request = await provider.CreateAuthenticationRequest(institution.ExternalId!, redirectUri,
+            cancellationToken);
 
         if (!request.IsSuccessful)
         {
@@ -68,8 +70,8 @@ public class AuthenticationRequestRepository
         }
 
         request.Result.Institution = institution;
-        await _dbContext.AuthenticationRequests.AddAsync(request.Result);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.AuthenticationRequests.AddAsync(request.Result, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new CreateAuthenticationRequestResult.Created(request.Result);
     }
@@ -78,11 +80,14 @@ public class AuthenticationRequestRepository
     /// Deletes an existing <see cref="AuthenticationRequest"/>.
     /// </summary>
     /// <param name="id">The id of the <see cref="AuthenticationRequest"/> to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The error if the deletion failed, otherwise <see langword="null"/>.</returns>
-    public async Task<ThirdPartyError?> DeleteAuthenticationRequest(Guid id)
+    public async Task<ThirdPartyError?> DeleteAuthenticationRequest(Guid id,
+        CancellationToken cancellationToken = default)
     {
         var authRequest =
-            await _dbContext.AuthenticationRequests.SingleOrDefaultAsync(authRequest => authRequest.Id == id);
+            await _dbContext.AuthenticationRequests.SingleOrDefaultAsync(authRequest => authRequest.Id == id,
+                cancellationToken);
 
         if (authRequest is null)
         {
@@ -99,11 +104,11 @@ public class AuthenticationRequestRepository
                 $"No data provider is registered for {authRequest.Source}.");
         }
 
-        var error = await provider.DeleteAuthenticationRequest(authRequest.ExternalId!);
+        var error = await provider.DeleteAuthenticationRequest(authRequest.ExternalId!, cancellationToken);
         if (error is null)
         {
             _dbContext.AuthenticationRequests.Remove(authRequest);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Successfully deleted authentication request with id {Id}", id);
 
             return null;

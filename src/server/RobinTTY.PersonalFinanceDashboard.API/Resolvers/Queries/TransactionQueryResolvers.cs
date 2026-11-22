@@ -13,6 +13,7 @@ public class TransactionQueryResolvers
     /// Look up transactions.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
+    [UsePaging]
     [UseProjection]
     public IQueryable<Transaction> GetTransactions(TransactionRepository repository) =>
         repository.GetTransactions();

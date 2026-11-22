@@ -72,25 +72,37 @@ public class TransactionQueryTests(ApiFactory factory) : IClassFixture<ApiFactor
     }
 
     [Fact]
-    public async Task Transactions_IncludeTheirAccount()
+    public async Task Transactions_ArePagedNewestFirstAndIncludeTheirAccount()
     {
-        var account = await SeedAccountWithTransactions(-10m);
+        // Newer than the transactions of the other tests, so they make up the first page
+        var account = await SeedAccountWithTransactions(new DateTime(2099, 1, 10), -10m, -20m, -30m);
 
-        var response = await _client.PostGraphQl("query { transactions { id bankAccount { id } } }");
+        var page = (await _client.PostGraphQl("""
+                                              query {
+                                                transactions(first: 2) { nodes { amount bankAccount { id } } pageInfo { hasNextPage } }
+                                              }
+                                              """)).Data("transactions");
 
-        var transaction = Assert.Single(response.Data("transactions").EnumerateArray(),
-            node => node.GetProperty("id").GetString() == account.Transactions[0].Id.ToString());
-        Assert.Equal(account.Id.ToString(), transaction.GetProperty("bankAccount").GetProperty("id").GetString());
+        Assert.Equal([-10m, -20m], Amounts(page));
+        Assert.All(page.GetProperty("nodes").EnumerateArray(), node =>
+            Assert.Equal(account.Id.ToString(), node.GetProperty("bankAccount").GetProperty("id").GetString()));
+        Assert.True(page.GetProperty("pageInfo").GetProperty("hasNextPage").GetBoolean());
     }
 
     /// <summary>
     /// Seeds an account whose transactions are a day apart, the first one being the newest.
     /// </summary>
-    private async Task<BankAccount> SeedAccountWithTransactions(params decimal[] amounts)
+    private Task<BankAccount> SeedAccountWithTransactions(params decimal[] amounts) =>
+        SeedAccountWithTransactions(new DateTime(2026, 11, 10), amounts);
+
+    /// <inheritdoc cref="SeedAccountWithTransactions(decimal[])"/>
+    /// <param name="newest">The value date of the first transaction.</param>
+    /// <param name="amounts">The amounts of the transactions.</param>
+    private async Task<BankAccount> SeedAccountWithTransactions(DateTime newest, params decimal[] amounts)
     {
         var account = TestData.ManualAccount();
         account.Transactions.AddRange(amounts.Select((amount, index) => TestData.Transaction(Guid.NewGuid(), account,
-            amount, valueDate: new DateTime(2026, 11, 10).AddDays(-index))));
+            amount, valueDate: newest.AddDays(-index))));
         return await factory.Seed(account);
     }
 

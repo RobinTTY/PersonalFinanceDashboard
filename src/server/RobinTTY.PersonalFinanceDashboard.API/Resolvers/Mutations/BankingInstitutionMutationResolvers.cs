@@ -17,12 +17,13 @@ public class BankingInstitutionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="input">The banking institution to create.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<BankingInstitution> CreateBankingInstitution(BankingInstitutionRepository repository,
-        CreateBankingInstitutionInput input)
+        CreateBankingInstitutionInput input, CancellationToken cancellationToken)
     {
         var bankingInstitution = new BankingInstitution(DataSource.Manual, null, input.Bic, input.Name, input.LogoUri,
             input.Countries);
-        return await repository.AddBankingInstitution(bankingInstitution);
+        return await repository.AddBankingInstitution(bankingInstitution, cancellationToken);
     }
 
     /// <summary>
@@ -30,11 +31,12 @@ public class BankingInstitutionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="input">The banking institution values to update.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<BankingInstitution> UpdateBankingInstitution(BankingInstitutionRepository repository,
-        UpdateBankingInstitutionInput input)
+        UpdateBankingInstitutionInput input, CancellationToken cancellationToken)
     {
         return await repository.UpdateBankingInstitution(input.Id, input.Name, input.Bic, input.LogoUri,
-                   input.Countries)
+                   input.Countries, cancellationToken)
                ?? throw MutationErrors.NotFound<BankingInstitution>(input.Id, ErrorCodes.BankingInstitutionNotFound);
     }
 
@@ -43,10 +45,11 @@ public class BankingInstitutionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<DeleteResponse> DeleteBankingInstitution(BankingInstitutionRepository repository,
-        Guid bankingInstitutionId)
+        Guid bankingInstitutionId, CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteBankingInstitution(bankingInstitutionId);
+        var deleted = await repository.DeleteBankingInstitution(bankingInstitutionId, cancellationToken);
         if (deleted)
             return new DeleteResponse { DeletedId = bankingInstitutionId };
 

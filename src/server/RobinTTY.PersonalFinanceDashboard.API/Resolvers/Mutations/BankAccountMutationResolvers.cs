@@ -17,11 +17,13 @@ public class BankAccountMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="input">The banking account to create.</param>
-    public async Task<BankAccount> CreateBankAccount(BankAccountRepository repository, CreateBankAccountInput input)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<BankAccount> CreateBankAccount(BankAccountRepository repository, CreateBankAccountInput input,
+        CancellationToken cancellationToken)
     {
         var bankAccount = new BankAccount(DataSource.Manual, null, input.Name, input.Description, input.Balance,
             input.Currency, input.Iban, input.Bic, input.Bban, input.OwnerName, input.AccountType);
-        return await repository.AddBankAccount(bankAccount);
+        return await repository.AddBankAccount(bankAccount, cancellationToken);
     }
 
     /// <summary>
@@ -29,9 +31,11 @@ public class BankAccountMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="input">The banking account values to update.</param>
-    public async Task<BankAccount> UpdateBankAccount(BankAccountRepository repository, UpdateBankAccountInput input)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<BankAccount> UpdateBankAccount(BankAccountRepository repository, UpdateBankAccountInput input,
+        CancellationToken cancellationToken)
     {
-        return await repository.UpdateBankAccount(input.Id, input.Name, input.Description)
+        return await repository.UpdateBankAccount(input.Id, input.Name, input.Description, cancellationToken)
                ?? throw MutationErrors.NotFound<BankAccount>(input.Id, ErrorCodes.BankAccountNotFound);
     }
 
@@ -41,10 +45,11 @@ public class BankAccountMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankAccountId">The id of the bank account to update.</param>
     /// <param name="includeInAnalytics">Whether the account should be included in analytics.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<BankAccount> SetBankAccountIncludeInAnalytics(BankAccountRepository repository,
-        Guid bankAccountId, bool includeInAnalytics)
+        Guid bankAccountId, bool includeInAnalytics, CancellationToken cancellationToken)
     {
-        return await repository.SetIncludeInAnalytics(bankAccountId, includeInAnalytics)
+        return await repository.SetIncludeInAnalytics(bankAccountId, includeInAnalytics, cancellationToken)
                ?? throw MutationErrors.NotFound<BankAccount>(bankAccountId, ErrorCodes.BankAccountNotFound);
     }
 
@@ -53,10 +58,11 @@ public class BankAccountMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankAccountId">The id of the bank account to delete.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task<DeleteResponse> DeleteBankAccount(BankAccountRepository repository,
-        Guid bankAccountId)
+        Guid bankAccountId, CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteBankAccount(bankAccountId);
+        var deleted = await repository.DeleteBankAccount(bankAccountId, cancellationToken);
         if (deleted)
             return new DeleteResponse { DeletedId = bankAccountId };
 

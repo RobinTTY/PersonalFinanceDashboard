@@ -17,7 +17,9 @@ public class TransactionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>
     /// <param name="input">The transaction to create.</param>
-    public async Task<Transaction> CreateTransaction(TransactionRepository repository, CreateTransactionInput input)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<Transaction> CreateTransaction(TransactionRepository repository, CreateTransactionInput input,
+        CancellationToken cancellationToken)
     {
         var transaction = new Transaction
         {
@@ -32,7 +34,7 @@ public class TransactionMutationResolvers
             ValueDate = input.ValueDate,
             Id = null
         };
-        return await repository.AddTransaction(transaction, input.AccountId)
+        return await repository.AddTransaction(transaction, input.AccountId, cancellationToken)
                ?? throw MutationErrors.NotFound<BankAccount>(input.AccountId, ErrorCodes.BankAccountNotFound);
     }
 
@@ -41,9 +43,11 @@ public class TransactionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>
     /// <param name="input">The transaction values to update.</param>
-    public async Task<Transaction> UpdateTransaction(TransactionRepository repository, UpdateTransactionInput input)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<Transaction> UpdateTransaction(TransactionRepository repository, UpdateTransactionInput input,
+        CancellationToken cancellationToken)
     {
-        return await repository.UpdateTransaction(input.Id, input.Category, input.Notes)
+        return await repository.UpdateTransaction(input.Id, input.Category, input.Notes, cancellationToken)
                ?? throw MutationErrors.NotFound<Transaction>(input.Id, ErrorCodes.TransactionNotFound);
     }
 
@@ -52,9 +56,11 @@ public class TransactionMutationResolvers
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>
     /// <param name="transactionId">The id of the transaction to delete.</param>
-    public async Task<DeleteResponse> DeleteTransaction(TransactionRepository repository, Guid transactionId)
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    public async Task<DeleteResponse> DeleteTransaction(TransactionRepository repository, Guid transactionId,
+        CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteTransaction(transactionId);
+        var deleted = await repository.DeleteTransaction(transactionId, cancellationToken);
         if (deleted)
             return new DeleteResponse { DeletedId = transactionId };
 
