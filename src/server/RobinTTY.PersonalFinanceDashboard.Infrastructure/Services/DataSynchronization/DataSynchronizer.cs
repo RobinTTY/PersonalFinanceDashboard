@@ -62,20 +62,23 @@ public class DataSynchronizer(
     }, cancellationToken);
 
     private Task<bool> SynchronizeDataType(ThirdPartyDataType dataType, bool forceThirdPartySync,
-        CancellationToken cancellationToken) => dataType switch
+        CancellationToken cancellationToken)
     {
-        ThirdPartyDataType.BankingInstitutions =>
-            bankingInstitutionSyncHandler.SynchronizeData(forceThirdPartySync, cancellationToken),
-        ThirdPartyDataType.AuthenticationRequests =>
-            authenticationRequestSyncHandler.SynchronizeData(forceThirdPartySync: forceThirdPartySync,
-                cancellationToken: cancellationToken),
-        ThirdPartyDataType.BankAccounts =>
-            bankAccountSyncHandler.SynchronizeData(forceThirdPartySync: forceThirdPartySync,
-                cancellationToken: cancellationToken),
-        ThirdPartyDataType.Transactions =>
-            transactionSyncHandler.SynchronizeData(forceThirdPartySync, cancellationToken),
-        _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
-    };
+        return dataType switch
+        {
+            ThirdPartyDataType.BankingInstitutions =>
+                bankingInstitutionSyncHandler.SynchronizeData(forceThirdPartySync, cancellationToken),
+            ThirdPartyDataType.AuthenticationRequests =>
+                authenticationRequestSyncHandler.SynchronizeData(forceThirdPartySync: forceThirdPartySync,
+                    cancellationToken: cancellationToken),
+            ThirdPartyDataType.BankAccounts =>
+                bankAccountSyncHandler.SynchronizeData(forceThirdPartySync: forceThirdPartySync,
+                    cancellationToken: cancellationToken),
+            ThirdPartyDataType.Transactions =>
+                transactionSyncHandler.SynchronizeData(forceThirdPartySync, cancellationToken),
+            _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
+        };
+    }
 
     private async Task<bool> Run(Func<Task<bool>> synchronize, CancellationToken cancellationToken)
     {

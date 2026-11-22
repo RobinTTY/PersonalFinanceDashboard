@@ -93,7 +93,10 @@ public static class GoCardlessTypeExtensions
                 .ToList())
         {
             Institution = new BankingInstitution
-                { Source = DataSource.GoCardless, ExternalId = requisition.InstitutionId }
+            {
+                Source = DataSource.GoCardless,
+                ExternalId = requisition.InstitutionId
+            }
         };
     }
 

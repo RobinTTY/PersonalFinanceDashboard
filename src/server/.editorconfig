@@ -9,6 +9,7 @@ indent_style = space
 indent_size = 2
 
 [*.cs]
+insert_final_newline = false
 csharp_style_namespace_declarations = file_scoped:warning
 # Logging runs a few times per synchronization, so LoggerMessage delegates wouldn't make a difference
 dotnet_diagnostic.CA1848.severity = none

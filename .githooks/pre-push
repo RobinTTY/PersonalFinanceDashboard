@@ -1,0 +1,40 @@
+#!/bin/sh
+# Formats the server code with Rider's formatter before pushing commits that change the server, like CI checks it.
+# Enable it once per clone with: git config core.hooksPath .githooks
+# Skip it for a single push with: git push --no-verify
+
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+check_server=false
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Deleting a remote branch pushes no commits
+  [ "$local_sha" = "$zero" ] && continue
+
+  if [ "$remote_sha" = "$zero" ]; then
+    # A new branch: the commits that aren't on the remote yet
+    commits=$(git rev-list "$local_sha" --not --remotes -- src/server global.json)
+  else
+    # Unknown remote commits (e.g. a force push) can't be compared, so the check runs anyway
+    commits=$(git rev-list "$remote_sha..$local_sha" -- src/server global.json 2>/dev/null) || commits=unknown
+  fi
+
+  [ -n "$commits" ] && check_server=true
+done
+
+$check_server || exit 0
+
+echo "Formatting the server code..."
+before=$(git diff --ignore-cr-at-eol -- src/server | git hash-object --stdin)
+(
+  cd src/server &&
+    dotnet tool restore >/dev/null &&
+    dotnet jb cleanupcode RobinTTY.PersonalFinanceDashboard.sln --profile="Built-in: Reformat Code" --no-build \
+      --verbosity=ERROR
+) || exit 1
+after=$(git diff --ignore-cr-at-eol -- src/server | git hash-object --stdin)
+
+if [ "$before" != "$after" ]; then
+  echo "The server code wasn't formatted. Review and commit the formatting changes, then push again:" >&2
+  git diff --ignore-cr-at-eol --stat -- src/server >&2
+  exit 1
+fi
