@@ -40,3 +40,25 @@ public class DatabaseConfiguration
     [Required]
     public string ConnectionString { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Configuration parameters for logging.
+/// </summary>
+public class LoggingConfiguration
+{
+    /// <summary>
+    /// The configuration section the settings are read from.
+    /// </summary>
+    public const string SectionName = $"{AppConfiguration.SectionName}:LoggingConfiguration";
+
+    /// <summary>
+    /// The URL of the Seq server logs are sent to. If not set, logs aren't sent to Seq.
+    /// </summary>
+    public string? SeqServerUrl { get; set; }
+
+    /// <summary>
+    /// The file logs are written to while Seq isn't reachable, relative to the content root.
+    /// The date is appended to the file name.
+    /// </summary>
+    public string SeqFallbackPath { get; set; } = "logs/log-.clef";
+}

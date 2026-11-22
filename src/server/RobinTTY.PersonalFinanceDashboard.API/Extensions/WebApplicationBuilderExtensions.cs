@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using RobinTTY.PersonalFinanceDashboard.Api.Utility;
+using Serilog.Debugging;
+using Path = System.IO.Path;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
 
@@ -18,12 +22,20 @@ public static class WebApplicationBuilderExtensions
         // Forward issues with Serilog itself to console
         if (webApplicationBuilder.Environment.IsDevelopment())
         {
-            Serilog.Debugging.SelfLog.Enable(Console.Error);
+            SelfLog.Enable(Console.Error);
         }
-        
+
         return webApplicationBuilder.Host.UseSerilog((context, loggerConfig) =>
         {
             loggerConfig.ReadFrom.Configuration(context.Configuration);
+
+            var logging = context.Configuration.GetSection(LoggingConfiguration.SectionName)
+                .Get<LoggingConfiguration>();
+            if (logging?.SeqServerUrl is { } seqServerUrl)
+            {
+                var fallbackPath = Path.Combine(context.HostingEnvironment.ContentRootPath, logging.SeqFallbackPath);
+                loggerConfig.WriteTo.SeqWithFileFallback(seqServerUrl, fallbackPath);
+            }
         });
     }
 }
