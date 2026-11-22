@@ -31,7 +31,14 @@ public class DataSynchronizationSubscriptionTests(ApiFactory factory) : IClassFi
         while (!next.IsCompleted && DateTime.UtcNow < deadline)
         {
             await _client.PostGraphQl("mutation { synchronizeTransactionData { boolean } }");
-            await Task.WhenAny(next, Task.Delay(100));
+            try
+            {
+                await next.WaitAsync(TimeSpan.FromMilliseconds(100));
+            }
+            catch (TimeoutException)
+            {
+                // Not received yet, so the next synchronization is triggered
+            }
         }
 
         var message = await next.WaitAsync(Timeout);
@@ -68,6 +75,6 @@ public class DataSynchronizationSubscriptionTests(ApiFactory factory) : IClassFi
             message.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
         } while (!result.EndOfMessage);
 
-        return JsonDocument.Parse(message.ToString()).RootElement;
+        return JsonElement.Parse(message.ToString());
     }
 }

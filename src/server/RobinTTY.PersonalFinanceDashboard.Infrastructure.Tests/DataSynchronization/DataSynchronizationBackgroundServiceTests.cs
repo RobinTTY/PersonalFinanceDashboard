@@ -52,7 +52,14 @@ public sealed class DataSynchronizationBackgroundServiceTests : IAsyncDisposable
         while (!nextRun.IsCompleted && DateTime.UtcNow < deadline)
         {
             _time.Advance(DataSynchronizationBackgroundService.Interval);
-            await Task.WhenAny(nextRun, Task.Delay(10));
+            try
+            {
+                await nextRun.WaitAsync(TimeSpan.FromMilliseconds(10));
+            }
+            catch (TimeoutException)
+            {
+                // Not run yet, so the time is advanced again
+            }
         }
 
         await nextRun;

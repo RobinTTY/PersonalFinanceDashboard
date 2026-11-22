@@ -11,7 +11,7 @@ internal static class GraphQlClient
     public static async Task<JsonElement> PostGraphQl(this HttpClient client, string query, object? variables = null)
     {
         var response = await client.PostAsJsonAsync("/graphql", new { query, variables });
-        return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        return JsonElement.Parse(await response.Content.ReadAsStringAsync());
     }
 
     /// <summary>
