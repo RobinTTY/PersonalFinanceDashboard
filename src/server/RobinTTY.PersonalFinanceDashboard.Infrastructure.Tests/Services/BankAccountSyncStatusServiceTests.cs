@@ -4,7 +4,7 @@ using RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.Services;
 
-public class BankAccountSyncStatusServiceTests : IDisposable
+public sealed class BankAccountSyncStatusServiceTests : IDisposable
 {
     private readonly SyncTestEnvironment _env = new();
 

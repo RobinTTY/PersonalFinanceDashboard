@@ -16,7 +16,7 @@ public class StartupTests
         Assert.Contains("SecretId", exception.Message);
     }
 
-    private class ApiFactoryWithoutGoCardlessKeys : ApiFactory
+    private sealed class ApiFactoryWithoutGoCardlessKeys : ApiFactory
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

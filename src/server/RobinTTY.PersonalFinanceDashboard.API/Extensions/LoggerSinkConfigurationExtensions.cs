@@ -1,4 +1,5 @@
-﻿using Serilog.Configuration;
+﻿using System.Globalization;
+using Serilog.Configuration;
 using Serilog.Formatting.Compact;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
@@ -35,7 +36,8 @@ public static class LoggerSinkConfigurationExtensions
 
         if (IsReachable(serverUrl))
         {
-            return writeTo.FallbackChain(sink => sink.Seq(serverUrl), File);
+            return writeTo.FallbackChain(sink => sink.Seq(serverUrl, formatProvider: CultureInfo.InvariantCulture),
+                File);
         }
 
         // The logger doesn't exist yet

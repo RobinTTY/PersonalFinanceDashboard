@@ -6,7 +6,7 @@ using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilitie
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.Repositories;
 
-public class AuthenticationRequestRepositoryTests : IDisposable
+public sealed class AuthenticationRequestRepositoryTests : IDisposable
 {
     private static readonly Guid RequestId = Guid.Parse("e1000000-0000-0000-0000-000000000001");
     private static readonly Uri RedirectUri = new("https://localhost/");

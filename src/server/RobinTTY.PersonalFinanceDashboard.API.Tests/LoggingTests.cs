@@ -7,7 +7,7 @@ using Serilog.Core;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
-public class LoggingTests : IDisposable
+public sealed class LoggingTests : IDisposable
 {
     private readonly string _logDirectory = Path.Combine(Path.GetTempPath(), $"pfd-logging-tests-{Guid.NewGuid()}");
 

@@ -90,7 +90,11 @@ internal sealed class SyncTestEnvironment : IDisposable
     public ThirdPartyDataRetrievalMetadataService CreateMetadataService(ApplicationDbContext dbContext) =>
         new(new ThirdPartyDataRetrievalMetadataRepository(dbContext), Time);
 
-    public void Dispose() => _connection.Dispose();
+    public void Dispose()
+    {
+        _connection.Dispose();
+        SyncLock.Dispose();
+    }
 
     // Like in the API, the handlers of a synchronization share their metadata service
     private DataSynchronizer CreateSynchronizer(ApplicationDbContext dbContext)

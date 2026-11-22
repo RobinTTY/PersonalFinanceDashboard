@@ -5,7 +5,7 @@ using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilitie
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchronization;
 
-public class AuthenticationRequestSyncHandlerTests : IDisposable
+public sealed class AuthenticationRequestSyncHandlerTests : IDisposable
 {
     private static readonly Guid RequestId = Guid.Parse("e1000000-0000-0000-0000-000000000001");
     private static readonly Guid OtherRequestId = Guid.Parse("e2000000-0000-0000-0000-000000000002");

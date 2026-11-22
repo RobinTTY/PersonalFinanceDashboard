@@ -5,7 +5,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchron
 /// the same data and both try to insert it.
 /// </summary>
 /// <remarks>The lock isn't reentrant. <see cref="DataSynchronizer"/> holds it for a whole synchronization.</remarks>
-public sealed class DataSynchronizationLock
+public sealed class DataSynchronizationLock : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
@@ -19,6 +19,9 @@ public sealed class DataSynchronizationLock
         await _semaphore.WaitAsync(cancellationToken);
         return new Releaser(_semaphore);
     }
+
+    /// <inheritdoc />
+    public void Dispose() => _semaphore.Dispose();
 
     private sealed class Releaser(SemaphoreSlim semaphore) : IDisposable
     {

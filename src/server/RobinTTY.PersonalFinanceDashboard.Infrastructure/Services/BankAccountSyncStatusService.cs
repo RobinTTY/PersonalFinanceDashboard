@@ -41,7 +41,7 @@ public class BankAccountSyncStatusService(ApplicationDbContext dbContext, TimePr
     }
 
     private static SyncStatus GetSyncStatus(BankAccount account,
-        IReadOnlyCollection<ThirdPartyDataRetrievalMetadata> metadata, DateTime utcNow)
+        List<ThirdPartyDataRetrievalMetadata> metadata, DateTime utcNow)
     {
         if (account.Source == DataSource.Manual)
             return new SyncStatus(SyncState.NotSynced);

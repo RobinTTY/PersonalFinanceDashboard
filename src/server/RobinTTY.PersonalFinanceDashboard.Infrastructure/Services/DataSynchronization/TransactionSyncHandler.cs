@@ -54,7 +54,7 @@ public class TransactionSyncHandler(
             if (!retrievalIsDue && !forceThirdPartySync)
             {
                 logger.LogDebug(
-                    "Transaction data for account with id {accountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
+                    "Transaction data for account with id {AccountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
                     account.Id);
                 continue;
             }
@@ -67,7 +67,7 @@ public class TransactionSyncHandler(
                 var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
                     ThirdPartyDataType.Transactions, account.Id, response.Error, cancellationToken);
                 logger.LogWarning(
-                    "Encountered error while getting transactions for account with id {accountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
+                    "Encountered error while getting transactions for account with id {AccountId} from {DataSource}, retrying after {NextRetryTime}. Summary: {ErrorSummary} Detail: {ErrorDetail}",
                     account.Id, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
                 continue;
             }
@@ -84,12 +84,12 @@ public class TransactionSyncHandler(
         await AddOrUpdateTransactions(provider.Source, transactions, cancellationToken);
         foreach (var accountId in syncedAccountIds)
         {
-            logger.LogDebug("Resetting data expiry for transactions for account with id {accountId}", accountId);
+            logger.LogDebug("Resetting data expiry for transactions for account with id {AccountId}", accountId);
             await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.Transactions,
                 accountId, cancellationToken);
         }
 
-        logger.LogInformation("Synced {Count} transactions from {dataSource}", transactions.Count, provider.Source);
+        logger.LogInformation("Synced {Count} transactions from {DataSource}", transactions.Count, provider.Source);
     }
 
     private async Task<List<SyncedAccount>> GetActiveAccounts(CancellationToken cancellationToken)
@@ -181,7 +181,7 @@ public class TransactionSyncHandler(
             if (updatedTransaction.BankAccount == null ||
                 !accounts.TryGetValue(updatedTransaction.BankAccount.ExternalId!, out var account))
             {
-                logger.LogWarning("Skipping transaction {transactionId} without a known bank account.",
+                logger.LogWarning("Skipping transaction {TransactionId} without a known bank account.",
                     updatedTransaction.ExternalId);
                 continue;
             }

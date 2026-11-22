@@ -5,7 +5,7 @@ using static RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.TestUtilitie
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchronization;
 
-public class BankingInstitutionSyncHandlerTests : IDisposable
+public sealed class BankingInstitutionSyncHandlerTests : IDisposable
 {
     private readonly SyncTestEnvironment _env = new();
 

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -43,7 +44,8 @@ internal sealed class FakeGoCardless : HttpMessageHandler
             """{"summary":"Rate limit exceeded","detail":"Too many requests","status_code":429}""",
             new Dictionary<string, string>
             {
-                ["HTTP_X_RATELIMIT_ACCOUNT_SUCCESS_RESET"] = ((int)resetAfter.TotalSeconds).ToString()
+                ["HTTP_X_RATELIMIT_ACCOUNT_SUCCESS_RESET"] =
+                    ((int)resetAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture)
             });
 
     /// <summary>
@@ -65,7 +67,8 @@ internal sealed class FakeGoCardless : HttpMessageHandler
         };
     }
 
-    public int RequestCount(string path) => _requestedPaths.Count(requested => requested.EndsWith(path));
+    public int RequestCount(string path) =>
+        _requestedPaths.Count(requested => requested.EndsWith(path, StringComparison.Ordinal));
 
     public int TotalRequestCount => _requestedPaths.Count;
 
@@ -94,7 +97,9 @@ internal sealed class FakeGoCardless : HttpMessageHandler
         if (_heldResponses is { } heldResponses)
             await heldResponses.Task.WaitAsync(cancellationToken);
 
-        var response = _responses.FirstOrDefault(response => path.EndsWith(response.Key)).Value ?? NotFound;
+        var response =
+            _responses.FirstOrDefault(response => path.EndsWith(response.Key, StringComparison.Ordinal)).Value ??
+            NotFound;
         return CreateResponse(response);
     }
 

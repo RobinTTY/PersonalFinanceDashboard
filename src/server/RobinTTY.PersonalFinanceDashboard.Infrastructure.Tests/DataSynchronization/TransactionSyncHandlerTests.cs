@@ -6,7 +6,7 @@ using RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Tests.DataSynchronization;
 
-public class TransactionSyncHandlerTests : IDisposable
+public sealed class TransactionSyncHandlerTests : IDisposable
 {
     private static readonly Guid AccountId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
     private static readonly Guid OtherAccountId = Guid.Parse("a2000000-0000-0000-0000-000000000002");

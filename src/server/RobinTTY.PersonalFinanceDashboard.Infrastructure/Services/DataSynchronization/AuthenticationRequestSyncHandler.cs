@@ -39,7 +39,7 @@ public class AuthenticationRequestSyncHandler(
             .SingleOrDefaultAsync(authRequest => authRequest.Id == authenticationRequestId, cancellationToken);
         if (authenticationRequest == null)
         {
-            logger.LogWarning("Authentication request with id {id} does not exist.", authenticationRequestId);
+            logger.LogWarning("Authentication request with id {Id} does not exist.", authenticationRequestId);
             return false;
         }
 
@@ -99,7 +99,7 @@ public class AuthenticationRequestSyncHandler(
             return true;
 
         logger.LogDebug(
-            "{dataType} data of {dataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
+            "{DataType} data of {DataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
             ThirdPartyDataType.AuthenticationRequests, source);
         return false;
     }
@@ -219,7 +219,7 @@ public class AuthenticationRequestSyncHandler(
     private void LogFailure(DataSource source, ThirdPartyError error)
     {
         logger.LogWarning(
-            "Could not retrieve authentication requests from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
+            "Could not retrieve authentication requests from {DataSource}. Summary: {ErrorSummary} Detail: {ErrorDetail}",
             source, error.Summary, error.Detail);
     }
 
@@ -227,7 +227,7 @@ public class AuthenticationRequestSyncHandler(
         int numOfAddedAuthRequests, int numOfRemovedAuthRequests)
     {
         logger.LogInformation(
-            "Synchronized {numOfSynchronizedRequests} authentication requests from {dataSource}. Added: {numOfAddedAuthRequests}, Removed: {numOfRemovedAuthRequests}",
+            "Synchronized {NumOfSynchronizedRequests} authentication requests from {DataSource}. Added: {NumOfAddedAuthRequests}, Removed: {NumOfRemovedAuthRequests}",
             numOfSynchronizedRequests, source, numOfAddedAuthRequests, numOfRemovedAuthRequests);
     }
 }

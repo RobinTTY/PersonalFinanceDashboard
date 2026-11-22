@@ -44,7 +44,7 @@ public class BankingInstitutionSyncHandler(
         await dbContext.SaveChangesAsync(cancellationToken);
         await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.BankingInstitutions,
             cancellationToken: cancellationToken);
-        logger.LogInformation("Synced {Count} banking institutions from {dataSource}", response.Result.Count,
+        logger.LogInformation("Synced {Count} banking institutions from {DataSource}", response.Result.Count,
             provider.Source);
 
         return true;
@@ -59,7 +59,7 @@ public class BankingInstitutionSyncHandler(
             return true;
 
         logger.LogDebug(
-            "{dataType} data of {dataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
+            "{DataType} data of {DataSource} is not stale or waiting to be retried. Skipping synchronization with third party.",
             ThirdPartyDataType.BankingInstitutions, source);
         return false;
     }
@@ -67,7 +67,7 @@ public class BankingInstitutionSyncHandler(
     private void LogFailure(DataSource source, ThirdPartyError error)
     {
         logger.LogWarning(
-            "Could not retrieve banking institutions from {dataSource}. Summary: {errorSummary} Detail: {errorDetail}",
+            "Could not retrieve banking institutions from {DataSource}. Summary: {ErrorSummary} Detail: {ErrorDetail}",
             source, error.Summary, error.Detail);
     }
 

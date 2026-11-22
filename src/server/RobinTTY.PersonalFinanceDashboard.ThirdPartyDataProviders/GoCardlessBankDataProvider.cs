@@ -167,7 +167,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             var error = $"Summary: {balanceResponse.Error.Summary}, Details: {balanceResponse.Error.Detail}";
 
             errorMessages.Add(error);
-            logger.LogWarning("Failed to retrieve balances for account {accountId}: {error}", accountId, error);
+            logger.LogWarning("Failed to retrieve balances for account {AccountId}: {Error}", accountId, error);
         }
 
         if (includeMetadata)
@@ -178,7 +178,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
                     $"Summary: {generalAccountInfoResponse.Error.Summary}, Details: {generalAccountInfoResponse.Error.Detail}";
 
                 errorMessages.Add(error);
-                logger.LogWarning("Failed to retrieve general account metadata for account {accountId}: {error}",
+                logger.LogWarning("Failed to retrieve general account metadata for account {AccountId}: {Error}",
                     accountId, error);
             }
 
@@ -188,7 +188,7 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
                     $"Summary: {accountDetailsResponse.Error.Summary}, Details: {accountDetailsResponse.Error.Detail}";
 
                 errorMessages.Add(error);
-                logger.LogWarning("Failed to retrieve detailed account metadata for account {accountId}: {error}",
+                logger.LogWarning("Failed to retrieve detailed account metadata for account {AccountId}: {Error}",
                     accountId, error);
             }
         }

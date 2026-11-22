@@ -33,7 +33,7 @@ public class BankAccountSyncHandler(
                 .SingleOrDefaultAsync(account => account.Id == internalBankAccountId, cancellationToken);
             if (bankAccount == null)
             {
-                logger.LogWarning("Bank account with id {bankAccountId} does not exist.", internalBankAccountId);
+                logger.LogWarning("Bank account with id {BankAccountId} does not exist.", internalBankAccountId);
                 return false;
             }
 
@@ -103,7 +103,7 @@ public class BankAccountSyncHandler(
             var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
                 ThirdPartyDataType.BankAccounts, accountId, response.Error, cancellationToken);
             logger.LogWarning(
-                "Encountered error while getting bank account with id {bankAccountId} from {dataSource}, retrying after {nextRetryTime}. Summary: {errorSummary} Detail: {errorDetail}",
+                "Encountered error while getting bank account with id {BankAccountId} from {DataSource}, retrying after {NextRetryTime}. Summary: {ErrorSummary} Detail: {ErrorDetail}",
                 accountId, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
         }
 
@@ -112,12 +112,12 @@ public class BankAccountSyncHandler(
             await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts, cancellationToken);
         foreach (var bankAccount in updatedBankAccounts)
         {
-            logger.LogDebug("Resetting data expiry for bank account with id {bankAccountId}", bankAccount.Id);
+            logger.LogDebug("Resetting data expiry for bank account with id {BankAccountId}", bankAccount.Id);
             await dataRetrievalMetadataService.ResetDataExpiry(provider.Source, ThirdPartyDataType.BankAccounts,
                 bankAccount.Id, cancellationToken);
         }
 
-        logger.LogInformation("Synced {Count} bank accounts from {dataSource}", fetchedBankAccounts.Count,
+        logger.LogInformation("Synced {Count} bank accounts from {DataSource}", fetchedBankAccounts.Count,
             provider.Source);
     }
 
@@ -175,7 +175,7 @@ public class BankAccountSyncHandler(
                     predecessor.Id!.Value, lastTransactionDate.Value.Date, cancellationToken);
 
             logger.LogInformation(
-                "Bank account with id {bankAccountId} was reconnected and now has the external id {externalId}.",
+                "Bank account with id {BankAccountId} was reconnected and now has the external id {ExternalId}.",
                 predecessor.Id, predecessor.ExternalId);
         }
     }
@@ -205,7 +205,7 @@ public class BankAccountSyncHandler(
             else
             {
                 logger.LogDebug(
-                    "Bank account data for account with id {bankAccountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
+                    "Bank account data for account with id {BankAccountId} is not stale or waiting to be retried. Skipping synchronization with third party.",
                     bankAccount.Id);
             }
         }
@@ -258,7 +258,7 @@ public class BankAccountSyncHandler(
             {
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
                 logger.LogInformation(
-                    "Updated existing bank account {name} with id {bankAccountId}. New balance: {balance}.",
+                    "Updated existing bank account {Name} with id {BankAccountId}. New balance: {Balance}.",
                     existingBankAccount.Name, existingBankAccount.Id, updatedBankAccount.Balance);
             }
             else

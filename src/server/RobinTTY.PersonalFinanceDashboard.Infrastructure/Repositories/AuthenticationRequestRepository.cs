@@ -63,7 +63,7 @@ public class AuthenticationRequestRepository
         {
             _logger.LogError(
                 "Creation of new authentication request failed. The data provider returned the following error: " +
-                "\"{error}\" error details: \"{errorDetails}\"", request.Error.Summary, request.Error.Detail);
+                "\"{Error}\" error details: \"{ErrorDetails}\"", request.Error.Summary, request.Error.Detail);
             return new CreateAuthenticationRequestResult.ProviderFailed(request.Error);
         }
 
@@ -87,7 +87,7 @@ public class AuthenticationRequestRepository
         if (authRequest is null)
         {
             _logger.LogError(
-                "Deletion of authentication request failed. Authentication request with id {id} does not exist.", id);
+                "Deletion of authentication request failed. Authentication request with id {Id} does not exist.", id);
 
             return new ThirdPartyError("Authentication request not found.",
                 $"Authentication request with id {id} does not exist.");
@@ -104,14 +104,14 @@ public class AuthenticationRequestRepository
         {
             _dbContext.AuthenticationRequests.Remove(authRequest);
             await _dbContext.SaveChangesAsync();
-            _logger.LogInformation("Successfully deleted authentication request with id {id}", id);
+            _logger.LogInformation("Successfully deleted authentication request with id {Id}", id);
 
             return null;
         }
 
         _logger.LogError(
             "Deletion of authentication request failed. The data provider returned the following error: " +
-            "\"{error}\" error details: \"{errorDetails}\"", error.Summary, error.Detail);
+            "\"{Error}\" error details: \"{ErrorDetails}\"", error.Summary, error.Detail);
 
         return new ThirdPartyError("Failed to delete authentication request.",
             $"The data provider returned the following error: {error.Message}");

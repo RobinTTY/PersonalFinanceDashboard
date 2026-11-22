@@ -59,7 +59,7 @@ public class GoCardlessCreateAuthenticationRequestTests
         return $"{Encode("""{"alg":"none","typ":"JWT"}""")}.{Encode($$"""{"exp":{{expires.ToUnixTimeSeconds()}}}""")}.";
     }
 
-    private class StubHandler(HttpStatusCode statusCode, string body) : HttpMessageHandler
+    private sealed class StubHandler(HttpStatusCode statusCode, string body) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken) =>
