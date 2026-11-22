@@ -52,6 +52,37 @@ public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFac
     }
 
     [Fact]
+    public async Task SetBankAccountIncludeInAnalytics_UpdatesTheAccount()
+    {
+        var accountId = await CreateBankAccount(_client);
+
+        var response = await _client.PostGraphQl("""
+                                                 mutation($id: UUID!) {
+                                                   setBankAccountIncludeInAnalytics(input: { bankAccountId: $id, includeInAnalytics: false }) {
+                                                     bankAccount { includeInAnalytics }
+                                                   }
+                                                 }
+                                                 """, new { id = accountId });
+
+        var account = response.Data("setBankAccountIncludeInAnalytics", "bankAccount");
+        Assert.False(account.GetProperty("includeInAnalytics").GetBoolean());
+    }
+
+    [Fact]
+    public async Task SetBankAccountIncludeInAnalytics_UnknownIdReturnsNotFound()
+    {
+        var response = await _client.PostGraphQl("""
+                                                 mutation($id: UUID!) {
+                                                   setBankAccountIncludeInAnalytics(input: { bankAccountId: $id, includeInAnalytics: false }) {
+                                                     bankAccount { id }
+                                                   }
+                                                 }
+                                                 """, new { id = Guid.NewGuid() });
+
+        Assert.Equal("BANK_ACCOUNT_NOT_FOUND", response.ErrorCode());
+    }
+
+    [Fact]
     public async Task DeleteBankAccount_ReturnsTheDeletedIdAndThenNotFound()
     {
         var accountId = await CreateBankAccount(_client);

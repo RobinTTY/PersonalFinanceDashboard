@@ -41,11 +41,11 @@ public class BankAccountMutationResolvers
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankAccountId">The id of the bank account to update.</param>
     /// <param name="includeInAnalytics">Whether the account should be included in analytics.</param>
-    /// <returns>The updated bank account if one is matched, otherwise <see langword="null"/>.</returns>
-    public async Task<BankAccount?> SetBankAccountIncludeInAnalytics(BankAccountRepository repository,
+    public async Task<BankAccount> SetBankAccountIncludeInAnalytics(BankAccountRepository repository,
         Guid bankAccountId, bool includeInAnalytics)
     {
-        return await repository.SetIncludeInAnalytics(bankAccountId, includeInAnalytics);
+        return await repository.SetIncludeInAnalytics(bankAccountId, includeInAnalytics)
+               ?? throw MutationErrors.NotFound<BankAccount>(bankAccountId, ErrorCodes.BankAccountNotFound);
     }
 
     /// <summary>
