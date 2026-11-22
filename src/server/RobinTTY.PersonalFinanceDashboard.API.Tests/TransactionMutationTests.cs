@@ -101,8 +101,13 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
         {
             input = new
             {
-                accountId, amount = -12.5m, currency = "EUR", category = "", notes = "",
-                payee = "Supermarket", valueDate = "2026-11-10T00:00:00Z"
+                accountId,
+                amount = -12.5m,
+                currency = "EUR",
+                category = "",
+                notes = "",
+                payee = "Supermarket",
+                valueDate = "2026-11-10T00:00:00Z"
             }
         });
 }

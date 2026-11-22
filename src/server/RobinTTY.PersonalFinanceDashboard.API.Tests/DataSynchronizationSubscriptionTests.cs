@@ -21,7 +21,8 @@ public class DataSynchronizationSubscriptionTests(ApiFactory factory) : IClassFi
         using var socket = await ConnectGraphQlWs();
         await Send(socket, new
         {
-            id = "1", type = "subscribe",
+            id = "1",
+            type = "subscribe",
             payload = new { query = "subscription { dataSynchronized { completedAt } }" }
         });
 

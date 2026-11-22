@@ -39,7 +39,12 @@ public static class GoCardlessJson
 
     public static string Requisitions(params object[] requisitions) =>
         JsonSerializer.Serialize(new
-            { count = requisitions.Length, next = (string?)null, previous = (string?)null, results = requisitions });
+        {
+            count = requisitions.Length,
+            next = (string?)null,
+            previous = (string?)null,
+            results = requisitions
+        });
 
     public static string RequisitionJson(Guid id, string status, DateTime created, params Guid[] accounts) =>
         JsonSerializer.Serialize(Requisition(id, status, created, accounts));

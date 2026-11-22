@@ -32,7 +32,7 @@ public sealed class ApplicationDbContext : DbContext
     /// <see cref="DbSet{TEntity}"/> holding authentication requests.
     /// </summary>
     public DbSet<AuthenticationRequest> AuthenticationRequests => Set<AuthenticationRequest>();
-    
+
     /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding the third party data retrieval metadata.
     /// </summary>
@@ -43,7 +43,9 @@ public sealed class ApplicationDbContext : DbContext
     /// Creates a new instance of <see cref="ApplicationDbContext"/>.
     /// </summary>
     /// <param name="options">The <see cref="DbContextOptions"/> to use.</param>
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

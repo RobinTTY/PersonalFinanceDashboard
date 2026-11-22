@@ -126,7 +126,10 @@ public static class GoCardlessTypeExtensions
             transactions: [],
             associatedInstitution: generalAccountInfo != null
                 ? new BankingInstitution
-                    { Source = DataSource.GoCardless, ExternalId = generalAccountInfo.InstitutionId }
+                {
+                    Source = DataSource.GoCardless,
+                    ExternalId = generalAccountInfo.InstitutionId
+                }
                 : null,
             associatedAuthenticationRequests: []);
     }

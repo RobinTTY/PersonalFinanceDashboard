@@ -48,7 +48,9 @@ public class BankingInstitutionMutationTests(ApiFactory factory) : IClassFixture
             {
                 input = new
                 {
-                    name = "Test Bank", bic = "TESTDEFF", logoUri = "https://localhost/logo.png",
+                    name = "Test Bank",
+                    bic = "TESTDEFF",
+                    logoUri = "https://localhost/logo.png",
                     countries = new[] { "DE" }
                 }
             });
