@@ -1,5 +1,4 @@
-﻿using HotChocolate.Types;
-using RobinTTY.PersonalFinanceDashboard.Api.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Inputs;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;

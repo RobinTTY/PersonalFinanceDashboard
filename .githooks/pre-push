@@ -24,17 +24,17 @@ done
 $check_server || exit 0
 
 echo "Formatting the server code..."
-before=$(git diff --ignore-cr-at-eol -- src/server | git hash-object --stdin)
+before=$(git diff -- src/server | git hash-object --stdin)
 (
   cd src/server &&
     dotnet tool restore >/dev/null &&
     dotnet jb cleanupcode RobinTTY.PersonalFinanceDashboard.sln --profile="Built-in: Reformat Code" --no-build \
       --verbosity=ERROR
 ) || exit 1
-after=$(git diff --ignore-cr-at-eol -- src/server | git hash-object --stdin)
+after=$(git diff -- src/server | git hash-object --stdin)
 
 if [ "$before" != "$after" ]; then
   echo "The server code wasn't formatted. Review and commit the formatting changes, then push again:" >&2
-  git diff --ignore-cr-at-eol --stat -- src/server >&2
+  git diff --stat -- src/server >&2
   exit 1
 fi

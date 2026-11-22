@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Api.Models;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;

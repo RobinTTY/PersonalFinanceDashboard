@@ -38,7 +38,7 @@ jobs:
       - name: Check formatting
         run: |
           dotnet jb cleanupcode RobinTTY.PersonalFinanceDashboard.sln --profile="Built-in: Reformat Code" --no-build --verbosity=WARN
-          git diff --ignore-cr-at-eol --exit-code -- .
+          git diff --exit-code -- .
       - name: Check for missing migrations
         run: >-
           dotnet ef migrations has-pending-model-changes --configuration Release --no-build

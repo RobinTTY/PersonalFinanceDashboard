@@ -1,6 +1,4 @@
-﻿using HotChocolate.Data;
-using HotChocolate.Types;
-using RobinTTY.PersonalFinanceDashboard.Core.Models;
+﻿using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services.DataSynchronization.Interfaces;
 

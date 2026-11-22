@@ -1,4 +1,3 @@
-using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Api.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Resolvers.Subscriptions;

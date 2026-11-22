@@ -1,4 +1,3 @@
-using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 

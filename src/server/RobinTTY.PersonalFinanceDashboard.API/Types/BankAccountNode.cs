@@ -1,5 +1,3 @@
-using GreenDonut;
-using HotChocolate.Types;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
