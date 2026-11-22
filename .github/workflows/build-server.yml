@@ -1,21 +1,52 @@
-name: Build Server
+name: Build and test server
 
 on:
-  push
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'src/server/**'
+      - 'global.json'
+      - '.github/workflows/build-server.yml'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/server/**'
+      - 'global.json'
+      - '.github/workflows/build-server.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
 
 jobs:
-
-  Build-Library:
-    name: Build library
+  build_and_test:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: src/server
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '10.x'
+          global-json-file: global.json
+      - name: Restore tools
+        run: dotnet tool restore
       - name: Build
-        run: dotnet build --configuration Release src/server/
-      - name: Test
-        run: dotnet test --configuration Release --no-build src/server/
+        run: dotnet build --configuration Release
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+      - name: Check for missing migrations
+        run: >-
+          dotnet ef migrations has-pending-model-changes --configuration Release --no-build
+          --project RobinTTY.PersonalFinanceDashboard.Infrastructure
+          --startup-project RobinTTY.PersonalFinanceDashboard.API
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build
+      - name: Report vulnerable packages
+        run: |
+          dotnet list package --vulnerable --include-transitive | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::warning title=Vulnerable packages::Some NuGet packages have known vulnerabilities, see the log of this step."
+          fi

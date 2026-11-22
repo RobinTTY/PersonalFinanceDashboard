@@ -4,10 +4,9 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <!-- Rules that don't fit are turned off in .editorconfig -->
         <AnalysisLevel>latest-recommended</AnalysisLevel>
-        <!-- Release only, so warnings don't block local Debug builds; CI builds Release -->
         <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     </PropertyGroup>
 
 </Project>
