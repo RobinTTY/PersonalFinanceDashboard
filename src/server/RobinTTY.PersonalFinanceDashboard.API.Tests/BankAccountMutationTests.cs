@@ -1,5 +1,6 @@
 using System.Text.Json;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
@@ -37,6 +38,32 @@ public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFac
         Assert.Equal("Savings", account.GetProperty("name").GetString());
         Assert.Equal("Emergency fund", account.GetProperty("description").GetString());
         Assert.Equal(100m, account.GetProperty("balance").GetDecimal());
+    }
+
+    [Fact]
+    public async Task UpdateBankAccount_OfASynchronizedAccountReplacesTheProviderNameUntilCleared()
+    {
+        var account = TestData.Account(Guid.NewGuid());
+        account.ProviderDescription = "Giro";
+        await factory.Seed(account);
+        const string rename = """
+                              mutation($input: UpdateBankAccountInput!) {
+                                updateBankAccount(input: $input) { bankAccount { id } }
+                              }
+                              """;
+        // Only the resolved fields are selected, so the provider's values have to be projected anyway
+        const string query = "query($id: UUID!) { bankAccount(accountId: $id) { name description } }";
+
+        var synchronized = (await _client.PostGraphQl(query, new { id = account.Id })).Data("bankAccount");
+        await _client.PostGraphQl(rename,
+            new { input = new { id = account.Id, name = "Household", description = "Shared expenses" } });
+        var renamed = (await _client.PostGraphQl(query, new { id = account.Id })).Data("bankAccount");
+        await _client.PostGraphQl(rename, new { input = new { id = account.Id, name = "", description = "" } });
+        var cleared = (await _client.PostGraphQl(query, new { id = account.Id })).Data("bankAccount");
+
+        Assert.Equal(("Account", "Giro"), NameAndDescription(synchronized));
+        Assert.Equal(("Household", "Shared expenses"), NameAndDescription(renamed));
+        Assert.Equal(("Account", "Giro"), NameAndDescription(cleared));
     }
 
     [Fact]
@@ -134,4 +161,7 @@ public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFac
 
         return response.Data("createBankAccount", "bankAccount", "id").GetString()!;
     }
+
+    private static (string?, string?) NameAndDescription(JsonElement account) =>
+        (account.GetProperty("name").GetString(), account.GetProperty("description").GetString());
 }

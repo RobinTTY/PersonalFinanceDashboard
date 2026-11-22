@@ -13,6 +13,20 @@ public static partial class BankAccountNode
     {
         // The sync status is looked up by the account id, so it's loaded even if the query doesn't select it
         descriptor.Field(account => account.Id).IsProjected();
+
+        // Synchronized accounts show the provider's values until the user sets their own
+        descriptor.Field(account => account.Name).Resolve(context =>
+        {
+            var account = context.Parent<BankAccount>();
+            return account.Name ?? account.ProviderName;
+        });
+        descriptor.Field(account => account.Description).Resolve(context =>
+        {
+            var account = context.Parent<BankAccount>();
+            return account.Description ?? account.ProviderDescription;
+        });
+        descriptor.Field(account => account.ProviderName).IsProjected();
+        descriptor.Field(account => account.ProviderDescription).IsProjected();
     }
 
     /// <summary>

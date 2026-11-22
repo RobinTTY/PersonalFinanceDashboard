@@ -38,7 +38,9 @@ public class BankAccountRepository
     /// </summary>
     /// <returns>A list of <see cref="BankAccount"/>s.</returns>
     public IQueryable<BankAccount> GetBankAccounts() =>
-        _dbContext.BankAccounts.OrderBy(account => account.Name).ThenBy(account => account.Id);
+        _dbContext.BankAccounts
+            .OrderBy(account => account.Name ?? account.ProviderName)
+            .ThenBy(account => account.Id);
 
     /// <summary>
     /// Adds a new <see cref="BankAccount"/>.
@@ -58,8 +60,8 @@ public class BankAccountRepository
     /// Updates the name and description of an existing <see cref="BankAccount"/>.
     /// </summary>
     /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to update.</param>
-    /// <param name="name">The name of the account.</param>
-    /// <param name="description">A description of this account.</param>
+    /// <param name="name">The name of the account. If empty, the provider's name is used again.</param>
+    /// <param name="description">A description of this account. If empty, the provider's description is used again.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
     /// <returns>The updated <see cref="BankAccount"/>, or <see langword="null"/> if it doesn't exist.</returns>
     public async Task<BankAccount?> UpdateBankAccount(Guid bankAccountId, string name, string? description,
@@ -70,8 +72,8 @@ public class BankAccountRepository
         if (bankAccount == null)
             return null;
 
-        bankAccount.Name = name;
-        bankAccount.Description = description;
+        bankAccount.Name = string.IsNullOrWhiteSpace(name) ? null : name;
+        bankAccount.Description = string.IsNullOrWhiteSpace(description) ? null : description;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return bankAccount;

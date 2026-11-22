@@ -42,11 +42,31 @@ public sealed class BankAccountSyncHandlerTests : IDisposable
 
         var account = await GetAccount();
         Assert.Equal("EUR", account.Currency);
-        Assert.Equal("Giro account", account.Name);
+        Assert.Equal("Giro account", account.ProviderName);
         Assert.Equal(InstitutionId, account.AssociatedInstitution?.ExternalId);
 
         await using var dbContext = _env.CreateDbContext();
         Assert.Equal(1, await dbContext.BankingInstitutions.CountAsync(i => i.ExternalId == InstitutionId));
+    }
+
+    [Fact]
+    public async Task RenamedAccount_KeepsItsNameWhenItsDetailsAreFetched()
+    {
+        var renamed = TestData.Account(AccountId, currency: null);
+        renamed.Name = "Household";
+        renamed.Description = "Shared expenses";
+        await _env.Seed(TestData.Institution(InstitutionId),
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), renamed));
+        _env.GoCardless.Respond(BalancesPath(AccountId), Balances(50m));
+        _env.GoCardless.Respond(AccountPath(AccountId), Account(AccountId, InstitutionId));
+        _env.GoCardless.Respond(DetailsPath(AccountId), Details(AccountId, "EUR", "Giro account"));
+
+        Assert.True(await _env.SyncBankAccounts());
+
+        var account = await GetAccount();
+        Assert.Equal("Household", account.Name);
+        Assert.Equal("Shared expenses", account.Description);
+        Assert.Equal("Giro account", account.ProviderName);
     }
 
     [Fact]

@@ -32,6 +32,18 @@ public class BankAccount : Account
     public string? AccountType { get; set; }
 
     /// <summary>
+    /// The name the data provider gives the account, e.g. its product name. Unlike <see cref="Account.Name"/>,
+    /// which the user sets, this is updated by the synchronization.
+    /// </summary>
+    public string? ProviderName { get; set; }
+
+    /// <summary>
+    /// The description the data provider gives the account. Unlike <see cref="Account.Description"/>, which the
+    /// user sets, this is updated by the synchronization.
+    /// </summary>
+    public string? ProviderDescription { get; set; }
+
+    /// <summary>
     /// Whether this account is included in analytics such as graphs and account views.
     /// This is user-controlled and is not affected by third party data synchronization.
     /// </summary>
@@ -79,10 +91,13 @@ public class BankAccount : Account
     /// then two names might be noted here.</param>
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
+    /// <param name="providerName">The name the data provider gives the account.</param>
+    /// <param name="providerDescription">The description the data provider gives the account.</param>
     public BankAccount(DataSource source, string? externalId, string? name = null, string? description = null,
         decimal? balance = null, string? currency = null, string? iban = null, string? bic = null, string? bban = null,
         string? ownerName = null, string? accountType = null,
-        List<AuthenticationRequest>? associatedAuthenticationRequests = null)
+        List<AuthenticationRequest>? associatedAuthenticationRequests = null, string? providerName = null,
+        string? providerDescription = null)
         : base(source, externalId, name, description, balance, currency)
     {
         Iban = iban;
@@ -90,6 +105,8 @@ public class BankAccount : Account
         Bban = bban;
         OwnerName = ownerName;
         AccountType = accountType;
+        ProviderName = providerName;
+        ProviderDescription = providerDescription;
         AssociatedInstitution = null;
         AssociatedAuthenticationRequests = associatedAuthenticationRequests ?? [];
     }
@@ -113,10 +130,13 @@ public class BankAccount : Account
     /// <param name="accountType">Specifies the nature, or use, of the account.</param>
     /// <param name="associatedInstitution">The banking institution this account belongs to.</param>
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
+    /// <param name="providerName">The name the data provider gives the account.</param>
+    /// <param name="providerDescription">The description the data provider gives the account.</param>
     public BankAccount(DataSource source, string? externalId, string? name, string? description, decimal? balance,
         string? currency, List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType,
-        BankingInstitution? associatedInstitution, List<AuthenticationRequest> associatedAuthenticationRequests)
+        BankingInstitution? associatedInstitution, List<AuthenticationRequest> associatedAuthenticationRequests,
+        string? providerName = null, string? providerDescription = null)
         : base(source, externalId, name, description, balance, currency, transactions)
     {
         Iban = iban;
@@ -124,6 +144,8 @@ public class BankAccount : Account
         Bban = bban;
         OwnerName = ownerName;
         AccountType = accountType;
+        ProviderName = providerName;
+        ProviderDescription = providerDescription;
         AssociatedInstitution = associatedInstitution;
         AssociatedAuthenticationRequests = associatedAuthenticationRequests;
     }
@@ -137,19 +159,22 @@ public class BankAccount : Account
     {
         return new BankAccount(bankAccount.Source, bankAccount.ExternalId, bankAccount.Name, bankAccount.Description,
             bankAccount.Balance, bankAccount.Currency, bankAccount.Iban, bankAccount.Bic, bankAccount.Bban,
-            bankAccount.OwnerName, bankAccount.AccountType);
+            bankAccount.OwnerName, bankAccount.AccountType, providerName: bankAccount.ProviderName,
+            providerDescription: bankAccount.ProviderDescription);
     }
 
     /// <summary>
     /// Updates the (non-navigation) properties of the current <see cref="BankAccount"/> instance with the values
     /// provided in the specified <paramref name="updatedAccount"/>. Only properties that are not <see langword="null"/> in the <paramref name="updatedAccount"/> will be updated.
+    /// The user's <see cref="Account.Name"/> and <see cref="Account.Description"/> are left untouched.
     /// </summary>
     /// <param name="updatedAccount">The <see cref="BankAccount"/> instance whose properties are used to update the current object.</param>
-    /// <returns>The updated <see cref="BankAccount"/> instance.</returns>
     public void UpdateNonNavigationProperties(BankAccount updatedAccount)
     {
-        if (updatedAccount.Name != null)
-            Name = updatedAccount.Name;
+        if (updatedAccount.ProviderName != null)
+            ProviderName = updatedAccount.ProviderName;
+        if (updatedAccount.ProviderDescription != null)
+            ProviderDescription = updatedAccount.ProviderDescription;
         if (updatedAccount.Iban != null)
             Iban = updatedAccount.Iban;
         if (updatedAccount.Bic != null)
@@ -164,7 +189,5 @@ public class BankAccount : Account
             OwnerName = updatedAccount.OwnerName;
         if (updatedAccount.AccountType != null)
             AccountType = updatedAccount.AccountType;
-        if (updatedAccount.Description != null)
-            Description = updatedAccount.Description;
     }
 }

@@ -259,7 +259,8 @@ public class BankAccountSyncHandler(
                 existingBankAccount.UpdateNonNavigationProperties(updatedBankAccount);
                 logger.LogInformation(
                     "Updated existing bank account {Name} with id {BankAccountId}. New balance: {Balance}.",
-                    existingBankAccount.Name, existingBankAccount.Id, updatedBankAccount.Balance);
+                    existingBankAccount.Name ?? existingBankAccount.ProviderName, existingBankAccount.Id,
+                    updatedBankAccount.Balance);
             }
             else
             {

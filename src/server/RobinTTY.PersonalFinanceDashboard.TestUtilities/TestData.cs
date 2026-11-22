@@ -15,7 +15,8 @@ public static class TestData
         new(DataSource.Manual, null, "TESTDEFF", "My Bank", new Uri("https://localhost/logo.png"), ["DE"]);
 
     public static BankAccount Account(Guid externalId, string? currency = "EUR", decimal? balance = null) =>
-        new(DataSource.GoCardless, externalId.ToExternalId(), name: "Account", currency: currency, balance: balance);
+        new(DataSource.GoCardless, externalId.ToExternalId(), currency: currency, balance: balance,
+            providerName: "Account");
 
     public static BankAccount ManualAccount() => new(DataSource.Manual, null, name: "Cash", currency: "EUR");
 

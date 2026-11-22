@@ -118,8 +118,10 @@ public static class GoCardlessTypeExtensions
             accountType: accountDetails?.CashAccountType is { } cashAccountType
                 ? Enum.GetName(cashAccountType)
                 : null,
-            name: accountDetails?.Product,
-            description: accountDetails?.Details,
+            name: null,
+            description: null,
+            providerName: accountDetails?.Product,
+            providerDescription: accountDetails?.Details,
             balance: SelectBalance(balances),
             currency: accountDetails?.Currency,
             iban: accountDetails?.Iban,

@@ -114,6 +114,12 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("OwnerName")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProviderDescription")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProviderName")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("TEXT");
