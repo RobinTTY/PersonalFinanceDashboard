@@ -26,6 +26,11 @@ public record CreateTransactionInput
     public string? Payee { get; init; }
 
     /// <summary>
+    /// What the transaction is for.
+    /// </summary>
+    public string? Description { get; init; }
+
+    /// <summary>
     /// The amount being transacted.
     /// </summary>
     public required decimal Amount { get; init; }

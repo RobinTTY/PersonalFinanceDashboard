@@ -25,7 +25,8 @@ public static class TestData
             new Uri("https://localhost/link"), createdAt, accounts.ToList());
 
     public static Transaction Transaction(Guid externalId, BankAccount account, decimal amount,
-        string? category = null, string? notes = null, DateTime? valueDate = null) =>
+        string? category = null, string? notes = null, DateTime? valueDate = null,
+        TransactionStatus status = TransactionStatus.Booked) =>
         new(DataSource.GoCardless, externalId.ToExternalId(), $"bank-{externalId}",
-            valueDate ?? new DateTime(2026, 11, 10), null, null, amount, "EUR", category, notes, [], account);
+            valueDate ?? new DateTime(2026, 11, 10), null, null, amount, "EUR", category, notes, [], account, status);
 }

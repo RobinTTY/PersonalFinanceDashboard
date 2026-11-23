@@ -212,13 +212,12 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
             await client.AccountsEndpoint.GetTransactions(goCardlessAccountId,
                 dateFrom is { } from ? DateOnly.FromDateTime(from) : null, cancellationToken: cancellationToken);
 
-        // TODO: Also return pending transactions
         return response.ToThirdPartyResponse(IReadOnlyList<Transaction> (result) =>
-            result.BookedTransactions.ToTransactions(goCardlessAccountId));
+            result.ToTransactions(goCardlessAccountId));
     }
 
     /// <summary>
-    /// Creates the error returned for an id that isn't a GoCardless id.
+    /// Maps a requisition, logging statuses that aren't known.
     /// </summary>
     private AuthenticationRequest ToAuthenticationRequest(Requisition requisition, int? accessValidForDays = null)
     {
@@ -249,6 +248,9 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
         return null;
     }
 
+    /// <summary>
+    /// Creates the error returned for an id that isn't a GoCardless id.
+    /// </summary>
     private static ThirdPartyError InvalidId(string externalId) =>
         new("Invalid id.", $"\"{externalId}\" is not a valid GoCardless id.");
 }

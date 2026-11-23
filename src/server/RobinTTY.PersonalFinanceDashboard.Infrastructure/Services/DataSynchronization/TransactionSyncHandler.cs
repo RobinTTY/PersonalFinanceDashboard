@@ -72,6 +72,7 @@ public class TransactionSyncHandler(
                 continue;
             }
 
+            await RemoveOutdatedPendingTransactions(account.Id, response.Result, cancellationToken);
             transactions.AddRange(retrieveFrom.HasValue
                 ? await RemoveAlreadyRetrieved(account.Id, retrieveFrom.Value, response.Result, cancellationToken)
                 : response.Result);
@@ -117,9 +118,30 @@ public class TransactionSyncHandler(
     }
 
     /// <summary>
+    /// Deletes the pending transactions of an account that the data source no longer returns, because they were
+    /// booked (usually under a different id) or cancelled.
+    /// </summary>
+    /// <param name="accountId">The id of the account.</param>
+    /// <param name="fetchedTransactions">All transactions of the account retrieved from the data source.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    private async Task RemoveOutdatedPendingTransactions(Guid accountId,
+        IReadOnlyList<Transaction> fetchedTransactions, CancellationToken cancellationToken)
+    {
+        var fetchedIds = fetchedTransactions.Select(transaction => transaction.ExternalId!).ToList();
+        var removed = await dbContext.Transactions
+            .Where(transaction => transaction.BankAccount!.Id == accountId &&
+                                  transaction.Status == TransactionStatus.Pending &&
+                                  !fetchedIds.Contains(transaction.ExternalId!))
+            .ExecuteDeleteAsync(cancellationToken);
+        if (removed > 0)
+            logger.LogDebug("Removed {Count} outdated pending transactions of account with id {AccountId}", removed,
+                accountId);
+    }
+
+    /// <summary>
     /// Removes the transactions of a reconnected account that were already retrieved through the earlier
     /// connection, under different ids. Only transactions from the day the account was taken over are retrieved
-    /// again, so the ones on that day are matched by their content.
+    /// again, so the booked ones on that day are matched by their content.
     /// </summary>
     /// <param name="accountId">The id of the account.</param>
     /// <param name="retrieveFrom">The day from which the account's transactions are retrieved.</param>
@@ -132,6 +154,7 @@ public class TransactionSyncHandler(
         var fetchedIds = fetchedTransactions.Select(transaction => transaction.ExternalId!).ToList();
         var earlierTransactions = await dbContext.Transactions
             .Where(transaction => transaction.BankAccount!.Id == accountId &&
+                                  transaction.Status == TransactionStatus.Booked &&
                                   transaction.ValueDate >= retrieveFrom &&
                                   transaction.ValueDate < retrieveFrom.AddDays(1) &&
                                   !fetchedIds.Contains(transaction.ExternalId!))
@@ -148,7 +171,8 @@ public class TransactionSyncHandler(
                 continue;
 
             var key = ContentKey.Of(transaction);
-            if (valueDate == retrieveFrom && remaining.TryGetValue(key, out var count) && count > 0)
+            if (transaction.Status == TransactionStatus.Booked && valueDate == retrieveFrom &&
+                remaining.TryGetValue(key, out var count) && count > 0)
             {
                 remaining[key] = count - 1;
                 continue;

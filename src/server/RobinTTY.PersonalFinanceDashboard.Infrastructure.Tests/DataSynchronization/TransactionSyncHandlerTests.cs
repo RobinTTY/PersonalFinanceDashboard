@@ -62,6 +62,52 @@ public sealed class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task PendingTransaction_IsReplacedByTheBookedOne()
+    {
+        // Banks usually assign booked transactions a new id
+        await SeedAccountsWithActiveRequest(AccountId);
+        _env.Provider.RespondTransactionsWithStatus(AccountId, (TransactionId, -10m, TransactionStatus.Pending));
+        await _env.SyncTransactions();
+        Assert.Equal(TransactionStatus.Pending, (await GetTransactions(AccountId)).Single().Status);
+
+        _env.Provider.RespondTransactionsWithStatus(AccountId, (OtherTransactionId, -10m, TransactionStatus.Booked));
+        await _env.SyncTransactions(force: true);
+
+        var transaction = (await GetTransactions(AccountId)).Single();
+        Assert.Equal(OtherTransactionId.ToString(), transaction.ExternalId);
+        Assert.Equal(TransactionStatus.Booked, transaction.Status);
+    }
+
+    [Fact]
+    public async Task PendingTransactionBookedUnderTheSameId_KeepsItsCategory()
+    {
+        var account = TestData.Account(AccountId);
+        await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), account),
+            TestData.Transaction(TransactionId, account, -10m, category: "Groceries",
+                status: TransactionStatus.Pending));
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
+
+        await _env.SyncTransactions();
+
+        var transaction = (await GetTransactions(AccountId)).Single();
+        Assert.Equal(TransactionStatus.Booked, transaction.Status);
+        Assert.Equal("Groceries", transaction.Category);
+    }
+
+    [Fact]
+    public async Task FailedRequest_KeepsThePendingTransactions()
+    {
+        // No response is configured, so the request fails
+        var account = TestData.Account(AccountId);
+        await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), account),
+            TestData.Transaction(TransactionId, account, -10m, status: TransactionStatus.Pending));
+
+        await _env.SyncTransactions();
+
+        Assert.Single(await GetTransactions(AccountId));
+    }
+
+    [Fact]
     public async Task SameExternalIdInTwoAccounts_CreatesATransactionForEachAccount()
     {
         // External ids are only unique per account

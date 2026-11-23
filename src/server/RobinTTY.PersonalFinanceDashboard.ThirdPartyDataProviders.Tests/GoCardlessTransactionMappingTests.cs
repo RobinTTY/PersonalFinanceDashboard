@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using RobinTTY.NordigenApiClient.Models.Responses;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using NordigenTransaction = RobinTTY.NordigenApiClient.Models.Responses.Transaction;
+using Transaction = RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction;
 
 namespace RobinTTY.PersonalFinanceDashboard.ThirdPartyDataProviders.Tests;
 
@@ -103,7 +105,7 @@ public class GoCardlessTransactionMappingTests
     {
         var transaction = CreateTransaction(internalTransactionId: "tx-1");
 
-        var mapped = new[] { transaction }.ToTransactions(AccountId).Single();
+        var mapped = MapBooked(transaction).Single();
 
         Assert.Equal("Jane Doe", mapped.Payer);
         Assert.Equal("Corner Shop", mapped.Payee);
@@ -115,21 +117,71 @@ public class GoCardlessTransactionMappingTests
     {
         var transaction = CreateTransaction(internalTransactionId: "A9A6B2F4-1C2D-4E5F-8A9B-0C1D2E3F4A5B");
 
-        var mapped = new[] { transaction }.ToTransactions(AccountId).Single();
+        var mapped = MapBooked(transaction).Single();
 
         Assert.Equal(DataSource.GoCardless, mapped.Source);
         Assert.Equal("a9a6b2f4-1c2d-4e5f-8a9b-0c1d2e3f4a5b", mapped.ExternalId);
         Assert.Equal(DataSource.GoCardless, mapped.BankAccount?.Source);
     }
 
+    [Fact]
+    public void BookingDateAndDescription_AreMapped()
+    {
+        var mapped = MapBooked(CreateTransaction()).Single();
+
+        Assert.Equal(new DateTime(2026, 7, 18), mapped.BookingDate);
+        Assert.Equal("Card payment", mapped.Description);
+    }
+
+    [Fact]
+    public void DescriptionLines_AreUsedWithoutUnstructuredDescription()
+    {
+        var transaction = CreateTransaction(configure: json =>
+        {
+            json.Remove("remittanceInformationUnstructured");
+            json["remittanceInformationUnstructuredArray"] = new JsonArray("Corner Shop", "Card 1234");
+        });
+
+        Assert.Equal("Corner Shop Card 1234", MapBooked(transaction).Single().Description);
+    }
+
+    [Fact]
+    public void PendingTransactions_AreMappedAfterTheBookedOnes()
+    {
+        var booked = CreateTransaction(transactionId: "booked");
+        var pending = CreateTransaction(transactionId: "pending", configure: json => json.Remove("bookingDate"));
+
+        var mapped = new AccountTransactions([booked], [pending]).ToTransactions(AccountId);
+
+        Assert.Equal([("booked", TransactionStatus.Booked), ("pending", TransactionStatus.Pending)],
+            mapped.Select(transaction => (transaction.BankTransactionId, transaction.Status)));
+        Assert.Null(mapped[1].BookingDate);
+    }
+
+    [Fact]
+    public void MissingAllIds_PendingTransactionsDoNotChangeTheIdsOfBookedOnes()
+    {
+        var bookedOnly = Map(AccountId, CreateTransaction(), CreateTransaction());
+        var withPending = new AccountTransactions([CreateTransaction(), CreateTransaction()], [CreateTransaction()])
+            .ToTransactions(AccountId).Select(transaction => Guid.Parse(transaction.ExternalId!)).ToList();
+
+        Assert.Equal(bookedOnly, withPending.Take(2));
+        Assert.Equal(3, withPending.Distinct().Count());
+    }
+
+    private static List<Transaction> MapBooked(params NordigenTransaction[] transactions) =>
+        new AccountTransactions(transactions.ToList(), []).ToTransactions(AccountId);
+
     private static List<Guid> Map(Guid accountId, params NordigenTransaction[] transactions) =>
-        transactions.ToTransactions(accountId).Select(transaction => Guid.Parse(transaction.ExternalId!)).ToList();
+        new AccountTransactions(transactions.ToList(), []).ToTransactions(accountId)
+            .Select(transaction => Guid.Parse(transaction.ExternalId!)).ToList();
 
     /// <summary>
     /// Creates a transaction the way the API client would, by deserializing a GoCardless response.
     /// </summary>
     private static NordigenTransaction CreateTransaction(string? internalTransactionId = null,
-        string? transactionId = null, string? entryReference = null, string amount = "-4.20")
+        string? transactionId = null, string? entryReference = null, string amount = "-4.20",
+        Action<JsonObject>? configure = null)
     {
         var json = new JsonObject
         {
@@ -147,6 +199,7 @@ public class GoCardlessTransactionMappingTests
             json["transactionId"] = transactionId;
         if (entryReference != null)
             json["entryReference"] = entryReference;
+        configure?.Invoke(json);
 
         return JsonSerializer.Deserialize<NordigenTransaction>(json.ToJsonString(), SerializerOptions)!;
     }

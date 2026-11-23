@@ -158,31 +158,48 @@ public static class GoCardlessTypeExtensions
             ?.BalanceAmount.Amount;
 
     /// <summary>
-    /// Maps the booked transactions of a GoCardless account to <see cref="Transaction"/>s, giving each one a
-    /// <see cref="SourcedEntity.ExternalId"/> that is stable across syncs.
+    /// Maps the booked and pending transactions of a GoCardless account to <see cref="Transaction"/>s, giving each
+    /// one a <see cref="SourcedEntity.ExternalId"/> that is stable across syncs.
     /// </summary>
     /// <param name="transactions">The transactions as returned by GoCardless, in the order of the response.</param>
     /// <param name="goCardlessAccountId">The GoCardless id of the account the transactions belong to.</param>
     /// <returns>The mapped transactions.</returns>
-    public static List<Transaction> ToTransactions(this IEnumerable<NordigenTransaction> transactions,
-        Guid goCardlessAccountId)
+    public static List<Transaction> ToTransactions(this AccountTransactions transactions, Guid goCardlessAccountId)
     {
         // Counts how often each transaction content occurred, so identical transactions (e.g. two equal
-        // purchases on the same day) still get distinct ids
+        // purchases on the same day) still get distinct ids. Booked transactions come first, so their ids don't
+        // depend on the pending ones.
         var contentOccurrences = new Dictionary<string, int>();
 
-        return transactions.Select(transaction =>
-        {
-            var externalId = GetTransactionId(transaction, goCardlessAccountId, contentOccurrences).ToExternalId();
-            var valueDate = transaction.ValueDateTime ?? transaction.ValueDate;
+        return transactions.BookedTransactions
+            .Select(transaction => (Transaction: transaction, Status: TransactionStatus.Booked))
+            .Concat((transactions.PendingTransactions ?? [])
+                .Select(transaction => (Transaction: transaction, Status: TransactionStatus.Pending)))
+            .Select(entry =>
+            {
+                var transaction = entry.Transaction;
+                var externalId = GetTransactionId(transaction, goCardlessAccountId, contentOccurrences)
+                    .ToExternalId();
 
-            // The debtor sends the money (payer), the creditor receives it (payee)
-            return new Transaction(DataSource.GoCardless, externalId, transaction.TransactionId, valueDate,
-                payer: transaction.DebtorName, payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
-                transaction.TransactionAmount.Currency, category: null, notes: null, [],
-                new BankAccount(DataSource.GoCardless, goCardlessAccountId.ToExternalId()));
-        }).ToList();
+                // The debtor sends the money (payer), the creditor receives it (payee)
+                return new Transaction(DataSource.GoCardless, externalId, transaction.TransactionId,
+                    transaction.ValueDateTime ?? transaction.ValueDate, payer: transaction.DebtorName,
+                    payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
+                    transaction.TransactionAmount.Currency, category: null, notes: null, [],
+                    new BankAccount(DataSource.GoCardless, goCardlessAccountId.ToExternalId()), entry.Status,
+                    transaction.BookingDateTime ?? transaction.BookingDate, GetDescription(transaction));
+            }).ToList();
     }
+
+    /// <summary>
+    /// Gets what a transaction is for. Card payments often have no creditor name, the merchant is only named here.
+    /// </summary>
+    private static string? GetDescription(NordigenTransaction transaction) =>
+        transaction.RemittanceInformationUnstructured is { Length: > 0 } description
+            ? description
+            : transaction.RemittanceInformationUnstructuredArray is { Count: > 0 } lines
+                ? string.Join(' ', lines)
+                : null;
 
     /// <summary>
     /// Determines the id of a transaction. The GoCardless id is used when it is a GUID. All identifiers are

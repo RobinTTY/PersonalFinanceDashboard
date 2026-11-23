@@ -13,6 +13,16 @@ public class Transaction : SourcedEntity
     public string? BankTransactionId { get; set; }
 
     /// <summary>
+    /// Whether the transaction was already posted to the account.
+    /// </summary>
+    public TransactionStatus Status { get; set; }
+
+    /// <summary>
+    /// Date at which the transaction was posted to the account.
+    /// </summary>
+    public DateTime? BookingDate { get; set; }
+
+    /// <summary>
     /// Date at which the transaction amount becomes available to the payee.
     /// </summary>
     public DateTime? ValueDate { get; set; }
@@ -26,6 +36,11 @@ public class Transaction : SourcedEntity
     /// The name of the party which is owed the money.
     /// </summary>
     public string? Payee { get; set; }
+
+    /// <summary>
+    /// What the transaction is for, e.g. the reference of a transfer or the details of a card payment.
+    /// </summary>
+    public string? Description { get; set; }
 
     /// <summary>
     /// The amount being transacted.
@@ -80,14 +95,21 @@ public class Transaction : SourcedEntity
     /// <param name="notes">User created notes for this transaction.</param>
     /// <param name="tags">Tags associated with the transaction (to associate expenses with certain subcategories).</param>
     /// <param name="bankAccount">The bank account associated with the transaction, representing the source or destination of funds.</param>
+    /// <param name="status">Whether the transaction was already posted to the account.</param>
+    /// <param name="bookingDate">Date at which the transaction was posted to the account.</param>
+    /// <param name="description">What the transaction is for.</param>
     public Transaction(DataSource source, string? externalId, string? bankTransactionId, DateTime? valueDate,
         string? payer, string? payee, decimal amount, string currency, string? category, string? notes, List<Tag> tags,
-        BankAccount? bankAccount) : base(source, externalId)
+        BankAccount? bankAccount, TransactionStatus status = TransactionStatus.Booked, DateTime? bookingDate = null,
+        string? description = null) : base(source, externalId)
     {
         BankTransactionId = bankTransactionId;
+        Status = status;
+        BookingDate = bookingDate;
         ValueDate = valueDate;
         Payer = payer;
         Payee = payee;
+        Description = description;
         Amount = amount;
         Currency = currency;
         Category = category;
@@ -104,9 +126,9 @@ public class Transaction : SourcedEntity
     public static Transaction CreateWithoutNavigationProperties(Transaction transaction)
     {
         return new Transaction(transaction.Source, transaction.ExternalId, transaction.BankTransactionId,
-            transaction.ValueDate,
-            transaction.Payer, transaction.Payee, transaction.Amount, transaction.Currency, transaction.Category,
-            transaction.Notes, [], null);
+            transaction.ValueDate, transaction.Payer, transaction.Payee, transaction.Amount, transaction.Currency,
+            transaction.Category, transaction.Notes, [], null, transaction.Status, transaction.BookingDate,
+            transaction.Description);
     }
 
     /// <summary>
@@ -118,10 +140,30 @@ public class Transaction : SourcedEntity
     public void UpdateNonNavigationProperties(Transaction transaction)
     {
         BankTransactionId = transaction.BankTransactionId;
+        Status = transaction.Status;
+        BookingDate = transaction.BookingDate;
         ValueDate = transaction.ValueDate;
         Payer = transaction.Payer;
         Payee = transaction.Payee;
+        Description = transaction.Description;
         Amount = transaction.Amount;
         Currency = transaction.Currency;
     }
+}
+
+/// <summary>
+/// Whether a <see cref="Transaction"/> was already posted to the account.
+/// </summary>
+public enum TransactionStatus
+{
+    /// <summary>
+    /// The transaction was posted to the account.
+    /// </summary>
+    Booked,
+
+    /// <summary>
+    /// The transaction wasn't posted to the account yet. It may still change, or be replaced by a booked transaction
+    /// with a different id.
+    /// </summary>
+    Pending
 }

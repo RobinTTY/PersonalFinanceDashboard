@@ -31,6 +31,7 @@ public class TransactionMutationResolvers
             Notes = string.IsNullOrWhiteSpace(input.Notes) ? null : input.Notes,
             Payee = input.Payee,
             Payer = input.Payer,
+            Description = input.Description,
             ValueDate = input.ValueDate,
             Id = null
         };

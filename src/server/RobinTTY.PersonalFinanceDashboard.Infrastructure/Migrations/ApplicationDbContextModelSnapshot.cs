@@ -278,11 +278,17 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<string>("BankTransactionId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("BookingDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Category")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Currency")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalId")
@@ -298,6 +304,10 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

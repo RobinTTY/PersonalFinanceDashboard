@@ -11,6 +11,7 @@ public class TransactionTypeConfiguration : IEntityTypeConfiguration<Transaction
         builder.HasOne(transaction => transaction.BankAccount)
             .WithMany(account => account.Transactions)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(transaction => transaction.Status).HasConversion<string>();
         // Scoped to the bank account, since external transaction ids are only unique per account
         builder.ConfigureSource("BankAccountId");
     }

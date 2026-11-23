@@ -44,9 +44,15 @@ internal sealed class FakeBankDataProvider : IBankDataProvider
     public void Fail(string method, string? id, ThirdPartyError error) => _responses[Key(method, id)] = () => error;
 
     public void RespondTransactions(Guid accountId, params (Guid Id, decimal Amount)[] transactions) =>
+        RespondTransactionsWithStatus(accountId, transactions
+            .Select(transaction => (transaction.Id, transaction.Amount, TransactionStatus.Booked))
+            .ToArray());
+
+    public void RespondTransactionsWithStatus(Guid accountId,
+        params (Guid Id, decimal Amount, TransactionStatus Status)[] transactions) =>
         Respond(nameof(GetTransactions), accountId.ToExternalId(), IReadOnlyList<Transaction> () => transactions
             .Select(transaction => TestData.Transaction(transaction.Id,
-                new BankAccount(Source, accountId.ToExternalId()), transaction.Amount))
+                new BankAccount(Source, accountId.ToExternalId()), transaction.Amount, status: transaction.Status))
             .ToList());
 
     public Task<ThirdPartyResponse<BankingInstitution>> GetBankingInstitution(string institutionId,

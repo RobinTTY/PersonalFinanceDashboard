@@ -16,6 +16,8 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
 
         var transaction = response.Data("createTransaction", "transaction");
         Assert.Equal(-12.5m, transaction.GetProperty("amount").GetDecimal());
+        Assert.Equal("Weekly shopping", transaction.GetProperty("description").GetString());
+        Assert.Equal("BOOKED", transaction.GetProperty("status").GetString());
         Assert.Equal(accountId, transaction.GetProperty("bankAccount").GetProperty("id").GetString());
     }
 
@@ -114,7 +116,9 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
     private static Task<JsonElement> PostCreateTransaction(HttpClient client, string accountId) =>
         client.PostGraphQl("""
                            mutation($input: CreateTransactionInput!) {
-                             createTransaction(input: $input) { transaction { id amount bankAccount { id } } }
+                             createTransaction(input: $input) {
+                               transaction { id amount description status bankAccount { id } }
+                             }
                            }
                            """, new
         {
@@ -124,6 +128,7 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
                 amount = -12.5m,
                 currency = "EUR",
                 payee = "Supermarket",
+                description = "Weekly shopping",
                 valueDate = "2026-11-10T00:00:00Z"
             }
         });
