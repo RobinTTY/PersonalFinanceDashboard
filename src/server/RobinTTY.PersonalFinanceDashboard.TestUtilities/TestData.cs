@@ -28,5 +28,5 @@ public static class TestData
         string? category = null, string? notes = null, DateTime? valueDate = null,
         TransactionStatus status = TransactionStatus.Booked) =>
         new(DataSource.GoCardless, externalId.ToExternalId(), $"bank-{externalId}",
-            valueDate ?? new DateTime(2026, 11, 10), null, null, amount, "EUR", category, notes, [], account, status);
+            valueDate ?? new DateTime(2026, 11, 10), null, null, amount, "EUR", category, notes, account, status);
 }

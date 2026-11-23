@@ -18,6 +18,7 @@ public class AuthenticationRequestSyncHandler(
     TimeProvider timeProvider,
     ILogger<AuthenticationRequestSyncHandler> logger) : IAuthenticationRequestSyncHandler
 {
+    /// <inheritdoc />
     public async Task<bool> SynchronizeData(Guid? authenticationRequestId = null, bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default)
     {

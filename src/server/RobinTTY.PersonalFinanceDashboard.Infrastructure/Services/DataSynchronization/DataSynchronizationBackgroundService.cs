@@ -16,10 +16,12 @@ public sealed class DataSynchronizationBackgroundService(
     ILogger<DataSynchronizationBackgroundService> logger) : BackgroundService
 {
     /// <summary>
-    /// How often the data is checked. How often it's retrieved is set per data type by its retrieval metadata.
+    /// How often the data is checked. How often it's retrieved is set per data type by the
+    /// <see cref="DataRetrievalConfiguration"/>.
     /// </summary>
     public static readonly TimeSpan Interval = TimeSpan.FromMinutes(15);
 
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)

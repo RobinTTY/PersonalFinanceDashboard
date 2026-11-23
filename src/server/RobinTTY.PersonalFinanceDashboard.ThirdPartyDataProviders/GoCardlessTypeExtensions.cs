@@ -185,7 +185,7 @@ public static class GoCardlessTypeExtensions
                 return new Transaction(DataSource.GoCardless, externalId, transaction.TransactionId,
                     transaction.ValueDateTime ?? transaction.ValueDate, payer: transaction.DebtorName,
                     payee: transaction.CreditorName, transaction.TransactionAmount.Amount,
-                    transaction.TransactionAmount.Currency, category: null, notes: null, [],
+                    transaction.TransactionAmount.Currency, category: null, notes: null,
                     new BankAccount(DataSource.GoCardless, goCardlessAccountId.ToExternalId()), entry.Status,
                     transaction.BookingDateTime ?? transaction.BookingDate, GetDescription(transaction));
             }).ToList();

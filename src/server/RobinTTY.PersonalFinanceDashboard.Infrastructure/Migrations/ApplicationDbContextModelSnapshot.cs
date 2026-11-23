@@ -182,29 +182,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tags");
-                });
-
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.ThirdPartyDataRetrievalMetadata", b =>
                 {
                     b.Property<Guid>("Id")
@@ -229,9 +206,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<DateTime?>("NextRetryTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("RetrievalInterval")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime?>("RetrieveFrom")
                         .HasColumnType("TEXT");
 
@@ -249,8 +223,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                             ConsecutiveFailures = 0,
                             DataSource = 1,
                             DataType = 1,
-                            LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RetrievalInterval = new TimeSpan(7, 0, 0, 0, 0)
+                            LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -258,8 +231,7 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                             ConsecutiveFailures = 0,
                             DataSource = 1,
                             DataType = 2,
-                            LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RetrievalInterval = new TimeSpan(7, 0, 0, 0, 0)
+                            LastRetrievalTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -326,21 +298,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TagTransaction", b =>
-                {
-                    b.Property<Guid>("TagsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("TransactionsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("TagsId", "TransactionsId");
-
-                    b.HasIndex("TransactionsId");
-
-                    b.ToTable("TagTransaction");
-                });
-
             modelBuilder.Entity("AuthenticationRequestBankAccount", b =>
                 {
                     b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", null)
@@ -384,21 +341,6 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("BankAccount");
-                });
-
-            modelBuilder.Entity("TagTransaction", b =>
-                {
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RobinTTY.PersonalFinanceDashboard.Core.Models.Transaction", null)
-                        .WithMany()
-                        .HasForeignKey("TransactionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("RobinTTY.PersonalFinanceDashboard.Core.Models.BankAccount", b =>

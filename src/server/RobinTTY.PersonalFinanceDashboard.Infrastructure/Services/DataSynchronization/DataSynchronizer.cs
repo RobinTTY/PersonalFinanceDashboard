@@ -25,6 +25,7 @@ public class DataSynchronizer(
         ThirdPartyDataType.BankAccounts, ThirdPartyDataType.Transactions
     ];
 
+    /// <inheritdoc />
     public Task<bool> SynchronizeAll(bool forceThirdPartySync = false, CancellationToken cancellationToken = default) =>
         Run(async () =>
         {
@@ -35,10 +36,12 @@ public class DataSynchronizer(
             return success;
         }, cancellationToken);
 
+    /// <inheritdoc />
     public Task<bool> Synchronize(ThirdPartyDataType dataType, bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default) =>
         Run(() => SynchronizeDataType(dataType, forceThirdPartySync, cancellationToken), cancellationToken);
 
+    /// <inheritdoc />
     public Task<bool> RefreshAuthenticationRequest(Guid authenticationRequestId,
         CancellationToken cancellationToken = default) => Run(async () =>
     {

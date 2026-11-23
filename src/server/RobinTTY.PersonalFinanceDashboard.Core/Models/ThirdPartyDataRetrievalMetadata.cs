@@ -2,6 +2,10 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.Core.Models;
 
+/// <summary>
+/// Tracks when data of a data provider was retrieved, so it's only retrieved again once its retrieval interval
+/// passed, and failed retrievals are retried with an increasing delay.
+/// </summary>
 public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
 {
     /// <summary>
@@ -37,38 +41,14 @@ public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
     public DateTime? RetrieveFrom { get; set; }
 
     /// <summary>
-    /// The earliest time a failed retrieval is retried. Takes precedence over <see cref="RetrievalInterval"/>
+    /// The earliest time a failed retrieval is retried. Takes precedence over the configured retrieval interval
     /// while set, and is reset by a successful retrieval.
     /// </summary>
     public DateTime? NextRetryTime { get; set; }
 
-    // TODO: This may be removed 
     /// <summary>
-    /// The interval at which the data should be retrieved again from the data source.
-    /// </summary>
-    public required TimeSpan RetrievalInterval { get; set; }
-
-    /// <summary>
-    /// Depending on the data type, we track individual synchronization entities. For example, for accounts,
-    /// we track the account id for which the data retrieval metadata applies. This allows us to have different
-    /// retrieval times and intervals for different accounts.
+    /// The entity the data belongs to, e.g. the account whose transactions are retrieved, so each one is retrieved
+    /// on its own schedule. <see langword="null"/> for data retrieved as a whole, e.g. banking institutions.
     /// </summary>
     public Guid? SynchronizationEntityId { get; set; }
-
-    public ThirdPartyDataRetrievalMetadata()
-    {
-    }
-
-    public ThirdPartyDataRetrievalMetadata(Guid id,
-        ThirdPartyDataType dataType,
-        DataSource dataSource,
-        DateTime lastRetrievalTime,
-        TimeSpan retrievalInterval)
-    {
-        Id = id;
-        DataType = dataType;
-        DataSource = dataSource;
-        LastRetrievalTime = lastRetrievalTime;
-        RetrievalInterval = retrievalInterval;
-    }
 }

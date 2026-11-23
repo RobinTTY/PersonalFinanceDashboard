@@ -1,4 +1,5 @@
-﻿using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
+﻿using Microsoft.Extensions.Options;
+using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
@@ -6,14 +7,16 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Services;
 
 /// <summary>
 /// Service used to manage the data retrieval from third party services. It is used to
-/// make sure data is only retrieved once it has gone stale as specified by the given data
+/// make sure data is only retrieved once it has gone stale as specified by the configured data
 /// retrieval interval, and that failed retrievals are retried with an increasing delay.
 /// </summary>
 /// <param name="thirdPartyDataRetrievalMetadataRepository">The repository which holds the
 /// <see cref="ThirdPartyDataRetrievalMetadata"/> used to determine when data is stale.</param>
+/// <param name="configuration">The intervals at which data is retrieved again.</param>
 /// <param name="timeProvider">Provides the current time.</param>
 public class ThirdPartyDataRetrievalMetadataService(
     ThirdPartyDataRetrievalMetadataRepository thirdPartyDataRetrievalMetadataRepository,
+    IOptions<DataRetrievalConfiguration> configuration,
     TimeProvider timeProvider)
 {
     /// <summary>
@@ -47,8 +50,8 @@ public class ThirdPartyDataRetrievalMetadataService(
             return true;
         }
 
-        var nextRetrievalTime = retrievalMetadata.NextRetryTime ??
-                                retrievalMetadata.LastRetrievalTime + retrievalMetadata.RetrievalInterval;
+        var nextRetrievalTime = retrievalMetadata.NextRetryTime ?? retrievalMetadata.LastRetrievalTime +
+            configuration.Value.GetRetrievalInterval(thirdPartyDataType);
         return nextRetrievalTime <= timeProvider.GetUtcNow().UtcDateTime;
     }
 
@@ -96,7 +99,8 @@ public class ThirdPartyDataRetrievalMetadataService(
         metadata.ConsecutiveFailures++;
         metadata.LastError = error.Message;
 
-        var retryDelay = GetRetryDelay(metadata.ConsecutiveFailures, metadata.RetrievalInterval);
+        var retryDelay = GetRetryDelay(metadata.ConsecutiveFailures,
+            configuration.Value.GetRetrievalInterval(thirdPartyDataType));
         if (error.RetryAfter > retryDelay)
             retryDelay = error.RetryAfter.Value;
         metadata.NextRetryTime = timeProvider.GetUtcNow().UtcDateTime + retryDelay;

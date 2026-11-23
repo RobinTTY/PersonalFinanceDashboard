@@ -18,6 +18,11 @@ public class AppConfiguration
     public const string GoCardlessSectionName = $"{SectionName}:GoCardlessConfiguration";
 
     /// <summary>
+    /// The configuration section the data retrieval intervals are read from.
+    /// </summary>
+    public const string DataRetrievalSectionName = $"{SectionName}:DataRetrievalConfiguration";
+
+    /// <summary>
     /// The origins allowed to call the API from a browser, e.g. "http://localhost:5173".
     /// If not set, only the Vite dev server is allowed.
     /// </summary>

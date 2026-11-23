@@ -17,13 +17,7 @@ public class BankAccountSyncHandler(
     TimeProvider timeProvider,
     ILogger<BankAccountSyncHandler> logger) : IBankAccountSyncHandler
 {
-    /// <summary>
-    /// Synchronizes stale bank account data by fetching it from the account's data provider and updating the local database. If a specific bank account ID is provided, synchronization is limited to that account; otherwise, all accounts of active authentication requests are synchronized.
-    /// </summary>
-    /// <param name="internalBankAccountId">The internal ID of a specific bank account to synchronize. If <see langword="null"/>, all bank accounts will be synchronized.</param>
-    /// <param name="forceThirdPartySync">Indicates whether to force synchronization with the third-party API.</param>
-    /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>A boolean value indicating whether the synchronization process was successful.</returns>
+    /// <inheritdoc />
     public async Task<bool> SynchronizeData(Guid? internalBankAccountId = null, bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default)
     {
@@ -56,7 +50,7 @@ public class BankAccountSyncHandler(
     }
 
     /// <summary>
-    /// Gets the bank accounts associated with active authentication requests that are not older than 90 days.
+    /// Gets the bank accounts of authentication requests that currently grant access.
     /// </summary>
     private async Task<List<BankAccount>> GetAccountsOfActiveAuthenticationRequests(
         CancellationToken cancellationToken)

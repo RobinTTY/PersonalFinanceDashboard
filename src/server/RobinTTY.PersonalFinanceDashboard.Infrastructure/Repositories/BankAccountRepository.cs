@@ -108,8 +108,8 @@ public class BankAccountRepository
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
     public async Task<bool> DeleteBankAccount(Guid bankAccountId, CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId)
+        var deleted = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId)
             .ExecuteDeleteAsync(cancellationToken);
-        return Convert.ToBoolean(result);
+        return deleted > 0;
     }
 }

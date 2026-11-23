@@ -15,6 +15,7 @@ public class BankingInstitutionSyncHandler(
     ThirdPartyDataRetrievalMetadataService dataRetrievalMetadataService,
     ILogger<BankingInstitutionSyncHandler> logger) : IBankingInstitutionSyncHandler
 {
+    /// <inheritdoc />
     public async Task<bool> SynchronizeData(bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default)
     {

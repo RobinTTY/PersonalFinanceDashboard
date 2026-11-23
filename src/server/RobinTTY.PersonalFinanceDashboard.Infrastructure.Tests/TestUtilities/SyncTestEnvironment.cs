@@ -1,6 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 using RobinTTY.PersonalFinanceDashboard.Core.DataProviders;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
@@ -27,6 +28,7 @@ internal sealed class SyncTestEnvironment : IDisposable
     public DataSynchronizationLock SyncLock { get; } = new();
     public DataSynchronizationTrigger Trigger { get; } = new();
     public CountingNotifier Notifier { get; } = new();
+    public DataRetrievalConfiguration RetrievalConfiguration { get; } = new();
 
     /// <param name="useFakeProvider">Whether the handlers get their data from <see cref="Provider"/> instead
     /// of <see cref="GoCardless"/>.</param>
@@ -89,7 +91,7 @@ internal sealed class SyncTestEnvironment : IDisposable
         new([_useFakeProvider ? Provider : GoCardless.CreateService()]);
 
     public ThirdPartyDataRetrievalMetadataService CreateMetadataService(ApplicationDbContext dbContext) =>
-        new(new ThirdPartyDataRetrievalMetadataRepository(dbContext), Time);
+        new(new ThirdPartyDataRetrievalMetadataRepository(dbContext), Options.Create(RetrievalConfiguration), Time);
 
     public void Dispose()
     {

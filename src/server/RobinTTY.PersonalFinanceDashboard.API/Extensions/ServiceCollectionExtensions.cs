@@ -102,6 +102,10 @@ public static class ServiceCollectionExtensions
                 .BindConfiguration(DatabaseConfiguration.SectionName)
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
+            services.AddOptions<DataRetrievalConfiguration>()
+                .BindConfiguration(AppConfiguration.DataRetrievalSectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             return services;
         }

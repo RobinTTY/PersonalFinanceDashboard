@@ -2,6 +2,9 @@
 
 namespace RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 
+/// <summary>
+/// Determines how long an <see cref="AuthenticationRequest"/> grants access to its accounts.
+/// </summary>
 public static class AuthenticationRequestExtensions
 {
     /// <summary>

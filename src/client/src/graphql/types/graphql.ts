@@ -395,13 +395,6 @@ export type ListFilterInputTypeOfBankAccountFilterInput = {
   some?: InputMaybe<BankAccountFilterInput>;
 };
 
-export type ListFilterInputTypeOfTagFilterInput = {
-  all?: InputMaybe<TagFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<TagFilterInput>;
-  some?: InputMaybe<TagFilterInput>;
-};
-
 export type ListFilterInputTypeOfTransactionFilterInput = {
   all?: InputMaybe<TransactionFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
@@ -713,25 +706,6 @@ export type SynchronizeTransactionDataPayload = {
   boolean: Maybe<Scalars['Boolean']['output']>;
 };
 
-export type Tag = {
-  __typename: 'Tag';
-  color: Scalars['String']['output'];
-  description: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  name: Scalars['String']['output'];
-  transactions: Array<Transaction>;
-};
-
-export type TagFilterInput = {
-  and?: InputMaybe<Array<TagFilterInput>>;
-  color?: InputMaybe<StringOperationFilterInput>;
-  description?: InputMaybe<StringOperationFilterInput>;
-  id?: InputMaybe<UuidOperationFilterInput>;
-  name?: InputMaybe<StringOperationFilterInput>;
-  or?: InputMaybe<Array<TagFilterInput>>;
-  transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
-};
-
 export type Transaction = {
   __typename: 'Transaction';
   amount: Scalars['Decimal']['output'];
@@ -748,7 +722,6 @@ export type Transaction = {
   payer: Maybe<Scalars['String']['output']>;
   source: DataSource;
   status: TransactionStatus;
-  tags: Array<Tag>;
   valueDate: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -769,7 +742,6 @@ export type TransactionFilterInput = {
   payer?: InputMaybe<StringOperationFilterInput>;
   source?: InputMaybe<DataSourceOperationFilterInput>;
   status?: InputMaybe<TransactionStatusOperationFilterInput>;
-  tags?: InputMaybe<ListFilterInputTypeOfTagFilterInput>;
   valueDate?: InputMaybe<DateTimeOperationFilterInput>;
 };
 

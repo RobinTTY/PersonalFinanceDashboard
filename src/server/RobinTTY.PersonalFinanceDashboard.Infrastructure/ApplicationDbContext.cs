@@ -14,11 +14,6 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Transaction> Transactions => Set<Transaction>();
 
     /// <summary>
-    /// <see cref="DbSet{TEntity}"/> holding tags.
-    /// </summary>
-    public DbSet<Tag> Tags => Set<Tag>();
-
-    /// <summary>
     /// <see cref="DbSet{TEntity}"/> holding banking institutions.
     /// </summary>
     public DbSet<BankingInstitution> BankingInstitutions => Set<BankingInstitution>();
@@ -47,6 +42,7 @@ public sealed class ApplicationDbContext : DbContext
     {
     }
 
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

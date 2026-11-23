@@ -3,6 +3,10 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
 
+/// <summary>
+/// Manages <see cref="ThirdPartyDataRetrievalMetadata"/> data retrieval.
+/// </summary>
+/// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
 public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbContext)
 {
     /// <summary>
@@ -45,8 +49,7 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
             DataType = dataType,
             DataSource = dataSource,
             SynchronizationEntityId = synchronizationEntityId,
-            LastRetrievalTime = DateTime.MinValue,
-            RetrievalInterval = GetRetrievalInterval(dataType)
+            LastRetrievalTime = DateTime.MinValue
         };
         dbContext.ThirdPartyDataRetrievalMetadata.Add(metadata);
 
@@ -76,14 +79,4 @@ public class ThirdPartyDataRetrievalMetadataRepository(ApplicationDbContext dbCo
     /// <param name="cancellationToken">A token to signal cancellation.</param>
     public async Task SaveChanges(CancellationToken cancellationToken = default) =>
         await dbContext.SaveChangesAsync(cancellationToken);
-
-    private static TimeSpan GetRetrievalInterval(ThirdPartyDataType dataType)
-    {
-        return dataType switch
-        {
-            ThirdPartyDataType.BankingInstitutions or ThirdPartyDataType.AuthenticationRequests => TimeSpan.FromDays(7),
-            ThirdPartyDataType.Transactions or ThirdPartyDataType.BankAccounts => TimeSpan.FromDays(1),
-            _ => throw new ArgumentException("Data type cannot be undefined.", nameof(dataType))
-        };
-    }
 }

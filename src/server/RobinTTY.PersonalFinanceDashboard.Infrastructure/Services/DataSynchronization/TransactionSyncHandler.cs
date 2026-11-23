@@ -29,6 +29,7 @@ public class TransactionSyncHandler(
             : new ContentKey(transaction.BankTransactionId, 0, null, null);
     }
 
+    /// <inheritdoc />
     public async Task<bool> SynchronizeData(bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default)
     {

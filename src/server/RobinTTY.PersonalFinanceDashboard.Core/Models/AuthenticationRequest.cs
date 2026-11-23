@@ -18,7 +18,8 @@ public class AuthenticationRequest : SourcedEntity
     public Uri AuthenticationLink { get; set; }
 
     /// <summary>
-    /// The date when the authentication request was created. Usually authentication requests are valid for 90 days.
+    /// The date when the authentication request was created. The access it grants expires
+    /// <see cref="AccessValidForDays"/> later.
     /// </summary>
     public DateTime CreatedAt { get; set; }
 
@@ -34,7 +35,7 @@ public class AuthenticationRequest : SourcedEntity
     public BankingInstitution? Institution { get; set; }
 
     /// <summary>
-    /// The ids of the accounts associated with this authentication request.
+    /// The accounts this authentication request grants access to.
     /// </summary>
     public List<BankAccount> AssociatedAccounts { get; set; } = [];
 
@@ -83,6 +84,11 @@ public class AuthenticationRequest : SourcedEntity
         CreatedAt = createdAt;
     }
 
+    /// <summary>
+    /// Creates a new instance from the supplied authentication request without the navigation properties set.
+    /// </summary>
+    /// <param name="authenticationRequest">The authentication request to copy.</param>
+    /// <returns>New instance of <see cref="AuthenticationRequest"/> without navigation properties set.</returns>
     public static AuthenticationRequest CreateWithoutNavigationProperties(AuthenticationRequest authenticationRequest)
     {
         return new AuthenticationRequest(authenticationRequest.Source, authenticationRequest.ExternalId!,

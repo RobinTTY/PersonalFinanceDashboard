@@ -83,8 +83,7 @@ public sealed class BankAccountSyncStatusServiceTests : IDisposable
             DataType = dataType,
             DataSource = DataSource.GoCardless,
             SynchronizationEntityId = account.Id,
-            LastRetrievalTime = lastRetrievalTime,
-            RetrievalInterval = TimeSpan.FromDays(1)
+            LastRetrievalTime = lastRetrievalTime
         };
 
     private async Task<SyncStatus> GetSyncStatus(BankAccount account) =>

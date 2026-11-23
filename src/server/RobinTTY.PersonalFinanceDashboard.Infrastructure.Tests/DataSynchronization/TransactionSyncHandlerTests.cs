@@ -137,6 +137,20 @@ public sealed class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task ConfiguredInterval_DeterminesWhenTransactionsAreFetchedAgain()
+    {
+        _env.RetrievalConfiguration.TransactionsInterval = TimeSpan.FromHours(6);
+        await SeedAccountsWithActiveRequest(AccountId);
+        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m));
+
+        await _env.SyncTransactions();
+        _env.Time.Advance(TimeSpan.FromHours(6));
+        await _env.SyncTransactions();
+
+        Assert.Equal(2, TransactionRequests(AccountId));
+    }
+
+    [Fact]
     public async Task AccountsOfAuthRequestsOlderThan90Days_AreNotSynced()
     {
         await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-91), TestData.Account(AccountId)));
@@ -268,7 +282,6 @@ public sealed class TransactionSyncHandlerTests : IDisposable
             DataSource = DataSource.GoCardless,
             SynchronizationEntityId = account.Id,
             LastRetrievalTime = DateTime.MinValue,
-            RetrievalInterval = TimeSpan.FromDays(1),
             RetrieveFrom = new DateTime(2026, 11, 10)
         });
         _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m), (OtherTransactionId, 25m));

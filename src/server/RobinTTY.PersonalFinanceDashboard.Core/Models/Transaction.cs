@@ -63,11 +63,6 @@ public class Transaction : SourcedEntity
     public string? Notes { get; set; }
 
     /// <summary>
-    /// Tags associated with the transaction (to associate expenses with certain subcategories).
-    /// </summary>
-    public List<Tag> Tags { get; set; } = [];
-
-    /// <summary>
     /// The bank account associated with the transaction, representing the source or destination of funds.
     /// </summary>
     public BankAccount? BankAccount { get; set; }
@@ -93,13 +88,12 @@ public class Transaction : SourcedEntity
     /// <param name="currency">The currency the amount is denominated in.</param>
     /// <param name="category">The category this transaction belongs to.</param>
     /// <param name="notes">User created notes for this transaction.</param>
-    /// <param name="tags">Tags associated with the transaction (to associate expenses with certain subcategories).</param>
     /// <param name="bankAccount">The bank account associated with the transaction, representing the source or destination of funds.</param>
     /// <param name="status">Whether the transaction was already posted to the account.</param>
     /// <param name="bookingDate">Date at which the transaction was posted to the account.</param>
     /// <param name="description">What the transaction is for.</param>
     public Transaction(DataSource source, string? externalId, string? bankTransactionId, DateTime? valueDate,
-        string? payer, string? payee, decimal amount, string currency, string? category, string? notes, List<Tag> tags,
+        string? payer, string? payee, decimal amount, string currency, string? category, string? notes,
         BankAccount? bankAccount, TransactionStatus status = TransactionStatus.Booked, DateTime? bookingDate = null,
         string? description = null) : base(source, externalId)
     {
@@ -113,7 +107,6 @@ public class Transaction : SourcedEntity
         Amount = amount;
         Currency = currency;
         Category = category;
-        Tags = tags;
         Notes = notes;
         BankAccount = bankAccount;
     }
@@ -127,7 +120,7 @@ public class Transaction : SourcedEntity
     {
         return new Transaction(transaction.Source, transaction.ExternalId, transaction.BankTransactionId,
             transaction.ValueDate, transaction.Payer, transaction.Payee, transaction.Amount, transaction.Currency,
-            transaction.Category, transaction.Notes, [], null, transaction.Status, transaction.BookingDate,
+            transaction.Category, transaction.Notes, null, transaction.Status, transaction.BookingDate,
             transaction.Description);
     }
 

@@ -4,8 +4,12 @@ using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.EntityConfigurations;
 
+/// <summary>
+/// Configures how <see cref="Transaction"/>s are stored.
+/// </summary>
 public class TransactionTypeConfiguration : IEntityTypeConfiguration<Transaction>
 {
+    /// <inheritdoc />
     public void Configure(EntityTypeBuilder<Transaction> builder)
     {
         builder.HasOne(transaction => transaction.BankAccount)

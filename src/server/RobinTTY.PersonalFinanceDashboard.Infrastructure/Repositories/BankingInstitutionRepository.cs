@@ -107,8 +107,8 @@ public class BankingInstitutionRepository
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
     public async Task<bool> DeleteBankingInstitution(Guid institutionId, CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId)
+        var deleted = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId)
             .ExecuteDeleteAsync(cancellationToken);
-        return Convert.ToBoolean(result);
+        return deleted > 0;
     }
 }

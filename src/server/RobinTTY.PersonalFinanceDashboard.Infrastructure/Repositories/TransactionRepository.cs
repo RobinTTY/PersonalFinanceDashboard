@@ -95,8 +95,8 @@ public class TransactionRepository
     /// <returns>Boolean value indicating whether the operation was successful.</returns>
     public async Task<bool> DeleteTransaction(Guid transactionId, CancellationToken cancellationToken = default)
     {
-        var result = await _dbContext.Transactions.Where(t => t.Id == transactionId)
+        var deleted = await _dbContext.Transactions.Where(t => t.Id == transactionId)
             .ExecuteDeleteAsync(cancellationToken);
-        return Convert.ToBoolean(result);
+        return deleted > 0;
     }
 }
