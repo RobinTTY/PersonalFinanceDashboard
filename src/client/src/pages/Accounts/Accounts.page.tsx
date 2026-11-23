@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { GetBankAccounts } from '@graphql-queries/GetBankAccounts';
 import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAccountId';
+import { TransactionStatus } from '@graphql-types/graphql';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { formatAmount, formatDate } from '@utility';
-import { Alert, Box, Button, Loader, Stack, Text } from '@mantine/core';
+import { Alert, Badge, Box, Button, Group, Loader, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AccountsHeader } from '@/components/AccountsHeader/AccountsHeader';
 import { AddAccountModal, PendingAuthState } from '@/components/AddAccountModal/AddAccountModal';
@@ -203,12 +204,20 @@ export function AccountsPage() {
                   style={{ transform: `translateY(${virtualRow.start}px)` }}
                 >
                   <Text size="sm">{formatDate(transaction.valueDate)}</Text>
-                  <Text size="sm" truncate>
-                    {/* Show the counterparty: who was paid for outgoing, who paid for incoming */}
-                    {transaction.amount < 0
-                      ? (transaction.payee ?? '—')
-                      : (transaction.payer ?? '—')}
-                  </Text>
+                  <Group gap="xs" wrap="nowrap" miw={0}>
+                    <Text size="sm" truncate>
+                      {/* Show the counterparty: who was paid for outgoing, who paid for incoming. Card
+                          payments often only name the merchant in the description. */}
+                      {(transaction.amount < 0 ? transaction.payee : transaction.payer) ??
+                        transaction.description ??
+                        '—'}
+                    </Text>
+                    {transaction.status === TransactionStatus.Pending && (
+                      <Badge size="xs" variant="light" color="gray" style={{ flexShrink: 0 }}>
+                        Pending
+                      </Badge>
+                    )}
+                  </Group>
                   <Text size="sm" fw={600} ta="right" c={transaction.amount >= 0 ? 'green' : 'red'}>
                     {formatAmount(transaction.amount, transaction.currency)}
                   </Text>

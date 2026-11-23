@@ -14,6 +14,7 @@ export const GetNetWorthHistory: TypedDocumentNode<GetNetWorthHistoryQuery> = gq
         transactions {
           valueDate
           amount
+          status
         }
       }
     }

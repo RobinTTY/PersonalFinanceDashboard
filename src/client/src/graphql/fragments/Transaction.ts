@@ -8,6 +8,8 @@ export const Transaction: TypedDocumentNode<TransactionFragment> = gql`
     amount
     payer
     payee
+    description
     currency
+    status
   }
 `;

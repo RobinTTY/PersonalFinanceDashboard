@@ -1,3 +1,4 @@
+import { TransactionStatus } from '@graphql-types/graphql';
 import { buildNetWorthHistory, NetWorthAccount } from './buildNetWorthHistory';
 
 // Fixed reference "now" so day labels and reconstructed values are deterministic.
@@ -94,6 +95,25 @@ describe('buildNetWorthHistory', () => {
     expect(Object.keys(dataByLabel)[0]).toBe('Feb 12, 2026');
     expect(dataByLabel['Feb 12, 2026']).toBe(800); // 1000 - 200 (Mar txn)
     expect(dataByLabel['Mar 20, 2026']).toBe(1000);
+  });
+
+  it('skips pending transactions, which the balance does not include yet', () => {
+    const accounts: NetWorthAccount[] = [
+      {
+        balance: 1000,
+        currency: 'EUR',
+        transactions: [
+          { valueDate: new Date(2026, 2, 10), amount: -50, status: TransactionStatus.Booked },
+          { valueDate: new Date(2026, 2, 19), amount: -30, status: TransactionStatus.Pending },
+        ],
+      },
+    ];
+
+    const { dataByLabel } = buildNetWorthHistory(accounts, NOW);
+
+    // Counting the pending -30 would put the days before it at 1030
+    expect(dataByLabel['Mar 10, 2026']).toBe(1000);
+    expect(dataByLabel['Mar 18, 2026']).toBe(1000);
   });
 
   it('handles accounts with no transactions as a single current-balance point', () => {

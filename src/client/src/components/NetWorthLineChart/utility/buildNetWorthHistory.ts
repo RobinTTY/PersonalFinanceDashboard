@@ -1,3 +1,5 @@
+import { TransactionStatus } from '@graphql-types/graphql';
+
 /**
  * The most days the net worth history will span. One year of daily points keeps the
  * series bounded while the full-date labels (e.g. "Oct 3, 2025") stay unique within a
@@ -9,6 +11,7 @@ const MAX_DAYS = 365;
 interface NetWorthTransaction {
   valueDate?: Date | string | null;
   amount: number;
+  status?: TransactionStatus | null;
 }
 
 export interface NetWorthAccount {
@@ -32,6 +35,7 @@ export interface NetWorthHistory {
  * point in time equals the current total minus the net of every transaction that
  * happened after that point. Transactions from all accounts are summed together,
  * which assumes a single currency (the common case) — see {@link pickDominantCurrency}.
+ * Pending transactions are skipped, as the balance usually only includes booked ones.
  *
  * @param accounts The accounts to combine, each with its current balance and transactions.
  * @param now Reference point for "today"; injectable to keep the output deterministic in tests.
@@ -45,6 +49,7 @@ export function buildNetWorthHistory(
 
   const transactions = accounts
     .flatMap((account) => account.transactions)
+    .filter((transaction) => transaction.status !== TransactionStatus.Pending)
     .map((transaction) => ({ date: toDate(transaction.valueDate), amount: transaction.amount }))
     .filter(
       (transaction): transaction is { date: Date; amount: number } => transaction.date != null

@@ -6,5 +6,5 @@ export const scalarTypePolicies = {
   },
   DataSynchronization: { fields: { completedAt: dateTimeTypePolicy } },
   SyncStatus: { fields: { lastSuccessfulSync: dateTimeTypePolicy, nextRetry: dateTimeTypePolicy } },
-  Transaction: { fields: { valueDate: dateTimeTypePolicy } },
+  Transaction: { fields: { bookingDate: dateTimeTypePolicy, valueDate: dateTimeTypePolicy } },
 };

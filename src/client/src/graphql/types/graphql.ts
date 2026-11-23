@@ -24,6 +24,7 @@ export type AuthenticationRequest = {
   __typename: 'AuthenticationRequest';
   /** When the access to the accounts granted by this request expires. */
   accessExpiresAt: Scalars['DateTime']['output'];
+  accessValidForDays: Maybe<Scalars['Int']['output']>;
   associatedAccounts: Array<BankAccount>;
   authenticationLink: Scalars['URL']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -35,6 +36,7 @@ export type AuthenticationRequest = {
 };
 
 export type AuthenticationRequestFilterInput = {
+  accessValidForDays?: InputMaybe<IntOperationFilterInput>;
   and?: InputMaybe<Array<AuthenticationRequestFilterInput>>;
   associatedAccounts?: InputMaybe<ListFilterInputTypeOfBankAccountFilterInput>;
   authenticationLink?: InputMaybe<UrlOperationFilterInput>;
@@ -79,6 +81,8 @@ export type BankAccount = {
   includeInAnalytics: Scalars['Boolean']['output'];
   name: Maybe<Scalars['String']['output']>;
   ownerName: Maybe<Scalars['String']['output']>;
+  providerDescription: Maybe<Scalars['String']['output']>;
+  providerName: Maybe<Scalars['String']['output']>;
   source: DataSource;
   /** How up to date the account is with the data source it originates from. */
   syncStatus: SyncStatus;
@@ -102,6 +106,8 @@ export type BankAccountFilterInput = {
   name?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<BankAccountFilterInput>>;
   ownerName?: InputMaybe<StringOperationFilterInput>;
+  providerDescription?: InputMaybe<StringOperationFilterInput>;
+  providerName?: InputMaybe<StringOperationFilterInput>;
   source?: InputMaybe<DataSourceOperationFilterInput>;
   transactions?: InputMaybe<ListFilterInputTypeOfTransactionFilterInput>;
 };
@@ -240,11 +246,13 @@ export type CreateTransactionInput = {
   /** The amount being transacted. */
   amount: Scalars['Decimal']['input'];
   /** The category this transaction belongs to. */
-  category: Scalars['String']['input'];
+  category?: InputMaybe<Scalars['String']['input']>;
   /** The currency the amount is denominated in. */
   currency: Scalars['String']['input'];
+  /** What the transaction is for. */
+  description?: InputMaybe<Scalars['String']['input']>;
   /** User created notes for this transaction. */
-  notes: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
   /** The name of the party which is owed the money. */
   payee?: InputMaybe<Scalars['String']['input']>;
   /** The name of the party which owes the money. */
@@ -358,6 +366,21 @@ export type Error = {
   message: Scalars['String']['output'];
 };
 
+export type IntOperationFilterInput = {
+  eq?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
+  neq?: InputMaybe<Scalars['Int']['input']>;
+  ngt?: InputMaybe<Scalars['Int']['input']>;
+  ngte?: InputMaybe<Scalars['Int']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  nlt?: InputMaybe<Scalars['Int']['input']>;
+  nlte?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type ListFilterInputTypeOfAuthenticationRequestFilterInput = {
   all?: InputMaybe<AuthenticationRequestFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
@@ -412,13 +435,7 @@ export type Mutation = {
   deleteBankingInstitution: DeleteBankingInstitutionPayload;
   /** Delete an existing transaction. */
   deleteTransaction: DeleteTransactionPayload;
-  /**
-   * Sets whether a bank account is included in analytics such as graphs and account views.
-   *
-   *
-   * **Returns:**
-   * The updated bank account if one is matched, otherwise null.
-   */
+  /** Sets whether a bank account is included in analytics such as graphs and account views. */
   setBankAccountIncludeInAnalytics: SetBankAccountIncludeInAnalyticsPayload;
   /**
    * Synchronizes authentication request data with third-party data providers.
@@ -561,7 +578,7 @@ export type Query = {
   /** Look up banking institutions. */
   bankingInstitutions: Maybe<BankingInstitutionsConnection>;
   /** Look up transactions. */
-  transactions: Array<Transaction>;
+  transactions: Maybe<TransactionsConnection>;
   /** Look up transactions of an account. */
   transactionsByAccountId: Maybe<TransactionsByAccountIdConnection>;
 };
@@ -601,6 +618,15 @@ export type QueryBankingInstitutionsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
   countryCode?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** AuthenticationRequest related query resolvers. */
+export type QueryTransactionsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -711,14 +737,17 @@ export type Transaction = {
   amount: Scalars['Decimal']['output'];
   bankAccount: Maybe<BankAccount>;
   bankTransactionId: Maybe<Scalars['String']['output']>;
-  category: Scalars['String']['output'];
+  bookingDate: Maybe<Scalars['DateTime']['output']>;
+  category: Maybe<Scalars['String']['output']>;
   currency: Scalars['String']['output'];
+  description: Maybe<Scalars['String']['output']>;
   externalId: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
-  notes: Scalars['String']['output'];
+  notes: Maybe<Scalars['String']['output']>;
   payee: Maybe<Scalars['String']['output']>;
   payer: Maybe<Scalars['String']['output']>;
   source: DataSource;
+  status: TransactionStatus;
   tags: Array<Tag>;
   valueDate: Maybe<Scalars['DateTime']['output']>;
 };
@@ -728,8 +757,10 @@ export type TransactionFilterInput = {
   and?: InputMaybe<Array<TransactionFilterInput>>;
   bankAccount?: InputMaybe<BankAccountFilterInput>;
   bankTransactionId?: InputMaybe<StringOperationFilterInput>;
+  bookingDate?: InputMaybe<DateTimeOperationFilterInput>;
   category?: InputMaybe<StringOperationFilterInput>;
   currency?: InputMaybe<StringOperationFilterInput>;
+  description?: InputMaybe<StringOperationFilterInput>;
   externalId?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   notes?: InputMaybe<StringOperationFilterInput>;
@@ -737,8 +768,21 @@ export type TransactionFilterInput = {
   payee?: InputMaybe<StringOperationFilterInput>;
   payer?: InputMaybe<StringOperationFilterInput>;
   source?: InputMaybe<DataSourceOperationFilterInput>;
+  status?: InputMaybe<TransactionStatusOperationFilterInput>;
   tags?: InputMaybe<ListFilterInputTypeOfTagFilterInput>;
   valueDate?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export enum TransactionStatus {
+  Booked = 'BOOKED',
+  Pending = 'PENDING'
+}
+
+export type TransactionStatusOperationFilterInput = {
+  eq?: InputMaybe<TransactionStatus>;
+  in?: InputMaybe<Array<TransactionStatus>>;
+  neq?: InputMaybe<TransactionStatus>;
+  nin?: InputMaybe<Array<TransactionStatus>>;
 };
 
 /** A connection to a list of items. */
@@ -761,13 +805,33 @@ export type TransactionsByAccountIdEdge = {
   node: Transaction;
 };
 
+/** A connection to a list of items. */
+export type TransactionsConnection = {
+  __typename: 'TransactionsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<TransactionsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Transaction>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type TransactionsEdge = {
+  __typename: 'TransactionsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Transaction;
+};
+
 /** Payload required to update a bank account through the API. */
 export type UpdateBankAccountInput = {
-  /** A description of this account. */
+  /** A description of this account. If empty, a synchronized account shows its bank's description again. */
   description?: InputMaybe<Scalars['String']['input']>;
   /** The id of the bank account to update. */
   id: Scalars['UUID']['input'];
-  /** The name of the account. */
+  /** The name of the account. If empty, a synchronized account shows its bank's name again. */
   name: Scalars['String']['input'];
 };
 
@@ -797,12 +861,12 @@ export type UpdateBankingInstitutionPayload = {
 
 /** Payload required to update a transaction through the API. */
 export type UpdateTransactionInput = {
-  /** The category this transaction belongs to. */
-  category: Scalars['String']['input'];
+  /** The category this transaction belongs to, empty or omitted to remove it. */
+  category?: InputMaybe<Scalars['String']['input']>;
   /** The id of the transaction to update. */
   id: Scalars['UUID']['input'];
-  /** User created notes for this transaction. */
-  notes: Scalars['String']['input'];
+  /** User created notes for this transaction, empty or omitted to remove them. */
+  notes?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateTransactionPayload = {
@@ -848,7 +912,7 @@ export type BankAccountSummaryFragment = { __typename: 'BankAccount', id: unknow
 
 export type SyncStatusFieldsFragment = { __typename: 'SyncStatus', state: SyncState, lastSuccessfulSync: Date | null, lastError: string | null, nextRetry: Date | null };
 
-export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string };
+export type TransactionFragment = { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, description: string | null, currency: string, status: TransactionStatus };
 
 export type CreateAuthenticationRequestMutationVariables = Exact<{
   institutionId: Scalars['UUID']['input'];
@@ -915,7 +979,7 @@ export type GetBankingInstitutionsQuery = { bankingInstitutions: { __typename: '
 export type GetNetWorthHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNetWorthHistoryQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, balance: number | null, currency: string | null, syncStatus: { __typename: 'SyncStatus', state: SyncState }, transactions: Array<{ __typename: 'Transaction', valueDate: Date | null, amount: number }> }> | null } | null };
+export type GetNetWorthHistoryQuery = { bankAccounts: { __typename: 'BankAccountsConnection', nodes: Array<{ __typename: 'BankAccount', id: unknown | null, balance: number | null, currency: string | null, syncStatus: { __typename: 'SyncStatus', state: SyncState }, transactions: Array<{ __typename: 'Transaction', valueDate: Date | null, amount: number, status: TransactionStatus }> }> | null } | null };
 
 export type GetTransactionsByAccountIdQueryVariables = Exact<{
   accountId: Scalars['UUID']['input'];
@@ -926,7 +990,7 @@ export type GetTransactionsByAccountIdQueryVariables = Exact<{
 }>;
 
 
-export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, currency: string } }> | null } | null };
+export type GetTransactionsByAccountIdQuery = { transactionsByAccountId: { __typename: 'TransactionsByAccountIdConnection', pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, startCursor: string | null, endCursor: string | null }, edges: Array<{ __typename: 'TransactionsByAccountIdEdge', node: { __typename: 'Transaction', id: unknown | null, valueDate: Date | null, amount: number, payer: string | null, payee: string | null, description: string | null, currency: string, status: TransactionStatus } }> | null } | null };
 
 export type DataSynchronizedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
