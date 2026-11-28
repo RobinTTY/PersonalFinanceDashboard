@@ -22,6 +22,11 @@ public class BankAccount : Account
     public string? Bban { get; set; }
 
     /// <summary>
+    /// The masked number of the card of a card account, e.g. "123456XXXXXX1234".
+    /// </summary>
+    public string? MaskedPan { get; set; }
+
+    /// <summary>
     /// Name of the legal account owner. If there is more than one owner, then two names might be noted here.
     /// </summary>
     public string? OwnerName { get; set; }
@@ -93,16 +98,18 @@ public class BankAccount : Account
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     /// <param name="providerName">The name the data provider gives the account.</param>
     /// <param name="providerDescription">The description the data provider gives the account.</param>
+    /// <param name="maskedPan">The masked number of the card of a card account.</param>
     public BankAccount(DataSource source, string? externalId, string? name = null, string? description = null,
         decimal? balance = null, string? currency = null, string? iban = null, string? bic = null, string? bban = null,
         string? ownerName = null, string? accountType = null,
         List<AuthenticationRequest>? associatedAuthenticationRequests = null, string? providerName = null,
-        string? providerDescription = null)
+        string? providerDescription = null, string? maskedPan = null)
         : base(source, externalId, name, description, balance, currency)
     {
         Iban = iban;
         Bic = bic;
         Bban = bban;
+        MaskedPan = maskedPan;
         OwnerName = ownerName;
         AccountType = accountType;
         ProviderName = providerName;
@@ -132,16 +139,18 @@ public class BankAccount : Account
     /// <param name="associatedAuthenticationRequests">Authentication requests made for this bank account.</param>
     /// <param name="providerName">The name the data provider gives the account.</param>
     /// <param name="providerDescription">The description the data provider gives the account.</param>
+    /// <param name="maskedPan">The masked number of the card of a card account.</param>
     public BankAccount(DataSource source, string? externalId, string? name, string? description, decimal? balance,
         string? currency, List<Transaction> transactions,
         string? iban, string? bic, string? bban, string? ownerName, string? accountType,
         BankingInstitution? associatedInstitution, List<AuthenticationRequest> associatedAuthenticationRequests,
-        string? providerName = null, string? providerDescription = null)
+        string? providerName = null, string? providerDescription = null, string? maskedPan = null)
         : base(source, externalId, name, description, balance, currency, transactions)
     {
         Iban = iban;
         Bic = bic;
         Bban = bban;
+        MaskedPan = maskedPan;
         OwnerName = ownerName;
         AccountType = accountType;
         ProviderName = providerName;
@@ -160,7 +169,7 @@ public class BankAccount : Account
         return new BankAccount(bankAccount.Source, bankAccount.ExternalId, bankAccount.Name, bankAccount.Description,
             bankAccount.Balance, bankAccount.Currency, bankAccount.Iban, bankAccount.Bic, bankAccount.Bban,
             bankAccount.OwnerName, bankAccount.AccountType, providerName: bankAccount.ProviderName,
-            providerDescription: bankAccount.ProviderDescription);
+            providerDescription: bankAccount.ProviderDescription, maskedPan: bankAccount.MaskedPan);
     }
 
     /// <summary>
@@ -181,6 +190,8 @@ public class BankAccount : Account
             Bic = updatedAccount.Bic;
         if (updatedAccount.Bban != null)
             Bban = updatedAccount.Bban;
+        if (updatedAccount.MaskedPan != null)
+            MaskedPan = updatedAccount.MaskedPan;
         if (updatedAccount.Balance != null)
             Balance = updatedAccount.Balance;
         if (updatedAccount.Currency != null)

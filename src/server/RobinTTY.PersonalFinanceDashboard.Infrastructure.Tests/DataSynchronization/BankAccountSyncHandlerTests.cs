@@ -10,6 +10,8 @@ public sealed class BankAccountSyncHandlerTests : IDisposable
 {
     private static readonly Guid AccountId = Guid.Parse("a1000000-0000-0000-0000-000000000001");
     private static readonly Guid OtherAccountId = Guid.Parse("a2000000-0000-0000-0000-000000000002");
+    private static readonly Guid ThirdAccountId = Guid.Parse("a3000000-0000-0000-0000-000000000003");
+    private const string MaskedPan = "123456XXXXXX1234";
     private const string InstitutionId = "TESTBANK_TESTDEFF";
 
     private readonly SyncTestEnvironment _env = new();
@@ -166,6 +168,77 @@ public sealed class BankAccountSyncHandlerTests : IDisposable
             await dbContext.BankAccounts.Select(a => a.ExternalId).OrderBy(id => id).ToListAsync());
     }
 
+    [Theory]
+    [InlineData("1234567890", null)]
+    [InlineData(null, MaskedPan)]
+    public async Task ReconnectedAccountWithoutIban_TakesThePlaceOfTheExpiredOneWithTheSameBbanOrCard(
+        string? bban, string? maskedPan)
+    {
+        var institution = TestData.Institution(InstitutionId);
+        var expired = ExpiredAccount(OtherAccountId, institution, bban, maskedPan);
+        await _env.Seed(institution, TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-100), expired),
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), TestData.Account(AccountId, currency: null)));
+        RespondWithAccount(AccountId, iban: null, bban, maskedPan);
+
+        Assert.True(await _env.SyncBankAccounts());
+
+        await using var dbContext = _env.CreateDbContext();
+        var account = await dbContext.BankAccounts.SingleAsync();
+        Assert.Equal(expired.Id, account.Id);
+        Assert.Equal(AccountId.ToString(), account.ExternalId);
+    }
+
+    [Fact]
+    public async Task CardWithTheSameMaskedNumberAtAnotherInstitution_IsNotTakenOver()
+    {
+        var otherInstitution = TestData.Institution("OTHERBANK_OTHERDEFF");
+        await _env.Seed(otherInstitution,
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-100),
+                ExpiredAccount(OtherAccountId, otherInstitution, maskedPan: MaskedPan)),
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), TestData.Account(AccountId, currency: null)));
+        RespondWithAccount(AccountId, iban: null, maskedPan: MaskedPan);
+
+        Assert.True(await _env.SyncBankAccounts());
+
+        await using var dbContext = _env.CreateDbContext();
+        Assert.Equal(2, await dbContext.BankAccounts.CountAsync());
+    }
+
+    [Fact]
+    public async Task TwoExpiredCardsWithTheSameMaskedNumber_AreNotTakenOver()
+    {
+        // It's unclear which one the new connection replaces
+        var institution = TestData.Institution(InstitutionId);
+        await _env.Seed(institution,
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-100),
+                ExpiredAccount(OtherAccountId, institution, maskedPan: MaskedPan),
+                ExpiredAccount(ThirdAccountId, institution, maskedPan: MaskedPan)),
+            TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), TestData.Account(AccountId, currency: null)));
+        RespondWithAccount(AccountId, iban: null, maskedPan: MaskedPan);
+
+        Assert.True(await _env.SyncBankAccounts());
+
+        await using var dbContext = _env.CreateDbContext();
+        Assert.Equal(3, await dbContext.BankAccounts.CountAsync());
+    }
+
+    [Fact]
+    public async Task AccountWithoutIdentifiers_GetsItsDetailsUntilOneIsKnown()
+    {
+        // E.g. a card account synced before masked card numbers were stored
+        var account = TestData.Account(AccountId);
+        account.Iban = null;
+        await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), account));
+        RespondWithAccount(AccountId, iban: null, maskedPan: MaskedPan);
+
+        await _env.SyncBankAccounts();
+        await _env.SyncBankAccounts(force: true);
+
+        Assert.Equal(MaskedPan, (await GetAccount()).MaskedPan);
+        Assert.Equal(1, _env.GoCardless.RequestCount(DetailsPath(AccountId)));
+        Assert.Equal(2, _env.GoCardless.RequestCount(BalancesPath(AccountId)));
+    }
+
     [Fact]
     public async Task ManualAccount_IsNotFetched()
     {
@@ -177,11 +250,24 @@ public sealed class BankAccountSyncHandlerTests : IDisposable
         Assert.Equal(0, _env.GoCardless.TotalRequestCount);
     }
 
-    private void RespondWithAccount(Guid accountId)
+    private void RespondWithAccount(Guid accountId, string? iban = "DE00123456789", string? bban = null,
+        string? maskedPan = null)
     {
         _env.GoCardless.Respond(BalancesPath(accountId), Balances(50m));
         _env.GoCardless.Respond(AccountPath(accountId), Account(accountId, InstitutionId));
-        _env.GoCardless.Respond(DetailsPath(accountId), Details(accountId, "EUR", "Giro account"));
+        _env.GoCardless.Respond(DetailsPath(accountId),
+            Details(accountId, "EUR", "Giro account", iban, bban, maskedPan));
+    }
+
+    private static BankAccount ExpiredAccount(Guid externalId, BankingInstitution institution, string? bban = null,
+        string? maskedPan = null)
+    {
+        var account = TestData.Account(externalId);
+        account.Iban = null;
+        account.Bban = bban;
+        account.MaskedPan = maskedPan;
+        account.AssociatedInstitution = institution;
+        return account;
     }
 
     private async Task<Guid> GetAccountId(Guid accountExternalId)

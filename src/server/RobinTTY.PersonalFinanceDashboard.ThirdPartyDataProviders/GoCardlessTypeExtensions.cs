@@ -140,7 +140,8 @@ public static class GoCardlessTypeExtensions
                     ExternalId = generalAccountInfo.InstitutionId
                 }
                 : null,
-            associatedAuthenticationRequests: []);
+            associatedAuthenticationRequests: [],
+            maskedPan: accountDetails?.MaskedPan);
     }
 
     // Booked balances come first, since the net worth history subtracts booked transactions from the balance.

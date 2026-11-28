@@ -79,6 +79,7 @@ export type BankAccount = {
   iban: Maybe<Scalars['String']['output']>;
   id: Maybe<Scalars['UUID']['output']>;
   includeInAnalytics: Scalars['Boolean']['output'];
+  maskedPan: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
   ownerName: Maybe<Scalars['String']['output']>;
   providerDescription: Maybe<Scalars['String']['output']>;
@@ -103,6 +104,7 @@ export type BankAccountFilterInput = {
   iban?: InputMaybe<StringOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
   includeInAnalytics?: InputMaybe<BooleanOperationFilterInput>;
+  maskedPan?: InputMaybe<StringOperationFilterInput>;
   name?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<BankAccountFilterInput>>;
   ownerName?: InputMaybe<StringOperationFilterInput>;

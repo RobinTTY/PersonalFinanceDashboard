@@ -117,7 +117,7 @@ public class BankAccountSyncHandler(
 
     /// <summary>
     /// After a bank is reconnected, the provider assigns its accounts new ids. Each fetched account takes the place
-    /// of an earlier account with the same IBAN that is no longer synchronized, so that account keeps its id,
+    /// of the earlier account it replaces (see <see cref="FindPredecessor"/>), so that account keeps its id,
     /// transactions and settings. The placeholder created for the new id is removed.
     /// </summary>
     /// <param name="source">The data source the accounts were retrieved from.</param>
@@ -126,17 +126,9 @@ public class BankAccountSyncHandler(
     private async Task TakeOverPredecessors(DataSource source, List<BankAccount> fetchedBankAccounts,
         CancellationToken cancellationToken)
     {
-        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
-        foreach (var fetched in fetchedBankAccounts.Where(account => account.Iban != null))
+        foreach (var fetched in fetchedBankAccounts)
         {
-            var candidates = await dbContext.BankAccounts
-                .Include(account => account.AssociatedAuthenticationRequests)
-                .Where(account => account.Source == source && account.Iban == fetched.Iban &&
-                                  account.ExternalId != fetched.ExternalId)
-                .ToListAsync(cancellationToken);
-            // Accounts that are still synchronized through another connection aren't replaced
-            var predecessor = candidates.FirstOrDefault(account =>
-                !account.AssociatedAuthenticationRequests.Any(request => request.IsActive(utcNow)));
+            var predecessor = await FindPredecessor(source, fetched, cancellationToken);
             if (predecessor == null)
                 continue;
 
@@ -175,8 +167,44 @@ public class BankAccountSyncHandler(
     }
 
     /// <summary>
+    /// Finds the earlier account a fetched account replaces: one that is no longer synchronized and has the same
+    /// IBAN or, at the same institution, the same BBAN or masked card number. These are less distinctive than an
+    /// IBAN, so they only match if exactly one earlier account has them.
+    /// </summary>
+    /// <param name="source">The data source the account was retrieved from.</param>
+    /// <param name="fetched">The account retrieved from the data source.</param>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>The earlier account, or <see langword="null"/> if there is none.</returns>
+    private async Task<BankAccount?> FindPredecessor(DataSource source, BankAccount fetched,
+        CancellationToken cancellationToken)
+    {
+        var institutionId = fetched.AssociatedInstitution?.ExternalId;
+        var candidates = dbContext.BankAccounts
+            .Include(account => account.AssociatedAuthenticationRequests)
+            .Where(account => account.Source == source && account.ExternalId != fetched.ExternalId);
+        if (fetched.Iban != null)
+            candidates = candidates.Where(account => account.Iban == fetched.Iban);
+        else if (institutionId != null && fetched.Bban != null)
+            candidates = candidates.Where(account =>
+                account.AssociatedInstitution!.ExternalId == institutionId && account.Bban == fetched.Bban);
+        else if (institutionId != null && fetched.MaskedPan != null)
+            candidates = candidates.Where(account =>
+                account.AssociatedInstitution!.ExternalId == institutionId && account.MaskedPan == fetched.MaskedPan);
+        else
+            return null;
+
+        // Accounts that are still synchronized through another connection aren't replaced
+        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
+        var predecessors = (await candidates.ToListAsync(cancellationToken))
+            .Where(account => !account.AssociatedAuthenticationRequests.Any(request => request.IsActive(utcNow)))
+            .ToList();
+        return fetched.Iban != null || predecessors.Count == 1 ? predecessors.FirstOrDefault() : null;
+    }
+
+    /// <summary>
     /// Identifies the given bank accounts whose data is stale or must be synchronized because a force synchronization is required.
-    /// Currency information is used as an indicator of whether metadata needs to be fetched for the account, as this information requires additional API calls to be retrieved but doesn't usually change.
+    /// The metadata of an account requires additional API calls and doesn't usually change, so it's only fetched while
+    /// the currency is unknown, or no identifier is known that recognizes the account after a reconnect.
     /// </summary>
     /// <param name="source">The data source the accounts originate from.</param>
     /// <param name="bankAccounts">The bank accounts to evaluate for staleness.</param>
@@ -194,7 +222,8 @@ public class BankAccountSyncHandler(
                 ThirdPartyDataType.BankAccounts, bankAccount.Id, cancellationToken);
             if (retrievalIsDue || forceSync)
             {
-                accountsToFetch.Add(bankAccount.ExternalId!, bankAccount.Currency == null);
+                accountsToFetch.Add(bankAccount.ExternalId!,
+                    bankAccount is { Currency: null } or { Iban: null, Bban: null, MaskedPan: null });
             }
             else
             {

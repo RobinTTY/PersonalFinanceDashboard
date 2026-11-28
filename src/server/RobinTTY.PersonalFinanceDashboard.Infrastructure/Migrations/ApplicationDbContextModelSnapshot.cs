@@ -111,6 +111,9 @@ namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Migrations
                     b.Property<bool>("IncludeInAnalytics")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("MaskedPan")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
