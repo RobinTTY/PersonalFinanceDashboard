@@ -19,16 +19,6 @@ public class TransactionSyncHandler(
 {
     private sealed record SyncedAccount(Guid Id, DataSource Source, string ExternalId);
 
-    /// <summary>
-    /// Identifies a transaction across connections, whose external ids differ.
-    /// </summary>
-    private readonly record struct ContentKey(string? BankTransactionId, decimal Amount, string? Payer, string? Payee)
-    {
-        public static ContentKey Of(Transaction transaction) => string.IsNullOrEmpty(transaction.BankTransactionId)
-            ? new ContentKey(null, transaction.Amount, transaction.Payer, transaction.Payee)
-            : new ContentKey(transaction.BankTransactionId, 0, null, null);
-    }
-
     /// <inheritdoc />
     public async Task<bool> SynchronizeData(bool forceThirdPartySync = false,
         CancellationToken cancellationToken = default)
@@ -60,9 +50,7 @@ public class TransactionSyncHandler(
                 continue;
             }
 
-            var retrieveFrom = await dataRetrievalMetadataService.GetRetrieveFrom(provider.Source,
-                ThirdPartyDataType.Transactions, account.Id, cancellationToken);
-            var response = await provider.GetTransactions(account.ExternalId, retrieveFrom, cancellationToken);
+            var response = await provider.GetTransactions(account.ExternalId, cancellationToken);
             if (!response.IsSuccessful)
             {
                 var nextRetryTime = await dataRetrievalMetadataService.RecordFailedRetrieval(provider.Source,
@@ -74,9 +62,7 @@ public class TransactionSyncHandler(
             }
 
             await RemoveOutdatedPendingTransactions(account.Id, response.Result, cancellationToken);
-            transactions.AddRange(retrieveFrom.HasValue
-                ? await RemoveAlreadyRetrieved(account.Id, retrieveFrom.Value, response.Result, cancellationToken)
-                : response.Result);
+            transactions.AddRange(response.Result);
             syncedAccountIds.Add(account.Id);
         }
 
@@ -137,52 +123,6 @@ public class TransactionSyncHandler(
         if (removed > 0)
             logger.LogDebug("Removed {Count} outdated pending transactions of account with id {AccountId}", removed,
                 accountId);
-    }
-
-    /// <summary>
-    /// Removes the transactions of a reconnected account that were already retrieved through the earlier
-    /// connection, under different ids. Only transactions from the day the account was taken over are retrieved
-    /// again, so the booked ones on that day are matched by their content.
-    /// </summary>
-    /// <param name="accountId">The id of the account.</param>
-    /// <param name="retrieveFrom">The day from which the account's transactions are retrieved.</param>
-    /// <param name="fetchedTransactions">The transactions retrieved from the data source.</param>
-    /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>The transactions that weren't retrieved before.</returns>
-    private async Task<List<Transaction>> RemoveAlreadyRetrieved(Guid accountId, DateTime retrieveFrom,
-        IReadOnlyList<Transaction> fetchedTransactions, CancellationToken cancellationToken)
-    {
-        var fetchedIds = fetchedTransactions.Select(transaction => transaction.ExternalId!).ToList();
-        var earlierTransactions = await dbContext.Transactions
-            .Where(transaction => transaction.BankAccount!.Id == accountId &&
-                                  transaction.Status == TransactionStatus.Booked &&
-                                  transaction.ValueDate >= retrieveFrom &&
-                                  transaction.ValueDate < retrieveFrom.AddDays(1) &&
-                                  !fetchedIds.Contains(transaction.ExternalId!))
-            .ToListAsync(cancellationToken);
-        // Counted, so a transaction that occurs twice on that day is only removed as often as it was retrieved
-        var remaining = earlierTransactions.GroupBy(ContentKey.Of)
-            .ToDictionary(group => group.Key, group => group.Count());
-
-        var newTransactions = new List<Transaction>();
-        foreach (var transaction in fetchedTransactions)
-        {
-            var valueDate = transaction.ValueDate?.Date;
-            if (valueDate < retrieveFrom)
-                continue;
-
-            var key = ContentKey.Of(transaction);
-            if (transaction.Status == TransactionStatus.Booked && valueDate == retrieveFrom &&
-                remaining.TryGetValue(key, out var count) && count > 0)
-            {
-                remaining[key] = count - 1;
-                continue;
-            }
-
-            newTransactions.Add(transaction);
-        }
-
-        return newTransactions;
     }
 
     private async Task AddOrUpdateTransactions(DataSource source, List<Transaction> updatedTransactions,

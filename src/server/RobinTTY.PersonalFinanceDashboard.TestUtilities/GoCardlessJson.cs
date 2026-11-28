@@ -95,26 +95,19 @@ public static class GoCardlessJson
             ["owner_name"] = "Owner"
         });
 
-    public static string Details(Guid accountId, string currency, string product, string? iban = "DE00123456789",
-        string? bban = null, string? maskedPan = null)
-    {
-        var account = new Dictionary<string, object>
+    public static string Details(Guid accountId, string currency, string product) =>
+        JsonSerializer.Serialize(new
         {
-            ["resourceId"] = accountId.ToString(),
-            ["currency"] = currency,
-            ["ownerName"] = "Owner",
-            ["product"] = product,
-            ["cashAccountType"] = "CACC"
-        };
-        if (iban != null)
-            account["iban"] = iban;
-        if (bban != null)
-            account["bban"] = bban;
-        if (maskedPan != null)
-            account["maskedPan"] = maskedPan;
-
-        return JsonSerializer.Serialize(new { account });
-    }
+            account = new
+            {
+                resourceId = accountId.ToString(),
+                iban = "DE00123456789",
+                currency,
+                ownerName = "Owner",
+                product,
+                cashAccountType = "CACC"
+            }
+        });
 
     public static string Balances(decimal amount) =>
         JsonSerializer.Serialize(new

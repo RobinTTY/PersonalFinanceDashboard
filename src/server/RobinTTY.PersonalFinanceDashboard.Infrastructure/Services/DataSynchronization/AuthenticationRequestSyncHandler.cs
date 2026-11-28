@@ -179,8 +179,7 @@ public class AuthenticationRequestSyncHandler(
         {
             if (!trackedAccounts.TryGetValue(account.ExternalId!, out var trackedAccount))
             {
-                // Accounts of inactive requests can't be synchronized. After a reconnect, their old ids would
-                // otherwise come back as empty accounts next to the ones that took their place.
+                // Accounts of inactive requests can't be synchronized
                 if (!updatedAuthenticationRequest.IsActive(timeProvider.GetUtcNow().UtcDateTime))
                     continue;
 

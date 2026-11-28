@@ -34,13 +34,6 @@ public class ThirdPartyDataRetrievalMetadata : DatabaseEntity
     public string? LastError { get; set; }
 
     /// <summary>
-    /// The date from which the data is retrieved, <see langword="null"/> to retrieve all the data source provides.
-    /// Set for the transactions of an account that was taken over from an earlier connection to its bank, whose
-    /// transactions were already retrieved under different ids.
-    /// </summary>
-    public DateTime? RetrieveFrom { get; set; }
-
-    /// <summary>
     /// The earliest time a failed retrieval is retried. Takes precedence over the configured retrieval interval
     /// while set, and is reset by a successful retrieval.
     /// </summary>

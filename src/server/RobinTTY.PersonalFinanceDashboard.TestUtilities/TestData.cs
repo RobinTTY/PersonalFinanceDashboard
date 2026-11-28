@@ -16,7 +16,7 @@ public static class TestData
 
     public static BankAccount Account(Guid externalId, string? currency = "EUR", decimal? balance = null) =>
         new(DataSource.GoCardless, externalId.ToExternalId(), currency: currency, balance: balance,
-            iban: $"DE{externalId:N}", providerName: "Account");
+            providerName: "Account");
 
     public static BankAccount ManualAccount() => new(DataSource.Manual, null, name: "Cash", currency: "EUR");
 

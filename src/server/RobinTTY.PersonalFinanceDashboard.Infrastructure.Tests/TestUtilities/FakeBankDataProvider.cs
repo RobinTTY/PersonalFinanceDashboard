@@ -90,7 +90,7 @@ internal sealed class FakeBankDataProvider : IBankDataProvider
     }
 
     public Task<ThirdPartyResponse<IReadOnlyList<Transaction>>> GetTransactions(string accountId,
-        DateTime? dateFrom = null, CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default) =>
         Call<IReadOnlyList<Transaction>>(nameof(GetTransactions), accountId);
 
     private Task<ThirdPartyResponse<TResult>> Call<TResult>(string method, string? id = null)

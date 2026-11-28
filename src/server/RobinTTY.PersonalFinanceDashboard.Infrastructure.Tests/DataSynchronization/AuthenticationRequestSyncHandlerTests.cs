@@ -63,7 +63,7 @@ public sealed class AuthenticationRequestSyncHandlerTests : IDisposable
     [Fact]
     public async Task AccountsOfExpiredRequests_AreNotAdded()
     {
-        // E.g. the old ids of accounts that were taken over by a reconnect
+        // They can't be synchronized
         _env.GoCardless.Respond(RequisitionsPath,
             Requisitions(Requisition(RequestId, "EX", _env.UtcNow.AddDays(-100), AccountId)));
 

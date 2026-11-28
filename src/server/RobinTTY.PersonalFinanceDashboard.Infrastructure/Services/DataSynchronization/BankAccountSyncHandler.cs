@@ -101,7 +101,6 @@ public class BankAccountSyncHandler(
                 accountId, provider.Source, nextRetryTime, response.Error.Summary, response.Error.Detail);
         }
 
-        await TakeOverPredecessors(provider.Source, fetchedBankAccounts, cancellationToken);
         var updatedBankAccounts =
             await AddOrUpdateBankAccounts(provider.Source, fetchedBankAccounts, cancellationToken);
         foreach (var bankAccount in updatedBankAccounts)
@@ -116,95 +115,9 @@ public class BankAccountSyncHandler(
     }
 
     /// <summary>
-    /// After a bank is reconnected, the provider assigns its accounts new ids. Each fetched account takes the place
-    /// of the earlier account it replaces (see <see cref="FindPredecessor"/>), so that account keeps its id,
-    /// transactions and settings. The placeholder created for the new id is removed.
-    /// </summary>
-    /// <param name="source">The data source the accounts were retrieved from.</param>
-    /// <param name="fetchedBankAccounts">The accounts retrieved from the data source.</param>
-    /// <param name="cancellationToken">A token to signal cancellation.</param>
-    private async Task TakeOverPredecessors(DataSource source, List<BankAccount> fetchedBankAccounts,
-        CancellationToken cancellationToken)
-    {
-        foreach (var fetched in fetchedBankAccounts)
-        {
-            var predecessor = await FindPredecessor(source, fetched, cancellationToken);
-            if (predecessor == null)
-                continue;
-
-            var placeholder = await dbContext.BankAccounts
-                .Include(account => account.AssociatedAuthenticationRequests)
-                .SingleOrDefaultAsync(account => account.Source == source && account.ExternalId == fetched.ExternalId,
-                    cancellationToken);
-            if (placeholder != null)
-            {
-                foreach (var request in placeholder.AssociatedAuthenticationRequests
-                             .Where(request => !predecessor.AssociatedAuthenticationRequests.Contains(request)))
-                    predecessor.AssociatedAuthenticationRequests.Add(request);
-
-                await dataRetrievalMetadataService.RemoveMetadata(source, placeholder.Id!.Value, cancellationToken);
-                dbContext.BankAccounts.Remove(placeholder);
-                // Frees the external id before the predecessor takes it
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-
-            // Transactions the earlier connection retrieved have different ids, so they aren't retrieved again
-            var lastTransactionDate = await dbContext.Transactions
-                .Where(transaction => transaction.BankAccount!.Id == predecessor.Id)
-                .MaxAsync(transaction => transaction.ValueDate, cancellationToken);
-            predecessor.ExternalId = fetched.ExternalId;
-            await dbContext.SaveChangesAsync(cancellationToken);
-            // Earlier retrieval failures and expiries don't apply to the new connection
-            await dataRetrievalMetadataService.RemoveMetadata(source, predecessor.Id!.Value, cancellationToken);
-            if (lastTransactionDate != null)
-                await dataRetrievalMetadataService.SetRetrieveFrom(source, ThirdPartyDataType.Transactions,
-                    predecessor.Id!.Value, lastTransactionDate.Value.Date, cancellationToken);
-
-            logger.LogInformation(
-                "Bank account with id {BankAccountId} was reconnected and now has the external id {ExternalId}.",
-                predecessor.Id, predecessor.ExternalId);
-        }
-    }
-
-    /// <summary>
-    /// Finds the earlier account a fetched account replaces: one that is no longer synchronized and has the same
-    /// IBAN or, at the same institution, the same BBAN or masked card number. These are less distinctive than an
-    /// IBAN, so they only match if exactly one earlier account has them.
-    /// </summary>
-    /// <param name="source">The data source the account was retrieved from.</param>
-    /// <param name="fetched">The account retrieved from the data source.</param>
-    /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>The earlier account, or <see langword="null"/> if there is none.</returns>
-    private async Task<BankAccount?> FindPredecessor(DataSource source, BankAccount fetched,
-        CancellationToken cancellationToken)
-    {
-        var institutionId = fetched.AssociatedInstitution?.ExternalId;
-        var candidates = dbContext.BankAccounts
-            .Include(account => account.AssociatedAuthenticationRequests)
-            .Where(account => account.Source == source && account.ExternalId != fetched.ExternalId);
-        if (fetched.Iban != null)
-            candidates = candidates.Where(account => account.Iban == fetched.Iban);
-        else if (institutionId != null && fetched.Bban != null)
-            candidates = candidates.Where(account =>
-                account.AssociatedInstitution!.ExternalId == institutionId && account.Bban == fetched.Bban);
-        else if (institutionId != null && fetched.MaskedPan != null)
-            candidates = candidates.Where(account =>
-                account.AssociatedInstitution!.ExternalId == institutionId && account.MaskedPan == fetched.MaskedPan);
-        else
-            return null;
-
-        // Accounts that are still synchronized through another connection aren't replaced
-        var utcNow = timeProvider.GetUtcNow().UtcDateTime;
-        var predecessors = (await candidates.ToListAsync(cancellationToken))
-            .Where(account => !account.AssociatedAuthenticationRequests.Any(request => request.IsActive(utcNow)))
-            .ToList();
-        return fetched.Iban != null || predecessors.Count == 1 ? predecessors.FirstOrDefault() : null;
-    }
-
-    /// <summary>
     /// Identifies the given bank accounts whose data is stale or must be synchronized because a force synchronization is required.
     /// The metadata of an account requires additional API calls and doesn't usually change, so it's only fetched while
-    /// the currency is unknown, or no identifier is known that recognizes the account after a reconnect.
+    /// the currency is unknown.
     /// </summary>
     /// <param name="source">The data source the accounts originate from.</param>
     /// <param name="bankAccounts">The bank accounts to evaluate for staleness.</param>
@@ -222,8 +135,7 @@ public class BankAccountSyncHandler(
                 ThirdPartyDataType.BankAccounts, bankAccount.Id, cancellationToken);
             if (retrievalIsDue || forceSync)
             {
-                accountsToFetch.Add(bankAccount.ExternalId!,
-                    bankAccount is { Currency: null } or { Iban: null, Bban: null, MaskedPan: null });
+                accountsToFetch.Add(bankAccount.ExternalId!, bankAccount.Currency == null);
             }
             else
             {

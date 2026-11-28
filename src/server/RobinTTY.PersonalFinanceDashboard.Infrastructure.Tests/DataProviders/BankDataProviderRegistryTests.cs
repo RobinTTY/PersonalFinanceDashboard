@@ -65,7 +65,7 @@ public class BankDataProviderRegistryTests
             throw new NotSupportedException();
 
         public Task<ThirdPartyResponse<IReadOnlyList<Transaction>>> GetTransactions(string accountId,
-            DateTime? dateFrom = null, CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
     }
 }

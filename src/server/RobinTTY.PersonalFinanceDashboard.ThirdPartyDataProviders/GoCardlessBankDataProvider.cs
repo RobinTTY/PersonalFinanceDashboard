@@ -203,14 +203,13 @@ public class GoCardlessBankDataProvider(NordigenClient client, ILogger<GoCardles
 
     /// <inheritdoc />
     public async Task<ThirdPartyResponse<IReadOnlyList<Transaction>>> GetTransactions(string accountId,
-        DateTime? dateFrom = null, CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
     {
         if (!Guid.TryParse(accountId, out var goCardlessAccountId))
             return ThirdPartyResponse<IReadOnlyList<Transaction>>.Failure(InvalidId(accountId));
 
         var response =
-            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId,
-                dateFrom is { } from ? DateOnly.FromDateTime(from) : null, cancellationToken: cancellationToken);
+            await client.AccountsEndpoint.GetTransactions(goCardlessAccountId, cancellationToken: cancellationToken);
 
         return response.ToThirdPartyResponse(IReadOnlyList<Transaction> (result) =>
             result.ToTransactions(goCardlessAccountId));

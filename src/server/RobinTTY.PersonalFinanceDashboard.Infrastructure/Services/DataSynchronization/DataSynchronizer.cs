@@ -56,7 +56,7 @@ public class DataSynchronizer(
             request.AssociatedAccounts.Count == 0)
             return true;
 
-        // Accounts of a reconnected bank thereby take the place of the earlier ones before they are returned
+        // So the accounts have their details and balances before the request is returned
         foreach (var accountId in request.AssociatedAccounts.Select(account => account.Id!.Value).ToList())
             await bankAccountSyncHandler.SynchronizeData(accountId, cancellationToken: cancellationToken);
 

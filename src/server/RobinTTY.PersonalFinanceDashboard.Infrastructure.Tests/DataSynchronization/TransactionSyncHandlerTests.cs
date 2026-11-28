@@ -269,32 +269,6 @@ public sealed class TransactionSyncHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task ReconnectedAccount_SkipsTransactionsTheEarlierConnectionRetrieved()
-    {
-        // The earlier connection retrieved the transaction under another id, the bank's id stays the same
-        var account = TestData.Account(AccountId);
-        var earlier = TestData.Transaction(Guid.NewGuid(), account, -10m);
-        earlier.BankTransactionId = $"bank-{TransactionId}";
-        await _env.Seed(TestData.Request(Guid.NewGuid(), _env.UtcNow.AddDays(-1), account), earlier);
-        await _env.Seed(new ThirdPartyDataRetrievalMetadata
-        {
-            DataType = ThirdPartyDataType.Transactions,
-            DataSource = DataSource.GoCardless,
-            SynchronizationEntityId = account.Id,
-            LastRetrievalTime = DateTime.MinValue,
-            RetrieveFrom = new DateTime(2026, 11, 10)
-        });
-        _env.Provider.RespondTransactions(AccountId, (TransactionId, -10m), (OtherTransactionId, 25m));
-
-        await _env.SyncTransactions();
-        await _env.SyncTransactions(force: true);
-
-        var transactions = await GetTransactions(AccountId);
-        Assert.Equal(new[] { earlier.ExternalId, OtherTransactionId.ToString() }.Order(),
-            transactions.Select(t => t.ExternalId).Order());
-    }
-
-    [Fact]
     public async Task ManualAccount_IsNotSynced()
     {
         var account = TestData.ManualAccount();
