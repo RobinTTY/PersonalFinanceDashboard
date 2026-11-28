@@ -1,34 +1,34 @@
-# Mantine Vite template
+# Client
 
-## Features
+The dashboard's web client, built with [React](https://react.dev/), [Mantine](https://mantine.dev/) and
+[Apollo Client](https://www.apollographql.com/docs/react/). See the [root README](../../README.md) for how to set it
+up together with the server.
 
-This template comes with the following features:
+## Configuration
 
-- [PostCSS](https://postcss.org/) with [mantine-postcss-preset](https://mantine.dev/styles/postcss-preset)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Storybook](https://storybook.js.org/)
-- [Vitest](https://vitest.dev/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
+Settings are read from `env-settings/.env`. Override them in `env-settings/.env.local`, which isn't committed:
 
-## npm scripts
+- `VITE_API_URL`: the GraphQL endpoint of the server. A relative URL (e.g. `/graphql`) is resolved against the page.
+- `VITE_ENABLE_API_MOCKING`: `true` serves the responses in `src/mocks` instead of calling the server.
 
-## Build and dev scripts
+## Scripts
 
-- `dev` – start development server
-- `build` – build production version of the app
-- `preview` – locally preview production build
+### Development
 
-### Testing scripts
+- `dev`: starts the development server
+- `build`: type-checks and builds the production version to `dist`
+- `preview`: serves the production build locally
+- `graphql-types-generate`: regenerates the types in `src/graphql/types` from the server's schema, which has to be
+  running at `VITE_API_URL`
 
-- `typecheck` – checks TypeScript types
-- `lint` – runs ESLint
-- `prettier:check` – checks files with Prettier
-- `vitest` – runs vitest tests
-- `vitest:watch` – starts vitest watch
-- `test` – runs `vitest`, `prettier:check`, `lint` and `typecheck` scripts
+### Checks
 
-### Other scripts
+- `test`: runs the tests with [Vitest](https://vitest.dev/), `test:watch` keeps running them on changes
+- `typecheck`: checks the TypeScript types
+- `lint`: runs ESLint (`eslint`) and Stylelint (`stylelint`)
+- `prettier`: checks the formatting, `prettier:write` fixes it
 
-- `storybook` – starts storybook dev server
-- `storybook:build` – build production storybook bundle to `storybook-static`
-- `prettier:write` – formats all files with Prettier
+### Storybook
+
+- `storybook`: starts [Storybook](https://storybook.js.org/) at http://localhost:6006
+- `storybook:build`: builds the stories to `storybook-static`

@@ -1,6 +1,6 @@
 # PersonalFinanceDashboard
 
-PersonalFinanceDashboard is the working title of this project which is intended to be a dashboard to track ones personal finances. The idea is to be able to track bank accounts, credit cards, investments and similar assets through one single application. I plan to include tools for budgeting, analyzing spending habits, and tracking investments.
+PersonalFinanceDashboard is the working title of this project which is intended to be a dashboard to track one's personal finances. The idea is to be able to track bank accounts, credit cards, investments and similar assets through one single application. I plan to include tools for budgeting, analyzing spending habits, and tracking investments.
 
 ## Development Status
 
@@ -12,6 +12,86 @@ I grew a little dissatisfied with the personal finance apps I have used so far. 
 
 ## Progress
 
-Here is a very early impression of the application. Keep in mind that most of what you see is no where near a finished state:
+Here is a very early impression of the application. Keep in mind that most of what you see is nowhere near a finished state:
 
 ![vision](./docs/docusaurus/static/img/vision.png)
+
+## Getting started
+
+The repository contains the server (`src/server`, .NET with a GraphQL API) and the client (`src/client`, React with
+Mantine UI). Bank data is retrieved through [GoCardless Bank Account Data](https://gocardless.com/bank-account-data/).
+
+### Prerequisites
+
+- The [.NET SDK](https://dotnet.microsoft.com/download) in the version set in `global.json` (10.0.404 or a later
+  patch)
+- [Node.js](https://nodejs.org/) in the version set in `src/client/.nvmrc` (24)
+- A GoCardless Bank Account Data account, for the secret ID and key of its API. They're created under "User secrets"
+  in the GoCardless portal.
+- Optionally [Docker](https://www.docker.com/), to collect logs with Seq or to [deploy](./deployment/README.md) the
+  dashboard
+
+### Server
+
+Store the GoCardless keys as user secrets:
+
+```shell
+cd src/server
+dotnet user-secrets set "AppConfiguration:GoCardlessConfiguration:SecretId" "<secret id>" --project RobinTTY.PersonalFinanceDashboard.API
+dotnet user-secrets set "AppConfiguration:GoCardlessConfiguration:SecretKey" "<secret key>" --project RobinTTY.PersonalFinanceDashboard.API
+```
+
+Then restore the .NET tools (Entity Framework and the formatter) and start the API:
+
+```shell
+dotnet tool restore
+dotnet run --project RobinTTY.PersonalFinanceDashboard.API
+```
+
+The GraphQL API runs at http://localhost:5115/graphql, which also serves an IDE for queries when opened in a browser.
+The SQLite database (`PersonalFinanceDashboard.db` next to the API project) is created and migrated on startup.
+
+In development, logs are also sent to Seq at http://localhost:5341. Start it with
+`docker compose -f deployment/docker-compose.yml up -d`, its UI is at http://localhost:8001. While Seq isn't
+running, logs are written to `logs/` in the API project instead.
+
+### Client
+
+```shell
+cd src/client
+npm ci
+npm run dev
+```
+
+The dashboard runs at http://localhost:5173 and talks to the API set as `VITE_API_URL` in
+`src/client/env-settings/.env`.
+
+To run the client without the server, use the mocked API: add `VITE_ENABLE_API_MOCKING=true` to
+`src/client/env-settings/.env.local` and restart `npm run dev`. The responses come from `src/client/src/mocks`.
+
+### GraphQL types
+
+The client's types in `src/client/src/graphql/types` are generated from the API's schema and the client's queries.
+Regenerate them after changing either, with the API running:
+
+```shell
+cd src/client
+npm run graphql-types-generate
+```
+
+### Tests and checks
+
+These are the checks CI runs:
+
+| Part | Command (in `src/server` or `src/client`) |
+| --- | --- |
+| Server tests | `dotnet test --configuration Release` |
+| Server formatting | `dotnet jb cleanupcode RobinTTY.PersonalFinanceDashboard.sln --profile="Built-in: Reformat Code" --no-build` |
+| Missing migrations | `dotnet ef migrations has-pending-model-changes --project RobinTTY.PersonalFinanceDashboard.Infrastructure --startup-project RobinTTY.PersonalFinanceDashboard.API` |
+| Client tests | `npm test` |
+| Client lint and formatting | `npm run lint`, `npm run prettier` |
+| Client types | `npm run typecheck` |
+
+A pre-push hook formats the server code before pushing, like CI checks it. Enable it once with `git config core.hooksPath .githooks`.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the conventions of the code base.

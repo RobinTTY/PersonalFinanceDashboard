@@ -3,8 +3,8 @@ import { Group, Stack, Text } from '@mantine/core';
 import { CountryFlag } from '../CountryFlag/CountryFlag';
 import { ComponentPreview } from '../storybook/ComponentPreview';
 import { SelectionCard } from './SelectionCard';
-import barclaysLogo from './story-resources/barclays-logo.jpg';
-import revolutLogo from './story-resources/revolut-logo.jpg';
+import demoBankLogo from './story-resources/demo-bank-logo.svg';
+import exampleBankLogo from './story-resources/example-bank-logo.svg';
 
 export default { title: 'SelectionCard' };
 
@@ -100,17 +100,17 @@ export function WithLogo() {
     <ComponentPreview canvas={{ center: true, maxWidth: 320 }} withSpacing>
       <Stack gap="xs">
         <SelectionCard
-          id="barclays"
-          optionName="Barclays"
-          logoUri={barclaysLogo}
-          isSelected={selectedId === 'barclays'}
+          id="example-bank"
+          optionName="Example Bank"
+          logoUri={exampleBankLogo}
+          isSelected={selectedId === 'example-bank'}
           onSelect={setSelectedId}
         />
         <SelectionCard
-          id="revolut"
-          optionName="Revolut"
-          logoUri={revolutLogo}
-          isSelected={selectedId === 'revolut'}
+          id="demo-bank"
+          optionName="Demo Bank"
+          logoUri={demoBankLogo}
+          isSelected={selectedId === 'demo-bank'}
           onSelect={setSelectedId}
         />
       </Stack>
