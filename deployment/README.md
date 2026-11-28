@@ -25,8 +25,15 @@ Run the same command again after pulling changes to rebuild and restart the cont
 ## Access
 
 The API has no authentication yet, so the dashboard is only published on `127.0.0.1`. Don't expose it to other
-machines until it has. To reach it from elsewhere later, put a reverse proxy in front of it that terminates TLS,
-since the containers only serve HTTP.
+machines until it has. To reach it from elsewhere later:
+
+- Put a reverse proxy in front of it that terminates TLS. The containers only serve HTTP, and the API neither
+  redirects to HTTPS nor sends HSTS headers, so the proxy should do both.
+- Add the host name to the hosts the API accepts, which are only `localhost`, `127.0.0.1` and `[::1]` by default. Set
+  `AllowedHosts` on the `api` service, separated by semicolons, e.g. `localhost;finance.example.com`. Requests for
+  other hosts are rejected, which also keeps websites from reaching the API through DNS rebinding.
+
+Outside development, the API serves neither its IDE (Nitro) nor its schema, and rejects introspection queries.
 
 ## Health and logs
 

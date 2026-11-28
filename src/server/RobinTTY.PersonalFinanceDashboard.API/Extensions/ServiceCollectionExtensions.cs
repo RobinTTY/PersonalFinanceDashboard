@@ -36,8 +36,10 @@ public static class ServiceCollectionExtensions
         /// <summary>
         /// Registers all necessary HotChocolate (GraphQL) features in the service collection.
         /// </summary>
+        /// <param name="environment">The environment of the application. The schema can only be queried through
+        /// introspection in development.</param>
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
-        public IServiceCollection AddGraphQlServices()
+        public IServiceCollection AddGraphQlServices(IHostEnvironment environment)
         {
             var requestExecutorBuilder = services
                 .AddGraphQLServer()
@@ -53,6 +55,7 @@ public static class ServiceCollectionExtensions
                 // Notifies clients of synchronized data
                 .AddInMemorySubscriptions()
                 .ModifyOptions(options => { options.StripLeadingIFromInterface = true; })
+                .DisableIntrospection(!environment.IsDevelopment())
                 // TODO: Configure cost analyzer at some point (enforces maximum query costs)
                 .ModifyCostOptions(options => { options.EnforceCostLimits = false; });
 

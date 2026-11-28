@@ -48,7 +48,8 @@ dotnet tool restore
 dotnet run --project RobinTTY.PersonalFinanceDashboard.API
 ```
 
-The GraphQL API runs at http://localhost:5115/graphql, which also serves an IDE for queries when opened in a browser.
+The GraphQL API runs at http://localhost:5115/graphql. In development, it also serves an IDE for queries when opened
+in a browser, and allows introspection.
 The SQLite database (`PersonalFinanceDashboard.db` next to the API project) is created and migrated on startup.
 
 In development, logs are also sent to Seq at http://localhost:5341. Start it with

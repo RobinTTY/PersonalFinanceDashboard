@@ -14,7 +14,7 @@ builder.Services
     .AddApplicationServices()
     .AddGoCardless(AppConfiguration.GoCardlessSectionName)
     .AddRepositories()
-    .AddGraphQlServices()
+    .AddGraphQlServices(environment)
     .AddThirdPartyDataSynchronizationServices();
 
 var app = builder.Build();

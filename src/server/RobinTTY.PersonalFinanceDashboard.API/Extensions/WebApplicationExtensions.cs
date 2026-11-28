@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotChocolate.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
 
 namespace RobinTTY.PersonalFinanceDashboard.Api.Extensions;
@@ -14,9 +15,15 @@ public static class WebApplicationExtensions
     /// <param name="app">The <see cref="WebApplication"/> instance to configure.</param>
     public static void UseGraphQl(this WebApplication app)
     {
+        var isDevelopment = app.Environment.IsDevelopment();
+
         // Subscriptions are delivered over WebSockets
         app.UseWebSockets();
-        app.MapGraphQL();
+        app.MapGraphQL().WithOptions(new GraphQLServerOptions
+        {
+            Tool = { Enable = isDevelopment },
+            EnableSchemaRequests = isDevelopment
+        });
     }
 
     /// <summary>
