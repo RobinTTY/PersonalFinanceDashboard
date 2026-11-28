@@ -1,0 +1,720 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+interface Error {
+  message: String!
+}
+
+type AuthenticationRequest {
+  "When the access to the accounts granted by this request expires."
+  accessExpiresAt: DateTime!
+  createdAt: DateTime!
+  accessValidForDays: Int
+  status: AuthenticationStatus!
+  authenticationLink: URL!
+  institution: BankingInstitution
+  associatedAccounts: [BankAccount!]!
+  source: DataSource!
+  externalId: String
+  id: UUID
+}
+
+type BankAccount {
+  "How up to date the account is with the data source it originates from."
+  syncStatus: SyncStatus! @cost(weight: "10")
+  id: UUID
+  name: String @cost(weight: "10")
+  description: String @cost(weight: "10")
+  providerName: String
+  providerDescription: String
+  iban: String
+  bic: String
+  bban: String
+  maskedPan: String
+  ownerName: String
+  accountType: String
+  includeInAnalytics: Boolean!
+  associatedInstitution: BankingInstitution
+  associatedAuthenticationRequests: [AuthenticationRequest!]!
+  balance: Decimal
+  currency: String
+  transactions: [Transaction!]!
+  source: DataSource!
+  externalId: String
+}
+
+"A connection to a list of items."
+type BankAccountsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [BankAccountsEdge!]
+  "A flattened list of the nodes."
+  nodes: [BankAccount!]
+}
+
+"An edge in a connection."
+type BankAccountsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: BankAccount!
+}
+
+type BankingInstitution {
+  bic: String!
+  name: String!
+  logoUri: URL!
+  countries: [String!]!
+  source: DataSource!
+  externalId: String
+  id: UUID
+}
+
+"A connection to a list of items."
+type BankingInstitutionsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [BankingInstitutionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [BankingInstitution!]
+}
+
+"An edge in a connection."
+type BankingInstitutionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: BankingInstitution!
+}
+
+type CreateAuthenticationRequestPayload {
+  authenticationRequest: AuthenticationRequest
+}
+
+type CreateBankAccountPayload {
+  bankAccount: BankAccount
+}
+
+type CreateBankingInstitutionPayload {
+  bankingInstitution: BankingInstitution
+}
+
+type CreateTransactionPayload {
+  transaction: Transaction
+}
+
+"A synchronization that retrieved data from a data provider."
+type DataSynchronization {
+  "When the synchronization completed."
+  completedAt: DateTime!
+}
+
+type DeleteAuthenticationRequestPayload {
+  deleteResponse: DeleteResponse
+}
+
+type DeleteBankAccountPayload {
+  deleteResponse: DeleteResponse
+}
+
+type DeleteBankingInstitutionPayload {
+  deleteResponse: DeleteResponse
+}
+
+"The result of a successful delete mutation."
+type DeleteResponse {
+  "The id of the deleted entity."
+  deletedId: UUID!
+}
+
+type DeleteTransactionPayload {
+  deleteResponse: DeleteResponse
+}
+
+"AuthenticationRequest related mutation resolvers."
+type Mutation {
+  "Create a new authentication request for an institution."
+  createAuthenticationRequest(input: CreateAuthenticationRequestInput!): CreateAuthenticationRequestPayload! @cost(weight: "10")
+  "Delete an existing authentication request."
+  deleteAuthenticationRequest(input: DeleteAuthenticationRequestInput!): DeleteAuthenticationRequestPayload! @cost(weight: "10")
+  """
+  Synchronizes authentication request data with third-party data providers.
+  
+  
+  **Returns:**
+  A boolean value indicating whether the synchronization was successful.
+  """
+  synchronizeAuthenticationRequestData: SynchronizeAuthenticationRequestDataPayload! @cost(weight: "10")
+  "Create a new banking account."
+  createBankAccount("The banking account to create." input: CreateBankAccountInput!): CreateBankAccountPayload! @cost(weight: "10")
+  "Update the name and description of an existing banking account."
+  updateBankAccount("The banking account values to update." input: UpdateBankAccountInput!): UpdateBankAccountPayload! @cost(weight: "10")
+  "Sets whether a bank account is included in analytics such as graphs and account views."
+  setBankAccountIncludeInAnalytics(input: SetBankAccountIncludeInAnalyticsInput!): SetBankAccountIncludeInAnalyticsPayload! @cost(weight: "10")
+  "Delete an existing bank account."
+  deleteBankAccount(input: DeleteBankAccountInput!): DeleteBankAccountPayload! @cost(weight: "10")
+  """
+  Synchronizes bank account data with third-party data providers.
+  
+  
+  **Returns:**
+  A boolean value indicating whether the synchronization was successful.
+  """
+  synchronizeBankAccountData: SynchronizeBankAccountDataPayload! @cost(weight: "10")
+  "Create a new banking institution."
+  createBankingInstitution("The banking institution to create." input: CreateBankingInstitutionInput!): CreateBankingInstitutionPayload! @cost(weight: "10")
+  "Update an existing banking institution."
+  updateBankingInstitution("The banking institution values to update." input: UpdateBankingInstitutionInput!): UpdateBankingInstitutionPayload! @cost(weight: "10")
+  "Delete an existing banking institution."
+  deleteBankingInstitution(input: DeleteBankingInstitutionInput!): DeleteBankingInstitutionPayload! @cost(weight: "10")
+  """
+  Synchronizes banking institution data with third-party data providers.
+  
+  
+  **Returns:**
+  A boolean value indicating whether the synchronization was successful.
+  """
+  synchronizeBankingInstitutionData: SynchronizeBankingInstitutionDataPayload! @cost(weight: "10")
+  "Create a new transaction."
+  createTransaction("The transaction to create." input: CreateTransactionInput!): CreateTransactionPayload! @cost(weight: "10")
+  "Update the category and notes of an existing transaction."
+  updateTransaction("The transaction values to update." input: UpdateTransactionInput!): UpdateTransactionPayload! @cost(weight: "10")
+  "Delete an existing transaction."
+  deleteTransaction(input: DeleteTransactionInput!): DeleteTransactionPayload! @cost(weight: "10")
+  """
+  Synchronizes transaction data with third-party data providers.
+  
+  
+  **Returns:**
+  A boolean value indicating whether the synchronization was successful.
+  """
+  synchronizeTransactionData: SynchronizeTransactionDataPayload! @cost(weight: "10")
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+"AuthenticationRequest related query resolvers."
+type Query {
+  "Look up authentication requests by their id."
+  authenticationRequest("The id of the authentication request to retrieve." authenticationId: UUID! """
+  Whether to retrieve the authentication request from its data provider first, e.g. while waiting for the user
+  to grant access. Once access was granted, its accounts are retrieved too.
+  """ refresh: Boolean! = false): AuthenticationRequest @cost(weight: "10")
+  "Look up authentication requests."
+  authenticationRequests: [AuthenticationRequest!]! @cost(weight: "10")
+  "Look up an account by its id."
+  bankAccount("The id of the account to lookup." accountId: UUID!): BankAccount @cost(weight: "10")
+  "Look up accounts."
+  bankAccounts("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: BankAccountFilterInput @cost(weight: "10")): BankAccountsConnection @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  "Look up banking institutions by their id."
+  bankingInstitution("The id of the banking institution to retrieve." institutionId: UUID!): BankingInstitution @cost(weight: "10")
+  "Look up banking institutions."
+  bankingInstitutions("Optional filter by country the institution operates in." countryCode: String "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): BankingInstitutionsConnection @listSize(assumedSize: 3000, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  "Look up transactions."
+  transactions("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): TransactionsConnection @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+  "Look up transactions of an account."
+  transactionsByAccountId("The id of the account to retrieve." accountId: UUID! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String): TransactionsByAccountIdConnection @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
+}
+
+type SetBankAccountIncludeInAnalyticsPayload {
+  bankAccount: BankAccount
+}
+
+"Subscriptions to the synchronization of third-party data."
+type Subscription {
+  """
+  Is sent whenever a synchronization retrieved data from a data provider, successfully or not, so the data and
+  its sync status can be refetched.
+  """
+  dataSynchronized: DataSynchronization! @cost(weight: "10")
+}
+
+type SyncStatus {
+  state: SyncState!
+  lastSuccessfulSync: DateTime
+  lastError: String
+  nextRetry: DateTime
+}
+
+type SynchronizeAuthenticationRequestDataPayload {
+  boolean: Boolean
+}
+
+type SynchronizeBankAccountDataPayload {
+  boolean: Boolean
+}
+
+type SynchronizeBankingInstitutionDataPayload {
+  boolean: Boolean
+}
+
+type SynchronizeTransactionDataPayload {
+  boolean: Boolean
+}
+
+type Transaction {
+  bankTransactionId: String
+  status: TransactionStatus!
+  bookingDate: DateTime
+  valueDate: DateTime
+  payer: String
+  payee: String
+  description: String
+  amount: Decimal!
+  currency: String!
+  category: String
+  notes: String
+  bankAccount: BankAccount
+  source: DataSource!
+  externalId: String
+  id: UUID
+}
+
+"A connection to a list of items."
+type TransactionsByAccountIdConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TransactionsByAccountIdEdge!]
+  "A flattened list of the nodes."
+  nodes: [Transaction!]
+}
+
+"An edge in a connection."
+type TransactionsByAccountIdEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Transaction!
+}
+
+"A connection to a list of items."
+type TransactionsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TransactionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Transaction!]
+}
+
+"An edge in a connection."
+type TransactionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Transaction!
+}
+
+type UpdateBankAccountPayload {
+  bankAccount: BankAccount
+}
+
+type UpdateBankingInstitutionPayload {
+  bankingInstitution: BankingInstitution
+}
+
+type UpdateTransactionPayload {
+  transaction: Transaction
+}
+
+input AuthenticationRequestFilterInput {
+  and: [AuthenticationRequestFilterInput!]
+  or: [AuthenticationRequestFilterInput!]
+  status: AuthenticationStatusOperationFilterInput
+  authenticationLink: UrlOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  accessValidForDays: IntOperationFilterInput
+  institution: BankingInstitutionFilterInput
+  associatedAccounts: ListFilterInputTypeOfBankAccountFilterInput
+  source: DataSourceOperationFilterInput
+  externalId: StringOperationFilterInput
+  id: UuidOperationFilterInput
+}
+
+input AuthenticationStatusOperationFilterInput {
+  eq: AuthenticationStatus @cost(weight: "10")
+  neq: AuthenticationStatus @cost(weight: "10")
+  in: [AuthenticationStatus!] @cost(weight: "10")
+  nin: [AuthenticationStatus!] @cost(weight: "10")
+}
+
+input BankAccountFilterInput {
+  and: [BankAccountFilterInput!]
+  or: [BankAccountFilterInput!]
+  iban: StringOperationFilterInput
+  bic: StringOperationFilterInput
+  bban: StringOperationFilterInput
+  maskedPan: StringOperationFilterInput
+  ownerName: StringOperationFilterInput
+  accountType: StringOperationFilterInput
+  providerName: StringOperationFilterInput
+  providerDescription: StringOperationFilterInput
+  includeInAnalytics: BooleanOperationFilterInput
+  associatedInstitution: BankingInstitutionFilterInput
+  associatedAuthenticationRequests: ListFilterInputTypeOfAuthenticationRequestFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  balance: DecimalOperationFilterInput
+  currency: StringOperationFilterInput
+  transactions: ListFilterInputTypeOfTransactionFilterInput
+  source: DataSourceOperationFilterInput
+  externalId: StringOperationFilterInput
+  id: UuidOperationFilterInput
+}
+
+input BankingInstitutionFilterInput {
+  and: [BankingInstitutionFilterInput!]
+  or: [BankingInstitutionFilterInput!]
+  bic: StringOperationFilterInput
+  name: StringOperationFilterInput
+  logoUri: UrlOperationFilterInput
+  countries: ListStringOperationFilterInput
+  source: DataSourceOperationFilterInput
+  externalId: StringOperationFilterInput
+  id: UuidOperationFilterInput
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean @cost(weight: "10")
+  neq: Boolean @cost(weight: "10")
+}
+
+input CreateAuthenticationRequestInput {
+  "The id of the institution which the authentication request should be created for."
+  institutionId: UUID!
+  "The URI to redirect to after the authentication is completed."
+  redirectUri: String!
+}
+
+"Payload required to create a bank account through the API."
+input CreateBankAccountInput {
+  "The name of the account."
+  name: String!
+  "A description of this account."
+  description: String
+  "The current balance of the account."
+  balance: Decimal
+  "The currency this account is denominated in."
+  currency: String
+  "The IBAN of the bank account."
+  iban: String
+  "The BIC (Business Identifier Code) associated with the account."
+  bic: String
+  """
+  Basic Bank Account Number represents a country-specific bank account number.
+  This data element is used for payment accounts which have no IBAN.
+  """
+  bban: String
+  "Name of the legal account owner. If there is more than one owner, then two names might be noted here."
+  ownerName: String
+  "Specifies the nature, or use, of the account."
+  accountType: String
+}
+
+"Payload required to create a banking institution through the API."
+input CreateBankingInstitutionInput {
+  "The name of the institution."
+  name: String!
+  "The Business Identifier Code (BIC) of the institution."
+  bic: String!
+  "A Uri for the logo of the institution."
+  logoUri: URL!
+  "The countries the institution operates in."
+  countries: [String!]!
+}
+
+"Payload required to create a transaction through the API."
+input CreateTransactionInput {
+  "The id of the account to which the transaction belongs."
+  accountId: UUID!
+  "Date at which the transaction amount becomes available to the payee."
+  valueDate: DateTime
+  "The name of the party which owes the money."
+  payer: String
+  "The name of the party which is owed the money."
+  payee: String
+  "What the transaction is for."
+  description: String
+  "The amount being transacted."
+  amount: Decimal!
+  "The currency the amount is denominated in."
+  currency: String!
+  "The category this transaction belongs to."
+  category: String
+  "User created notes for this transaction."
+  notes: String
+}
+
+input DataSourceOperationFilterInput {
+  eq: DataSource @cost(weight: "10")
+  neq: DataSource @cost(weight: "10")
+  in: [DataSource!] @cost(weight: "10")
+  nin: [DataSource!] @cost(weight: "10")
+}
+
+input DateTimeOperationFilterInput {
+  eq: DateTime @cost(weight: "10")
+  neq: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  nin: [DateTime] @cost(weight: "10")
+  gt: DateTime @cost(weight: "10")
+  ngt: DateTime @cost(weight: "10")
+  gte: DateTime @cost(weight: "10")
+  ngte: DateTime @cost(weight: "10")
+  lt: DateTime @cost(weight: "10")
+  nlt: DateTime @cost(weight: "10")
+  lte: DateTime @cost(weight: "10")
+  nlte: DateTime @cost(weight: "10")
+}
+
+input DecimalOperationFilterInput {
+  eq: Decimal @cost(weight: "10")
+  neq: Decimal @cost(weight: "10")
+  in: [Decimal] @cost(weight: "10")
+  nin: [Decimal] @cost(weight: "10")
+  gt: Decimal @cost(weight: "10")
+  ngt: Decimal @cost(weight: "10")
+  gte: Decimal @cost(weight: "10")
+  ngte: Decimal @cost(weight: "10")
+  lt: Decimal @cost(weight: "10")
+  nlt: Decimal @cost(weight: "10")
+  lte: Decimal @cost(weight: "10")
+  nlte: Decimal @cost(weight: "10")
+}
+
+input DeleteAuthenticationRequestInput {
+  "The id of the authentication request to delete."
+  authenticationId: UUID!
+}
+
+input DeleteBankAccountInput {
+  "The id of the bank account to delete."
+  bankAccountId: UUID!
+}
+
+input DeleteBankingInstitutionInput {
+  "The id of the banking institution to delete."
+  bankingInstitutionId: UUID!
+}
+
+input DeleteTransactionInput {
+  "The id of the transaction to delete."
+  transactionId: UUID!
+}
+
+input IntOperationFilterInput {
+  eq: Int @cost(weight: "10")
+  neq: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  nin: [Int] @cost(weight: "10")
+  gt: Int @cost(weight: "10")
+  ngt: Int @cost(weight: "10")
+  gte: Int @cost(weight: "10")
+  ngte: Int @cost(weight: "10")
+  lt: Int @cost(weight: "10")
+  nlt: Int @cost(weight: "10")
+  lte: Int @cost(weight: "10")
+  nlte: Int @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfAuthenticationRequestFilterInput {
+  all: AuthenticationRequestFilterInput @cost(weight: "10")
+  none: AuthenticationRequestFilterInput @cost(weight: "10")
+  some: AuthenticationRequestFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfBankAccountFilterInput {
+  all: BankAccountFilterInput @cost(weight: "10")
+  none: BankAccountFilterInput @cost(weight: "10")
+  some: BankAccountFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfTransactionFilterInput {
+  all: TransactionFilterInput @cost(weight: "10")
+  none: TransactionFilterInput @cost(weight: "10")
+  some: TransactionFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input ListStringOperationFilterInput {
+  all: StringOperationFilterInput @cost(weight: "10")
+  none: StringOperationFilterInput @cost(weight: "10")
+  some: StringOperationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+}
+
+input SetBankAccountIncludeInAnalyticsInput {
+  "The id of the bank account to update."
+  bankAccountId: UUID!
+  "Whether the account should be included in analytics."
+  includeInAnalytics: Boolean!
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String @cost(weight: "10")
+  neq: String @cost(weight: "10")
+  contains: String @cost(weight: "20")
+  ncontains: String @cost(weight: "20")
+  in: [String] @cost(weight: "10")
+  nin: [String] @cost(weight: "10")
+  startsWith: String @cost(weight: "20")
+  nstartsWith: String @cost(weight: "20")
+  endsWith: String @cost(weight: "20")
+  nendsWith: String @cost(weight: "20")
+}
+
+input TransactionFilterInput {
+  and: [TransactionFilterInput!]
+  or: [TransactionFilterInput!]
+  bankTransactionId: StringOperationFilterInput
+  status: TransactionStatusOperationFilterInput
+  bookingDate: DateTimeOperationFilterInput
+  valueDate: DateTimeOperationFilterInput
+  payer: StringOperationFilterInput
+  payee: StringOperationFilterInput
+  description: StringOperationFilterInput
+  amount: DecimalOperationFilterInput
+  currency: StringOperationFilterInput
+  category: StringOperationFilterInput
+  notes: StringOperationFilterInput
+  bankAccount: BankAccountFilterInput
+  source: DataSourceOperationFilterInput
+  externalId: StringOperationFilterInput
+  id: UuidOperationFilterInput
+}
+
+input TransactionStatusOperationFilterInput {
+  eq: TransactionStatus @cost(weight: "10")
+  neq: TransactionStatus @cost(weight: "10")
+  in: [TransactionStatus!] @cost(weight: "10")
+  nin: [TransactionStatus!] @cost(weight: "10")
+}
+
+"Payload required to update a bank account through the API."
+input UpdateBankAccountInput {
+  "The id of the bank account to update."
+  id: UUID!
+  "The name of the account. If empty, a synchronized account shows its bank's name again."
+  name: String!
+  "A description of this account. If empty, a synchronized account shows its bank's description again."
+  description: String
+}
+
+"Payload required to update a banking institution through the API."
+input UpdateBankingInstitutionInput {
+  "The id of the banking institution to update."
+  id: UUID!
+  "The name of the institution."
+  name: String!
+  "The Business Identifier Code (BIC) of the institution."
+  bic: String!
+  "A Uri for the logo of the institution."
+  logoUri: URL!
+  "The countries the institution operates in."
+  countries: [String!]!
+}
+
+"Payload required to update a transaction through the API."
+input UpdateTransactionInput {
+  "The id of the transaction to update."
+  id: UUID!
+  "The category this transaction belongs to, empty or omitted to remove it."
+  category: String
+  "User created notes for this transaction, empty or omitted to remove them."
+  notes: String
+}
+
+input UrlOperationFilterInput {
+  eq: URL @cost(weight: "10")
+  neq: URL @cost(weight: "10")
+  in: [URL] @cost(weight: "10")
+  nin: [URL] @cost(weight: "10")
+  gt: URL @cost(weight: "10")
+  ngt: URL @cost(weight: "10")
+  gte: URL @cost(weight: "10")
+  ngte: URL @cost(weight: "10")
+  lt: URL @cost(weight: "10")
+  nlt: URL @cost(weight: "10")
+  lte: URL @cost(weight: "10")
+  nlte: URL @cost(weight: "10")
+}
+
+input UuidOperationFilterInput {
+  eq: UUID @cost(weight: "10")
+  neq: UUID @cost(weight: "10")
+  in: [UUID] @cost(weight: "10")
+  nin: [UUID] @cost(weight: "10")
+  gt: UUID @cost(weight: "10")
+  ngt: UUID @cost(weight: "10")
+  gte: UUID @cost(weight: "10")
+  ngte: UUID @cost(weight: "10")
+  lt: UUID @cost(weight: "10")
+  nlt: UUID @cost(weight: "10")
+  lte: UUID @cost(weight: "10")
+  nlte: UUID @cost(weight: "10")
+}
+
+enum AuthenticationStatus {
+  UNKNOWN
+  REQUIRES_USER_ACTION
+  PENDING
+  ACTIVE
+  FAILED
+  EXPIRED
+}
+
+enum DataSource {
+  MANUAL
+  GO_CARDLESS
+}
+
+enum SyncState {
+  NOT_SYNCED
+  UP_TO_DATE
+  RETRYING
+  NEEDS_REAUTHENTICATION
+}
+
+enum TransactionStatus {
+  BOOKED
+  PENDING
+}
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost("The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc." weight: String!) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM | INPUT_FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize("The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field." assumedSize: Int "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments." slicingArguments: [String!] "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query." slicingArgumentDefaultValue: Int "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields." sizedFields: [String!] "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error." requireOneSlicingArgument: Boolean! = true) on FIELD_DEFINITION
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The `Decimal` scalar type represents a decimal floating-point number."
+scalar Decimal
+
+scalar URL @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3986")
+
+scalar UUID @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc4122")

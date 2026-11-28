@@ -71,13 +71,17 @@ To run the client without the server, use the mocked API: add `VITE_ENABLE_API_M
 
 ### GraphQL types
 
-The client's types in `src/client/src/graphql/types` are generated from the API's schema and the client's queries.
-Regenerate them after changing either, with the API running:
+The client's types in `src/client/src/graphql/types` are generated from the client's queries and the API's schema,
+which is committed as `src/client/src/graphql/schema.graphql`. After changing the schema, export it and regenerate
+the types. After changing a query, only regenerate the types:
 
 ```shell
 cd src/client
+npm run graphql-schema-export
 npm run graphql-types-generate
 ```
+
+The export builds the API, but doesn't need it running or touch its database.
 
 ### Tests and checks
 
@@ -91,6 +95,7 @@ These are the checks CI runs:
 | Client tests | `npm test` |
 | Client lint and formatting | `npm run lint`, `npm run prettier` |
 | Client types | `npm run typecheck` |
+| Schema and generated types up to date | `npm run graphql-schema-export`, `npm run graphql-types-generate`, then no changes in `git diff` |
 
 A pre-push hook formats the server code before pushing, like CI checks it. Enable it once with `git config core.hooksPath .githooks`.
 

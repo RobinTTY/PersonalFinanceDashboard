@@ -1,8 +1,4 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
-import { loadEnv } from 'vite';
-
-// Same env files as the app, so VITE_API_URL can be overridden in .env.local or the environment
-const env = loadEnv('development', 'env-settings', 'VITE_');
 
 /**
  * Default codegen configuration for a TypeScript project using Apollo Client.
@@ -10,7 +6,8 @@ const env = loadEnv('development', 'env-settings', 'VITE_');
  */
 const config: CodegenConfig = {
   overwrite: true,
-  schema: env.VITE_API_URL,
+  // Exported from the server with `npm run graphql-schema-export`
+  schema: 'src/graphql/schema.graphql',
   // Tests may define documents that aren't part of the schema
   documents: ['src/**/*.{ts,tsx}', '!src/**/*.test.{ts,tsx}'],
   ignoreNoDocuments: true,

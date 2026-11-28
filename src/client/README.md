@@ -18,8 +18,8 @@ Settings are read from `env-settings/.env`. Override them in `env-settings/.env.
 - `dev`: starts the development server
 - `build`: type-checks and builds the production version to `dist`
 - `preview`: serves the production build locally
-- `graphql-types-generate`: regenerates the types in `src/graphql/types` from the server's schema, which has to be
-  running at `VITE_API_URL`
+- `graphql-schema-export`: exports the server's schema to `src/graphql/schema.graphql`, after building the server
+- `graphql-types-generate`: regenerates the types in `src/graphql/types` from that schema and the queries
 
 ### Checks
 

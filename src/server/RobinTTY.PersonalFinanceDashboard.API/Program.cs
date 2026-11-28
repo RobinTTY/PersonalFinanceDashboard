@@ -19,7 +19,9 @@ builder.Services
 
 var app = builder.Build();
 
-app.ApplyMigrations();
+// GraphQL commands (see below) don't use the database
+if (args is not ["schema", ..])
+    app.ApplyMigrations();
 app.UseSerilogRequestLogging();
 app.UseCors();
 app.UseGraphQl();

@@ -38,5 +38,6 @@ The [README](./README.md) explains how to set up and run the project. These are 
 - Formatting follows Prettier, `npm run prettier:write` applies it.
 - Style Mantine components through their `styles` (or `classNames`) prop for their inner parts, instead of
   wrapping content in extra styled elements.
-- The types in `src/graphql/types` are generated, don't edit them by hand. Regenerate them after changing a query
-  or the server's schema.
+- The types in `src/graphql/types` are generated, don't edit them by hand. After changing the server's schema,
+  export it (`npm run graphql-schema-export`), then regenerate the types (`npm run graphql-types-generate`), which
+  is also needed after changing a query. CI fails if either is out of date.

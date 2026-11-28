@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
+    "graphql-schema-export": "dotnet run --project ../server/RobinTTY.PersonalFinanceDashboard.API --configuration Release --no-launch-profile -- schema export --output ../../client/src/graphql/schema.graphql",
     "graphql-types-generate": "graphql-codegen --config src/graphql/codegen.ts"
   },
   "dependencies": {
