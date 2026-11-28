@@ -54,7 +54,8 @@ public class BankAccountMutationResolvers
     }
 
     /// <summary>
-    /// Delete an existing bank account.
+    /// Delete an existing bank account and its transactions. A synchronized account can only be deleted once its
+    /// bank is disconnected or its access expired, since the synchronization would recreate it.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankAccountId">The id of the bank account to delete.</param>
@@ -62,11 +63,14 @@ public class BankAccountMutationResolvers
     public async Task<DeleteResponse> DeleteBankAccount(BankAccountRepository repository,
         Guid bankAccountId, CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteBankAccount(bankAccountId, cancellationToken);
-        if (deleted)
-            return new DeleteResponse { DeletedId = bankAccountId };
-
-        throw MutationErrors.NotFound<BankAccount>(bankAccountId, ErrorCodes.BankAccountNotFound);
+        return await repository.DeleteBankAccount(bankAccountId, cancellationToken) switch
+        {
+            DeleteResult.Deleted => new DeleteResponse { DeletedId = bankAccountId },
+            DeleteResult.Synchronized => throw MutationErrors.Create(
+                $"Bank account with id {bankAccountId} is still synchronized. Disconnect its bank first.",
+                ErrorCodes.BankAccountSynchronized),
+            _ => throw MutationErrors.NotFound<BankAccount>(bankAccountId, ErrorCodes.BankAccountNotFound)
+        };
     }
 
     /// <summary>

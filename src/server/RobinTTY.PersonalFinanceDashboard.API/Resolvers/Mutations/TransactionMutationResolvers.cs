@@ -53,7 +53,8 @@ public class TransactionMutationResolvers
     }
 
     /// <summary>
-    /// Delete an existing transaction.
+    /// Delete an existing transaction. A synchronized transaction can only be deleted once its account is no longer
+    /// synchronized, since the synchronization would recreate it.
     /// </summary>
     /// <param name="repository">The injected repository to use for data mutation.</param>
     /// <param name="transactionId">The id of the transaction to delete.</param>
@@ -61,11 +62,14 @@ public class TransactionMutationResolvers
     public async Task<DeleteResponse> DeleteTransaction(TransactionRepository repository, Guid transactionId,
         CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteTransaction(transactionId, cancellationToken);
-        if (deleted)
-            return new DeleteResponse { DeletedId = transactionId };
-
-        throw MutationErrors.NotFound<Transaction>(transactionId, ErrorCodes.TransactionNotFound);
+        return await repository.DeleteTransaction(transactionId, cancellationToken) switch
+        {
+            DeleteResult.Deleted => new DeleteResponse { DeletedId = transactionId },
+            DeleteResult.Synchronized => throw MutationErrors.Create(
+                $"Transaction with id {transactionId} belongs to an account that is still synchronized.",
+                ErrorCodes.TransactionSynchronized),
+            _ => throw MutationErrors.NotFound<Transaction>(transactionId, ErrorCodes.TransactionNotFound)
+        };
     }
 
     /// <summary>

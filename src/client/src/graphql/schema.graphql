@@ -156,7 +156,10 @@ type Mutation {
   updateBankAccount("The banking account values to update." input: UpdateBankAccountInput!): UpdateBankAccountPayload! @cost(weight: "10")
   "Sets whether a bank account is included in analytics such as graphs and account views."
   setBankAccountIncludeInAnalytics(input: SetBankAccountIncludeInAnalyticsInput!): SetBankAccountIncludeInAnalyticsPayload! @cost(weight: "10")
-  "Delete an existing bank account."
+  """
+  Delete an existing bank account and its transactions. A synchronized account can only be deleted once its
+  bank is disconnected or its access expired, since the synchronization would recreate it.
+  """
   deleteBankAccount(input: DeleteBankAccountInput!): DeleteBankAccountPayload! @cost(weight: "10")
   """
   Synchronizes bank account data with third-party data providers.
@@ -170,7 +173,10 @@ type Mutation {
   createBankingInstitution("The banking institution to create." input: CreateBankingInstitutionInput!): CreateBankingInstitutionPayload! @cost(weight: "10")
   "Update an existing banking institution."
   updateBankingInstitution("The banking institution values to update." input: UpdateBankingInstitutionInput!): UpdateBankingInstitutionPayload! @cost(weight: "10")
-  "Delete an existing banking institution."
+  """
+  Delete an existing banking institution that was created manually. Institutions of a data source are
+  synchronized, which would recreate them.
+  """
   deleteBankingInstitution(input: DeleteBankingInstitutionInput!): DeleteBankingInstitutionPayload! @cost(weight: "10")
   """
   Synchronizes banking institution data with third-party data providers.
@@ -184,7 +190,10 @@ type Mutation {
   createTransaction("The transaction to create." input: CreateTransactionInput!): CreateTransactionPayload! @cost(weight: "10")
   "Update the category and notes of an existing transaction."
   updateTransaction("The transaction values to update." input: UpdateTransactionInput!): UpdateTransactionPayload! @cost(weight: "10")
-  "Delete an existing transaction."
+  """
+  Delete an existing transaction. A synchronized transaction can only be deleted once its account is no longer
+  synchronized, since the synchronization would recreate it.
+  """
   deleteTransaction(input: DeleteTransactionInput!): DeleteTransactionPayload! @cost(weight: "10")
   """
   Synchronizes transaction data with third-party data providers.

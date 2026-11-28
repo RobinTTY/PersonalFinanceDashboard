@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -11,18 +12,22 @@ public class BankAccountRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<BankAccountRepository> _logger;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Creates a new instance of <see cref="BankAccountRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
+    /// <param name="timeProvider">Provides the current time.</param>
     public BankAccountRepository(
         ApplicationDbContext dbContext,
-        ILogger<BankAccountRepository> logger)
+        ILogger<BankAccountRepository> logger,
+        TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -101,15 +106,25 @@ public class BankAccountRepository
     }
 
     /// <summary>
-    /// Deletes an existing <see cref="BankAccount"/>.
+    /// Deletes an existing <see cref="BankAccount"/> and its transactions. Accounts that are still synchronized
+    /// aren't deleted, since the synchronization would recreate them.
     /// </summary>
     /// <param name="bankAccountId">The id of the <see cref="BankAccount"/> to delete.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteBankAccount(Guid bankAccountId, CancellationToken cancellationToken = default)
+    /// <returns>Whether the account was deleted.</returns>
+    public async Task<DeleteResult> DeleteBankAccount(Guid bankAccountId,
+        CancellationToken cancellationToken = default)
     {
-        var deleted = await _dbContext.BankAccounts.Where(t => t.Id == bankAccountId)
+        var bankAccount = await _dbContext.BankAccounts
+            .Include(account => account.AssociatedAuthenticationRequests)
+            .SingleOrDefaultAsync(account => account.Id == bankAccountId, cancellationToken);
+        if (bankAccount == null)
+            return DeleteResult.NotFound;
+        if (bankAccount.IsSynchronized(_timeProvider.GetUtcNow().UtcDateTime))
+            return DeleteResult.Synchronized;
+
+        await _dbContext.BankAccounts.Where(account => account.Id == bankAccountId)
             .ExecuteDeleteAsync(cancellationToken);
-        return deleted > 0;
+        return DeleteResult.Deleted;
     }
 }

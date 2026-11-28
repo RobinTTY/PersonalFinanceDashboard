@@ -126,6 +126,37 @@ public class BankAccountMutationTests(ApiFactory factory) : IClassFixture<ApiFac
         Assert.Equal("BANK_ACCOUNT_NOT_FOUND", deletedAgain.ErrorCode());
     }
 
+    [Theory]
+    [InlineData(-1, "BANK_ACCOUNT_SYNCHRONIZED")]
+    [InlineData(-100, null)]
+    public async Task DeleteBankAccount_OfASynchronizedAccountIsOnlyAllowedOnceItsAccessExpired(int requestAgeInDays,
+        string? errorCode)
+    {
+        // Otherwise the synchronization would recreate it
+        var account = TestData.Account(Guid.NewGuid());
+        await factory.Seed(TestData.Request(Guid.NewGuid(), DateTime.UtcNow.AddDays(requestAgeInDays), account));
+
+        var response = await _client.PostGraphQl("""
+                                                 mutation($id: UUID!) {
+                                                   deleteBankAccount(input: { bankAccountId: $id }) { deleteResponse { deletedId } }
+                                                 }
+                                                 """, new { id = account.Id });
+        var remaining = await _client.PostGraphQl("query($id: UUID!) { bankAccount(accountId: $id) { id } }",
+            new { id = account.Id });
+
+        if (errorCode is null)
+        {
+            Assert.Equal(account.Id.ToString(),
+                response.Data("deleteBankAccount", "deleteResponse", "deletedId").GetString());
+            Assert.Equal(JsonValueKind.Null, remaining.Data("bankAccount").ValueKind);
+        }
+        else
+        {
+            Assert.Equal(errorCode, response.ErrorCode());
+            Assert.Equal(account.Id.ToString(), remaining.Data("bankAccount", "id").GetString());
+        }
+    }
+
     [Fact]
     public async Task DeleteBankAccount_AlsoDeletesItsTransactions()
     {

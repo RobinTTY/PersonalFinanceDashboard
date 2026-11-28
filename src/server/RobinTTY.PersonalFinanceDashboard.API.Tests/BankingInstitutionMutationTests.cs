@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 using RobinTTY.PersonalFinanceDashboard.Infrastructure;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
@@ -35,6 +36,23 @@ public class BankingInstitutionMutationTests(ApiFactory factory) : IClassFixture
                 .SingleAsync(a => a.Id == accountId);
             Assert.Null(account.AssociatedInstitution);
         });
+    }
+
+    [Fact]
+    public async Task DeleteBankingInstitution_OfADataSourceIsRefused()
+    {
+        // The synchronization would recreate it
+        var institution = await factory.Seed(TestData.Institution(Guid.NewGuid().ToString()));
+
+        var response = await _client.PostGraphQl("""
+                                                 mutation($id: UUID!) {
+                                                   deleteBankingInstitution(input: { bankingInstitutionId: $id }) { deleteResponse { deletedId } }
+                                                 }
+                                                 """, new { id = institution.Id });
+
+        Assert.Equal("BANKING_INSTITUTION_SYNCHRONIZED", response.ErrorCode());
+        await WithDbContext(async dbContext =>
+            Assert.True(await dbContext.BankingInstitutions.AnyAsync(i => i.Id == institution.Id)));
     }
 
     private async Task<string> CreateBankingInstitution()

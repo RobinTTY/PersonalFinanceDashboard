@@ -1,5 +1,6 @@
 using System.Text.Json;
 using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
+using RobinTTY.PersonalFinanceDashboard.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
@@ -94,6 +95,31 @@ public class TransactionMutationTests(ApiFactory factory) : IClassFixture<ApiFac
 
         Assert.Equal(transactionId, deleted.Data("deleteTransaction", "deleteResponse", "deletedId").GetString());
         Assert.Equal("TRANSACTION_NOT_FOUND", deletedAgain.ErrorCode());
+    }
+
+    [Theory]
+    [InlineData(-1, "TRANSACTION_SYNCHRONIZED")]
+    [InlineData(-100, null)]
+    public async Task DeleteTransaction_OfASynchronizedAccountIsOnlyAllowedOnceItsAccessExpired(
+        int requestAgeInDays, string? errorCode)
+    {
+        // Otherwise the synchronization would recreate it
+        var account = TestData.Account(Guid.NewGuid());
+        var transaction = TestData.Transaction(Guid.NewGuid(), account, -10m);
+        account.Transactions.Add(transaction);
+        await factory.Seed(TestData.Request(Guid.NewGuid(), DateTime.UtcNow.AddDays(requestAgeInDays), account));
+
+        var response = await _client.PostGraphQl("""
+                                                 mutation($id: UUID!) {
+                                                   deleteTransaction(input: { transactionId: $id }) { deleteResponse { deletedId } }
+                                                 }
+                                                 """, new { id = transaction.Id });
+
+        if (errorCode is null)
+            Assert.Equal(transaction.Id.ToString(),
+                response.Data("deleteTransaction", "deleteResponse", "deletedId").GetString());
+        else
+            Assert.Equal(errorCode, response.ErrorCode());
     }
 
     private async Task<string> CreateTransactionForNewAccount()

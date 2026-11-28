@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -11,16 +12,20 @@ public class TransactionRepository
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<TransactionRepository> _logger;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Creates a new instance of <see cref="TransactionRepository"/>.
     /// </summary>
     /// <param name="dbContext">The <see cref="ApplicationDbContext"/> to use for data retrieval.</param>
     /// <param name="logger">Logger used for monitoring purposes.</param>
-    public TransactionRepository(ApplicationDbContext dbContext, ILogger<TransactionRepository> logger)
+    /// <param name="timeProvider">Provides the current time.</param>
+    public TransactionRepository(ApplicationDbContext dbContext, ILogger<TransactionRepository> logger,
+        TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -88,15 +93,26 @@ public class TransactionRepository
     }
 
     /// <summary>
-    /// Deletes an existing <see cref="Transaction"/>.
+    /// Deletes an existing <see cref="Transaction"/>. Synchronized transactions of accounts that are still
+    /// synchronized aren't deleted, since the synchronization would recreate them.
     /// </summary>
     /// <param name="transactionId">The id of the <see cref="Transaction"/> to delete.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteTransaction(Guid transactionId, CancellationToken cancellationToken = default)
+    /// <returns>Whether the transaction was deleted.</returns>
+    public async Task<DeleteResult> DeleteTransaction(Guid transactionId,
+        CancellationToken cancellationToken = default)
     {
-        var deleted = await _dbContext.Transactions.Where(t => t.Id == transactionId)
-            .ExecuteDeleteAsync(cancellationToken);
-        return deleted > 0;
+        var transaction = await _dbContext.Transactions
+            .Include(t => t.BankAccount)
+            .ThenInclude(account => account!.AssociatedAuthenticationRequests)
+            .SingleOrDefaultAsync(t => t.Id == transactionId, cancellationToken);
+        if (transaction == null)
+            return DeleteResult.NotFound;
+        if (!transaction.IsManual() &&
+            transaction.BankAccount?.IsSynchronized(_timeProvider.GetUtcNow().UtcDateTime) == true)
+            return DeleteResult.Synchronized;
+
+        await _dbContext.Transactions.Where(t => t.Id == transactionId).ExecuteDeleteAsync(cancellationToken);
+        return DeleteResult.Deleted;
     }
 }

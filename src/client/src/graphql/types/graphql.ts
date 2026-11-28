@@ -424,11 +424,20 @@ export type Mutation = {
   createTransaction: CreateTransactionPayload;
   /** Delete an existing authentication request. */
   deleteAuthenticationRequest: DeleteAuthenticationRequestPayload;
-  /** Delete an existing bank account. */
+  /**
+   * Delete an existing bank account and its transactions. A synchronized account can only be deleted once its
+   * bank is disconnected or its access expired, since the synchronization would recreate it.
+   */
   deleteBankAccount: DeleteBankAccountPayload;
-  /** Delete an existing banking institution. */
+  /**
+   * Delete an existing banking institution that was created manually. Institutions of a data source are
+   * synchronized, which would recreate them.
+   */
   deleteBankingInstitution: DeleteBankingInstitutionPayload;
-  /** Delete an existing transaction. */
+  /**
+   * Delete an existing transaction. A synchronized transaction can only be deleted once its account is no longer
+   * synchronized, since the synchronization would recreate it.
+   */
   deleteTransaction: DeleteTransactionPayload;
   /** Sets whether a bank account is included in analytics such as graphs and account views. */
   setBankAccountIncludeInAnalytics: SetBankAccountIncludeInAnalyticsPayload;

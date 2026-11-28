@@ -41,7 +41,8 @@ public class BankingInstitutionMutationResolvers
     }
 
     /// <summary>
-    /// Delete an existing banking institution.
+    /// Delete an existing banking institution that was created manually. Institutions of a data source are
+    /// synchronized, which would recreate them.
     /// </summary>
     /// <param name="repository">The injected repository to use for data retrieval.</param>
     /// <param name="bankingInstitutionId">The id of the banking institution to delete.</param>
@@ -49,12 +50,15 @@ public class BankingInstitutionMutationResolvers
     public async Task<DeleteResponse> DeleteBankingInstitution(BankingInstitutionRepository repository,
         Guid bankingInstitutionId, CancellationToken cancellationToken)
     {
-        var deleted = await repository.DeleteBankingInstitution(bankingInstitutionId, cancellationToken);
-        if (deleted)
-            return new DeleteResponse { DeletedId = bankingInstitutionId };
-
-        throw MutationErrors.NotFound<BankingInstitution>(bankingInstitutionId,
-            ErrorCodes.BankingInstitutionNotFound);
+        return await repository.DeleteBankingInstitution(bankingInstitutionId, cancellationToken) switch
+        {
+            DeleteResult.Deleted => new DeleteResponse { DeletedId = bankingInstitutionId },
+            DeleteResult.Synchronized => throw MutationErrors.Create(
+                $"Banking institution with id {bankingInstitutionId} is synchronized from a data source.",
+                ErrorCodes.BankingInstitutionSynchronized),
+            _ => throw MutationErrors.NotFound<BankingInstitution>(bankingInstitutionId,
+                ErrorCodes.BankingInstitutionNotFound)
+        };
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RobinTTY.PersonalFinanceDashboard.Core.Extensions;
 using RobinTTY.PersonalFinanceDashboard.Core.Models;
 
 namespace RobinTTY.PersonalFinanceDashboard.Infrastructure.Repositories;
@@ -100,15 +101,24 @@ public class BankingInstitutionRepository
     }
 
     /// <summary>
-    /// Deletes an existing <see cref="BankingInstitution"/>.
+    /// Deletes an existing <see cref="BankingInstitution"/>. Institutions of a data source aren't deleted, since
+    /// the synchronization would recreate them.
     /// </summary>
     /// <param name="institutionId">The id of the <see cref="BankingInstitution"/> to delete.</param>
     /// <param name="cancellationToken">A token to signal cancellation.</param>
-    /// <returns>Boolean value indicating whether the operation was successful.</returns>
-    public async Task<bool> DeleteBankingInstitution(Guid institutionId, CancellationToken cancellationToken = default)
+    /// <returns>Whether the institution was deleted.</returns>
+    public async Task<DeleteResult> DeleteBankingInstitution(Guid institutionId,
+        CancellationToken cancellationToken = default)
     {
-        var deleted = await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId)
+        var institution = await _dbContext.BankingInstitutions
+            .SingleOrDefaultAsync(t => t.Id == institutionId, cancellationToken);
+        if (institution == null)
+            return DeleteResult.NotFound;
+        if (!institution.IsManual())
+            return DeleteResult.Synchronized;
+
+        await _dbContext.BankingInstitutions.Where(t => t.Id == institutionId)
             .ExecuteDeleteAsync(cancellationToken);
-        return deleted > 0;
+        return DeleteResult.Deleted;
     }
 }
