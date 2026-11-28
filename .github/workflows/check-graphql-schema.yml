@@ -1,0 +1,59 @@
+name: Check GraphQL schema
+
+# The client's types are generated from the committed schema, which has to match the server's
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'src/server/**'
+      - 'src/client/**'
+      - 'global.json'
+      - '.github/workflows/check-graphql-schema.yml'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/server/**'
+      - 'src/client/**'
+      - 'global.json'
+      - '.github/workflows/check-graphql-schema.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  check_schema:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/client
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: src/client/.nvmrc
+          cache: npm
+          cache-dependency-path: src/client/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Export the schema
+        run: npm run graphql-schema-export
+      - name: Check that the committed schema is up to date
+        run: |
+          if ! git diff --exit-code -- src/graphql/schema.graphql; then
+            echo "::error::The server's schema changed. Run 'npm run graphql-schema-export' in src/client and commit the schema."
+            exit 1
+          fi
+      - name: Generate the types
+        run: npm run graphql-types-generate
+      - name: Check that the generated types are up to date
+        run: |
+          if ! git diff --exit-code -- src/graphql/types; then
+            echo "::error::The generated types are out of date. Run 'npm run graphql-types-generate' in src/client and commit them."
+            exit 1
+          fi
