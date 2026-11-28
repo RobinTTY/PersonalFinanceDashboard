@@ -1,6 +1,6 @@
 import { BankAccountSummaryFragment } from '@graphql-types/graphql';
 import { IconBuildingBank, IconChevronDown, IconPlus } from '@tabler/icons-react';
-import { formatBalance, getInitials } from '@utility';
+import { formatMoney, getInitials } from '@utility';
 import { Avatar, Box, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { useOpenSettings } from '@/components/SettingsModal/OpenSettingsContext';
 import {
@@ -30,7 +30,10 @@ export function AccountsHeader({
   const institution = currentAccount?.associatedInstitution;
   const accountLabel =
     currentAccount?.name ?? currentAccount?.iban ?? (loadingAccounts ? 'Loading…' : 'No account');
-  const balanceLabel = currentAccount ? formatBalance(currentAccount) : null;
+  const balanceLabel =
+    currentAccount?.balance != null
+      ? formatMoney(currentAccount.balance, currentAccount.currency)
+      : null;
 
   return (
     <Box className={classes.header}>

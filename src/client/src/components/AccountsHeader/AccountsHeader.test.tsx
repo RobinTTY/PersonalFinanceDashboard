@@ -1,6 +1,7 @@
 import { BankAccountSummaryFragment, SyncState } from '@graphql-types/graphql';
 import { axe, render } from '@test-utils';
 import { fireEvent, screen } from '@testing-library/react';
+import { formatMoney } from '@utility';
 import { AccountsHeader } from './AccountsHeader';
 
 type Account = BankAccountSummaryFragment;
@@ -71,7 +72,7 @@ describe('AccountsHeader', () => {
         onAddAccount={noop}
       />
     );
-    expect(screen.getByText('468.15 EUR')).toBeInTheDocument();
+    expect(screen.getByText(formatMoney(468.15, 'EUR'))).toBeInTheDocument();
   });
 
   it('renders the account name', () => {

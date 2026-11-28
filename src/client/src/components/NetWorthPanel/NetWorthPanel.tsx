@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { IconArrowDownRight, IconArrowUpRight, IconMinus } from '@tabler/icons-react';
+import { formatMoney } from '@utility';
 import { Badge, Group, SegmentedControl, Stack, Text } from '@mantine/core';
 import { NetWorthLineChart } from '@/components/NetWorthLineChart/NetWorthLineChart';
 import {
   computeChange,
-  formatCurrency,
   RANGE_LABELS,
   RANGE_OPTIONS,
   RangeKey,
@@ -50,7 +50,7 @@ export function NetWorthPanel({
 
   const { color, Icon } = DIRECTION[direction];
   const pctLabel = changePct == null ? '—' : `${formatSigned(changePct)}%`;
-  const absChange = formatCurrency(change, currency, { signDisplay: 'exceptZero' });
+  const absChange = formatMoney(change, currency, { signDisplay: 'exceptZero' });
 
   return (
     <Stack gap="lg">
@@ -58,7 +58,7 @@ export function NetWorthPanel({
         <Stack gap={6}>
           <NetWorthLabel />
           <Text fz={32} fw={700} lh={1.15}>
-            {formatCurrency(current, currency)}
+            {formatMoney(current, currency)}
           </Text>
           <Group gap="xs" align="center">
             <Badge

@@ -1,4 +1,5 @@
 import { TransactionStatus } from '@graphql-types/graphql';
+import { formatDate } from '@utility';
 
 /**
  * The most days the net worth history will span. One year of daily points keeps the
@@ -90,12 +91,7 @@ export function buildNetWorthHistory(
       (sum, transaction) => (transaction.date > boundary ? sum + transaction.amount : sum),
       0
     );
-    const label = cursor.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-    dataByLabel[label] = round2(totalNow - netAfterBoundary);
+    dataByLabel[formatDate(cursor)] = round2(totalNow - netAfterBoundary);
   }
 
   return { dataByLabel, currency };

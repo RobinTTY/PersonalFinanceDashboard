@@ -1,4 +1,4 @@
-import { computeChange, formatCurrency, sliceRange } from './netWorthRange';
+import { computeChange, sliceRange } from './netWorthRange';
 
 /** Builds a daily series of `count` sequential values keyed by an index label. */
 function series(values: number[]): Record<string, number> {
@@ -70,32 +70,5 @@ describe('computeChange', () => {
       changePct: null,
       direction: 'flat',
     });
-  });
-});
-
-describe('formatCurrency', () => {
-  // Assertions are built from Intl so they hold regardless of the runner's locale
-  // (thousands/decimal separators and symbol placement vary by locale).
-  it('formats with a currency symbol when a code is given', () => {
-    const expected = new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: 'EUR',
-      maximumFractionDigits: 2,
-    }).format(1234.5);
-    expect(formatCurrency(1234.5, 'EUR')).toBe(expected);
-  });
-
-  it('falls back to a plain number without a currency', () => {
-    const expected = new Intl.NumberFormat(undefined, {
-      style: 'decimal',
-      maximumFractionDigits: 2,
-    }).format(1000);
-    const formatted = formatCurrency(1000, null);
-    expect(formatted).toBe(expected);
-    expect(formatted).not.toMatch(/[€$]/);
-  });
-
-  it('passes through number-format options such as signDisplay', () => {
-    expect(formatCurrency(50, null, { signDisplay: 'exceptZero' })).toMatch(/^\+/);
   });
 });

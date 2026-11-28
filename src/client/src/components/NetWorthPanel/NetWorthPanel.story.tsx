@@ -1,3 +1,4 @@
+import { formatDate } from '@utility';
 import { ComponentPreview } from '../storybook/ComponentPreview';
 import { NetWorthPanel } from './NetWorthPanel';
 
@@ -9,11 +10,7 @@ const sampleData = Object.fromEntries(
   Array.from({ length: 365 }, (_, index) => {
     const date = new Date(2025, 6, 12);
     date.setDate(date.getDate() + index);
-    const label = date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    const label = formatDate(date);
     const trend = 8000 + index * 12;
     const wobble = Math.sin(index / 9) * 600 + Math.sin(index / 2) * 120;
     return [label, Math.round(trend + wobble)];

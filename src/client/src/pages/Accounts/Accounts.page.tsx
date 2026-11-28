@@ -5,7 +5,7 @@ import { GetTransactionsByAccountId } from '@graphql-queries/GetTransactionsByAc
 import { TransactionStatus } from '@graphql-types/graphql';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { formatAmount, formatDate } from '@utility';
+import { formatDate, formatMoney } from '@utility';
 import { Alert, Badge, Box, Button, Group, Loader, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { AccountsHeader } from '@/components/AccountsHeader/AccountsHeader';
@@ -219,7 +219,9 @@ export function AccountsPage() {
                     )}
                   </Group>
                   <Text size="sm" fw={600} ta="right" c={transaction.amount >= 0 ? 'green' : 'red'}>
-                    {formatAmount(transaction.amount, transaction.currency)}
+                    {formatMoney(transaction.amount, transaction.currency, {
+                      signDisplay: 'exceptZero',
+                    })}
                   </Text>
                 </div>
               );

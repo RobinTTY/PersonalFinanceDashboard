@@ -73,20 +73,6 @@ export function computeChange(dataByLabel: Record<string, number>): NetWorthChan
   return { current, change, changePct, direction };
 }
 
-/** Formats a value as currency when a code is supplied, otherwise as a plain number. */
-export function formatCurrency(
-  value: number,
-  currency: string | null | undefined,
-  options?: Intl.NumberFormatOptions
-): string {
-  return new Intl.NumberFormat(undefined, {
-    style: currency ? 'currency' : 'decimal',
-    currency: currency ?? undefined,
-    maximumFractionDigits: 2,
-    ...options,
-  }).format(value);
-}
-
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }

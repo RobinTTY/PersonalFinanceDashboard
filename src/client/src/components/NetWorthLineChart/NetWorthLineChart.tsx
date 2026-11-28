@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { formatMoney } from '@utility';
 import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
@@ -75,11 +76,6 @@ export function NetWorthLineChart({
     const yAxisInterval = Math.max(500, Math.ceil(roughInterval / 500) * 500);
     const yAxisMax = yAxisMin + yAxisInterval * 4;
 
-    const currencyFormatter = new Intl.NumberFormat(undefined, {
-      style: currency ? 'currency' : 'decimal',
-      currency: currency ?? undefined,
-      maximumFractionDigits: 2,
-    });
     const compactFormatter = new Intl.NumberFormat(undefined, {
       notation: 'compact',
       maximumFractionDigits: 1,
@@ -109,7 +105,7 @@ export function NetWorthLineChart({
             value: number;
           };
           const label = point.axisValueLabel ?? point.name ?? '';
-          const value = currencyFormatter.format(point.value);
+          const value = formatMoney(point.value, currency);
           return `
             <div style="font-weight:600;color:${palette.inkStrong};margin-bottom:4px">${label}</div>
             <div style="display:flex;align-items:center;gap:8px;white-space:nowrap">

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { IconAlertCircle } from '@tabler/icons-react';
+import { formatMoney } from '@utility';
 import { Badge, Divider, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { IncludeInAnalyticsSwitch } from '@/components/IncludeInAnalyticsSwitch/IncludeInAnalyticsSwitch';
 import { GetBankAccount } from '@/graphql/queries/GetBankAccount';
@@ -64,11 +65,7 @@ export function BankAccountCard({ accountId, onInstitutionLoaded }: BankAccountC
 
   const hasNameOrDescription = account.name || account.description;
   const balanceValue =
-    account.balance != null
-      ? account.currency
-        ? `${String(account.balance)} ${account.currency}`
-        : String(account.balance)
-      : null;
+    account.balance != null ? formatMoney(account.balance, account.currency) : null;
 
   return (
     <div className={classes.accountCard}>

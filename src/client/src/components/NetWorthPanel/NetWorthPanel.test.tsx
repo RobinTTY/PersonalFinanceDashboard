@@ -1,7 +1,8 @@
 import { render } from '@test-utils';
 import { fireEvent, screen } from '@testing-library/react';
+import { formatMoney } from '@utility';
 import { NetWorthPanel } from './NetWorthPanel';
-import { computeChange, formatCurrency, RangeKey, sliceRange } from './utility/netWorthRange';
+import { computeChange, RangeKey, sliceRange } from './utility/netWorthRange';
 
 const chartMock = vi.hoisted(() => ({
   setOption: vi.fn(),
@@ -34,7 +35,7 @@ describe('NetWorthPanel', () => {
     render(<NetWorthPanel dataByLabel={data} currency="EUR" />);
 
     // Current balance is the latest point regardless of range.
-    expect(screen.getByText(formatCurrency(119, 'EUR'))).toBeInTheDocument();
+    expect(screen.getByText(formatMoney(119, 'EUR'))).toBeInTheDocument();
     // Default range is 3M.
     expect(screen.getByText(expectedPct('3M'))).toBeInTheDocument();
     expect(screen.getByText(/Past 3 months/)).toBeInTheDocument();
@@ -47,7 +48,7 @@ describe('NetWorthPanel', () => {
 
     // The 1M window starts later, so its percentage differs; balance is unchanged.
     expect(screen.getByText(expectedPct('1M'))).toBeInTheDocument();
-    expect(screen.getByText(formatCurrency(119, 'EUR'))).toBeInTheDocument();
+    expect(screen.getByText(formatMoney(119, 'EUR'))).toBeInTheDocument();
     expect(screen.getByText(/Past month/)).toBeInTheDocument();
   });
 });

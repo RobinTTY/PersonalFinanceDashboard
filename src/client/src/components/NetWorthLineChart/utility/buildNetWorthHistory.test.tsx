@@ -1,8 +1,12 @@
 import { TransactionStatus } from '@graphql-types/graphql';
+import { formatDate } from '@utility';
 import { buildNetWorthHistory, NetWorthAccount } from './buildNetWorthHistory';
 
 // Fixed reference "now" so day labels and reconstructed values are deterministic.
 const NOW = new Date(2026, 2, 20); // 20 Mar 2026
+
+/** The label of a day in 2026. */
+const day = (month: number, date: number) => formatDate(new Date(2026, month, date));
 
 describe('buildNetWorthHistory', () => {
   it('reconstructs end-of-day balances backwards from the current balance', () => {
@@ -25,19 +29,19 @@ describe('buildNetWorthHistory', () => {
     // The window runs daily from the earliest transaction's day (Jan 15) through today
     // (Mar 20): 17 days in Jan + 28 in Feb + 20 in Mar = 65 points.
     expect(labels).toHaveLength(65);
-    expect(labels[0]).toBe('Jan 15, 2026');
-    expect(labels[labels.length - 1]).toBe('Mar 20, 2026');
+    expect(labels[0]).toBe(day(0, 15));
+    expect(labels[labels.length - 1]).toBe(day(2, 20));
 
     // Current total is 1000; working backwards through the transactions:
     //   Mar 20 (today) = 1000
     //   Feb 10 (day of the -50) = 1000 - 200 (Mar txn) = 800
     //   Jan 15 (day of the +100) = 800 - (-50) (Feb txn) = 850
-    expect(dataByLabel['Jan 15, 2026']).toBe(850);
-    expect(dataByLabel['Feb 10, 2026']).toBe(800);
-    expect(dataByLabel['Mar 20, 2026']).toBe(1000);
+    expect(dataByLabel[day(0, 15)]).toBe(850);
+    expect(dataByLabel[day(1, 10)]).toBe(800);
+    expect(dataByLabel[day(2, 20)]).toBe(1000);
     // The +200 lands on Mar 5, so the day before is still 800.
-    expect(dataByLabel['Mar 4, 2026']).toBe(800);
-    expect(dataByLabel['Mar 5, 2026']).toBe(1000);
+    expect(dataByLabel[day(2, 4)]).toBe(800);
+    expect(dataByLabel[day(2, 5)]).toBe(1000);
   });
 
   it('combines balances and transactions across multiple accounts', () => {
@@ -61,9 +65,9 @@ describe('buildNetWorthHistory', () => {
 
     // Combined current total: 800. The window starts at the earliest transaction day
     // (Feb 5). End of Feb 5 = 800 - (100 - 60) [later March txns] = 760.
-    expect(Object.keys(dataByLabel)[0]).toBe('Feb 5, 2026');
-    expect(dataByLabel['Feb 5, 2026']).toBe(760);
-    expect(dataByLabel['Mar 20, 2026']).toBe(800);
+    expect(Object.keys(dataByLabel)[0]).toBe(day(1, 5));
+    expect(dataByLabel[day(1, 5)]).toBe(760);
+    expect(dataByLabel[day(2, 20)]).toBe(800);
   });
 
   it('picks the dominant currency when accounts differ', () => {
@@ -92,9 +96,9 @@ describe('buildNetWorthHistory', () => {
     const { dataByLabel } = buildNetWorthHistory(accounts, NOW);
     // The invalid-date transaction (999) is ignored entirely. Window starts at the
     // earliest valid transaction day (Feb 12).
-    expect(Object.keys(dataByLabel)[0]).toBe('Feb 12, 2026');
-    expect(dataByLabel['Feb 12, 2026']).toBe(800); // 1000 - 200 (Mar txn)
-    expect(dataByLabel['Mar 20, 2026']).toBe(1000);
+    expect(Object.keys(dataByLabel)[0]).toBe(day(1, 12));
+    expect(dataByLabel[day(1, 12)]).toBe(800); // 1000 - 200 (Mar txn)
+    expect(dataByLabel[day(2, 20)]).toBe(1000);
   });
 
   it('skips pending transactions, which the balance does not include yet', () => {
@@ -112,14 +116,14 @@ describe('buildNetWorthHistory', () => {
     const { dataByLabel } = buildNetWorthHistory(accounts, NOW);
 
     // Counting the pending -30 would put the days before it at 1030
-    expect(dataByLabel['Mar 10, 2026']).toBe(1000);
-    expect(dataByLabel['Mar 18, 2026']).toBe(1000);
+    expect(dataByLabel[day(2, 10)]).toBe(1000);
+    expect(dataByLabel[day(2, 18)]).toBe(1000);
   });
 
   it('handles accounts with no transactions as a single current-balance point', () => {
     const accounts: NetWorthAccount[] = [{ balance: 1234.5, currency: 'EUR', transactions: [] }];
     const { dataByLabel } = buildNetWorthHistory(accounts, NOW);
-    expect(dataByLabel).toEqual({ 'Mar 20, 2026': 1234.5 });
+    expect(dataByLabel).toEqual({ [day(2, 20)]: 1234.5 });
   });
 
   it('caps the window at the most recent year of daily points', () => {
@@ -137,7 +141,7 @@ describe('buildNetWorthHistory', () => {
     const labels = Object.keys(dataByLabel);
 
     expect(labels).toHaveLength(365);
-    expect(labels[labels.length - 1]).toBe('Mar 20, 2026');
-    expect(labels[0]).toBe('Mar 21, 2025'); // 365 days back, inclusive
+    expect(labels[labels.length - 1]).toBe(day(2, 20));
+    expect(labels[0]).toBe(formatDate(new Date(2025, 2, 21))); // 365 days back, inclusive
   });
 });

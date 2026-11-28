@@ -4,7 +4,7 @@ import {
   SyncState,
 } from '@graphql-types/graphql';
 import { IconBuildingBank, IconPlugConnected, IconTrash } from '@tabler/icons-react';
-import { formatBalance, formatRelativeTime, getInitials } from '@utility';
+import { formatDate, formatMoney, formatRelativeTime, getInitials } from '@utility';
 import {
   Accordion,
   ActionIcon,
@@ -85,7 +85,7 @@ function AccessExpiry({ bank }: { bank: AuthRequestWithAccounts }) {
  * @param account The bank account to display details for.
  */
 function AccountRow({ account }: { account: ConnectedBankAccount }) {
-  const balance = formatBalance(account);
+  const balance = account.balance != null ? formatMoney(account.balance, account.currency) : null;
   const title = account.name || account.iban || 'Unnamed account';
 
   return (
@@ -185,12 +185,7 @@ export function ConnectedBankCard({
               {institution?.name ?? 'Unknown institution'}
             </Text>
             <Text size="xs" c="dimmed">
-              Connected on{' '}
-              {bank.createdAt.toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              Connected on {formatDate(bank.createdAt)}
             </Text>
             <AccessExpiry bank={bank} />
           </Stack>
