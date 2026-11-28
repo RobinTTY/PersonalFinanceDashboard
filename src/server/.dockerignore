@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+**/TestResults/
+artifacts/
+**/*.user
+**/*.DotSettings.user
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/logs/

@@ -34,6 +34,24 @@ describe('createLink', () => {
     expect(onReconnected).toHaveBeenCalledTimes(1);
   });
 
+  it('connects the WebSocket to the origin of the page for a relative API URL', () => {
+    vi.stubEnv('VITE_API_URL', '/graphql');
+
+    createLink();
+
+    const options = vi.mocked(createClient).mock.calls[0][0] as ClientOptions;
+    expect(options.url).toBe(`ws://${window.location.host}/graphql`);
+  });
+
+  it('keeps an absolute API URL', () => {
+    vi.stubEnv('VITE_API_URL', 'https://api.example.com/graphql');
+
+    createLink();
+
+    const options = vi.mocked(createClient).mock.calls[0][0] as ClientOptions;
+    expect(options.url).toBe('wss://api.example.com/graphql');
+  });
+
   it('does not report the first connection', () => {
     const onReconnected = vi.fn();
     createLink({ onReconnected });

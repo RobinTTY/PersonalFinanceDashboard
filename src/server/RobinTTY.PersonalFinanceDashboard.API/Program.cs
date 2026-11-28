@@ -23,6 +23,7 @@ app.ApplyMigrations();
 app.UseSerilogRequestLogging();
 app.UseCors();
 app.UseGraphQl();
+app.MapHealthChecks("/health");
 
 // Runs the server, or a GraphQL command such as: dotnet run -- schema export --output schema.graphql
 // https://chillicream.com/docs/hotchocolate/v14/server/command-line

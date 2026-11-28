@@ -1,0 +1,22 @@
+{
+	# TLS is left to a reverse proxy in front of the container
+	auto_https off
+}
+
+:80 {
+	encode zstd gzip
+
+	# Includes the WebSocket that delivers subscriptions
+	handle /graphql* {
+		reverse_proxy {$API_UPSTREAM:api:8080}
+	}
+
+	handle {
+		root * /srv
+		# Vite fingerprints the file names of its assets, so they never change
+		header /assets/* Cache-Control "public, max-age=31536000, immutable"
+		# Unknown paths are routes of the app
+		try_files {path} /index.html
+		file_server
+	}
+}

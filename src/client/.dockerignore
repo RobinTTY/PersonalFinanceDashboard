@@ -1,0 +1,6 @@
+node_modules/
+dist/
+storybook-static/
+coverage/
+env-settings/.env.local
+env-settings/.env.*.local

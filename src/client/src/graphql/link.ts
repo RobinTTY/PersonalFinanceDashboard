@@ -16,9 +16,12 @@ function createSubscriptionLink({ onReconnected }: LinkOptions): ApolloLink {
     return new ApolloLink(() => NEVER);
   }
 
+  // Resolved against the page, since the API can be served from the same origin under a relative URL
+  const apiUrl = new URL(import.meta.env.VITE_API_URL, window.location.href);
+
   return new GraphQLWsLink(
     createClient({
-      url: import.meta.env.VITE_API_URL.replace(/^http/, 'ws'),
+      url: apiUrl.href.replace(/^http/, 'ws'),
       // Keeps reconnecting while the server restarts
       retryAttempts: Infinity,
       on: {

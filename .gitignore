@@ -374,3 +374,6 @@ PersonalFinanceDashboard.db
 PersonalFinanceDashboard.db-shm
 PersonalFinanceDashboard.db-wal
 src/server/.idea/.idea.RobinTTY.PersonalFinanceDashboard/.idea/claudeCodeTabState.xml
+
+# The secrets of the Docker deployment
+deployment/.env

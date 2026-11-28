@@ -132,12 +132,15 @@ public static class ServiceCollectionExtensions
         }
 
         /// <summary>
-        /// Adds the database the application uses to the service collection.
+        /// Adds the database the application uses to the service collection, and a health check that it can be
+        /// reached.
         /// </summary>
         /// <param name="environment">The environment options of the application.</param>
         /// <returns>A reference to the <see cref="IServiceCollection"/> after the operation has completed.</returns>
         public IServiceCollection AddDatabase(IWebHostEnvironment environment)
         {
+            services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
+
             return services.AddDbContextPool<ApplicationDbContext>((provider, options) =>
             {
                 var config = provider.GetRequiredService<IOptions<DatabaseConfiguration>>().Value;

@@ -4,8 +4,17 @@ using RobinTTY.PersonalFinanceDashboard.API.Tests.TestUtilities;
 
 namespace RobinTTY.PersonalFinanceDashboard.API.Tests;
 
-public class StartupTests
+public class StartupTests(ApiFactory factory) : IClassFixture<ApiFactory>
 {
+    [Fact]
+    public async Task HealthCheck_ReportsHealthyWhileTheDatabaseIsReachable()
+    {
+        var response = await factory.CreateClient().GetAsync("/health", TestContext.Current.CancellationToken);
+
+        response.EnsureSuccessStatusCode();
+        Assert.Equal("Healthy", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+    }
+
     [Fact]
     public void MissingGoCardlessKeys_StopTheStartup()
     {

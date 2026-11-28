@@ -1,0 +1,27 @@
+# Runs the dashboard: docker compose -f docker-compose.app.yml up -d --build
+# Settings are read from a .env file next to this one, see .env.example.
+name: personal-finance-dashboard
+
+services:
+  api:
+    build: ../src/server
+    environment:
+      AppConfiguration__GoCardlessConfiguration__SecretId: ${GOCARDLESS_SECRET_ID:?Set GOCARDLESS_SECRET_ID in .env}
+      AppConfiguration__GoCardlessConfiguration__SecretKey: ${GOCARDLESS_SECRET_KEY:?Set GOCARDLESS_SECRET_KEY in .env}
+    volumes:
+      - data:/data
+    restart: unless-stopped
+
+  web:
+    build: ../src/client
+    ports:
+      # Only reachable from this machine, since the API has no authentication yet
+      - "127.0.0.1:${PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  # The SQLite database
+  data:
